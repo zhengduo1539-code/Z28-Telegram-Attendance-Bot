@@ -62,6 +62,19 @@ export class TelegramClient {
     return body.result as T;
   }
 
+  private botUsername?: string;
+
+  async getBotUsername(): Promise<string | undefined> {
+    if (this.botUsername) return this.botUsername;
+    try {
+      const me = await this.call<{ username?: string }>("getMe");
+      this.botUsername = me.username;
+      return this.botUsername;
+    } catch {
+      return undefined;
+    }
+  }
+
   getChat(chatId: number | string) {
     return this.call<{
       id: number;
