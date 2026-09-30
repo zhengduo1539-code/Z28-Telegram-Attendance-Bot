@@ -235,6 +235,10 @@ export class CommandHandler {
         response = text.help;
         markup = keyboard(locale);
         break;
+      case "id": {
+        response = text.idInfo(message.chat.id, message.from.id);
+        break;
+      }
       case "work": {
         if (message.chat.type === "private") {
           response = text.workGroupOnly;
