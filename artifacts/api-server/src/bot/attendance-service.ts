@@ -140,7 +140,7 @@ export class AttendanceService {
     const checkedAt = formatWorkDateTime(now, this.config.timeZone);
 
     if (!workStartTime) {
-      return text.workCheckIn(profile.displayName, profile.userId, checkedAt);
+      return text.workTimeRequired;
     }
 
     const currentSeconds = getLocalTimeSeconds(now, this.config.timeZone);
