@@ -10,6 +10,7 @@ const emptyState = (): BotState => ({
   activityLimits: {},
   connectedGroups: {},
   pendingConnects: {},
+  workStartTimes: {},
 });
 
 const isObjectRecord = (value: unknown): value is Record<string, unknown> =>
@@ -30,7 +31,9 @@ const isBotState = (value: unknown): value is BotState => {
     (candidate.connectedGroups === undefined ||
       isObjectRecord(candidate.connectedGroups)) &&
     (candidate.pendingConnects === undefined ||
-      isObjectRecord(candidate.pendingConnects))
+      isObjectRecord(candidate.pendingConnects)) &&
+    (candidate.workStartTimes === undefined ||
+      isObjectRecord(candidate.workStartTimes))
   );
 };
 
