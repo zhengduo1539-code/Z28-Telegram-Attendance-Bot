@@ -251,7 +251,7 @@ const zh: LocaleText = {
       ? `<a href="https://t.me/${encodeURIComponent(username)}">打开群</a>`
       : "打开群";
     return [
-      `Group Name：${inlineCode(groupName)}`,
+      `群组名称：${inlineCode(groupName)}`,
       `群组：${openGroup}【${inlineCode(activity)}】`,
       `群组标识：${inlineCode(groupId)}`,
       `用户：${userLink(displayName, userId)}`,
