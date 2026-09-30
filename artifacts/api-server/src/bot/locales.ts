@@ -148,6 +148,7 @@ const zh: LocaleText = {
   title: "打卡机器人 M58",
   help: [
     "可用命令：",
+    `${inlineCode("/work")} — 群成员工作打卡，显示实际打卡日期和时间`,
     `${inlineCode("/work HH:MM")} — 设置本群上班时间（仅群主/管理员）`,
     `${inlineCode("/back")} — 回座并结算当前活动`,
     `${inlineCode("/eat")} — 吃饭`,
@@ -168,6 +169,7 @@ const zh: LocaleText = {
     `提示：目标群组也必须能被 Bot 访问。`,
     "",
     "上班时间设置：",
+    `${inlineCode("/work")} — 成员点击后记录并显示实际工作打卡日期和时间；若超过设定时间 45 秒，会显示迟到警告和超出时间`,
     `${inlineCode("/work 09:00")} — 设置本群上班开始时间`,
     "只有当前群组的群主或管理员可以设置。",
     "设置仅对当前群组生效，不会影响 Bot 所在的其他群组。",
@@ -342,6 +344,7 @@ const en: LocaleText = {
   title: "Attendance Bot M58",
   help: [
     "Available commands:",
+    `${inlineCode("/work")} — Member work check-in; shows the actual check-in date and time`,
     `${inlineCode("/work HH:MM")} — Set this group's work start time (group owner/admin only)`,
     `${inlineCode("/back")} — Return to seat and settle activity`,
     `${inlineCode("/eat")} — Meal break`,
@@ -362,6 +365,7 @@ const en: LocaleText = {
     `Note: The Bot must also be able to access the target group.`,
     "",
     "Work Start Time:",
+    `${inlineCode("/work")} — Members can check in and see the actual work check-in date and time. If they are more than 45 seconds late, a warning and late duration are shown.`,
     `${inlineCode("/work 09:00")} — Set the work start time for this group.`,
     "Only the group owner or an administrator can set it.",
     "This setting applies only to the current group and does not affect other groups using the Bot.",
