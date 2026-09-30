@@ -155,7 +155,7 @@ const zh: LocaleText = {
       `✅ 打卡成功：${inlineCode(activity)} - ${inlineCode(time)}`,
       `注意：这是第 ${inlineCode(occurrence)} 次${inlineCode(activity)}`,
       `本次活动时间限制：${inlineCode(`${limitMinutes} 分钟`)}`,
-      "提示：活动完成后请及时打卡回座",
+      `提示：${inlineCode("活动完成后请及时打卡回座")}`,
       `回座：${inlineCode("/back")}`,
     ].join("\n");
   },
