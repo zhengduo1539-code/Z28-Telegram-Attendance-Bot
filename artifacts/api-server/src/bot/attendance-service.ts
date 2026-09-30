@@ -188,7 +188,7 @@ export class AttendanceService {
         response =
           settledBy === "offwork"
             ? text.shiftEnded(formatDateTime(now, this.config.timeZone))
-            : text.noActive;
+            : text.noActive(profile.displayName, profile.userId);
         return;
       }
 

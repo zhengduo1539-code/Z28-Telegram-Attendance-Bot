@@ -10,7 +10,7 @@ import type {
 type LocaleText = {
   title: string;
   help: string;
-  noActive: string;
+  noActive: (displayName: string, userId: number) => string;
   alreadyActive: (
     displayName: string,
     userId: number,
@@ -132,7 +132,16 @@ const zh: LocaleText = {
     "",
     `活动开始后请在回座时使用 ${inlineCode("/back")}。`,
   ].join("\n"),
-  noActive: "当前没有正在进行的活动，无需回座结算。",
+  noActive: (displayName, userId) => [
+    "用户：" + userLink(displayName, userId),
+    "用户标识：" + inlineCode(userId),
+    "状态：" + inlineCode("❌ 回座打卡失败！"),
+    "原因：" + inlineCode("您没有进行中的活动"),
+    "您可以————",
+    inlineCode("上厕所"),
+    inlineCode("抽烟"),
+    inlineCode("WCD"),
+  ].join("\n"),
   alreadyActive: (displayName, userId, activity) => {
     const identity = userIdentity(displayName, userId);
     return [
@@ -271,7 +280,16 @@ const en: LocaleText = {
     "",
     `Use ${inlineCode("/back")} when you return.`,
   ].join("\n"),
-  noActive: "You do not have an active activity to settle.",
+  noActive: (displayName, userId) => [
+    "User: " + userLink(displayName, userId),
+    "User ID: " + inlineCode(userId),
+    "Status: " + inlineCode("❌ Back to Seat Check-In Failed!"),
+    "Reason: " + inlineCode("You do not have an active activity"),
+    "You can use:",
+    inlineCode("Toilet"),
+    inlineCode("Smoke"),
+    inlineCode("WCD"),
+  ].join("\n"),
   alreadyActive: (displayName, userId, activity) => {
     const identity = userIdentity(displayName, userId);
     return [
