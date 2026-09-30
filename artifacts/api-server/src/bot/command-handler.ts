@@ -191,7 +191,25 @@ export class CommandHandler {
     let markup: ReplyKeyboardMarkup | undefined;
 
     switch (command.name) {
-      case "start":
+      case "start": {
+        response = text.help;
+        markup = keyboard(locale);
+        const botUsername = await this.telegram.getBotUsername();
+        if (botUsername) {
+          markup = {
+            inline_keyboard: [
+              [
+                {
+                  text: locale === "en" ? "➕ Add Bot to Your Group" : "➕ 将 Bot 添加到群组",
+                  style: "primary",
+                  url: `https://t.me/${botUsername}?startgroup=attendance`,
+                },
+              ],
+            ],
+          };
+        }
+        break;
+      }
       case "help":
         response = text.help;
         markup = keyboard(locale);
