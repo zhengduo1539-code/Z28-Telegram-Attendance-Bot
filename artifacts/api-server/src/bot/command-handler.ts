@@ -75,7 +75,18 @@ const buttonCommand = (value: string): Command | undefined => {
   return name ? { name } : undefined;
 };
 
+const ADMIN_MENU_COMMANDS = [
+  { command: "limit", description: "Set activity time limits" },
+  { command: "limits", description: "View activity time limits" },
+  { command: "countlimit", description: "Set daily activity count limits" },
+  { command: "countlimits", description: "View daily activity count limits" },
+  { command: "reminder", description: "Turn overdue reminders on/off" },
+  { command: "reminders", description: "View overdue reminder status" },
+];
+
 export class CommandHandler {
+  private readonly adminMenuScopes = new Set<string>();
+
   constructor(
     private readonly telegram: TelegramClient,
     private readonly attendance: AttendanceService,
@@ -99,6 +110,8 @@ export class CommandHandler {
     );
     const profile = profileFromUser(message, currentLocale);
     if (!profile) return;
+
+    await this.ensureAdminCommandMenu(message, profile.userId);
 
     const pendingConnect = await this.attendance.getPendingConnect(
       message.chat.id,
@@ -316,6 +329,42 @@ export class CommandHandler {
           : "团队需要使用活动打卡功能？请先将 Bot 添加到群组：",
         addGroupMarkup,
       );
+    }
+  }
+
+  private async ensureAdminCommandMenu(
+    message: TelegramMessage,
+    userId: number,
+  ): Promise<void> {
+    const isConfiguredAdmin =
+      this.config.botOwnerId === userId || this.config.adminIds.includes(userId);
+    if (!isConfiguredAdmin) return;
+
+    const scope =
+      message.chat.type === "private"
+        ? { type: "chat" as const, chat_id: message.chat.id }
+        : message.chat.type === "group" || message.chat.type === "supergroup"
+          ? {
+              type: "chat_member" as const,
+              chat_id: message.chat.id,
+              user_id: userId,
+            }
+          : undefined;
+
+    if (!scope) return;
+
+    const scopeKey =
+      scope.type === "chat"
+        ? `private:${scope.chat_id}`
+        : `member:${scope.chat_id}:${scope.user_id}`;
+
+    if (this.adminMenuScopes.has(scopeKey)) return;
+
+    try {
+      await this.telegram.setMyCommands(ADMIN_MENU_COMMANDS, scope);
+      this.adminMenuScopes.add(scopeKey);
+    } catch {
+      // Command-menu configuration must not interrupt normal bot handling.
     }
   }
 
