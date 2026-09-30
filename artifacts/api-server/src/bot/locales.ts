@@ -56,6 +56,11 @@ type LocaleText = {
   ) => string;
   shiftStarted: (time: string) => string;
   shiftEnded: (time: string) => string;
+  workGroupOnly: string;
+  workAdminOnly: string;
+  workUsage: string;
+  workCurrent: (time: string) => string;
+  workUpdated: (time: string) => string;
   languageChanged: string;
   languageUsage: string;
   unknownLanguage: string;
@@ -134,7 +139,7 @@ const zh: LocaleText = {
   title: "打卡机器人 M58",
   help: [
     "可用命令：",
-    `${inlineCode("/work")} — 上班`,
+    `${inlineCode("/work HH:MM")} — 设置本群上班时间（仅群主/管理员）`,
     `${inlineCode("/back")} — 回座并结算当前活动`,
     `${inlineCode("/eat")} — 吃饭`,
     `${inlineCode("/wc")} — 上厕所`,
@@ -152,6 +157,11 @@ const zh: LocaleText = {
     `3. 输入目标通知群组的 ID 或公开群组链接。`,
     `4. 连接成功后，当前群组用户的活动超时并使用 ${inlineCode("/back")}，Bot 会将超时通知发送到已连接的目标群组。`,
     `提示：目标群组也必须能被 Bot 访问。`,
+    "",
+    "上班时间设置：",
+    `${inlineCode("/work 09:00")} — 设置本群上班开始时间`,
+    "只有当前群组的群主或管理员可以设置。",
+    "设置仅对当前群组生效，不会影响 Bot 所在的其他群组。",
     "",
     `活动开始后请在回座时使用 ${inlineCode("/back")}。`,
   ].join("\n"),
@@ -274,6 +284,11 @@ const zh: LocaleText = {
   },
   shiftStarted: (time) => `✅ 上班打卡成功：${inlineCode(time)}`,
   shiftEnded: (time) => `✅ 下班打卡成功：${inlineCode(time)}`,
+  workGroupOnly: "此命令只能在群组中使用。请在需要设置上班时间的群组中使用 /work。",
+  workAdminOnly: "只有本群组的群主或管理员可以设置上班时间。",
+  workUsage: `用法：${inlineCode("/work 09:00")}。时间使用 24 小时制。`,
+  workCurrent: (time) => `本群上班时间：${inlineCode(time)}`,
+  workUpdated: (time) => `✅ 本群上班时间已设置为 ${inlineCode(time)}。`,
   languageChanged: "语言已切换为中文。",
   languageUsage: "用法：/lang zh 或 /lang en（/lang eng 也可以）",
   unknownLanguage: "支持的语言：zh（中文）、en/eng（English）。",
@@ -318,7 +333,7 @@ const en: LocaleText = {
   title: "Attendance Bot M58",
   help: [
     "Available commands:",
-    `${inlineCode("/work")} — Start work`,
+    `${inlineCode("/work HH:MM")} — Set this group's work start time (group owner/admin only)`,
     `${inlineCode("/back")} — Return to seat and settle activity`,
     `${inlineCode("/eat")} — Meal break`,
     `${inlineCode("/wc")} — Toilet`,
@@ -336,6 +351,11 @@ const en: LocaleText = {
     `3. Send the target notification group ID or public group link.`,
     `4. After the connection is successful, when an activity in the current group exceeds its time limit and the user uses ${inlineCode("/back")}, the Bot sends the timeout notification to the connected target group.`,
     `Note: The Bot must also be able to access the target group.`,
+    "",
+    "Work Start Time:",
+    `${inlineCode("/work 09:00")} — Set the work start time for this group.`,
+    "Only the group owner or an administrator can set it.",
+    "This setting applies only to the current group and does not affect other groups using the Bot.",
     "",
     `Use ${inlineCode("/back")} when you return.`,
   ].join("\n"),
@@ -466,6 +486,11 @@ const en: LocaleText = {
   },
   shiftStarted: (time) => `✅ Work check-in succeeded: ${inlineCode(time)}`,
   shiftEnded: (time) => `✅ Work check-out succeeded: ${inlineCode(time)}`,
+  workGroupOnly: "This command can only be used in a group. Use /work in the group where you want to set the work start time.",
+  workAdminOnly: "Only the group owner or an administrator of this group can set the work start time.",
+  workUsage: `Usage: ${inlineCode("/work 09:00")}. Use 24-hour time.`,
+  workCurrent: (time) => `This group's work start time is ${inlineCode(time)}.`,
+  workUpdated: (time) => `✅ This group's work start time has been set to ${inlineCode(time)}.`,
   languageChanged: "Language switched to English.",
   languageUsage: "Usage: /lang zh or /lang en (/lang eng also works)",
   unknownLanguage: "Supported languages: zh (中文), en/eng (English).",
