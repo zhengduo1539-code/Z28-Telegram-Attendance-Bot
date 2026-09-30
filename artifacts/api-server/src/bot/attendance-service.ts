@@ -13,7 +13,7 @@ import type { BotStore } from "./store/types";
 
 const trackedActivities: ActivityKind[] = ["eat", "wc", "smoke", "wcd"];
 const DEFAULT_ACTIVITY_COUNT_LIMITS: ActivityCountLimits = {
-  eat: 0,
+  eat: Number.POSITIVE_INFINITY,
   wc: 7,
   smoke: 7,
   wcd: 2,
@@ -104,6 +104,27 @@ export class AttendanceService {
   async getLocale(chatId: number, userId: number): Promise<Locale> {
     const state = await this.store.load();
     return state.users[userKey(chatId, userId)]?.locale || "zh";
+  }
+
+  async workCheckIn(
+    profile: Omit<UserProfile, "createdAt" | "updatedAt">,
+  ): Promise<string> {
+    const now = new Date();
+    const key = userKey(profile.chatId, profile.userId);
+    const state = await this.store.load();
+    const locale = state.users[key]?.locale || profile.locale;
+    const text = getLocale(locale);
+    const checkedAt = new Intl.DateTimeFormat("en-GB", {
+      timeZone: this.config.timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    }).format(now).replace(",", " ");
+    return text.workCheckIn(profile.displayName, profile.userId, checkedAt);
   }
 
   async startActivity(
