@@ -12,6 +12,12 @@ import type {
 import type { BotStore } from "./store/types";
 
 const trackedActivities: ActivityKind[] = ["eat", "wc", "smoke", "wcd"];
+const DEFAULT_ACTIVITY_COUNT_LIMITS: ActivityCountLimits = {
+  eat: 0,
+  wc: 7,
+  smoke: 7,
+  wcd: 2,
+};
 const REMINDER_GRACE_MS = 45_000;
 const REMINDER_CLAIM_LEASE_MS = 60_000;
 
@@ -184,7 +190,8 @@ export class AttendanceService {
           record.kind === kind &&
           localDateKey(new Date(record.endedAt), this.config.timeZone) === dayKey,
       ).length;
-      const countLimit = state.activityCountLimits?.[kind];
+      const countLimit =
+        state.activityCountLimits?.[kind] ?? DEFAULT_ACTIVITY_COUNT_LIMITS[kind];
       if (countLimit !== undefined && todayCount >= countLimit) {
         response = text.dailyCountLimitReached(
           profile.displayName,
