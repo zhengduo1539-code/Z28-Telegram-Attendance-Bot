@@ -115,6 +115,15 @@ export class CommandHandler {
     // reply-keyboard buttons such as "回座". Only target-looking plain text
     // is treated as the pending connection target.
     if (pendingConnect && !command && looksLikeConnectTarget) {
+      if (!(await this.isGroupAdmin(message))) {
+        await this.telegram.sendMessage(
+          message.chat.id,
+          getLocale(currentLocale).connectAdminOnly,
+          undefined,
+          message.message_id,
+        );
+        return;
+      }
       const target = await this.resolveConnectTarget(message.text);
       if (!target) {
         await this.telegram.sendMessage(
