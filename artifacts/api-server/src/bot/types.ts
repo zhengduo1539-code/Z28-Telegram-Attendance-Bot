@@ -63,6 +63,7 @@ export type BotState = {
   reminderEnabled?: boolean;
   connectedGroups?: Record<string, ConnectedGroup>;
   pendingConnects?: Record<string, PendingConnect>;
+  workStartTimes?: Record<string, string>;
 };
 
 export type TelegramUser = {
