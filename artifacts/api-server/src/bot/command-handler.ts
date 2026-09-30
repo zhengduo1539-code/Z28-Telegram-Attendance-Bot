@@ -77,7 +77,6 @@ const buttonCommand = (value: string): Command | undefined => {
 
 export const ADMIN_MENU_COMMANDS = [
   { command: "start", description: "开始 / Start" },
-  { command: "work", description: "Set group work start time" },
   { command: "limit", description: "Set activity time limits" },
   { command: "limits", description: "View activity time limits" },
   { command: "countlimit", description: "Set daily activity count limits" },
@@ -250,30 +249,10 @@ export class CommandHandler {
         response = text.idInfo(message.chat.id, message.from.id);
         break;
       }
-      case "work": {
-        if (message.chat.type === "private") {
-          response = text.workGroupOnly;
-          break;
-        }
-        if (command.argument) {
-          if (!(await this.isGroupAdmin(message))) {
-            response = text.workAdminOnly;
-            break;
-          }
-          const workTime = command.argument.trim();
-          if (!/^([01]?\d|2[0-3]):[0-5]\d$/.test(workTime)) {
-            response = text.workUsage;
-            break;
-          }
-          const [hours, minutes] = workTime.split(":");
-          const normalizedTime = hours.padStart(2, "0") + ":" + minutes;
-          await this.attendance.setWorkStartTime(message.chat.id, normalizedTime);
-          response = text.workUpdated(normalizedTime);
-          break;
-        }
-        response = await this.attendance.workCheckIn(profile);
+      case "work":
+        response = await this.attendance.startShift(profile);
+        markup = keyboard(locale);
         break;
-      }
       case "back": {
         const result = await this.attendance.settle(profile);
         response = result.response;
