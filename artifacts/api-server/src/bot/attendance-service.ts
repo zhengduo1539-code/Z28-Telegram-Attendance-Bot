@@ -13,7 +13,7 @@ import type { BotStore } from "./store/types";
 
 const trackedActivities: ActivityKind[] = ["eat", "wc", "smoke", "wcd"];
 const DEFAULT_ACTIVITY_COUNT_LIMITS: ActivityCountLimits = {
-  eat: 0,
+  eat: Number.POSITIVE_INFINITY,
   wc: 7,
   smoke: 7,
   wcd: 2,
