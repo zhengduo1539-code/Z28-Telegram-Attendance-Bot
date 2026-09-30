@@ -98,9 +98,10 @@ export class FileBotStore implements BotStore {
     let updatedState: BotState | undefined;
     const update = this.updateQueue.then(async () => {
       const state = await this.load();
-      mutator(state);
-      await this.save(state);
-      updatedState = state;
+      const nextState: BotState = structuredClone(state);
+      mutator(nextState);
+      await this.save(nextState);
+      updatedState = nextState;
     });
     this.updateQueue = update.catch(() => undefined);
     await update;
