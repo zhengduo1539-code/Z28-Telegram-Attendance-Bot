@@ -30,7 +30,7 @@ const isBotState = (value: unknown): value is BotState => {
     (candidate.connectedGroups === undefined ||
       isObjectRecord(candidate.connectedGroups)) &&
     (candidate.pendingConnects === undefined ||
-      isObjectRecord(candidate.pendingConnects)) &&
+      isObjectRecord(candidate.pendingConnects))
   );
 };
 
