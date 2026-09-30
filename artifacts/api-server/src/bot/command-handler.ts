@@ -75,7 +75,7 @@ const buttonCommand = (value: string): Command | undefined => {
   return name ? { name } : undefined;
 };
 
-const ADMIN_MENU_COMMANDS = [
+export const ADMIN_MENU_COMMANDS = [
   { command: "limit", description: "Set activity time limits" },
   { command: "limits", description: "View activity time limits" },
   { command: "countlimit", description: "Set daily activity count limits" },
