@@ -106,6 +106,27 @@ export class AttendanceService {
     return state.users[userKey(chatId, userId)]?.locale || "zh";
   }
 
+  async workCheckIn(
+    profile: Omit<UserProfile, "createdAt" | "updatedAt">,
+  ): Promise<string> {
+    const now = new Date();
+    const key = userKey(profile.chatId, profile.userId);
+    const state = await this.store.load();
+    const locale = state.users[key]?.locale || profile.locale;
+    const text = getLocale(locale);
+    const checkedAt = new Intl.DateTimeFormat("en-GB", {
+      timeZone: this.config.timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    }).format(now).replace(",", " ");
+    return text.workCheckIn(profile.displayName, profile.userId, checkedAt);
+  }
+
   async startActivity(
     profile: Omit<UserProfile, "createdAt" | "updatedAt">,
     kind: ActivityKind,
