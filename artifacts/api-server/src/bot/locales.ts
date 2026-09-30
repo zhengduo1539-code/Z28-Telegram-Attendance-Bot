@@ -11,6 +11,7 @@ type LocaleText = {
   title: string;
   startWelcome: string;
   help: string;
+  idInfo: (chatId: number, userId: number) => string;
   noActive: (displayName: string, userId: number) => string;
   alreadyActive: (
     displayName: string,
@@ -164,6 +165,7 @@ const zh: LocaleText = {
     `${inlineCode("/offwork")} — 下班`,
     `${inlineCode("/lang en")} — 切换英文`,
     `${inlineCode("/lang zh")} — 切换中文`,
+    `${inlineCode("/id")} — 查看当前群组 ID 或用户 ID（私聊中显示用户 ID）`,
     "",
     "群组连接：",
     `${inlineCode("/connect")} — 在当前群组设置超时通知目标群组`,
@@ -182,6 +184,7 @@ const zh: LocaleText = {
     "",
     `活动开始后请在回座时使用 ${inlineCode("/back")}。`,
   ].join("\n"),
+  idInfo: (chatId, userId) => `群组标识：${inlineCode(chatId)}\n用户标识：${inlineCode(userId)}`,
   noActive: (displayName, userId) => [
     "用户：" + userLink(displayName, userId),
     "用户标识：" + inlineCode(userId),
@@ -272,7 +275,11 @@ const zh: LocaleText = {
       `回座：${inlineCode("/back")}`,
     ].join("\n");
   },
-  connectPrompt: "请输入要连接的群组 ID 或群组链接。",
+  connectPrompt: [
+    "请输入要连接的群组 ID 或群组链接。",
+    `如果群组 ID 或链接填写错误，请使用 ${inlineCode("/id")} 查看群组 ID。`,
+    `然后使用 ${inlineCode("/connect -1234567890")} 重新连接。`,
+  ].join("\n"),
   connectUsage: "用法：在群组中发送 /connect，然后发送目标群组 ID 或公开群组链接。",
   connectAdminOnly: "只有本群组的群主或管理员可以使用 /connect。",
   connectSuccess: (groupName, groupId) => [
@@ -280,7 +287,11 @@ const zh: LocaleText = {
     `群组：${inlineCode(groupName)}`,
     `群组标识：${inlineCode(groupId)}`,
   ].join("\n"),
-  connectInvalid: "无法识别或访问该群组。请确认 Bot 已加入目标群组，并输入正确的群组 ID；公开群组也可以使用 t.me 链接。",
+  connectInvalid: [
+    "无法识别或访问该群组。",
+    `请使用 ${inlineCode("/id")} 查看正确的群组 ID，然后发送 ${inlineCode("/connect -1234567890")} 进行连接。`,
+    "请确认 Bot 已加入目标群组；公开群组也可以使用 t.me 链接。",
+  ].join("\n"),
   groupTimeoutNotification: (groupName, groupId, username, displayName, userId, activity, timeoutSeconds) => {
     const minutes = Math.floor(timeoutSeconds / 60);
     const seconds = timeoutSeconds % 60;
@@ -365,6 +376,7 @@ const en: LocaleText = {
     `${inlineCode("/offwork")} — End work`,
     `${inlineCode("/lang en")} — Switch to English`,
     `${inlineCode("/lang zh")} — Switch to Chinese`,
+    `${inlineCode("/id")} — View the current group ID or user ID (in private chat, shows your user ID)`,
     "",
     "Group Connection:",
     `${inlineCode("/connect")} — Set the target group for activity timeout notifications`,
@@ -383,6 +395,7 @@ const en: LocaleText = {
     "",
     `Use ${inlineCode("/back")} when you return.`,
   ].join("\n"),
+  idInfo: (chatId, userId) => `Chat ID: ${inlineCode(chatId)}\nUser ID: ${inlineCode(userId)}`,
   noActive: (displayName, userId) => [
     "User: " + userLink(displayName, userId),
     "User ID: " + inlineCode(userId),
@@ -481,7 +494,11 @@ const en: LocaleText = {
       `Back to Seat: ${inlineCode("/back")}`,
     ].join("\n");
   },
-  connectPrompt: "Please send the target group ID or group link.",
+  connectPrompt: [
+    "Please send the target group ID or group link.",
+    `If the group ID or link is incorrect, use ${inlineCode("/id")} to view the group ID.`,
+    `Then send ${inlineCode("/connect -1234567890")} to connect again.`,
+  ].join("\n"),
   connectUsage: "Use /connect in a group, then send the target group ID or public group link.",
   connectAdminOnly: "Only the group owner or an administrator of this group can use /connect.",
   connectSuccess: (groupName, groupId) => [
@@ -489,7 +506,11 @@ const en: LocaleText = {
     `Group: ${inlineCode(groupName)}`,
     `Group ID: ${inlineCode(groupId)}`,
   ].join("\n"),
-  connectInvalid: "I could not identify or access that group. Make sure the bot is in the target group and send a valid group ID; public groups can also use a t.me link.",
+  connectInvalid: [
+    "I could not identify or access that group.",
+    `Use ${inlineCode("/id")} to view the correct group ID, then send ${inlineCode("/connect -1234567890")} to connect again.`,
+    "Make sure the bot is in the target group; public groups can also use a t.me link.",
+  ].join("\n"),
   groupTimeoutNotification: (groupName, groupId, username, displayName, userId, activity, timeoutSeconds) => {
     const minutes = Math.floor(timeoutSeconds / 60);
     const seconds = timeoutSeconds % 60;
