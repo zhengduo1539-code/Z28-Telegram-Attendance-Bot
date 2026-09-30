@@ -208,7 +208,7 @@ export class CommandHandler {
 
     switch (command.name) {
       case "start": {
-        response = text.help;
+        response = text.startWelcome;
         markup = keyboard(locale);
         if (message.chat.type === "private") {
           const botUsername = await this.telegram.getBotUsername();
