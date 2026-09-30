@@ -368,7 +368,6 @@ const en: LocaleText = {
     `4. After the connection is successful, when an activity in the current group exceeds its time limit and the user uses ${inlineCode("/back")}, the Bot sends the timeout notification to the connected target group.`,
     `Note: The Bot must also be able to access the target group.`,
     "",
-    `${inlineCode("/work")} — Members can check in and see the actual work check-in date and time. If they are more than 45 seconds late, a warning and late duration are shown.`,
     "",
     `Use ${inlineCode("/back")} when you return.`,
   ].join("\n"),
