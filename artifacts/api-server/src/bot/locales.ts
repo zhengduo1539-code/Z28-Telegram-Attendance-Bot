@@ -61,6 +61,7 @@ type LocaleText = {
   workUsage: string;
   workCurrent: (time: string) => string;
   workUpdated: (time: string) => string;
+  workTimeRequired: string;
   workCheckIn: (displayName: string, userId: number, checkedAt: string, workStartTime?: string, lateSeconds?: number) => string;
   languageChanged: string;
   languageUsage: string;
@@ -300,6 +301,7 @@ const zh: LocaleText = {
   workUsage: `用法：${inlineCode("/work 09:00")}。时间使用 24 小时制。`,
   workCurrent: (time) => `本群上班时间：${inlineCode(time)}`,
   workUpdated: (time) => `✅ 本群上班时间已设置为 ${inlineCode(time)}。`,
+  workTimeRequired: `⚠️ 请先设置本群上班时间后，再使用 /work 进行工作打卡。`,
   languageChanged: "语言已切换为中文。",
   languageUsage: "用法：/lang zh 或 /lang en（/lang eng 也可以）",
   unknownLanguage: "支持的语言：zh（中文）、en/eng（English）。",
@@ -504,6 +506,7 @@ const en: LocaleText = {
   workUsage: `Usage: ${inlineCode("/work 09:00")}. Use 24-hour time.`,
   workCurrent: (time) => `This group's work start time is ${inlineCode(time)}.`,
   workUpdated: (time) => `✅ This group's work start time has been set to ${inlineCode(time)}.`,
+  workTimeRequired: `⚠️ Please set this group's work start time before using /work for work check-in.`,
   workCheckIn: (displayName, userId, checkedAt, workStartTime, lateSeconds = 0) => [
     `User: ${userLink(displayName, userId)}`,
     `User ID: ${inlineCode(userId)}`,
