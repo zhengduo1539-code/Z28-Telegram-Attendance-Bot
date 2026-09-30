@@ -1,6 +1,6 @@
 import type { Logger } from "pino";
 import type { BotConfig } from "./config";
-import { CommandHandler } from "./command-handler";
+import { ADMIN_MENU_COMMANDS, CommandHandler } from "./command-handler";
 import { setBotStatus } from "./runtime";
 import { TelegramClient } from "./telegram-client";
 
@@ -21,6 +21,20 @@ export class TelegramPollingBot {
   async start() {
     await this.telegram.deleteWebhook();
     await this.telegram.setMyCommands();
+
+    const adminIds = new Set<number>([
+      ...(this.config.botOwnerId ? [this.config.botOwnerId] : []),
+      ...this.config.adminIds,
+    ]);
+    await Promise.allSettled(
+      [...adminIds].map((userId) =>
+        this.telegram.setMyCommands(ADMIN_MENU_COMMANDS, {
+          type: "chat",
+          chat_id: userId,
+        }),
+      ),
+    );
+
     setBotStatus({ enabled: true, running: true, lastError: undefined });
     this.logger.info("Telegram polling started");
     void this.loop().catch((error: unknown) => {
