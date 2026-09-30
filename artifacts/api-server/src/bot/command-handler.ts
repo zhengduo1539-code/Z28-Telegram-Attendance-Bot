@@ -189,24 +189,30 @@ export class CommandHandler {
     const text = getLocale(locale);
     let response: string | undefined;
     let markup: ReplyKeyboardMarkup | undefined;
+    let addGroupMarkup: import("./types").InlineKeyboardMarkup | undefined;
 
     switch (command.name) {
       case "start": {
         response = text.help;
         markup = keyboard(locale);
-        const botUsername = await this.telegram.getBotUsername();
-        if (botUsername) {
-          markup = {
-            inline_keyboard: [
-              [
-                {
-                  text: locale === "en" ? "➕ Add Bot to Your Group" : "➕ 将 Bot 添加到群组",
-                  style: "primary",
-                  url: `https://t.me/${botUsername}?startgroup=attendance`,
-                },
+        if (message.chat.type === "private") {
+          const botUsername = await this.telegram.getBotUsername();
+          if (botUsername) {
+            addGroupMarkup = {
+              inline_keyboard: [
+                [
+                  {
+                    text:
+                      locale === "en"
+                        ? "➕ Add Bot to Your Group"
+                        : "➕ 将 Bot 添加到群组",
+                    style: "primary",
+                    url: `https://t.me/${botUsername}?startgroup=attendance`,
+                  },
+                ],
               ],
-            ],
-          };
+            };
+          }
         }
         break;
       }
@@ -302,6 +308,15 @@ export class CommandHandler {
       markup,
       message.message_id,
     );
+    if (addGroupMarkup) {
+      await this.telegram.sendMessage(
+        message.chat.id,
+        locale === "en"
+          ? "Add the bot to a group to use activity tracking with your team:"
+          : "团队需要使用活动打卡功能？请先将 Bot 添加到群组：",
+        addGroupMarkup,
+      );
+    }
   }
 
   private async isGroupAdmin(message: TelegramMessage): Promise<boolean> {
