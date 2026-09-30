@@ -46,6 +46,7 @@ type LocaleText = {
   connectUsage: string;
   connectAdminOnly: string;
   connectSuccess: (groupName: string, groupId: number) => string;
+  connectSelf: string;
   connectInvalid: string;
   groupTimeoutNotification: (
     groupName: string,
@@ -282,6 +283,13 @@ const zh: LocaleText = {
   ].join("\n"),
   connectUsage: "用法：在群组中发送 /connect，然后发送目标群组 ID 或公开群组链接。",
   connectAdminOnly: "只有本群组的群主或管理员可以使用 /connect。",
+  connectSelf: [
+    `❌ ${inlineCode("连接失败")}`,
+    `您输入的群组 ID 是当前群组的 ID。`,
+    `当前群组是 ${inlineCode("Target Group（接收超时警告）")}。`,
+    `请使用活动所在群组的 ID，例如：${inlineCode("/connect -1234567890")}`,
+    `这样活动群组超时后使用 ${inlineCode("/back")}，警告消息才会发送到当前群组。`,
+  ].join("\n"),
   connectSuccess: (groupName, groupId) => [
     "✅ 连接成功",
     `群组：${inlineCode(groupName)}`,
@@ -501,6 +509,13 @@ const en: LocaleText = {
   ].join("\n"),
   connectUsage: "Use /connect in a group, then send the target group ID or public group link.",
   connectAdminOnly: "Only the group owner or an administrator of this group can use /connect.",
+  connectSelf: [
+    `❌ ${inlineCode("Connection failed")}`,
+    `The group ID you entered is the ID of the current group.`,
+    `The current group is the ${inlineCode("Target Group (receives timeout warnings)")}.`,
+    `Please enter the ID of the group where activities are performed, for example: ${inlineCode("/connect -1234567890")}`,
+    `Then, when an activity in that group exceeds its limit and the user uses ${inlineCode("/back")}, the warning will be sent to this current group.`,
+  ].join("\n"),
   connectSuccess: (groupName, groupId) => [
     "✅ Connection successful",
     `Group: ${inlineCode(groupName)}`,
