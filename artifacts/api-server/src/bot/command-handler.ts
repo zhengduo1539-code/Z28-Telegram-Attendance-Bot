@@ -126,12 +126,12 @@ export class CommandHandler {
         return;
       }
       await this.attendance.setConnectedGroup(
-        message.chat.id,
-        message.chat.title,
-        message.chat.username,
         target.id,
-        target.title || String(target.id),
+        target.title,
         target.username,
+        message.chat.id,
+        message.chat.title || String(message.chat.id),
+        message.chat.username,
       );
       await this.attendance.clearPendingConnect(
         message.chat.id,
