@@ -102,6 +102,8 @@ export type TelegramUpdate = {
 
 export type InlineKeyboardButton = {
   text: string;
+  style?: "danger" | "success" | "primary";
+  url?: string;
   callback_data?: string;
 };
 
