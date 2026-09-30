@@ -250,7 +250,7 @@ export class CommandHandler {
         break;
       }
       case "work":
-        response = await this.attendance.startShift(profile);
+        response = await this.attendance.workCheckIn(profile);
         markup = keyboard(locale);
         break;
       case "back": {
