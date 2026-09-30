@@ -181,6 +181,8 @@ export class AttendanceService {
     const now = new Date();
     const key = userKey(profile.chatId, profile.userId);
     let response = "";
+    let timeoutNotification: string | undefined;
+    let notificationChatId: number | undefined;
     await this.store.update((state) => {
       ensureProfile(state, profile, now.toISOString());
       const locale = state.users[key].locale;
