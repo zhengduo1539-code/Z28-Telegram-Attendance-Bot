@@ -61,6 +61,7 @@ type LocaleText = {
   workUsage: string;
   workCurrent: (time: string) => string;
   workUpdated: (time: string) => string;
+  workCheckIn: (displayName: string, userId: number, checkedAt: string, workStartTime?: string, lateSeconds?: number) => string;
   languageChanged: string;
   languageUsage: string;
   unknownLanguage: string;
@@ -103,6 +104,14 @@ const userLink = (text: string, userId: number): string =>
 
 const inlineCode = (value: string | number): string =>
   `<code>${escapeHtml(String(value))}</code>`;
+
+const formatWorkLateDuration = (seconds: number): string => {
+  const safe = Math.max(0, Math.floor(seconds));
+  const h = Math.floor(safe / 3600), m = Math.floor((safe % 3600) / 60), s = safe % 60;
+  return h > 0
+    ? `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`
+    : `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+};
 
 const divider = inlineCode("--------------------");
 
@@ -491,6 +500,19 @@ const en: LocaleText = {
   workUsage: `Usage: ${inlineCode("/work 09:00")}. Use 24-hour time.`,
   workCurrent: (time) => `This group's work start time is ${inlineCode(time)}.`,
   workUpdated: (time) => `✅ This group's work start time has been set to ${inlineCode(time)}.`,
+  workCheckIn: (displayName, userId, checkedAt, workStartTime, lateSeconds = 0) => [
+    `User: ${userLink(displayName, userId)}`,
+    `User ID: ${inlineCode(userId)}`,
+    `Work Check-In Time: ${inlineCode(checkedAt)}`,
+    ...(workStartTime ? [
+      `Scheduled Work Start: ${inlineCode(workStartTime)}`,
+      ...(lateSeconds > 0 ? [
+        `⚠️ ${inlineCode("Late Check-In Warning: You are more than 45 seconds late.")}`,
+        inlineCode("-"),
+        `Late by: ${inlineCode(formatWorkLateDuration(lateSeconds))}`,
+      ] : []),
+    ] : [`⚠️ This group's work start time has not been set.`]),
+  ].join("\n"),
   languageChanged: "Language switched to English.",
   languageUsage: "Usage: /lang zh or /lang en (/lang eng also works)",
   unknownLanguage: "Supported languages: zh (中文), en/eng (English).",
