@@ -508,13 +508,13 @@ const en: LocaleText = {
   workUpdated: (time) => `✅ This group's work start time has been set to ${inlineCode(time)}.`,
   workTimeRequired: `⚠️ Please set this group's work start time before using /work for work check-in.`,
   workCheckIn: (displayName, userId, checkedAt, workStartTime, lateSeconds = 0) => [
-    `User: ${userLink(displayName, userId)}`,
+    `User: ${inlineCode(displayName)}`,
     `User ID: ${inlineCode(userId)}`,
     `Work Check-In Time: ${inlineCode(checkedAt)}`,
     ...(workStartTime ? [
       `Scheduled Work Start: ${inlineCode(workStartTime)}`,
       ...(lateSeconds > 0 ? [
-        `⚠️ ${inlineCode("Late Check-In Warning: You are more than 45 seconds late.")}`,
+        `⚠️ Late Check-In Warning: ${inlineCode("You are more than 45 seconds late.")}`,
         inlineCode("-"),
         `Late by: ${inlineCode(formatWorkLateDuration(lateSeconds))}`,
       ] : []),
