@@ -113,7 +113,9 @@ export class CommandHandler {
     const profile = profileFromUser(message, currentLocale);
     if (!profile) return;
 
-    await this.ensureAdminCommandMenu(message, profile.userId);
+    // Do not block normal update handling on Telegram's command-menu API.
+    // A slow/failing setMyCommands call must never make the bot appear frozen.
+    void this.ensureAdminCommandMenu(message, profile.userId);
 
     const pendingConnect = await this.attendance.getPendingConnect(
       message.chat.id,
