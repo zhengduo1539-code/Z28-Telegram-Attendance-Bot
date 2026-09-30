@@ -263,6 +263,18 @@ export class AttendanceService {
     };
   }
 
+  async isActivityReminderEnabled(): Promise<boolean> {
+    const state = await this.store.load();
+    return state.reminderEnabled !== false;
+  }
+
+  async setActivityReminderEnabled(enabled: boolean): Promise<boolean> {
+    await this.store.update((state) => {
+      state.reminderEnabled = enabled;
+    });
+    return enabled;
+  }
+
   async setActivityLimit(
     kind: ActivityKind,
     minutes: number,
@@ -280,6 +292,8 @@ export class AttendanceService {
   }
 
   async dueActivityReminders(now = new Date()): Promise<ActiveActivity[]> {
+    if (!(await this.isActivityReminderEnabled())) return [];
+
     const state = await this.store.load();
     const nowMs = now.getTime();
     return Object.values(state.activeActivities)
@@ -316,6 +330,8 @@ export class AttendanceService {
     let claim: ActivityReminderClaim | undefined;
 
     await this.store.update((state) => {
+      if (state.reminderEnabled === false) return;
+
       const activity = state.activeActivities[key];
       if (
         !activity ||

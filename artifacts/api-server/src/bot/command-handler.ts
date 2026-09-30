@@ -161,6 +161,10 @@ export class CommandHandler {
       case "limit":
         response = await this.handleLimitCommand(message, profile, command.argument);
         break;
+      case "reminder":
+      case "reminders":
+        response = await this.handleReminderCommand(message, profile, command.argument);
+        break;
       default:
         response = text.unknownCommand;
     }
@@ -170,6 +174,29 @@ export class CommandHandler {
       markup,
       message.message_id,
     );
+  }
+
+  private async handleReminderCommand(
+    message: TelegramMessage,
+    profile: Omit<UserProfile, "createdAt" | "updatedAt">,
+    argument: string | undefined,
+  ): Promise<string> {
+    const text = getLocale(profile.locale);
+    const isAdmin =
+      this.config.botOwnerId === profile.userId ||
+      this.config.adminIds.includes(profile.userId);
+    if (!isAdmin) return text.adminOnly;
+    if (message.chat.type !== "private") return text.reminderPrivate;
+
+    if (!argument) {
+      const enabled = await this.attendance.isActivityReminderEnabled();
+      return text.reminderStatus(enabled);
+    }
+    if (argument !== "on" && argument !== "off") return text.reminderUsage;
+
+    const enabled = argument === "on";
+    await this.attendance.setActivityReminderEnabled(enabled);
+    return text.reminderUpdated(enabled);
   }
 
   private async handleLimitCommand(

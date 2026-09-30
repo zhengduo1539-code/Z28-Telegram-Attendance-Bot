@@ -42,6 +42,7 @@ export type BotState = {
   activeActivities: Record<string, ActiveActivity>;
   records: ActivityRecord[];
   activityLimits?: Partial<ActivityLimits>;
+  reminderEnabled?: boolean;
 };
 
 export type TelegramUser = {

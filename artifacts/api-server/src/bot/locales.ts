@@ -59,6 +59,10 @@ type LocaleText = {
   invalidLimit: string;
   limits: (limits: ActivityLimits) => string;
   limitUpdated: (activity: string, minutes: number) => string;
+  reminderPrivate: string;
+  reminderUsage: string;
+  reminderStatus: (enabled: boolean) => string;
+  reminderUpdated: (enabled: boolean) => string;
 };
 
 const escapeHtml = (value: string): string =>
@@ -216,6 +220,12 @@ const zh: LocaleText = {
     ].join("\n"),
   limitUpdated: (activity, minutes) =>
     `✅ 已将 ${inlineCode(activity)} 的活动时间限制设置为 ${inlineCode(`${minutes} 分钟`)}。`,
+  reminderPrivate: "请在 Bot 私聊中使用此命令。",
+  reminderUsage: "用法：/reminder on 或 /reminder off",
+  reminderStatus: (enabled) =>
+    `超时提醒当前：${inlineCode(enabled ? "开启" : "关闭")}（45 秒宽限）`,
+  reminderUpdated: (enabled) =>
+    `✅ 超时提醒已${enabled ? "开启" : "关闭"}（45 秒宽限）。`,
 };
 
 const en: LocaleText = {
@@ -337,6 +347,12 @@ const en: LocaleText = {
     ].join("\n"),
   limitUpdated: (activity, minutes) =>
     `✅ ${inlineCode(activity)} activity limit set to ${inlineCode(`${minutes} minutes`)}.`,
+  reminderPrivate: "Please use this command in the bot private chat.",
+  reminderUsage: "Usage: /reminder on or /reminder off",
+  reminderStatus: (enabled) =>
+    `Overdue reminder is currently ${inlineCode(enabled ? "ON" : "OFF")} (45-second grace).`,
+  reminderUpdated: (enabled) =>
+    `✅ Overdue reminder has been turned ${enabled ? "ON" : "OFF"} (45-second grace).`,
 };
 
 export const getLocale = (locale: Locale): LocaleText =>
