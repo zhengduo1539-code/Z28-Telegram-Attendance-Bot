@@ -104,7 +104,17 @@ export class CommandHandler {
       message.chat.id,
       profile.userId,
     );
-    if (pendingConnect && message.text.trim().toLowerCase() !== "/connect") {
+    const looksLikeConnectTarget =
+      /^-?\d+$/.test(message.text.trim()) ||
+      /^@?[A-Za-z0-9_]{5,}$/.test(message.text.trim()) ||
+      /^(?:https?:\/\/)?(?:www\.)?t\.me\/[A-Za-z0-9_]{5,}\/?$/i.test(
+        message.text.trim(),
+      );
+
+    // Do not let a pending /connect flow swallow normal commands or
+    // reply-keyboard buttons such as "回座". Only target-looking plain text
+    // is treated as the pending connection target.
+    if (pendingConnect && !command && looksLikeConnectTarget) {
       const target = await this.resolveConnectTarget(message.text);
       if (!target) {
         await this.telegram.sendMessage(
