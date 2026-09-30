@@ -134,7 +134,7 @@ export class TelegramClient {
   setMyCommands(
     commands: Array<{ command: string; description: string }> = [
       { command: "start", description: "开始 / Start" },
-      { command: "work", description: "上班 / Start work" },
+      { command: "work", description: "Set group work start time" },
       { command: "back", description: "回座 / Return to seat" },
       { command: "eat", description: "吃饭 / Meal break" },
       { command: "wc", description: "上厕所 / Toilet" },
