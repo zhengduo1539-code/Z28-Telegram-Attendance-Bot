@@ -47,22 +47,6 @@ const localDateKey = (date: Date, timeZone: string): string => {
   return `${values["year"]}-${values["month"]}-${values["day"]}`;
 };
 
-const formatWorkDateTime = (date: Date, timeZone: string) =>
-  new Intl.DateTimeFormat("en-GB", {
-    timeZone, year: "numeric", month: "2-digit", day: "2-digit",
-    hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false,
-  }).format(date).replace(",", " ");
-
-const getLocalTimeSeconds = (date: Date, timeZone: string): number => {
-  const parts = new Intl.DateTimeFormat("en-GB", {
-    timeZone, hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false,
-  }).formatToParts(date);
-  const values = Object.fromEntries(
-    parts.filter((part) => part.type !== "literal").map((part) => [part.type, part.value]),
-  );
-  return Number(values["hour"]) * 3600 + Number(values["minute"]) * 60 + Number(values["second"]);
-};
-
 const formatDateTime = (date: Date, timeZone: string) =>
   new Intl.DateTimeFormat("en-GB", {
     timeZone,
@@ -120,44 +104,6 @@ export class AttendanceService {
   async getLocale(chatId: number, userId: number): Promise<Locale> {
     const state = await this.store.load();
     return state.users[userKey(chatId, userId)]?.locale || "zh";
-  }
-
-  async setWorkStartTime(chatId: number, time: string): Promise<void> {
-    await this.store.update((state) => {
-      state.workStartTimes = state.workStartTimes || {};
-      state.workStartTimes[String(chatId)] = time;
-    });
-  }
-
-  async getWorkStartTime(chatId: number): Promise<string | undefined> {
-    const state = await this.store.load();
-    return state.workStartTimes?.[String(chatId)];
-  }
-
-  async workCheckIn(
-    profile: Omit<UserProfile, "createdAt" | "updatedAt">,
-  ): Promise<string> {
-    const now = new Date();
-    const key = userKey(profile.chatId, profile.userId);
-    const state = await this.store.load();
-    const locale = state.users[key]?.locale || profile.locale;
-    const text = getLocale(locale);
-    const workStartTime = state.workStartTimes?.[String(profile.chatId)];
-    const checkedAt = formatWorkDateTime(now, this.config.timeZone);
-
-    if (!workStartTime) {
-      return text.workTimeRequired;
-    }
-
-    const currentSeconds = getLocalTimeSeconds(now, this.config.timeZone);
-    const [hours, minutes] = workStartTime.split(":").map(Number);
-    const scheduledSeconds = hours * 3600 + minutes * 60;
-    const lateSeconds = currentSeconds - scheduledSeconds - REMINDER_GRACE_MS / 1000;
-
-    return text.workCheckIn(
-      profile.displayName, profile.userId, checkedAt, workStartTime,
-      lateSeconds > 0 ? Math.floor(lateSeconds) : 0,
-    );
   }
 
   async startActivity(
