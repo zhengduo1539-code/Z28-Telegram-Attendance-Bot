@@ -38,6 +38,22 @@ export type ActiveActivity = {
   reminderSentAt?: string;
 };
 
+export type ConnectedGroup = {
+  sourceChatId: number;
+  sourceGroupName?: string;
+  sourceUsername?: string;
+  targetChatId: number;
+  targetGroupName: string;
+  targetUsername?: string;
+  connectedAt: string;
+};
+
+export type PendingConnect = {
+  sourceChatId: number;
+  userId: number;
+  requestedAt: string;
+};
+
 export type BotState = {
   users: Record<string, UserProfile>;
   activeActivities: Record<string, ActiveActivity>;
@@ -45,6 +61,8 @@ export type BotState = {
   activityLimits?: Partial<ActivityLimits>;
   activityCountLimits?: Partial<ActivityCountLimits>;
   reminderEnabled?: boolean;
+  connectedGroups?: Record<string, ConnectedGroup>;
+  pendingConnects?: Record<string, PendingConnect>;
 };
 
 export type TelegramUser = {
