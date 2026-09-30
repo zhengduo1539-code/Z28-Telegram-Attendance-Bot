@@ -76,6 +76,7 @@ const buttonCommand = (value: string): Command | undefined => {
 };
 
 export const ADMIN_MENU_COMMANDS = [
+  { command: "start", description: "开始 / Start" },
   { command: "limit", description: "Set activity time limits" },
   { command: "limits", description: "View activity time limits" },
   { command: "countlimit", description: "Set daily activity count limits" },
