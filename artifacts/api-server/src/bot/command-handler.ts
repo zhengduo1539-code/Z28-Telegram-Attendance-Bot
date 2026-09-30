@@ -161,6 +161,10 @@ export class CommandHandler {
       case "limit":
         response = await this.handleLimitCommand(message, profile, command.argument);
         break;
+      case "countlimits":
+      case "countlimit":
+        response = await this.handleCountLimitCommand(message, profile, command.argument);
+        break;
       case "reminder":
       case "reminders":
         response = await this.handleReminderCommand(message, profile, command.argument);
@@ -174,6 +178,33 @@ export class CommandHandler {
       markup,
       message.message_id,
     );
+  }
+
+  private async handleCountLimitCommand(
+    message: TelegramMessage,
+    profile: Omit<UserProfile, "createdAt" | "updatedAt">,
+    argument: string | undefined,
+  ): Promise<string> {
+    const text = getLocale(profile.locale);
+    const isAdmin =
+      this.config.botOwnerId === profile.userId ||
+      this.config.adminIds.includes(profile.userId);
+    if (!isAdmin) return text.adminOnly;
+    if (message.chat.type !== "private") return text.countLimitPrivate;
+
+    const parts = argument?.split(/\s+/).filter(Boolean) || [];
+    if (parts.length === 0) {
+      return text.countLimits(await this.attendance.getActivityCountLimits());
+    }
+    if (parts.length !== 2) return text.countLimitUsage;
+
+    const kind = parts[0] as ActivityKind;
+    if (!["eat", "wc", "smoke", "wcd"].includes(kind)) return text.unknownActivity;
+    const count = Number(parts[1]);
+    if (!Number.isInteger(count) || count <= 0) return text.invalidCountLimit;
+
+    await this.attendance.setActivityCountLimit(kind, count);
+    return text.countLimitUpdated(activityLabel(kind, profile.locale), count);
   }
 
   private async handleReminderCommand(

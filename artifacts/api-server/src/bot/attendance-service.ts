@@ -4,6 +4,7 @@ import type {
   ActivityKind,
   ActiveActivity,
   ActivityLimits,
+  ActivityCountLimits,
   BotState,
   Locale,
   UserProfile,
@@ -130,15 +131,24 @@ export class AttendanceService {
         return;
       }
       const dayKey = localDateKey(now, this.config.timeZone);
-      const occurrence =
-        state.records.filter(
-          (record) =>
-            record.chatId === profile.chatId &&
-            record.userId === profile.userId &&
-            record.kind === kind &&
-            localDateKey(new Date(record.endedAt), this.config.timeZone) ===
-              dayKey,
-        ).length + 1;
+      const todayCount = state.records.filter(
+        (record) =>
+          record.chatId === profile.chatId &&
+          record.userId === profile.userId &&
+          record.kind === kind &&
+          localDateKey(new Date(record.endedAt), this.config.timeZone) === dayKey,
+      ).length;
+      const countLimit = state.activityCountLimits?.[kind];
+      if (countLimit !== undefined && todayCount >= countLimit) {
+        response = text.dailyCountLimitReached(
+          profile.displayName,
+          profile.userId,
+          activityLabel(kind, locale),
+          countLimit,
+        );
+        return;
+      }
+      const occurrence = todayCount + 1;
       state.activeActivities[key] = {
         chatId: profile.chatId,
         userId: profile.userId,
@@ -253,6 +263,23 @@ export class AttendanceService {
 
   async offWork(profile: Omit<UserProfile, "createdAt" | "updatedAt">) {
     return this.settle(profile, "offwork");
+  }
+
+  async getActivityCountLimits(): Promise<Partial<ActivityCountLimits>> {
+    const state = await this.store.load();
+    return { ...state.activityCountLimits };
+  }
+
+  async setActivityCountLimit(
+    kind: ActivityKind,
+    count: number,
+  ): Promise<Partial<ActivityCountLimits>> {
+    let limits: Partial<ActivityCountLimits> = {};
+    await this.store.update((state) => {
+      limits = { ...(state.activityCountLimits || {}), [kind]: count };
+      state.activityCountLimits = limits;
+    });
+    return limits;
   }
 
   async getActivityLimits(): Promise<ActivityLimits> {

@@ -59,6 +59,12 @@ type LocaleText = {
   invalidLimit: string;
   limits: (limits: ActivityLimits) => string;
   limitUpdated: (activity: string, minutes: number) => string;
+  dailyCountLimitReached: (displayName: string, userId: number, activity: string, countLimit: number) => string;
+  countLimitPrivate: string;
+  countLimitUsage: string;
+  invalidCountLimit: string;
+  countLimits: (limits: Partial<Record<ActivityKind, number>>) => string;
+  countLimitUpdated: (activity: string, count: number) => string;
   reminderPrivate: string;
   reminderUsage: string;
   reminderStatus: (enabled: boolean) => string;
@@ -189,6 +195,15 @@ const zh: LocaleText = {
         ),
     ].join("\n");
   },
+  dailyCountLimitReached: (displayName, userId, activity, countLimit) => [
+    "用户：" + inlineCode(displayName),
+    "用户标识：" + inlineCode(userId),
+    "⚠️ 警告：" + inlineCode("您今天使用 " + activity + " 的次数已达到 " + countLimit + " 次的上限"),
+    "您可以————",
+    "上厕所：" + inlineCode("/wc"),
+    "抽烟：" + inlineCode("/smoke"),
+    "WCD：" + inlineCode("/wcd"),
+  ].join("\n"),
   timeoutReminder: (displayName, userId, activity) => {
     const identity = userIdentity(displayName, userId);
     return [
@@ -220,6 +235,18 @@ const zh: LocaleText = {
     ].join("\n"),
   limitUpdated: (activity, minutes) =>
     `✅ 已将 ${inlineCode(activity)} 的活动时间限制设置为 ${inlineCode(`${minutes} 分钟`)}。`,
+  countLimitPrivate: "请在 Bot 私聊中使用此命令。",
+  countLimitUsage: "用法：/countlimit <eat|wc|smoke|wcd> <次数>，例如：/countlimit wcd 2",
+  invalidCountLimit: "次数必须是大于 0 的整数。",
+  countLimits: (limits) => [
+    "当前每日使用次数限制：",
+    `吃饭 / eat：${inlineCode(limits.eat ?? "未设置")}`,
+    `上厕所 / wc：${inlineCode(limits.wc ?? "未设置")}`,
+    `抽烟 / smoke：${inlineCode(limits.smoke ?? "未设置")}`,
+    `WCD / wcd：${inlineCode(limits.wcd ?? "未设置")}`,
+  ].join("\n"),
+  countLimitUpdated: (activity, count) =>
+    `✅ 已将 ${inlineCode(activity)} 的每日使用次数上限设置为 ${inlineCode(`${count} 次`)}。`,
   reminderPrivate: "请在 Bot 私聊中使用此命令。",
   reminderUsage: "用法：/reminder on 或 /reminder off",
   reminderStatus: (enabled) =>
@@ -315,6 +342,15 @@ const en: LocaleText = {
         ),
     ].join("\n");
   },
+  dailyCountLimitReached: (displayName, userId, activity, countLimit) => [
+    "User: " + inlineCode(displayName),
+    "User ID: " + inlineCode(userId),
+    "⚠️ Warning: " + inlineCode("Your daily " + activity + " usage has reached the limit of " + countLimit + " times."),
+    "You can use:",
+    "Toilet: " + inlineCode("/wc"),
+    "Smoke: " + inlineCode("/smoke"),
+    "WCD: " + inlineCode("/wcd"),
+  ].join("\n"),
   timeoutReminder: (displayName, userId, activity) => {
     const identity = userIdentity(displayName, userId);
     return [
@@ -347,6 +383,18 @@ const en: LocaleText = {
     ].join("\n"),
   limitUpdated: (activity, minutes) =>
     `✅ ${inlineCode(activity)} activity limit set to ${inlineCode(`${minutes} minutes`)}.`,
+  countLimitPrivate: "Please use this command in the bot private chat.",
+  countLimitUsage: "Usage: /countlimit <eat|wc|smoke|wcd> <count>, for example: /countlimit wcd 2",
+  invalidCountLimit: "Count must be a positive integer.",
+  countLimits: (limits) => [
+    "Current daily usage limits:",
+    `Meal / eat: ${inlineCode(limits.eat ?? "Not set")}`,
+    `Toilet / wc: ${inlineCode(limits.wc ?? "Not set")}`,
+    `Smoke / smoke: ${inlineCode(limits.smoke ?? "Not set")}`,
+    `WCD / wcd: ${inlineCode(limits.wcd ?? "Not set")}`,
+  ].join("\n"),
+  countLimitUpdated: (activity, count) =>
+    `✅ Daily ${inlineCode(activity)} usage limit set to ${inlineCode(`${count} times`)}.`,
   reminderPrivate: "Please use this command in the bot private chat.",
   reminderUsage: "Usage: /reminder on or /reminder off",
   reminderStatus: (enabled) =>

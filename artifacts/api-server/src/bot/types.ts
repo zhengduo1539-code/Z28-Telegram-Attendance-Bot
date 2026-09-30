@@ -3,6 +3,7 @@ export type Locale = "zh" | "en";
 export type ActivityKind = "eat" | "wc" | "smoke" | "wcd";
 
 export type ActivityLimits = Record<ActivityKind, number>;
+export type ActivityCountLimits = Record<ActivityKind, number>;
 
 export type UserProfile = {
   chatId: number;
@@ -42,6 +43,7 @@ export type BotState = {
   activeActivities: Record<string, ActiveActivity>;
   records: ActivityRecord[];
   activityLimits?: Partial<ActivityLimits>;
+  activityCountLimits?: Partial<ActivityCountLimits>;
   reminderEnabled?: boolean;
 };
 
