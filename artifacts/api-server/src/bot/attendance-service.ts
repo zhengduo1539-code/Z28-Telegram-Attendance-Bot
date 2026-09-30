@@ -100,14 +100,16 @@ export class AttendanceService {
     return state.users[userKey(chatId, userId)]?.locale || "zh";
   }
 
-  async startShift(profile: Omit<UserProfile, "createdAt" | "updatedAt">) {
-    const now = new Date();
+  async setWorkStartTime(chatId: number, time: string): Promise<void> {
     await this.store.update((state) => {
-      ensureProfile(state, profile, now.toISOString());
+      state.workStartTimes = state.workStartTimes || {};
+      state.workStartTimes[String(chatId)] = time;
     });
-    return getLocale(profile.locale).shiftStarted(
-      formatDateTime(now, this.config.timeZone),
-    );
+  }
+
+  async getWorkStartTime(chatId: number): Promise<string | undefined> {
+    const state = await this.store.load();
+    return state.workStartTimes?.[String(chatId)];
   }
 
   async startActivity(
