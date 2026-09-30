@@ -213,6 +213,30 @@ export class CommandHandler {
           response = text.connectUsage;
           break;
         }
+        if (command.argument) {
+          const target = await this.resolveConnectTarget(command.argument);
+          if (!target) {
+            response = text.connectInvalid;
+            break;
+          }
+          await this.attendance.setConnectedGroup(
+            message.chat.id,
+            message.chat.title,
+            message.chat.username,
+            target.id,
+            target.title || String(target.id),
+            target.username,
+          );
+          await this.attendance.clearPendingConnect(
+            message.chat.id,
+            profile.userId,
+          );
+          response = text.connectSuccess(
+            target.title || String(target.id),
+            target.id,
+          );
+          break;
+        }
         await this.attendance.beginConnect(message.chat.id, profile.userId);
         response = text.connectPrompt;
         break;
@@ -243,7 +267,7 @@ export class CommandHandler {
     input: string,
   ): Promise<{ id: number; title?: string; username?: string } | undefined> {
     const value = input.trim();
-    const idMatch = value.match(/^-\d+$/);
+    const idMatch = value.match(/^-?\d+$/);
     const publicLinkMatch = value.match(
       /^(?:https?:\/\/)?(?:www\.)?t\.me\/([A-Za-z0-9_]{5,})\/?$/i,
     );
