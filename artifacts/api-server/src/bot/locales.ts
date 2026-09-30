@@ -42,6 +42,7 @@ type LocaleText = {
   ) => string;
   connectPrompt: string;
   connectUsage: string;
+  connectAdminOnly: string;
   connectSuccess: (groupName: string, groupId: number) => string;
   connectInvalid: string;
   groupTimeoutNotification: (
@@ -237,6 +238,7 @@ const zh: LocaleText = {
   },
   connectPrompt: "请输入要连接的群组 ID 或群组链接。",
   connectUsage: "用法：在群组中发送 /connect，然后发送目标群组 ID 或公开群组链接。",
+  connectAdminOnly: "只有本群组的群主或管理员可以使用 /connect。",
   connectSuccess: (groupName, groupId) => [
     "✅ 连接成功",
     `群组：${inlineCode(groupName)}`,
@@ -419,6 +421,7 @@ const en: LocaleText = {
   },
   connectPrompt: "Please send the target group ID or group link.",
   connectUsage: "Use /connect in a group, then send the target group ID or public group link.",
+  connectAdminOnly: "Only the group owner or an administrator of this group can use /connect.",
   connectSuccess: (groupName, groupId) => [
     "✅ Connection successful",
     `Group: ${inlineCode(groupName)}`,
