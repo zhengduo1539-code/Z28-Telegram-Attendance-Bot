@@ -1,0 +1,1 @@
+Initializing repository from M58-Telegram-Attendance-Bot.
