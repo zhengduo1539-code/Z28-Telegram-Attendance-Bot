@@ -240,24 +240,23 @@ export class CommandHandler {
           response = text.workGroupOnly;
           break;
         }
-        if (!(await this.isGroupAdmin(message))) {
-          response = text.workAdminOnly;
+        if (command.argument) {
+          if (!(await this.isGroupAdmin(message))) {
+            response = text.workAdminOnly;
+            break;
+          }
+          const workTime = command.argument.trim();
+          if (!/^([01]?\d|2[0-3]):[0-5]\d$/.test(workTime)) {
+            response = text.workUsage;
+            break;
+          }
+          const [hours, minutes] = workTime.split(":");
+          const normalizedTime = hours.padStart(2, "0") + ":" + minutes;
+          await this.attendance.setWorkStartTime(message.chat.id, normalizedTime);
+          response = text.workUpdated(normalizedTime);
           break;
         }
-        if (!command.argument) {
-          const current = await this.attendance.getWorkStartTime(message.chat.id);
-          response = current ? text.workCurrent(current) : text.workUsage;
-          break;
-        }
-        const workTime = command.argument.trim();
-        if (!/^([01]?\d|2[0-3]):[0-5]\d$/.test(workTime)) {
-          response = text.workUsage;
-          break;
-        }
-        const [hours, minutes] = workTime.split(":");
-        const normalizedTime = hours.padStart(2, "0") + ":" + minutes;
-        await this.attendance.setWorkStartTime(message.chat.id, normalizedTime);
-        response = text.workUpdated(normalizedTime);
+        response = await this.attendance.workCheckIn(profile);
         break;
       }
       case "back": {
