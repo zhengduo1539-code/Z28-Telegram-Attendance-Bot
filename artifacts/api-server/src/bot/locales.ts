@@ -58,6 +58,7 @@ type LocaleText = {
     timeoutSeconds: number,
   ) => string;
   shiftStarted: (time: string) => string;
+  workCheckIn: (displayName: string, userId: number, checkedAt: string) => string;
   shiftEnded: (time: string) => string;
   languageChanged: string;
   languageUsage: string;
@@ -298,6 +299,11 @@ const zh: LocaleText = {
       `超时时长：${inlineCode(pad(minutes) + "分钟 " + pad(seconds) + "秒")}`,
     ].join("\n");
   },
+  workCheckIn: (displayName, userId, checkedAt) => [
+    `用户：${userLink(displayName, userId)}`,
+    `用户标识：${inlineCode(userId)}`,
+    `上班打卡时间：${inlineCode(checkedAt)}`,
+  ].join("\n"),
   shiftStarted: (time) => `✅ 上班打卡成功：${inlineCode(time)}`,
   shiftEnded: (time) => `✅ 下班打卡成功：${inlineCode(time)}`,
   languageChanged: "语言已切换为中文。",
@@ -512,6 +518,11 @@ const en: LocaleText = {
       `Overtime: ${inlineCode(pad(minutes) + "m " + pad(seconds) + "s")}`,
     ].join("\n");
   },
+  workCheckIn: (displayName, userId, checkedAt) => [
+    `User: ${userLink(displayName, userId)}`,
+    `User ID: ${inlineCode(userId)}`,
+    `Work Check-In Time: ${inlineCode(checkedAt)}`,
+  ].join("\n"),
   shiftStarted: (time) => `✅ Work check-in succeeded: ${inlineCode(time)}`,
   shiftEnded: (time) => `✅ Work check-out succeeded: ${inlineCode(time)}`,
   languageChanged: "Language switched to English.",
