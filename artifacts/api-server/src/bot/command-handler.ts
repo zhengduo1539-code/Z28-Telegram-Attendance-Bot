@@ -149,6 +149,15 @@ export class CommandHandler {
         );
         return;
       }
+      if (target.id === message.chat.id) {
+        await this.telegram.sendMessage(
+          message.chat.id,
+          getLocale(currentLocale).connectSelf,
+          undefined,
+          message.message_id,
+        );
+        return;
+      }
       await this.attendance.setConnectedGroup(
         target.id,
         target.title,
@@ -303,6 +312,10 @@ export class CommandHandler {
           const target = await this.resolveConnectTarget(command.argument);
           if (!target) {
             response = text.connectInvalid;
+            break;
+          }
+          if (target.id === message.chat.id) {
+            response = text.connectSelf;
             break;
           }
           await this.attendance.setConnectedGroup(
