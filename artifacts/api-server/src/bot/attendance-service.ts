@@ -117,6 +117,8 @@ export class AttendanceService {
     const now = new Date();
     const key = userKey(profile.chatId, profile.userId);
     let response = "";
+    let timeoutNotification: string | undefined;
+    let notificationChatId: number | undefined;
     await this.store.update((state) => {
       ensureProfile(state, profile, now.toISOString());
       const locale = state.users[key].locale;
@@ -175,7 +177,7 @@ export class AttendanceService {
   async settle(
     profile: Omit<UserProfile, "createdAt" | "updatedAt">,
     settledBy: "back" | "offwork" = "back",
-  ) {
+  ): Promise<{ response: string; timeoutNotification?: string; notificationChatId?: number }> {
     const now = new Date();
     const key = userKey(profile.chatId, profile.userId);
     let response = "";
@@ -198,6 +200,26 @@ export class AttendanceService {
           (now.getTime() - new Date(active.startedAt).getTime()) / 1000,
         ),
       );
+      const timeoutSeconds = Math.max(
+        0,
+        Math.floor(elapsedSeconds - active.limitMinutes * 60),
+      );
+      if (settledBy === "back" && timeoutSeconds > 0) {
+        const connection = state.connectedGroups?.[String(profile.chatId)];
+        if (connection) {
+          const locale = state.users[key].locale;
+          timeoutNotification = getLocale(locale).groupTimeoutNotification(
+            connection.targetGroupName,
+            connection.sourceChatId,
+            connection.sourceUsername,
+            active.displayName,
+            active.userId,
+            activityLabel(active.kind, locale),
+            timeoutSeconds,
+          );
+          notificationChatId = connection.targetChatId;
+        }
+      }
       state.records.push({
         id: createId(),
         chatId: active.chatId,
@@ -258,11 +280,60 @@ export class AttendanceService {
         todayCounts,
       );
     });
-    return response;
+    return { response, timeoutNotification, notificationChatId };
   }
 
   async offWork(profile: Omit<UserProfile, "createdAt" | "updatedAt">) {
     return this.settle(profile, "offwork");
+  }
+
+  async beginConnect(chatId: number, userId: number): Promise<void> {
+    await this.store.update((state) => {
+      state.pendingConnects = state.pendingConnects || {};
+      state.pendingConnects[`${chatId}:${userId}`] = {
+        sourceChatId: chatId,
+        userId,
+        requestedAt: new Date().toISOString(),
+      };
+    });
+  }
+
+  async getPendingConnect(chatId: number, userId: number) {
+    const state = await this.store.load();
+    return state.pendingConnects?.[`${chatId}:${userId}`];
+  }
+
+  async clearPendingConnect(chatId: number, userId: number): Promise<void> {
+    await this.store.update((state) => {
+      delete state.pendingConnects?.[`${chatId}:${userId}`];
+    });
+  }
+
+  async setConnectedGroup(
+    sourceChatId: number,
+    sourceGroupName: string | undefined,
+    sourceUsername: string | undefined,
+    targetChatId: number,
+    targetGroupName: string,
+    targetUsername?: string,
+  ): Promise<void> {
+    await this.store.update((state) => {
+      state.connectedGroups = state.connectedGroups || {};
+      state.connectedGroups[String(sourceChatId)] = {
+        sourceChatId,
+        ...(sourceGroupName ? { sourceGroupName } : {}),
+        ...(sourceUsername ? { sourceUsername } : {}),
+        targetChatId,
+        targetGroupName,
+        ...(targetUsername ? { targetUsername } : {}),
+        connectedAt: new Date().toISOString(),
+      };
+    });
+  }
+
+  async getConnectedGroup(sourceChatId: number) {
+    const state = await this.store.load();
+    return state.connectedGroups?.[String(sourceChatId)];
   }
 
   async getActivityCountLimits(): Promise<Partial<ActivityCountLimits>> {

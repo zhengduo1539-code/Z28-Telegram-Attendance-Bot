@@ -40,6 +40,19 @@ type LocaleText = {
     userId: number,
     activity: string,
   ) => string;
+  connectPrompt: string;
+  connectUsage: string;
+  connectSuccess: (groupName: string, groupId: number) => string;
+  connectInvalid: string;
+  groupTimeoutNotification: (
+    groupName: string,
+    groupId: number,
+    username: string | undefined,
+    displayName: string,
+    userId: number,
+    activity: string,
+    timeoutSeconds: number,
+  ) => string;
   shiftStarted: (time: string) => string;
   shiftEnded: (time: string) => string;
   languageChanged: string;
@@ -222,6 +235,32 @@ const zh: LocaleText = {
       `回座：${inlineCode("/back")}`,
     ].join("\n");
   },
+  connectPrompt: "请输入要连接的群组 ID 或群组链接。",
+  connectUsage: "用法：在群组中发送 /connect，然后发送目标群组 ID 或公开群组链接。",
+  connectSuccess: (groupName, groupId) => [
+    "✅ 连接成功",
+    `群组：${inlineCode(groupName)}`,
+    `群组标识：${inlineCode(groupId)}`,
+  ].join("\n"),
+  connectInvalid: "无法识别或访问该群组。请确认 Bot 已加入目标群组，并输入正确的群组 ID；公开群组也可以使用 t.me 链接。",
+  groupTimeoutNotification: (groupName, groupId, username, displayName, userId, activity, timeoutSeconds) => {
+    const minutes = Math.floor(timeoutSeconds / 60);
+    const seconds = timeoutSeconds % 60;
+    const pad = (value: number) => String(value).padStart(2, "0");
+    const openGroup = username
+      ? `<a href="https://t.me/${encodeURIComponent(username)}">打开群</a>`
+      : "打开群";
+    return [
+      `Group Name：${inlineCode(groupName)}`,
+      `群组：${openGroup}【${inlineCode(activity)}】`,
+      `群组标识：${inlineCode(groupId)}`,
+      `用户：${userLink(displayName, userId)}`,
+      `用户标识：${inlineCode(userId)}`,
+      `打卡活动：${inlineCode(activity)}`,
+      `状态：${inlineCode("单次活动超过时间限制")}`,
+      `超时时长：${inlineCode(pad(minutes) + "分钟 " + pad(seconds) + "秒")}`,
+    ].join("\n");
+  },
   shiftStarted: (time) => `✅ 上班打卡成功：${inlineCode(time)}`,
   shiftEnded: (time) => `✅ 下班打卡成功：${inlineCode(time)}`,
   languageChanged: "语言已切换为中文。",
@@ -376,6 +415,32 @@ const en: LocaleText = {
       `User ID: ${identity.id}`,
       `⚠️ Warning: Your ${inlineCode(activity)} activity is overdue. Please return to your seat.`,
       `Back to Seat: ${inlineCode("/back")}`,
+    ].join("\n");
+  },
+  connectPrompt: "Please send the target group ID or group link.",
+  connectUsage: "Use /connect in a group, then send the target group ID or public group link.",
+  connectSuccess: (groupName, groupId) => [
+    "✅ Connection successful",
+    `Group: ${inlineCode(groupName)}`,
+    `Group ID: ${inlineCode(groupId)}`,
+  ].join("\n"),
+  connectInvalid: "I could not identify or access that group. Make sure the bot is in the target group and send a valid group ID; public groups can also use a t.me link.",
+  groupTimeoutNotification: (groupName, groupId, username, displayName, userId, activity, timeoutSeconds) => {
+    const minutes = Math.floor(timeoutSeconds / 60);
+    const seconds = timeoutSeconds % 60;
+    const pad = (value: number) => String(value).padStart(2, "0");
+    const openGroup = username
+      ? `<a href="https://t.me/${encodeURIComponent(username)}">Open Group</a>`
+      : "Open Group";
+    return [
+      `Group Name: ${inlineCode(groupName)}`,
+      `Group: ${openGroup}【${inlineCode(activity)}】`,
+      `Group ID: ${inlineCode(groupId)}`,
+      `User: ${userLink(displayName, userId)}`,
+      `User ID: ${inlineCode(userId)}`,
+      `Activity: ${inlineCode(activity)}`,
+      `Status: ${inlineCode("Single activity exceeded time limit")}`,
+      `Overtime: ${inlineCode(pad(minutes) + "m " + pad(seconds) + "s")}`,
     ].join("\n");
   },
   shiftStarted: (time) => `✅ Work check-in succeeded: ${inlineCode(time)}`,

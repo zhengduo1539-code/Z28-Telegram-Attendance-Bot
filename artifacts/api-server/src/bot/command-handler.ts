@@ -93,12 +93,53 @@ export class CommandHandler {
   private async handleMessage(message: TelegramMessage) {
     if (!message.text || !message.from || message.from.is_bot) return;
     const command = parseCommand(message.text) || buttonCommand(message.text);
-    if (!command) return;
-
     const currentLocale = await this.attendance.getLocale(
       message.chat.id,
       message.from.id,
     );
+    const profile = profileFromUser(message, currentLocale);
+    if (!profile) return;
+
+    const pendingConnect = await this.attendance.getPendingConnect(
+      message.chat.id,
+      profile.userId,
+    );
+    if (pendingConnect && message.text.trim().toLowerCase() !== "/connect") {
+      const target = await this.resolveConnectTarget(message.text);
+      if (!target) {
+        await this.telegram.sendMessage(
+          message.chat.id,
+          getLocale(currentLocale).connectInvalid,
+          undefined,
+          message.message_id,
+        );
+        return;
+      }
+      await this.attendance.setConnectedGroup(
+        message.chat.id,
+        message.chat.title,
+        message.chat.username,
+        target.id,
+        target.title || String(target.id),
+        target.username,
+      );
+      await this.attendance.clearPendingConnect(
+        message.chat.id,
+        profile.userId,
+      );
+      await this.telegram.sendMessage(
+        message.chat.id,
+        getLocale(currentLocale).connectSuccess(
+          target.title || String(target.id),
+          target.id,
+        ),
+        undefined,
+        message.message_id,
+      );
+      return;
+    }
+
+    if (!command) return;
     if (command.name === "lang" || command.name === "language") {
       const requestedLocale =
         command.argument === "eng" ? "en" : command.argument;
@@ -125,8 +166,6 @@ export class CommandHandler {
       return;
     }
 
-    const profile = profileFromUser(message, currentLocale);
-    if (!profile) return;
     const locale = profile.locale;
     const text = getLocale(locale);
     let response: string | undefined;
@@ -142,10 +181,22 @@ export class CommandHandler {
         response = await this.attendance.startShift(profile);
         markup = keyboard(locale);
         break;
-      case "back":
-        response = await this.attendance.settle(profile);
+      case "back": {
+        const result = await this.attendance.settle(profile);
+        response = result.response;
+        if (result.timeoutNotification && result.notificationChatId) {
+          try {
+            await this.telegram.sendMessage(
+              result.notificationChatId,
+              result.timeoutNotification,
+            );
+          } catch {
+            // Connected target group may no longer be reachable.
+          }
+        }
         markup = keyboard(locale);
         break;
+      }
       case "eat":
       case "wc":
       case "smoke":
@@ -154,8 +205,16 @@ export class CommandHandler {
         markup = keyboard(locale);
         break;
       case "offwork":
-        response = await this.attendance.offWork(profile);
+        response = (await this.attendance.offWork(profile)).response;
         markup = keyboard(locale);
+        break;
+      case "connect":
+        if (message.chat.type === "private") {
+          response = text.connectUsage;
+          break;
+        }
+        await this.attendance.beginConnect(message.chat.id, profile.userId);
+        response = text.connectPrompt;
         break;
       case "limits":
       case "limit":
@@ -178,6 +237,38 @@ export class CommandHandler {
       markup,
       message.message_id,
     );
+  }
+
+  private async resolveConnectTarget(
+    input: string,
+  ): Promise<{ id: number; title?: string; username?: string } | undefined> {
+    const value = input.trim();
+    const idMatch = value.match(/^-\d+$/);
+    const publicLinkMatch = value.match(
+      /^(?:https?:\/\/)?(?:www\.)?t\.me\/([A-Za-z0-9_]{5,})\/?$/i,
+    );
+    const username = publicLinkMatch
+      ? `@${publicLinkMatch[1]}`
+      : value.startsWith("@")
+        ? value
+        : undefined;
+    const chatId = idMatch ? Number(value) : username;
+    if (chatId === undefined || (typeof chatId === "number" && !Number.isSafeInteger(chatId))) {
+      return undefined;
+    }
+    try {
+      const chat = await this.telegram.getChat(chatId);
+      if (chat.type !== "group" && chat.type !== "supergroup") {
+        return undefined;
+      }
+      return {
+        id: chat.id,
+        title: chat.title,
+        username: chat.username,
+      };
+    } catch {
+      return undefined;
+    }
   }
 
   private async handleCountLimitCommand(

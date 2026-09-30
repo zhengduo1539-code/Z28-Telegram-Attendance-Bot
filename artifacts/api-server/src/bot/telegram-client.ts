@@ -62,6 +62,15 @@ export class TelegramClient {
     return body.result as T;
   }
 
+  getChat(chatId: number | string) {
+    return this.call<{
+      id: number;
+      type: string;
+      title?: string;
+      username?: string;
+    }>("getChat", { chat_id: chatId });
+  }
+
   getUpdates(offset: number | undefined, timeoutSeconds: number) {
     return this.call<TelegramUpdate[]>("getUpdates", {
       ...(offset === undefined ? {} : { offset }),

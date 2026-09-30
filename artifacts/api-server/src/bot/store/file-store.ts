@@ -8,6 +8,8 @@ const emptyState = (): BotState => ({
   activeActivities: {},
   records: [],
   activityLimits: {},
+  connectedGroups: {},
+  pendingConnects: {},
 });
 
 const isObjectRecord = (value: unknown): value is Record<string, unknown> =>
@@ -24,7 +26,11 @@ const isBotState = (value: unknown): value is BotState => {
     Array.isArray(candidate.records) &&
     candidate.records.every(isObjectRecord) &&
     (candidate.activityLimits === undefined ||
-      isObjectRecord(candidate.activityLimits))
+      isObjectRecord(candidate.activityLimits)) &&
+    (candidate.connectedGroups === undefined ||
+      isObjectRecord(candidate.connectedGroups)) &&
+    (candidate.pendingConnects === undefined ||
+      isObjectRecord(candidate.pendingConnects))
   );
 };
 
