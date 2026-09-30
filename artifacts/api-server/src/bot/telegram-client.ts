@@ -131,19 +131,16 @@ export class TelegramClient {
     return this.call("deleteWebhook", { drop_pending_updates: false });
   }
 
-  setMyCommands() {
+  setMyCommands(
+    commands: Array<{ command: string; description: string }>,
+    scope?:
+      | { type: "default" }
+      | { type: "chat"; chat_id: number | string }
+      | { type: "chat_member"; chat_id: number | string; user_id: number },
+  ) {
     return this.call("setMyCommands", {
-      commands: [
-        { command: "work", description: "上班 / Start work" },
-        { command: "back", description: "回座 / Return to seat" },
-        { command: "eat", description: "吃饭 / Meal break" },
-        { command: "wc", description: "上厕所 / Toilet" },
-        { command: "smoke", description: "抽烟 / Smoke break" },
-        { command: "wcd", description: "WCD" },
-        { command: "offwork", description: "下班 / End work" },
-        { command: "help", description: "帮助 / Help" },
-        { command: "lang", description: "语言 / Language" },
-      ],
+      commands,
+      ...(scope ? { scope } : {}),
     });
   }
 }
