@@ -223,6 +223,10 @@ export class CommandHandler {
           response = text.connectUsage;
           break;
         }
+        if (!(await this.isGroupAdmin(message))) {
+          response = text.connectAdminOnly;
+          break;
+        }
         if (command.argument) {
           const target = await this.resolveConnectTarget(command.argument);
           if (!target) {
@@ -271,6 +275,25 @@ export class CommandHandler {
       markup,
       message.message_id,
     );
+  }
+
+  private async isGroupAdmin(message: TelegramMessage): Promise<boolean> {
+    if (
+      message.chat.type !== "group" &&
+      message.chat.type !== "supergroup"
+    ) {
+      return false;
+    }
+    if (!message.from || message.from.is_bot) return false;
+    try {
+      const member = await this.telegram.getChatMember(
+        message.chat.id,
+        message.from.id,
+      );
+      return member.status === "creator" || member.status === "administrator";
+    } catch {
+      return false;
+    }
   }
 
   private async resolveConnectTarget(
