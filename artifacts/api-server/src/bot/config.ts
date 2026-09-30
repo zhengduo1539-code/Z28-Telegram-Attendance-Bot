@@ -19,8 +19,8 @@ const parseAdminIds = (value: string | undefined): number[] =>
 
 const DEFAULT_ACTIVITY_LIMITS: ActivityLimits = {
   eat: 30,
-  wc: 10,
-  smoke: 10,
+  wc: 7,
+  smoke: 7,
   wcd: 15,
 };
 
