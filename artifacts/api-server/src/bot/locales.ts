@@ -9,6 +9,7 @@ import type {
 
 type LocaleText = {
   title: string;
+  startWelcome: string;
   help: string;
   noActive: (displayName: string, userId: number) => string;
   alreadyActive: (
@@ -147,6 +148,10 @@ const getTimeoutSeconds = (durationSeconds: number, limitMinutes: number) =>
 
 const zh: LocaleText = {
   title: "打卡机器人 M58",
+  startWelcome: [
+    "欢迎使用打卡机器人！",
+    `请使用 ${inlineCode("/help")} 查看所有可用命令及使用说明。`,
+  ].join("\n"),
   help: [
     "可用命令：",
     `${inlineCode("/work")} — 群成员工作打卡，显示实际打卡日期和时间`,
@@ -344,6 +349,10 @@ const zh: LocaleText = {
 
 const en: LocaleText = {
   title: "Attendance Bot M58",
+  startWelcome: [
+    "Welcome to the Attendance Bot!",
+    `Use ${inlineCode("/help")} to view all available commands and usage instructions.`,
+  ].join("\n"),
   help: [
     "Available commands:",
     `${inlineCode("/work")} — Member work check-in; shows the actual check-in date and time`,
