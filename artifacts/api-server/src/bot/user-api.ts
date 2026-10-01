@@ -86,6 +86,7 @@ type DashboardGroup = {
     wcd: number;
   };
   activeCount: number;
+  memberCount: number;
   userActive: ActiveActivity | null;
   connectedTarget: {
     chatId: number;
@@ -166,6 +167,8 @@ userApiRouter.post("/dashboard", async (req, res) => {
         (activity) => activity.chatId === groupId,
       ).length;
 
+      const memberCount = await auth.context.telegram.getChatMemberCount(groupId);
+
       const userActive =
         snapshot.activeActivities[`${groupId}:${requestedUserId}`] || null;
 
@@ -187,6 +190,7 @@ userApiRouter.post("/dashboard", async (req, res) => {
         memberStatus: member.status as "creator" | "administrator",
         today,
         activeCount,
+        memberCount,
         userActive,
         connectedTarget,
       });
@@ -202,6 +206,18 @@ userApiRouter.post("/dashboard", async (req, res) => {
     user: auth.user,
     groups,
     hasGroups: groups.length > 0,
+    activityLimits: {
+      eat: snapshot.activityLimits?.eat ?? 30,
+      wc: snapshot.activityLimits?.wc ?? 7,
+      smoke: snapshot.activityLimits?.smoke ?? 7,
+      wcd: snapshot.activityLimits?.wcd ?? 15,
+    },
+    countLimits: {
+      eat: snapshot.activityCountLimits?.eat ?? Number.POSITIVE_INFINITY,
+      wc: snapshot.activityCountLimits?.wc ?? 7,
+      smoke: snapshot.activityCountLimits?.smoke ?? 7,
+      wcd: snapshot.activityCountLimits?.wcd ?? 2,
+    },
     message:
       groups.length > 0
         ? undefined
