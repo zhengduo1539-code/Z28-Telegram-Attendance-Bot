@@ -2,7 +2,7 @@ import { Router, type IRouter, type Request, type Response } from "express";
 import { isConfiguredAdmin, getTelegramInitData, validateTelegramInitData } from "./admin-auth";
 import { getAdminApiContext } from "./admin-runtime";
 import { adminMiniAppHtml } from "./admin-mini-app";
-import type { ActivityKind } from "./types";
+import type { ActivityKind, AuditLogEntry } from "./types";
 
 const activityKinds: ActivityKind[] = ["eat", "wc", "smoke", "wcd"];
 const defaultCountLimits = { eat: null, wc: 7, smoke: 7, wcd: 2 } as const;
@@ -42,6 +42,27 @@ const requireAdmin = (req: Request, res: Response) => {
   }
 
   return { context, user: validated.user };
+};
+
+const recordAdminAudit = async (
+  auth: { context: NonNullable<ReturnType<typeof getAdminApiContext>>; user: { id: number; first_name?: string; last_name?: string; username?: string } },
+  action: string,
+  target: string,
+  details: string,
+) => {
+  const actorName = [auth.user.first_name, auth.user.last_name].filter(Boolean).join(" ") || auth.user.username || String(auth.user.id);
+  const role = auth.user.id === auth.context.config.botOwnerId ? "owner" : "administrator";
+  const entry: AuditLogEntry = {
+    id: Date.now().toString(36) + "-" + auth.user.id + "-" + Math.random().toString(36).slice(2, 8),
+    actorUserId: auth.user.id,
+    actorName,
+    role,
+    action,
+    target,
+    details: details.length > 240 ? details.slice(0, 237) + "..." : details,
+    createdAt: new Date().toISOString(),
+  };
+  await auth.context.attendance.createAuditLog(entry);
 };
 
 const serializeCountLimits = (
@@ -236,6 +257,20 @@ adminApiRouter.get("/groups", async (req, res) => {
   });
 });
 
+adminApiRouter.get("/audit-logs", async (req, res) => {
+  const auth = requireAdmin(req, res);
+  if (!auth) return;
+  const requestedPage = Number(req.query.page);
+  const requestedPageSize = Number(req.query.pageSize);
+  const page = Number.isSafeInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
+  const pageSize = Number.isSafeInteger(requestedPageSize) && requestedPageSize > 0 ? Math.min(requestedPageSize, 50) : 20;
+  const search = typeof req.query.search === "string" ? req.query.search.trim().slice(0, 100) : "";
+  const action = typeof req.query.action === "string" ? req.query.action.trim().slice(0, 80) : "";
+  const result = await auth.context.attendance.listAuditLogs({ search, action, page, pageSize });
+  res.setHeader("Cache-Control", "no-store");
+  res.json(result);
+});
+
 adminApiRouter.put("/activity-limits", async (req, res) => {
   const auth = requireAdmin(req, res);
   if (!auth) return;
@@ -251,6 +286,7 @@ adminApiRouter.put("/activity-limits", async (req, res) => {
     kind as ActivityKind,
     minutes,
   );
+  await recordAdminAudit(auth, "activity_limit.updated", kind.toUpperCase(), "Duration limit set to " + String(minutes) + " minutes.");
   res.setHeader("Cache-Control", "no-store");
   res.json({ activityLimits });
 });
@@ -274,6 +310,7 @@ adminApiRouter.put("/count-limits", async (req, res) => {
     kind as ActivityKind,
     count,
   );
+  await recordAdminAudit(auth, "daily_limit.updated", kind.toUpperCase(), "Daily activity limit set to " + String(count) + ".");
   res.setHeader("Cache-Control", "no-store");
   res.json({ countLimits: serializeCountLimits(countLimits) });
 });
@@ -289,6 +326,7 @@ adminApiRouter.put("/reminder", async (req, res) => {
 
   const reminderEnabled =
     await auth.context.attendance.setActivityReminderEnabled(req.body.enabled);
+  await recordAdminAudit(auth, "automation.updated", "Overdue Reminder", "Overdue reminder " + (reminderEnabled ? "enabled." : "disabled.") );
   res.setHeader("Cache-Control", "no-store");
   res.json({ reminderEnabled });
 });
