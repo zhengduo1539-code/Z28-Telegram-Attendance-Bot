@@ -40,6 +40,11 @@ export type BotConfig = {
   mongodbStorageWarnPercent: number;
   mongodbStorageCriticalPercent: number;
   mongodbEmergencyRetentionDays: number;
+  memoryHeapWarnPercent: number;
+  memoryHeapCriticalPercent: number;
+  memoryRssLimitMb: number;
+  memoryRssWarnPercent: number;
+  memoryRssCriticalPercent: number;
 };
 
 const resolveAdminMiniAppUrl = (): string | undefined => {
@@ -86,4 +91,9 @@ export const getBotConfig = (): BotConfig => ({
   mongodbStorageWarnPercent: Math.min(Math.max(Number(process.env["MONGODB_STORAGE_WARN_PERCENT"]) || 70, 1), 99),
   mongodbStorageCriticalPercent: Math.min(Math.max(Number(process.env["MONGODB_STORAGE_CRITICAL_PERCENT"]) || 90, 1), 99),
   mongodbEmergencyRetentionDays: Math.max(7, positiveInteger(process.env["MONGODB_EMERGENCY_RETENTION_DAYS"], 30)),
+  memoryHeapWarnPercent: Math.min(Math.max(Number(process.env["MEMORY_HEAP_WARN_PERCENT"]) || 80, 1), 99),
+  memoryHeapCriticalPercent: Math.min(Math.max(Number(process.env["MEMORY_HEAP_CRITICAL_PERCENT"]) || 90, 1), 99),
+  memoryRssLimitMb: positiveInteger(process.env["MEMORY_RSS_LIMIT_MB"], 512),
+  memoryRssWarnPercent: Math.min(Math.max(Number(process.env["MEMORY_RSS_WARN_PERCENT"]) || 80, 1), 99),
+  memoryRssCriticalPercent: Math.min(Math.max(Number(process.env["MEMORY_RSS_CRITICAL_PERCENT"]) || 90, 1), 99),
 });
