@@ -1,4 +1,4 @@
-import type { BotState, MiniAppGroupAccess } from "../types";
+import type { ActiveActivity, BotState, MiniAppGroupAccess } from "../types";
 
 export interface BotStore {
   load(): Promise<BotState>;
@@ -11,4 +11,22 @@ export interface BotStore {
     role: MiniAppGroupAccess["role"],
   ): Promise<MiniAppGroupAccess>;
   clearMiniAppGroupAccess(userId: number, groupId: number): Promise<void>;
+  getActiveActivity(chatId: number, userId: number): Promise<ActiveActivity | undefined>;
+  listActiveActivities(): Promise<ActiveActivity[]>;
+  createActiveActivity(activity: ActiveActivity): Promise<boolean>;
+  deleteActiveActivity(chatId: number, userId: number, activityId: string): Promise<void>;
+  listDueActiveActivities(now: Date, graceMs: number): Promise<ActiveActivity[]>;
+  claimActiveActivityReminder(
+    candidate: Pick<ActiveActivity, "chatId" | "userId" | "startedAt">,
+    now: Date,
+    graceMs: number,
+    leaseMs: number,
+  ): Promise<{ activity: ActiveActivity; claimedAt: string } | undefined>;
+  markActiveActivityReminderSent(
+    claim: { activity: ActiveActivity; claimedAt: string },
+    sentAt: Date,
+  ): Promise<void>;
+  releaseActiveActivityReminderClaim(
+    claim: { activity: ActiveActivity; claimedAt: string },
+  ): Promise<void>;
 }
