@@ -214,32 +214,70 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     }
 
     .section-icon {
-      width: 38px;
-      height: 38px;
-      flex: 0 0 38px;
+      position: relative;
+      width: 46px;
+      height: 46px;
+      flex: 0 0 46px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      border-radius: 12px;
-      background: linear-gradient(145deg, rgba(39, 132, 255, 0.24), rgba(20, 65, 130, 0.34));
-      border: 1px solid rgba(91, 155, 255, 0.26);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
-      font-size: 18px;
+      border-radius: 15px;
+      color: #9fd4ff;
+      background: linear-gradient(145deg, rgba(36, 134, 255, 0.22), rgba(8, 34, 66, 0.82));
+      border: 1px solid rgba(103, 178, 255, 0.30);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.08),
+        0 10px 24px rgba(0, 96, 220, 0.16);
     }
 
-    .section-title {
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-      min-width: 0;
+    .section-icon::after {
+      content: "";
+      position: absolute;
+      inset: 5px;
+      border-radius: 11px;
+      border: 1px solid rgba(132, 198, 255, 0.10);
+      pointer-events: none;
     }
 
-    .section-title small {
-      color: #7f91a8;
-      font-size: 11px;
-      font-weight: 650;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
+    .section-icon svg {
+      width: 24px;
+      height: 24px;
+      position: relative;
+      z-index: 1;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.9;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .activity-icon {
+      color: #54b4ff;
+      background: linear-gradient(145deg, rgba(38, 150, 255, 0.24), rgba(9, 43, 82, 0.88));
+    }
+
+    .counts-icon {
+      color: #9c8cff;
+      background: linear-gradient(145deg, rgba(112, 93, 255, 0.24), rgba(31, 26, 80, 0.88));
+    }
+
+    .reminder-icon {
+      color: #ffd166;
+      background: linear-gradient(145deg, rgba(255, 180, 45, 0.22), rgba(77, 46, 8, 0.88));
+    }
+
+    .reminder-icon::before {
+      content: "";
+      position: absolute;
+      inset: -5px;
+      border-radius: 19px;
+      border: 1px solid rgba(255, 209, 102, 0.10);
+      animation: reminderPulse 2.2s ease-in-out infinite;
+    }
+
+    @keyframes reminderPulse {
+      0%, 100% { transform: scale(0.92); opacity: 0.28; }
+      50% { transform: scale(1.08); opacity: 0.72; }
     }
 
     .card[data-section="activity"]::before {
@@ -480,7 +518,14 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
     <section class="card" id="limits-card" data-section="activity">
       <h2>
-        <span class="section-icon">⏱</span>
+        <span class="section-icon activity-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="13" r="7.5"></circle>
+            <path d="M9 3h6"></path>
+            <path d="M12 5.5v2"></path>
+            <path d="M12 13l3-2"></path>
+          </svg>
+        </span>
         <span class="section-title"><span>Activity Limits</span><small>Duration Control</small></span>
       </h2>
       <div class="section-caption" id="limits-scope"></div>
@@ -495,7 +540,15 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
     <section class="card" id="counts-card" data-section="counts">
       <h2>
-        <span class="section-icon">🔢</span>
+        <span class="section-icon counts-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M5 18v-5"></path>
+            <path d="M12 18V9"></path>
+            <path d="M19 18V5"></path>
+            <path d="M4 21h16"></path>
+            <path d="M4 8l4-3 4 2 4-4 4 1"></path>
+          </svg>
+        </span>
         <span class="section-title"><span>Daily Count Limits</span><small>Daily Usage Control</small></span>
       </h2>
       <div class="section-caption">Set how many times each activity can be used in one day.</div>
@@ -510,7 +563,12 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
     <section class="card panel-only-private" id="reminder-card" data-section="reminder">
       <h2>
-        <span class="section-icon">🔔</span>
+        <span class="section-icon reminder-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
+            <path d="M10 21h4"></path>
+          </svg>
+        </span>
         <span class="section-title"><span>Overdue Reminder</span><small>Automatic Notification</small></span>
       </h2>
       <div class="toggle">
