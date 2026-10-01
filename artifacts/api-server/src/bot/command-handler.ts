@@ -399,6 +399,20 @@ export class CommandHandler {
       default:
         response = text.unknownCommand;
     }
+    if (
+      (command.name === "help" ||
+        command.name === "limit" ||
+        command.name === "limits" ||
+        command.name === "countlimit" ||
+        command.name === "countlimits" ||
+        command.name === "connect") &&
+      (message.chat.type === "group" || message.chat.type === "supergroup") &&
+      (await this.isGroupAdmin(message))
+    ) {
+      const groupPanel = await this.getGroupAdminPanelMarkup(message, locale);
+      if (groupPanel) addGroupMarkup = groupPanel;
+    }
+
     await this.telegram.sendMessage(
       message.chat.id,
       response,
@@ -406,11 +420,17 @@ export class CommandHandler {
       message.message_id,
     );
     if (addGroupMarkup) {
+      const isGroupPanel =
+        message.chat.type === "group" || message.chat.type === "supergroup";
       await this.telegram.sendMessage(
         message.chat.id,
-        locale === "en"
-          ? "Add the bot to a group to use activity tracking with your team:"
-          : "团队需要使用活动打卡功能？请先将 Bot 添加到群组：",
+        isGroupPanel
+          ? locale === "en"
+            ? "Open the Group Admin Panel:"
+            : "打开群组管理面板："
+          : locale === "en"
+            ? "Add the bot to a group to use activity tracking with your team:"
+            : "团队需要使用活动打卡功能？请先将 Bot 添加到群组：",
         addGroupMarkup,
       );
     }
@@ -494,6 +514,38 @@ export class CommandHandler {
     }
   }
 
+  private async getGroupAdminPanelMarkup(
+    message: TelegramMessage,
+    locale: Locale,
+  ): Promise<import("./types").InlineKeyboardMarkup | undefined> {
+    if (
+      message.chat.type !== "group" &&
+      message.chat.type !== "supergroup"
+    ) {
+      return undefined;
+    }
+
+    const botUsername = await this.telegram.getBotUsername();
+    if (!botUsername) return undefined;
+
+    const startParam = `group_${message.chat.id}`;
+    const url = `https://t.me/${botUsername}?startapp=${encodeURIComponent(startParam)}`;
+    return {
+      inline_keyboard: [
+        [
+          {
+            text:
+              locale === "en"
+                ? "⚙️ Open Group Admin Panel"
+                : "⚙️ 打开群组管理面板",
+            style: "primary",
+            url,
+          },
+        ],
+      ],
+    };
+  }
+
   private async isGroupAdmin(message: TelegramMessage): Promise<boolean> {
     if (
       message.chat.type !== "group" &&
@@ -551,11 +603,17 @@ export class CommandHandler {
     argument: string | undefined,
   ): Promise<string> {
     const text = getLocale(profile.locale);
-    const isAdmin =
+    const isConfiguredAdmin =
       this.config.botOwnerId === profile.userId ||
       this.config.adminIds.includes(profile.userId);
-    if (!isAdmin) return text.adminOnly;
-    if (message.chat.type !== "private") return text.countLimitPrivate;
+    const isGroupAdmin =
+      message.chat.type === "group" || message.chat.type === "supergroup"
+        ? await this.isGroupAdmin(message)
+        : false;
+    if (!isConfiguredAdmin && !isGroupAdmin) return text.adminOnly;
+    if (message.chat.type !== "private" && !isGroupAdmin && !isConfiguredAdmin) {
+      return text.countLimitPrivate;
+    }
 
     const parts = argument?.split(/\s+/).filter(Boolean) || [];
     if (parts.length === 0) {
@@ -601,11 +659,17 @@ export class CommandHandler {
     argument: string | undefined,
   ): Promise<string> {
     const text = getLocale(profile.locale);
-    const isAdmin =
+    const isConfiguredAdmin =
       this.config.botOwnerId === profile.userId ||
       this.config.adminIds.includes(profile.userId);
-    if (!isAdmin) return text.adminOnly;
-    if (message.chat.type !== "private") return text.limitPrivate;
+    const isGroupAdmin =
+      message.chat.type === "group" || message.chat.type === "supergroup"
+        ? await this.isGroupAdmin(message)
+        : false;
+    if (!isConfiguredAdmin && !isGroupAdmin) return text.adminOnly;
+    if (message.chat.type !== "private" && !isGroupAdmin && !isConfiguredAdmin) {
+      return text.limitPrivate;
+    }
 
     const parts = argument?.split(/\s+/).filter(Boolean) || [];
     if (parts.length === 0) {
