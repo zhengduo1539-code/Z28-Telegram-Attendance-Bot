@@ -759,7 +759,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
     .panel-only-user { display: none; }
 
-    /* User Mini App must never expose admin/group settings. */
+    /* Regular-user Mini App uses a separate dashboard page with the same dark visual language as Admin Panel. */
     .user-mode .panel-only-private,
     .user-mode .panel-only-group {
       display: none !important;
@@ -778,37 +778,46 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     }
 
     .user-mode {
-      background: linear-gradient(145deg, #f7fbff 0%, #edf5ff 52%, #f8fbff 100%);
-      color: #132238;
+      background:
+        radial-gradient(circle at 10% 10%, rgba(23, 119, 255, 0.22), transparent 28%),
+        radial-gradient(circle at 88% 8%, rgba(0, 198, 255, 0.14), transparent 24%),
+        linear-gradient(145deg, #02040a 0%, #061126 46%, #02050e 100%);
+      color: #f7f9fc;
     }
 
     .user-mode h1 {
-      color: #0d2542;
-      background: none;
-      -webkit-text-fill-color: initial;
-      animation: none;
-      font-size: clamp(26px, 7vw, 34px);
+      color: transparent;
+      background: linear-gradient(
+        90deg,
+        #ff3b30,#ff9f0a,#ffd60a,#34c759,#00c7be,#0a84ff,#5e5ce6,#bf5af2,#ff2d55,#ff3b30
+      );
+      background-size: 220% auto;
+      background-clip: text;
+      -webkit-background-clip: text;
+      animation: rainbowFlow 5s linear infinite;
+      font-size: clamp(25px, 6vw, 31px);
     }
 
-    .user-mode .sub { color: #6f8299; }
+    .user-mode .sub { color: #93a4ba; }
     .user-mode .refresh {
-      background: #2563eb;
-      border-color: rgba(37,99,235,.16);
-      box-shadow: 0 8px 22px rgba(37,99,235,.18);
+      background: #1677ff;
+      color: #fff;
+      border-color: rgba(130, 191, 255, 0.35);
+      box-shadow: 0 8px 22px rgba(22,119,255,.24);
     }
 
     .user-card {
-      background: rgba(255,255,255,.90);
-      border: 1px solid rgba(105,145,185,.20);
-      border-radius: 24px;
-      box-shadow: 0 18px 45px rgba(62,91,126,.13);
+      background: linear-gradient(145deg, rgba(8, 16, 30, 0.94), rgba(7, 29, 58, 0.82));
+      border: 1px solid rgba(91,155,255,.22);
+      border-radius: 20px;
+      box-shadow: 0 16px 34px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.035);
     }
 
     .user-card::before { display: none; }
 
     .user-lead {
       margin: 0 0 15px;
-      color: #6b8098;
+      color: #93a4ba;
       font-size: 13px;
     }
 
@@ -819,22 +828,19 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       min-height: 50px;
       padding: 11px 14px;
       border-radius: 14px;
-      border: 1px solid #c8d8e8;
-      background: #fff;
-      color: #122843;
+      border: 1px solid rgba(97,161,255,.28);
+      background: rgba(2,9,20,.82);
+      color: #fff;
       font-size: 17px;
       outline: none;
     }
 
     .user-id-input:focus {
-      border-color: #5e98ed;
-      box-shadow: 0 0 0 4px rgba(37,99,235,.10);
+      border-color: rgba(72,157,255,.72);
+      box-shadow: 0 0 0 4px rgba(22,119,255,.12);
     }
 
-    .user-id-hint {
-      color: #7a8ea4;
-      font-size: 11px;
-    }
+    .user-id-hint { color: #7f92aa; font-size: 11px; }
 
     .user-confirm {
       width: 100%;
@@ -842,155 +848,322 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       margin-top: 14px;
       border: 0;
       border-radius: 14px;
-      background: #aebdce;
-      color: #fff;
+      background: #303b4b;
+      color: #8f9bab;
       font-weight: 800;
-      box-shadow: none;
-      transition: background .2s ease, box-shadow .2s ease;
+      transition: background .2s ease, color .2s ease, box-shadow .2s ease;
     }
 
     .user-confirm.ready {
-      background: linear-gradient(180deg,#2f80ed,#2563eb);
-      box-shadow: 0 10px 24px rgba(37,99,235,.20);
+      background: linear-gradient(180deg,#2f8cff,#1268e6);
+      color: #fff;
+      box-shadow: 0 10px 24px rgba(37,99,235,.24);
       cursor: pointer;
     }
 
     .user-dashboard { display: none; }
     .user-dashboard.visible { display: block; }
 
-    .user-dashboard-head {
+    .user-page-head {
       display:flex;
       justify-content:space-between;
-      align-items:center;
+      align-items:flex-start;
       gap:12px;
-      margin-bottom:14px;
+      margin: 4px 0 14px;
     }
 
-    .user-dashboard-title {
+    .user-page-title {
       margin:0;
-      color:#102b4b;
-      font-size:20px;
+      font-size: 23px;
+      font-weight: 850;
+      color:#f7f9fc;
+    }
+
+    .user-page-sub {
+      margin-top:4px;
+      color:#8497b0;
+      font-size:11px;
+    }
+
+    .user-group-box {
+      padding: 16px;
+      margin-bottom: 14px;
+      border: 1px solid rgba(91,155,255,.25);
+      border-radius: 20px;
+      background: linear-gradient(145deg, rgba(8,16,30,.90), rgba(7,29,58,.72));
+      box-shadow: 0 16px 34px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.035);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .user-group-box::before {
+      content:"";
+      position:absolute;
+      inset:0 auto 0 0;
+      width:4px;
+      background:linear-gradient(180deg,#42a5ff,#1677ff,#6f5cff);
+    }
+
+    .user-group-box-title {
+      display:flex;
+      align-items:center;
+      gap:9px;
+      color:#fff;
+      font-size:17px;
+      font-weight:850;
+      margin-bottom:13px;
+    }
+
+    .user-group-box-title::before {
+      content:"";
+      width:9px;
+      height:9px;
+      border-radius:50%;
+      background:#54b4ff;
+      box-shadow:0 0 14px rgba(84,180,255,.75);
+      animation: userLivePulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes userLivePulse {
+      0%,100% { transform:scale(.75); opacity:.55; }
+      50% { transform:scale(1); opacity:1; }
+    }
+
+    .user-group-name {
+      color:#9fd4ff;
+      font-size:12px;
+      margin-top:-8px;
+      margin-bottom:12px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .user-group-metrics {
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+    }
+
+    .user-live-metric {
+      padding:13px;
+      border-radius:15px;
+      border:1px solid rgba(85,154,255,.14);
+      background:linear-gradient(145deg,rgba(16,39,72,.76),rgba(5,18,36,.85));
+    }
+
+    .user-live-label {
+      color:#8497b0;
+      font-size:11px;
+      font-weight:700;
+    }
+
+    .user-live-value {
+      margin-top:4px;
+      color:#fff;
+      font-size:27px;
+      line-height:1.1;
       font-weight:850;
     }
 
-    .user-dashboard-count {
-      padding:7px 10px;
-      border-radius:999px;
-      background:#e7f0ff;
-      color:#2d6fd6;
-      font-size:11px;
+    .user-live-value.active {
+      color:#55d89b;
+      text-shadow:0 0 16px rgba(85,216,155,.22);
+    }
+
+    .user-tab-shell {
+      position:relative;
+      padding-bottom:82px;
+    }
+
+    .user-tab-panel { display:none; }
+    .user-tab-panel.active { display:block; }
+
+    .user-setting-card {
+      position:relative;
+      overflow:hidden;
+      padding:16px;
+      margin-bottom:14px;
+      border-radius:20px;
+      background:linear-gradient(145deg,rgba(8,16,30,.88),rgba(7,29,58,.72));
+      border:1px solid rgba(91,155,255,.22);
+      box-shadow:0 16px 34px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.035);
+    }
+
+    .user-setting-card::before {
+      content:"";
+      position:absolute;
+      left:0;
+      top:0;
+      width:4px;
+      height:100%;
+      background:linear-gradient(180deg,#42a5ff,#1677ff,#6f5cff);
+    }
+
+    .user-setting-card.counts::before {
+      background:linear-gradient(180deg,#8b7cff,#4f62ff);
+    }
+
+    .user-setting-head {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom:14px;
+    }
+
+    .user-setting-icon {
+      width:44px;
+      height:44px;
+      flex:0 0 44px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:14px;
+      color:#9fd4ff;
+      background:linear-gradient(145deg,rgba(36,134,255,.22),rgba(8,34,66,.82));
+      border:1px solid rgba(103,178,255,.30);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 10px 24px rgba(0,96,220,.16);
+    }
+
+    .user-setting-card.counts .user-setting-icon {
+      color:#9c8cff;
+      background:linear-gradient(145deg,rgba(112,93,255,.24),rgba(31,26,80,.88));
+    }
+
+    .user-setting-icon svg {
+      width:23px;
+      height:23px;
+      stroke:currentColor;
+      fill:none;
+      stroke-width:1.9;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+    }
+
+    .user-setting-card .clock-hand {
+      transform-box:fill-box;
+      transform-origin:center;
+      animation:clockHand 3.2s linear infinite;
+    }
+
+    .user-setting-card .count-bar {
+      transform-box:fill-box;
+      transform-origin:center bottom;
+    }
+
+    .user-setting-card .count-bar-1 { animation:countBar 1.6s ease-in-out infinite; }
+    .user-setting-card .count-bar-2 { animation:countBar 1.6s ease-in-out .18s infinite; }
+    .user-setting-card .count-bar-3 { animation:countBar 1.6s ease-in-out .36s infinite; }
+
+    .user-setting-title {
+      color:#f4f8ff;
+      font-size:16px;
       font-weight:800;
     }
+
+    .user-setting-sub {
+      margin-top:2px;
+      color:#8294ab;
+      font-size:11px;
+    }
+
+    .user-setting-grid {
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:8px;
+    }
+
+    .user-setting-value {
+      padding:10px 11px;
+      border-radius:13px;
+      border:1px solid rgba(91,155,255,.12);
+      background:rgba(2,9,20,.36);
+    }
+
+    .user-setting-value-label {
+      color:#8294ab;
+      font-size:10px;
+    }
+
+    .user-setting-value-number {
+      margin-top:2px;
+      color:#fff;
+      font-size:18px;
+      font-weight:850;
+    }
+
+    .user-tabbar {
+      position:fixed;
+      z-index:20;
+      left:50%;
+      bottom:max(10px,env(safe-area-inset-bottom));
+      transform:translateX(-50%);
+      width:min(730px,calc(100% - 28px));
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:7px;
+      padding:7px;
+      border:1px solid rgba(91,155,255,.24);
+      border-radius:18px;
+      background:rgba(4,11,23,.88);
+      backdrop-filter:blur(18px);
+      -webkit-backdrop-filter:blur(18px);
+      box-shadow:0 16px 35px rgba(0,0,0,.36);
+    }
+
+    .user-tab {
+      min-height:46px;
+      border:0;
+      border-radius:13px;
+      color:#8497b0;
+      background:transparent;
+      font-weight:800;
+      cursor:pointer;
+      transition:background .2s ease,color .2s ease,box-shadow .2s ease;
+    }
+
+    .user-tab.active {
+      color:#fff;
+      background:linear-gradient(180deg,#247fff,#1268e6);
+      box-shadow:0 8px 20px rgba(22,119,255,.25);
+    }
+
+    .user-warning {
+      padding:14px;
+      margin-bottom:14px;
+      border:1px solid rgba(255,180,45,.20);
+      border-radius:16px;
+      background:rgba(77,46,8,.20);
+      color:#ffd98a;
+      font-size:11px;
+      line-height:1.55;
+    }
+
+    .user-warning strong { color:#fff0c4; }
 
     .user-empty {
       padding:26px 18px;
       text-align:center;
       border-radius:18px;
-      border:1px dashed #c5d5e5;
-      background:rgba(247,251,255,.9);
-    }
-
-    .user-empty-icon {
-      width:52px;
-      height:52px;
-      margin:0 auto 12px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      border-radius:17px;
-      background:#e9f2ff;
-      color:#4f82ce;
-    }
-
-    .user-empty-icon svg {
-      width:26px;
-      height:26px;
-      fill:none;
-      stroke:currentColor;
-      stroke-width:1.8;
-      stroke-linecap:round;
-      stroke-linejoin:round;
+      border:1px dashed rgba(255,180,45,.35);
+      background:rgba(77,46,8,.18);
+      color:#ffd98a;
     }
 
     .user-empty strong {
       display:block;
-      margin-bottom:5px;
-      color:#16304e;
+      margin-bottom:7px;
+      color:#fff0c4;
       font-size:16px;
     }
 
     .user-empty p {
       margin:0 auto;
-      max-width:430px;
-      color:#71869b;
+      max-width:460px;
+      color:#d5b77a;
       font-size:12px;
       line-height:1.65;
     }
-
-    .user-group-list { display:grid; gap:12px; }
-
-    .user-group {
-      padding:15px;
-      border-radius:18px;
-      border:1px solid #d8e3ef;
-      background:rgba(255,255,255,.92);
-      box-shadow:0 9px 24px rgba(68,97,129,.08);
-    }
-
-    .user-group-head {
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:12px;
-    }
-
-    .user-group-name { color:#173657; font-weight:800; }
-
-    .user-group-meta {
-      margin-top:3px;
-      color:#7b8fa5;
-      font-size:11px;
-    }
-
-    .user-status {
-      padding:6px 9px;
-      border-radius:999px;
-      background:#e9f8f1;
-      color:#198754;
-      font-size:10px;
-      font-weight:800;
-      text-transform:uppercase;
-      letter-spacing:.04em;
-    }
-
-    .user-metrics {
-      display:grid;
-      grid-template-columns:repeat(3,minmax(0,1fr));
-      gap:8px;
-      margin-top:13px;
-    }
-
-    .user-metric {
-      padding:10px;
-      border-radius:13px;
-      background:#f5f9fd;
-      border:1px solid #e5edf5;
-    }
-
-    .user-metric-label { color:#7c91a7; font-size:10px; }
-    .user-metric-value { margin-top:2px; color:#193a5f; font-size:17px; font-weight:850; }
-
-    .user-active {
-      margin-top:10px;
-      padding:9px 11px;
-      border-radius:12px;
-      background:#fff8e7;
-      color:#8b6a1d;
-      font-size:11px;
-      font-weight:700;
-    }
-
-    .user-connection { margin-top:10px; color:#71869b; font-size:10px; }
 
     .user-loading {
       position:fixed;
@@ -999,7 +1172,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       display:none;
       align-items:center;
       justify-content:center;
-      background:rgba(247,251,255,.78);
+      background:rgba(2,7,17,.72);
       backdrop-filter:blur(8px);
       -webkit-backdrop-filter:blur(8px);
     }
@@ -1010,13 +1183,19 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       width:48px;
       height:48px;
       border-radius:50%;
-      border:4px solid #dbe8f8;
-      border-top-color:#2563eb;
+      border:4px solid rgba(126,171,232,.20);
+      border-top-color:#2f8cff;
       animation:userSpin .8s linear infinite;
-      box-shadow:0 0 22px rgba(37,99,235,.13);
+      box-shadow:0 0 22px rgba(37,99,235,.20);
     }
 
-    @keyframes userSpin { to { transform:rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) {
+      .user-group-box-title::before,
+      .user-setting-card .clock-hand,
+      .user-setting-card .count-bar {
+        animation:none !important;
+      }
+    }
 
     .panel-only-group,
     .panel-only-private { display: none; }
@@ -1101,7 +1280,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         </span>
         <span class="section-title"><span>Verify Your Telegram ID</span><small>User Access</small></span>
       </h2>
-      <p class="user-lead">Enter your Telegram user ID to open the groups where you are a group owner or administrator.</p>
+      <p class="user-lead">Enter your Telegram user ID to open your group dashboard.</p>
       <div class="user-id-wrap">
         <label for="user-id-input">Telegram User ID</label>
         <input class="user-id-input" id="user-id-input" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="Enter your Telegram ID">
@@ -1110,12 +1289,31 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       <button class="user-confirm" id="user-confirm" type="button" disabled>Confirm</button>
     </section>
 
-    <section class="user-dashboard panel-only-user" id="user-dashboard">
-      <div class="user-dashboard-head">
-        <h2 class="user-dashboard-title">Group Activities</h2>
-        <span class="user-dashboard-count" id="user-group-count">0 Groups</span>
+    <section class="panel-only-user user-dashboard" id="user-dashboard">
+      <div class="user-page-head">
+        <div>
+          <h2 class="user-page-title">Group Activities</h2>
+          <div class="user-page-sub" id="user-dashboard-sub">Live activity overview</div>
+        </div>
       </div>
-      <div id="user-group-list" class="user-group-list"></div>
+
+      <div class="user-tab-shell">
+        <div class="user-tab-panel active" id="user-warning-tab">
+          <div id="user-group-list"></div>
+          <div class="user-setting-card" id="user-warning-limits-card"></div>
+          <div class="user-setting-card counts" id="user-warning-counts-card"></div>
+        </div>
+
+        <div class="user-tab-panel" id="user-settings-tab">
+          <div class="user-setting-card" id="user-settings-limits-card"></div>
+          <div class="user-setting-card counts" id="user-settings-counts-card"></div>
+        </div>
+      </div>
+
+      <nav class="user-tabbar" aria-label="Dashboard sections">
+        <button class="user-tab" id="user-settings-tab-button" type="button">Admin Settings</button>
+        <button class="user-tab active" id="user-warning-tab-button" type="button">Warning</button>
+      </nav>
     </section>
 
     <section class="card panel-only-private panel-only-group" id="limits-card" data-section="activity">
@@ -1393,90 +1591,88 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         }
       }
 
-      var emptyDashboardTimer = null;
-
       function clearUserDashboard() {
-        if (emptyDashboardTimer) {
-          window.clearTimeout(emptyDashboardTimer);
-          emptyDashboardTimer = null;
-        }
         document.getElementById("user-dashboard").classList.remove("visible");
         document.getElementById("user-group-list").innerHTML = "";
-        document.getElementById("user-group-count").textContent = "0 Groups";
+        document.getElementById("user-dashboard-sub").textContent = "Live activity overview";
+      }
+
+      function settingCardMarkup(kind, titleText, subtitle, values) {
+        var icon = kind === "activity"
+          ? '<svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7.5"></circle><path d="M9 3h6"></path><path d="M12 5.5v2"></path><g class="clock-hand"><path d="M12 13l3-2"></path></g></svg>'
+          : '<svg viewBox="0 0 24 24"><path d="M4 21h16"></path><rect class="count-bar count-bar-1" x="5" y="13" width="3" height="5" rx="1.5" fill="currentColor" stroke="none"></rect><rect class="count-bar count-bar-2" x="10.5" y="9" width="3" height="9" rx="1.5" fill="currentColor" stroke="none"></rect><rect class="count-bar count-bar-3" x="16" y="5" width="3" height="13" rx="1.5" fill="currentColor" stroke="none"></rect><path d="M4.5 10l3.5-3 4 2 4-4 4.5 1"></path></svg>';
+
+        var items = values.map(function (item) {
+          return '<div class="user-setting-value"><div class="user-setting-value-label">' +
+            escapeHtml(item.label) +
+            '</div><div class="user-setting-value-number">' +
+            escapeHtml(item.value) +
+            '</div></div>';
+        }).join("");
+
+        return '<div class="user-setting-head">' +
+          '<span class="user-setting-icon">' + icon + '</span>' +
+          '<div><div class="user-setting-title">' + escapeHtml(titleText) + '</div>' +
+          '<div class="user-setting-sub">' + escapeHtml(subtitle) + '</div></div>' +
+          '</div><div class="user-setting-grid">' + items + '</div>';
       }
 
       function renderUserDashboard(data) {
         var dashboard = document.getElementById("user-dashboard");
-        var verifyCard = document.getElementById("user-verify-card");
-        var input = document.getElementById("user-id-input");
-        var confirm = document.getElementById("user-confirm");
         var list = document.getElementById("user-group-list");
-        var count = document.getElementById("user-group-count");
         var groups = Array.isArray(data.groups) ? data.groups : [];
-
-        if (emptyDashboardTimer) {
-          window.clearTimeout(emptyDashboardTimer);
-          emptyDashboardTimer = null;
-        }
+        var activity = data.activityLimits || {};
+        var counts = data.countLimits || {};
 
         dashboard.classList.add("visible");
-        count.textContent = groups.length + (groups.length === 1 ? " Group" : " Groups");
+
+        var activityValues = [
+          { label: "Eat", value: String(activity.eat ?? "—") + " min" },
+          { label: "WC", value: String(activity.wc ?? "—") + " min" },
+          { label: "Smoke", value: String(activity.smoke ?? "—") + " min" },
+          { label: "WCD", value: String(activity.wcd ?? "—") + " min" }
+        ];
+        var countValues = [
+          { label: "Eat", value: Number.isFinite(counts.eat) ? String(counts.eat) : "Unlimited" },
+          { label: "WC", value: String(counts.wc ?? "—") + " / day" },
+          { label: "Smoke", value: String(counts.smoke ?? "—") + " / day" },
+          { label: "WCD", value: String(counts.wcd ?? "—") + " / day" }
+        ];
+
+        document.getElementById("user-warning-limits-card").innerHTML =
+          settingCardMarkup("activity", "Activity Limits", "Duration Control", activityValues);
+        document.getElementById("user-warning-counts-card").innerHTML =
+          settingCardMarkup("counts", "Daily Count Limits", "Daily Usage Control", countValues);
+        document.getElementById("user-settings-limits-card").innerHTML =
+          settingCardMarkup("activity", "Activity Limits", "Duration Control", activityValues);
+        document.getElementById("user-settings-counts-card").innerHTML =
+          settingCardMarkup("counts", "Daily Count Limits", "Daily Usage Control", countValues);
 
         if (!groups.length) {
           list.innerHTML =
             '<div class="user-empty">' +
-              '<div class="user-empty-icon">' +
-                '<svg viewBox="0 0 24 24"><path d="M7 20h10"></path><path d="M5 20v-7a7 7 0 0 1 14 0v7"></path><path d="M3 20h18"></path><path d="M9 16h6"></path></svg>' +
-              '</div>' +
               '<strong>No eligible group found</strong>' +
               '<p>Add this bot to a group, then make sure your Telegram account is a group owner or administrator. Groups where the bot is no longer available are not shown.</p>' +
             '</div>';
-
-          emptyDashboardTimer = window.setTimeout(function () {
-            emptyDashboardTimer = null;
-            dashboard.classList.remove("visible");
-            verifyCard.classList.add("visible");
-            if (input) {
-              input.value = "";
-              input.focus();
-            }
-            if (confirm) {
-              confirm.disabled = true;
-              confirm.classList.remove("ready");
-              confirm.textContent = "Confirm";
-            }
-          }, 2800);
           return;
         }
 
-        verifyCard.classList.remove("visible");
         list.innerHTML = groups.map(function (group) {
-          var role = group.memberStatus === "creator" ? "Owner" : "Admin";
-          var target = group.connectedTarget
-            ? escapeHtml(group.connectedTarget.name)
-            : "Not connected";
-          var active = group.activeCount > 0
-            ? '<div class="user-active">' + group.activeCount + ' active ' + (group.activeCount === 1 ? 'activity' : 'activities') + ' right now.</div>'
-            : "";
-          return (
-            '<article class="user-group">' +
-              '<div class="user-group-head">' +
-                '<div>' +
-                  '<div class="user-group-name">' + escapeHtml(group.title) + '</div>' +
-                  '<div class="user-group-meta">' + escapeHtml(String(group.id)) + ' · ' + role + '</div>' +
-                '</div>' +
-                '<span class="user-status">' + role + '</span>' +
-              '</div>' +
-              '<div class="user-metrics">' +
-                '<div class="user-metric"><div class="user-metric-label">Today</div><div class="user-metric-value">' + String(group.today.total) + '</div></div>' +
-                '<div class="user-metric"><div class="user-metric-label">WC</div><div class="user-metric-value">' + String(group.today.wc) + '</div></div>' +
-                '<div class="user-metric"><div class="user-metric-label">Smoke</div><div class="user-metric-value">' + String(group.today.smoke) + '</div></div>' +
-              '</div>' +
-              active +
-              '<div class="user-connection">Notification target: ' + target + '</div>' +
-            '</article>'
-          );
+          var active = Number(group.activeCount || 0);
+          var members = Number(group.memberCount || 0);
+          return '<div class="user-group-box">' +
+            '<div class="user-group-box-title">Group Activities</div>' +
+            '<div class="user-group-name">' + escapeHtml(group.title) + '</div>' +
+            '<div class="user-group-metrics">' +
+              '<div class="user-live-metric"><div class="user-live-label">Group member</div><div class="user-live-value">' + String(members) + '</div></div>' +
+              '<div class="user-live-metric"><div class="user-live-label">Member active</div><div class="user-live-value active">' + String(active) + '</div></div>' +
+            '</div>' +
+          '</div>';
         }).join("");
+
+        document.getElementById("user-dashboard-sub").textContent =
+          groups.length === 1 ? "1 managed group · Live activity overview" :
+          String(groups.length) + " managed groups · Live activity overview";
       }
 
       async function apiUserMode() {
@@ -1515,6 +1711,28 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         showUserLoading(true);
         try {
           var data = await apiUserDashboard(telegramUserId);
+          if (!data.hasGroups) {
+            try { localStorage.removeItem(userVerifiedKey); } catch {}
+            document.getElementById("user-verify-card").classList.remove("visible");
+            renderUserDashboard(data);
+            window.setTimeout(function () {
+              clearUserDashboard();
+              document.getElementById("user-verify-card").classList.add("visible");
+              var input = document.getElementById("user-id-input");
+              var confirm = document.getElementById("user-confirm");
+              if (input) {
+                input.value = "";
+                input.focus();
+              }
+              if (confirm) {
+                confirm.disabled = true;
+                confirm.classList.remove("ready");
+                confirm.textContent = "Confirm";
+              }
+            }, 2800);
+            return false;
+          }
+
           rememberVerifiedUserId(telegramUserId);
           document.getElementById("user-verify-card").classList.remove("visible");
           renderUserDashboard(data);
@@ -1608,6 +1826,22 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         ).catch(function (error) {
           showNotice(error && error.message ? error.message : "Refresh failed.", "error");
         });
+      });
+
+      function activateUserTab(tab) {
+        var settings = tab === "settings";
+        document.getElementById("user-settings-tab").classList.toggle("active", settings);
+        document.getElementById("user-warning-tab").classList.toggle("active", !settings);
+        document.getElementById("user-settings-tab-button").classList.toggle("active", settings);
+        document.getElementById("user-warning-tab-button").classList.toggle("active", !settings);
+      }
+
+      document.getElementById("user-settings-tab-button").addEventListener("click", function () {
+        activateUserTab("settings");
+      });
+
+      document.getElementById("user-warning-tab-button").addEventListener("click", function () {
+        activateUserTab("warning");
       });
 
       var userIdInput = document.getElementById("user-id-input");
