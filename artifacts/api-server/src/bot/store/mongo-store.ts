@@ -169,9 +169,9 @@ export class MongoBotStore implements BotStore {
           const normalizedActivity = activity.id
             ? activity
             : { ...activity, id: `${activity.chatId}:${activity.userId}:${activity.startedAt}` };
-          await activeCollection.replaceOne(
+          await activeCollection.updateOne(
             { _id: activeActivityKey(activity.chatId, activity.userId) },
-            toMongoActiveActivity(normalizedActivity),
+            { $setOnInsert: toMongoActiveActivity(normalizedActivity) },
             { upsert: true },
           );
         }
@@ -202,9 +202,9 @@ export class MongoBotStore implements BotStore {
         const normalizedActivity = activity.id
           ? activity
           : { ...activity, id: `${activity.chatId}:${activity.userId}:${activity.startedAt}` };
-        await activeCollection.replaceOne(
+        await activeCollection.updateOne(
           { _id: activeActivityKey(activity.chatId, activity.userId) },
-          toMongoActiveActivity(normalizedActivity),
+          { $setOnInsert: toMongoActiveActivity(normalizedActivity) },
           { upsert: true },
         );
       }
