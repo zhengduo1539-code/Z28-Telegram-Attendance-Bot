@@ -797,8 +797,10 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
     .user-mode.user-verification-page .top { display:none !important; }
     .user-mode.user-dashboard-page .top { display:flex; }
-    .user-dashboard-page .top .credit-marquee,
     .user-dashboard-page .top .sub { display:none; }
+    .user-mode.user-dashboard-page .top .credit-marquee {
+      display:block;
+    }
 
     .user-mode.user-dashboard-page .user-card#user-verify-card {
       display: none !important;
@@ -2260,7 +2262,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         window.__z28SelectedGroupId = group.id;
         document.getElementById("user-group-options").hidden = true;
         document.getElementById("user-selected-dashboard").hidden = false;
-        title.textContent = group.title + " " + tUser("title");
+        title.textContent = String(telegramUserId) + " " + tUser("title");
         document.getElementById("switch-group").hidden = false;
         document.getElementById("switch-group").textContent = tUser("switch");
         document.getElementById("user-selected-group-title").textContent = group.title + " " + tUser("title");
@@ -2501,7 +2503,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             await load();
           } else {
             setPanelVisibility("user");
-            title.textContent = tUser("title");
+            title.textContent = telegramUserId ? String(telegramUserId) + " " + tUser("title") : tUser("title");
             var stored = getVerifiedUserId();
             var current = telegramUserId ? String(telegramUserId) : "";
             if (stored && current && stored === current) {
