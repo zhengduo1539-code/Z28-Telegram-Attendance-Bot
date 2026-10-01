@@ -271,7 +271,33 @@ adminApiRouter.get("/health", async (req, res) => {
     storage: { status: storageStatus, latencyMs: storageLatencyMs },
     telegram: { status: telegramStatus, latencyMs: telegramLatencyMs },
   };
-  const healthy = Object.values(services).every((service) => service.status === "healthy");
+  const memoryUsage = process.memoryUsage();
+  const rssMb = memoryUsage.rss / 1024 / 1024;
+  const heapUsedMb = memoryUsage.heapUsed / 1024 / 1024;
+  const heapTotalMb = memoryUsage.heapTotal / 1024 / 1024;
+  const heapUsagePercent = heapTotalMb > 0 ? (heapUsedMb / heapTotalMb) * 100 : 0;
+  const rssUsagePercent = (rssMb / auth.context.config.memoryRssLimitMb) * 100;
+  const heapStatus =
+    heapUsagePercent >= auth.context.config.memoryHeapCriticalPercent
+      ? "critical"
+      : heapUsagePercent >= auth.context.config.memoryHeapWarnPercent
+        ? "warning"
+        : "healthy";
+  const rssStatus =
+    rssUsagePercent >= auth.context.config.memoryRssCriticalPercent
+      ? "critical"
+      : rssUsagePercent >= auth.context.config.memoryRssWarnPercent
+        ? "warning"
+        : "healthy";
+  const memoryStatus =
+    heapStatus === "critical" || rssStatus === "critical"
+      ? "critical"
+      : heapStatus === "warning" || rssStatus === "warning"
+        ? "warning"
+        : "healthy";
+  const healthy =
+    Object.values(services).every((service) => service.status === "healthy") &&
+    memoryStatus === "healthy";
 
   res.setHeader("Cache-Control", "no-store");
   res.json({
@@ -279,9 +305,19 @@ adminApiRouter.get("/health", async (req, res) => {
     checkedAt: new Date().toISOString(),
     uptimeSeconds: Math.floor(process.uptime()),
     memory: {
-      rssMb: Math.round(process.memoryUsage().rss / 1024 / 1024),
-      heapUsedMb: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
-      heapTotalMb: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
+      status: memoryStatus,
+      rssMb: Math.round(rssMb * 10) / 10,
+      heapUsedMb: Math.round(heapUsedMb * 10) / 10,
+      heapTotalMb: Math.round(heapTotalMb * 10) / 10,
+      heapUsagePercent: Math.round(heapUsagePercent * 10) / 10,
+      rssUsagePercent: Math.round(rssUsagePercent * 10) / 10,
+      heapWarnPercent: auth.context.config.memoryHeapWarnPercent,
+      heapCriticalPercent: auth.context.config.memoryHeapCriticalPercent,
+      rssLimitMb: auth.context.config.memoryRssLimitMb,
+      rssWarnPercent: auth.context.config.memoryRssWarnPercent,
+      rssCriticalPercent: auth.context.config.memoryRssCriticalPercent,
+      heapStatus,
+      rssStatus,
     },
     services,
   });

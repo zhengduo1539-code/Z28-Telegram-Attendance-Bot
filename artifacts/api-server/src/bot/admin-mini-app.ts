@@ -2883,7 +2883,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
               <div class="admin-health-meta">
                 <div class="admin-health-meta-card"><div class="admin-health-meta-label">Overall status</div><div class="admin-health-meta-value" id="health-overall">Checking…</div></div>
                 <div class="admin-health-meta-card"><div class="admin-health-meta-label">Uptime</div><div class="admin-health-meta-value" id="health-uptime">—</div></div>
-                <div class="admin-health-meta-card"><div class="admin-health-meta-label">Memory</div><div class="admin-health-meta-value" id="health-memory">—</div></div>
+                <div class="admin-health-meta-card"><div class="admin-health-meta-label">Memory</div><div class="admin-health-meta-value" id="health-memory">—</div><div class="admin-health-meta" id="health-memory-meta">Memory thresholds</div></div>
               </div>
               <div class="admin-panel-sub" id="health-checked-at" style="margin-top:14px">Last checked: —</div>
             </div>
@@ -3709,10 +3709,23 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         var overall = document.getElementById("health-overall");
         var uptime = document.getElementById("health-uptime");
         var memory = document.getElementById("health-memory");
+        var memoryMeta = document.getElementById("health-memory-meta");
         var checked = document.getElementById("health-checked-at");
+        var memoryData = data.memory || {};
+        var memoryStatus = memoryData.status || "healthy";
         if (overall) overall.innerHTML = '<span class="admin-health-status ' + (data.status === "healthy" ? "healthy" : "degraded") + '">' + escapeHtml(data.status === "healthy" ? "Healthy" : "Degraded") + '</span>';
         if (uptime) uptime.textContent = formatHealthUptime(data.uptimeSeconds);
-        if (memory) memory.textContent = String(data.memory && data.memory.heapUsedMb || 0) + " MB heap";
+        if (memory) memory.textContent = String(memoryData.heapUsedMb || 0) + " MB heap · " + String(memoryData.rssMb || 0) + " MB RSS";
+        if (memoryMeta) {
+          var statusLabel = memoryStatus === "critical" ? "Critical" : memoryStatus === "warning" ? "Warning" : "Healthy";
+          memoryMeta.textContent =
+            statusLabel + " · Heap " + String(memoryData.heapUsagePercent || 0) + "% (Warn " +
+            String(memoryData.heapWarnPercent || 0) + "% · Critical " + String(memoryData.heapCriticalPercent || 0) +
+            "%) · RSS " + String(memoryData.rssUsagePercent || 0) + "% of " + String(memoryData.rssLimitMb || 0) +
+            " MB (Warn " + String(memoryData.rssWarnPercent || 0) + "% · Critical " +
+            String(memoryData.rssCriticalPercent || 0) + "%)";
+          memoryMeta.style.color = memoryStatus === "critical" ? "#fca5a5" : memoryStatus === "warning" ? "#fcd34d" : "";
+        }
         if (checked) checked.textContent = "Last checked: " + (data.checkedAt ? formatAdminDate(data.checkedAt) : "—");
       }
 
