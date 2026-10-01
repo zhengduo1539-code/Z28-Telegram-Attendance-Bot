@@ -2388,6 +2388,12 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       .admin-switch-track,
       .admin-switch-thumb { transition:none !important; }
     }
+    .admin-health-button{border:1px solid #cbd5e1;background:#fff;color:#334155;border-radius:9px;padding:7px 10px;font-size:11px;font-weight:800;cursor:pointer}
+    .admin-health-result{margin-top:16px;border:1px solid #e2e8f0;border-radius:14px;padding:15px;background:#f8fafc}
+    .admin-health-result-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+    .admin-health-result-title{font-weight:850;color:#0f172a}
+    .admin-health-check{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid #e2e8f0;font-size:12px}
+    .admin-health-ok{color:#15803d;font-weight:800}.admin-health-error{color:#b91c1c;font-weight:800}
   </style>
 </head>
 <body>
@@ -2582,9 +2588,10 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
               </div>
               <div class="admin-users-table-wrap">
                 <table class="admin-users-table">
-                  <thead><tr><th>Group</th><th>Chat ID</th><th>Members</th><th>Active</th><th>Connection</th><th>Last Updated</th></tr></thead>
-                  <tbody id="admin-groups-table-body"><tr><td colspan="6"><div class="admin-users-empty">Loading groups…</div></td></tr></tbody>
+                  <thead><tr><th>Group</th><th>Chat ID</th><th>Members</th><th>Active</th><th>Connection</th><th>Last Updated</th><th>Health</th></tr></thead>
+                  <tbody id="admin-groups-table-body"><tr><td colspan="7"><div class="admin-users-empty">Loading groups…</div></td></tr></tbody>
                 </table>
+              <div class="admin-health-result" id="admin-group-health-result" hidden></div>
               </div>
               <div class="admin-users-footer">
                 <span class="admin-users-meta" id="admin-groups-page-meta">—</span>
@@ -3704,18 +3711,44 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         var pageMeta=document.getElementById("admin-groups-page-meta"), prev=document.getElementById("admin-groups-prev"), next=document.getElementById("admin-groups-next");
         if(!body||!meta||!pageMeta||!prev||!next)return;
         adminGroupsState.page=pagination.page||1; adminGroupsState.totalPages=pagination.totalPages||1;
-        if(!groups.length) body.innerHTML='<tr><td colspan="6"><div class="admin-users-empty">No managed groups match the current search.</div></td></tr>';
+        if(!groups.length) body.innerHTML='<tr><td colspan="7"><div class="admin-users-empty">No managed groups match the current search.</div></td></tr>';
         else body.innerHTML=groups.map(function(group){
           var connection=group.connection ? "→ "+(group.connection.targetGroupName||String(group.connection.targetChatId)) : "Not connected";
           return '<tr><td><div class="admin-user-primary"><div class="admin-user-avatar">GR</div><div><div class="admin-user-name">'+escapeHtml(group.title||"Group")+
             '</div><div class="admin-user-sub">'+escapeHtml(group.username ? "@"+group.username : "Managed group")+'</div></div></div></td><td class="admin-user-id">'+escapeHtml(String(group.chatId))+
             '</td><td>'+escapeHtml(String(group.memberCount||0))+'</td><td><span class="admin-user-status '+(Number(group.activeCount||0)>0?"active":"inactive")+'">'+escapeHtml(String(group.activeCount||0))+
-            '</span></td><td><span class="admin-user-status '+(group.connection?"active":"inactive")+'">'+escapeHtml(connection)+'</span></td><td class="admin-user-muted">'+escapeHtml(formatAdminDate(group.updatedAt))+'</td></tr>';
+            '</span></td><td><span class="admin-user-status '+(group.connection?"active":"inactive")+'">'+escapeHtml(connection)+'</span></td><td class="admin-user-muted">'+escapeHtml(formatAdminDate(group.updatedAt))+'</td><td><button class="admin-health-button" type="button" data-group-health="'+escapeHtml(String(group.chatId))+'">Check</button></td></tr>';
         }).join("");
         var total=Number(pagination.total||0);
         meta.textContent=total+(total===1?" group":" groups");
         pageMeta.textContent="Page "+String(adminGroupsState.page)+" of "+String(adminGroupsState.totalPages);
         prev.disabled=adminGroupsState.page<=1; next.disabled=adminGroupsState.page>=adminGroupsState.totalPages;
+      }
+
+      async function checkAdminGroupHealth(chatId) {
+        var result = document.getElementById("admin-group-health-result");
+        if (!result) return;
+        result.hidden = false;
+        result.innerHTML = '<div class="admin-health-result-title">Checking group health…</div>';
+        try {
+          var data = await api("/group-health?chatId=" + encodeURIComponent(String(chatId)));
+          var statusClass = data.healthy ? "admin-health-ok" : "admin-health-error";
+          var statusText = data.healthy ? "Healthy" : "Needs attention";
+          result.innerHTML = '<div class="admin-health-result-head"><div class="admin-health-result-title">' +
+            escapeHtml(data.group && data.group.title ? data.group.title : String(chatId)) +
+            '</div><div class="' + statusClass + '">' + statusText + '</div></div>' +
+            (data.checks || []).map(function(check) {
+              return '<div class="admin-health-check"><span>' + escapeHtml(check.name) + '</span><span class="' +
+                (check.status === "ok" ? "admin-health-ok" : "admin-health-error") + '">' +
+                escapeHtml(check.status.toUpperCase() + " · " + String(check.latencyMs) + "ms · " + check.detail) + '</span></div>';
+            }).join("") +
+            '<div class="admin-users-meta" style="margin-top:10px">Checked ' + escapeHtml(formatAdminDate(data.checkedAt)) +
+            ' · Total ' + escapeHtml(String(data.totalLatencyMs || 0)) + 'ms</div>';
+        } catch (error) {
+          result.hidden = false;
+          result.innerHTML = '<div class="admin-health-result-title admin-health-error">' +
+            escapeHtml(error && error.message ? error.message : "Group health check failed.") + '</div>';
+        }
       }
 
       async function loadAdminGroups(resetPage) {
@@ -4403,6 +4436,12 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         adminGroupsState.search=this.value.trim(); window.clearTimeout(adminGroupsSearchTimer);
         adminGroupsSearchTimer=window.setTimeout(function(){loadAdminGroups(true).catch(function(error){showNotice(error&&error.message?error.message:"Unable to load groups.","error");});},250);
       });
+      document.getElementById("admin-groups-table-body").addEventListener("click", function(event) {
+        var target = event.target.closest("[data-group-health]");
+        if (!target) return;
+        checkAdminGroupHealth(target.getAttribute("data-group-health"));
+      });
+
       document.getElementById("admin-groups-prev").addEventListener("click", function(){
         if(adminGroupsState.page<=1)return; adminGroupsState.page-=1;
         loadAdminGroups(false).catch(function(error){showNotice(error&&error.message?error.message:"Unable to load groups.","error");});
