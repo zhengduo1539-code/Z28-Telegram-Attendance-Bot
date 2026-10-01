@@ -110,6 +110,10 @@ export class CommandHandler {
   ) {}
 
   async handleUpdate(update: TelegramUpdate): Promise<void> {
+    if (update.my_chat_member) {
+      await this.handleMyChatMember(update.my_chat_member);
+      return;
+    }
     if (update.callback_query) {
       await this.handleCallback(update.callback_query);
       return;
@@ -126,6 +130,14 @@ export class CommandHandler {
     );
     const profile = profileFromUser(message, currentLocale);
     if (!profile) return;
+
+    if (message.chat.type === "group" || message.chat.type === "supergroup") {
+      await this.attendance.recordManagedGroup(
+        message.chat.id,
+        message.chat.title || String(message.chat.id),
+        message.chat.username,
+      );
+    }
 
     // Do not block normal update handling on Telegram's command-menu API.
     // A slow/failing setMyCommands call must never make the bot appear frozen.
@@ -688,6 +700,25 @@ export class CommandHandler {
 
     await this.attendance.setActivityLimit(kind, minutes);
     return text.limitUpdated(activityLabel(kind, profile.locale), minutes);
+  }
+
+  private async handleMyChatMember(update: NonNullable<TelegramUpdate["my_chat_member"]>) {
+    const chat = update.chat;
+    if (chat.type !== "group" && chat.type !== "supergroup") return;
+
+    const activeStatuses = new Set(["member", "administrator"]);
+    if (activeStatuses.has(update.new_chat_member.status)) {
+      await this.attendance.recordManagedGroup(
+        chat.id,
+        chat.title || String(chat.id),
+        chat.username,
+      );
+      return;
+    }
+
+    if (update.new_chat_member.status === "left" || update.new_chat_member.status === "kicked") {
+      await this.attendance.removeManagedGroup(chat.id);
+    }
   }
 
   private async handleCallback(callback: TelegramCallbackQuery) {

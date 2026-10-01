@@ -54,6 +54,14 @@ export type PendingConnect = {
   requestedAt: string;
 };
 
+export type ManagedGroup = {
+  chatId: number;
+  title: string;
+  username?: string;
+  addedAt: string;
+  updatedAt: string;
+};
+
 export type BotState = {
   users: Record<string, UserProfile>;
   activeActivities: Record<string, ActiveActivity>;
@@ -63,6 +71,7 @@ export type BotState = {
   reminderEnabled?: boolean;
   connectedGroups?: Record<string, ConnectedGroup>;
   pendingConnects?: Record<string, PendingConnect>;
+  managedGroups?: Record<string, ManagedGroup>;
 };
 
 export type TelegramUser = {
@@ -77,6 +86,7 @@ export type TelegramChat = {
   id: number;
   type?: string;
   title?: string;
+  username?: string;
 };
 
 export type TelegramMessage = {
@@ -94,10 +104,19 @@ export type TelegramCallbackQuery = {
   data?: string;
 };
 
+export type TelegramChatMemberUpdated = {
+  chat: TelegramChat;
+  new_chat_member: {
+    user: TelegramUser;
+    status: string;
+  };
+};
+
 export type TelegramUpdate = {
   update_id: number;
   message?: TelegramMessage;
   callback_query?: TelegramCallbackQuery;
+  my_chat_member?: TelegramChatMemberUpdated;
 };
 
 export type InlineKeyboardButton = {

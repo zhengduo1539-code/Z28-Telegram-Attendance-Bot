@@ -95,7 +95,7 @@ export class TelegramClient {
     return this.call<TelegramUpdate[]>("getUpdates", {
       ...(offset === undefined ? {} : { offset }),
       timeout: timeoutSeconds,
-      allowed_updates: ["message", "callback_query"],
+      allowed_updates: ["message", "callback_query", "my_chat_member"],
     });
   }
 
