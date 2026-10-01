@@ -4,7 +4,6 @@ import type { Request } from "express";
 const MAX_INIT_DATA_AGE_MS = 10 * 60 * 1000;
 const FUTURE_CLOCK_SKEW_MS = 60 * 1000;
 const ADMIN_SESSION_TTL_MS = 30 * 60 * 1000;
-const adminSessions = new Map<string, { user: TelegramWebAppUser; expiresAt: number }>();
 
 export type TelegramWebAppUser = {
   id: number;
@@ -109,22 +108,70 @@ export const isConfiguredAdmin = (
 ): boolean => ownerId === userId || adminIds.includes(userId);
 
 
-export const createAdminSession = (user: TelegramWebAppUser): string => {
-  const token = randomBytes(32).toString("base64url");
-  adminSessions.set(token, { user, expiresAt: Date.now() + ADMIN_SESSION_TTL_MS });
-  return token;
+const encodeSessionPayload = (payload: object): string =>
+  Buffer.from(JSON.stringify(payload), "utf8").toString("base64url");
+
+const signAdminSession = (payload: string, botToken: string): string =>
+  hexHmac(botToken, "Z28AdminSession:" + payload);
+
+export const createAdminSession = (
+  user: TelegramWebAppUser,
+  botToken: string,
+): string => {
+  const payload = encodeSessionPayload({
+    v: 1,
+    uid: user.id,
+    user,
+    exp: Date.now() + ADMIN_SESSION_TTL_MS,
+    nonce: randomBytes(12).toString("base64url"),
+  });
+  return payload + "." + signAdminSession(payload, botToken);
 };
 
-export const getAdminSession = (token: string): TelegramWebAppUser | undefined => {
-  const session = adminSessions.get(token);
-  if (!session) return undefined;
-  if (session.expiresAt <= Date.now()) {
-    adminSessions.delete(token);
+export const getAdminSession = (
+  token: string,
+  botToken: string,
+): TelegramWebAppUser | undefined => {
+  if (!token || !botToken) return undefined;
+  const separator = token.lastIndexOf(".");
+  if (separator <= 0 || separator >= token.length - 1) return undefined;
+  const payload = token.slice(0, separator);
+  const signature = token.slice(separator + 1);
+  if (!/^[a-f0-9]{64}$/i.test(signature)) return undefined;
+
+  const expected = Buffer.from(signAdminSession(payload, botToken), "hex");
+  const received = Buffer.from(signature, "hex");
+  if (expected.length !== received.length || !timingSafeEqual(expected, received)) {
     return undefined;
   }
-  return session.user;
-};
 
-export const deleteAdminSession = (token: string): void => {
-  adminSessions.delete(token);
+  let decoded: unknown;
+  try {
+    decoded = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
+  } catch {
+    return undefined;
+  }
+
+  if (
+    typeof decoded !== "object" ||
+    decoded === null ||
+    !("v" in decoded) ||
+    (decoded as { v?: unknown }).v !== 1 ||
+    !("uid" in decoded) ||
+    typeof (decoded as { uid?: unknown }).uid !== "number" ||
+    !Number.isSafeInteger((decoded as { uid: number }).uid) ||
+    (decoded as { uid: number }).uid <= 0 ||
+    !("exp" in decoded) ||
+    typeof (decoded as { exp?: unknown }).exp !== "number" ||
+    !Number.isFinite((decoded as { exp: number }).exp) ||
+    (decoded as { exp: number }).exp <= Date.now() ||
+    !("user" in decoded) ||
+    typeof (decoded as { user?: unknown }).user !== "object" ||
+    (decoded as { user: { id?: unknown } }).user === null ||
+    (decoded as { user: { id?: unknown } }).user.id !== (decoded as { uid: number }).uid
+  ) {
+    return undefined;
+  }
+
+  return (decoded as { user: TelegramWebAppUser }).user;
 };
