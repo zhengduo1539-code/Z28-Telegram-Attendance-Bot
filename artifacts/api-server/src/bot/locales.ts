@@ -60,6 +60,7 @@ type LocaleText = {
     userId: number,
     activity: string,
     timeoutSeconds: number,
+    warningTime?: string,
   ) => string;
   shiftStarted: (time: string) => string;
   workCheckIn: (displayName: string, userId: number, checkedAt: string) => string;
@@ -283,22 +284,18 @@ const zh: LocaleText = {
     `请使用 ${inlineCode("/id")} 查看正确的群组 ID，然后发送 ${inlineCode("/connect -1234567890")} 进行连接。`,
     "请确认 Bot 已加入目标群组；公开群组也可以使用 t.me 链接。",
   ].join("\n"),
-  groupTimeoutNotification: (groupName, groupId, username, displayName, userId, activity, timeoutSeconds) => {
+  groupTimeoutNotification: (groupName, groupId, username, displayName, userId, activity, timeoutSeconds, warningTime) => {
     const minutes = Math.floor(timeoutSeconds / 60);
     const seconds = timeoutSeconds % 60;
     const pad = (value: number) => String(value).padStart(2, "0");
-    const openGroup = username
-      ? `<a href="https://t.me/${encodeURIComponent(username)}">打开群</a>`
-      : "打开群";
     return [
-      `群组名称：${inlineCode(groupName)}`,
-      `群组：${openGroup}【${inlineCode(activity)}】`,
-      `群组标识：${inlineCode(groupId)}`,
-      `用户：${userLink(displayName, userId)}`,
-      `用户标识：${inlineCode(userId)}`,
-      `打卡活动：${inlineCode(activity)}`,
-      `状态：${inlineCode("单次活动超过时间限制")}`,
-      `超时时长：${inlineCode(pad(minutes) + "分钟 " + pad(seconds) + "秒")}`,
+      `<b>⚠ Activity Warning · ${escapeHtml(warningTime || "Unknown time")}</b>`,
+      "",
+      `Group: ${inlineCode(groupId)}`,
+      `User: ${userLink(displayName, userId)}`,
+      `Activity: ${inlineCode(activity.toUpperCase())}`,
+      `Status: ${inlineCode("Single activity exceeded time limit")}`,
+      `Overtime: ${inlineCode(pad(minutes) + "m " + pad(seconds) + "s")}`,
     ].join("\n");
   },
   workCheckIn: (displayName, userId, checkedAt) => [
@@ -503,20 +500,16 @@ const en: LocaleText = {
     `Use ${inlineCode("/id")} to view the correct group ID, then send ${inlineCode("/connect -1234567890")} to connect again.`,
     "Make sure the bot is in the target group; public groups can also use a t.me link.",
   ].join("\n"),
-  groupTimeoutNotification: (groupName, groupId, username, displayName, userId, activity, timeoutSeconds) => {
+  groupTimeoutNotification: (groupName, groupId, username, displayName, userId, activity, timeoutSeconds, warningTime) => {
     const minutes = Math.floor(timeoutSeconds / 60);
     const seconds = timeoutSeconds % 60;
     const pad = (value: number) => String(value).padStart(2, "0");
-    const openGroup = username
-      ? `<a href="https://t.me/${encodeURIComponent(username)}">Open Group</a>`
-      : "Open Group";
     return [
-      `Group Name: ${inlineCode(groupName)}`,
-      `Group: ${openGroup}【${inlineCode(activity)}】`,
-      `Group ID: ${inlineCode(groupId)}`,
+      `<b>⚠ Activity Warning · ${escapeHtml(warningTime || "Unknown time")}</b>`,
+      "",
+      `Group: ${inlineCode(groupId)}`,
       `User: ${userLink(displayName, userId)}`,
-      `User ID: ${inlineCode(userId)}`,
-      `Activity: ${inlineCode(activity)}`,
+      `Activity: ${inlineCode(activity.toUpperCase())}`,
       `Status: ${inlineCode("Single activity exceeded time limit")}`,
       `Overtime: ${inlineCode(pad(minutes) + "m " + pad(seconds) + "s")}`,
     ].join("\n");
