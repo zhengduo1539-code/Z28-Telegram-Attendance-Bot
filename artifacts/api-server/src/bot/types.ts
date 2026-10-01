@@ -73,6 +73,13 @@ export type GroupWarning = {
   createdAt: string;
 };
 
+export type MiniAppGroupAccess = {
+  userId: number;
+  groupId: number;
+  role: "creator" | "administrator";
+  expiresAt: string;
+};
+
 export type BotState = {
   users: Record<string, UserProfile>;
   activeActivities: Record<string, ActiveActivity>;
