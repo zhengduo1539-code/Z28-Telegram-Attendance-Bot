@@ -68,8 +68,14 @@ adminApiRouter.get("/summary", async (req, res) => {
     ]);
 
   res.setHeader("Cache-Control", "no-store");
+  const role =
+    auth.user.id === auth.context.config.botOwnerId
+      ? "owner"
+      : "administrator";
+
   res.json({
     user: auth.user,
+    role,
     stats,
     activityLimits,
     countLimits: serializeCountLimits(rawCountLimits),
