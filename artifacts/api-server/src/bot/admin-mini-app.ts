@@ -1622,6 +1622,716 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       .top { align-items: center; }
       .refresh { padding: 0 13px; }
     }
+
+    /* Professional global admin dashboard. User Dashboard styles intentionally remain separate. */
+    .admin-shell {
+      display: none;
+      min-height: 100vh;
+      width: 100%;
+      gap: 0;
+      color: #0f172a;
+      background:
+        radial-gradient(circle at 88% 4%, rgba(59,130,246,.12), transparent 23%),
+        radial-gradient(circle at 8% 78%, rgba(99,102,241,.08), transparent 28%),
+        #f5f7fb;
+    }
+
+    .admin-sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      width: 238px;
+      flex: 0 0 238px;
+      padding: 22px 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      background: rgba(15,23,42,.97);
+      color: #e5edf8;
+      border-right: 1px solid rgba(148,163,184,.16);
+      box-shadow: 14px 0 36px rgba(15,23,42,.08);
+      z-index: 30;
+    }
+
+    .admin-brand {
+      display:flex;
+      align-items:center;
+      gap:11px;
+      padding: 4px 7px 0;
+    }
+
+    .admin-brand-mark {
+      width:40px;
+      height:40px;
+      display:grid;
+      place-items:center;
+      border-radius:13px;
+      background: linear-gradient(145deg,#2563eb,#4f46e5);
+      color:#fff;
+      font-weight:900;
+      box-shadow: 0 10px 24px rgba(37,99,235,.28);
+      letter-spacing:-.05em;
+    }
+
+    .admin-brand-copy { min-width:0; }
+    .admin-brand-title {
+      font-size:15px;
+      font-weight:850;
+      letter-spacing:.01em;
+      color:#fff;
+    }
+    .admin-brand-sub {
+      margin-top:2px;
+      font-size:10px;
+      color:#94a3b8;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+    }
+
+    .admin-nav {
+      display:grid;
+      gap:5px;
+    }
+
+    .admin-nav-label {
+      padding:0 10px 5px;
+      font-size:9px;
+      font-weight:800;
+      color:#64748b;
+      letter-spacing:.11em;
+      text-transform:uppercase;
+    }
+
+    .admin-nav-item {
+      appearance:none;
+      width:100%;
+      min-height:43px;
+      display:flex;
+      align-items:center;
+      gap:11px;
+      border:1px solid transparent;
+      border-radius:11px;
+      padding:0 11px;
+      background:transparent;
+      color:#aab7ca;
+      text-align:left;
+      font-size:13px;
+      font-weight:750;
+      cursor:pointer;
+      transition: background .18s ease, color .18s ease, border-color .18s ease, transform .18s ease;
+    }
+    .admin-nav-item:hover {
+      background:rgba(59,130,246,.10);
+      color:#eaf2ff;
+    }
+    .admin-nav-item.active {
+      background:linear-gradient(90deg,rgba(37,99,235,.25),rgba(79,70,229,.15));
+      border-color:rgba(96,165,250,.20);
+      color:#fff;
+      box-shadow: inset 3px 0 0 #60a5fa;
+    }
+    .admin-nav-icon {
+      width:18px;
+      height:18px;
+      display:grid;
+      place-items:center;
+      color:currentColor;
+      flex:0 0 18px;
+    }
+    .admin-nav-icon svg {
+      width:18px;
+      height:18px;
+      fill:none;
+      stroke:currentColor;
+      stroke-width:1.8;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+    }
+
+    .admin-sidebar-footer {
+      margin-top:auto;
+      padding:12px;
+      border:1px solid rgba(148,163,184,.12);
+      border-radius:14px;
+      background:rgba(255,255,255,.035);
+    }
+    .admin-secure-line {
+      display:flex;
+      align-items:center;
+      gap:7px;
+      color:#b9c7da;
+      font-size:10px;
+      font-weight:700;
+    }
+    .admin-secure-dot {
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:#34d399;
+      box-shadow:0 0 0 4px rgba(52,211,153,.10), 0 0 12px rgba(52,211,153,.46);
+    }
+    .admin-role-caption {
+      margin-top:6px;
+      color:#738198;
+      font-size:10px;
+      line-height:1.4;
+    }
+
+    .admin-main {
+      min-width:0;
+      flex:1;
+      padding: 26px clamp(18px,3vw,40px) 40px;
+    }
+
+    .admin-header {
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:18px;
+      margin-bottom:24px;
+    }
+    .admin-header-copy { min-width:0; }
+    .admin-eyebrow {
+      margin-bottom:6px;
+      color:#64748b;
+      font-size:10px;
+      font-weight:850;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+    }
+    .admin-heading {
+      margin:0;
+      color:#0f172a;
+      font-size:clamp(26px,4vw,34px);
+      line-height:1.05;
+      font-weight:900;
+      letter-spacing:-.035em;
+    }
+    .admin-heading-sub {
+      margin-top:7px;
+      color:#64748b;
+      font-size:12px;
+      line-height:1.45;
+    }
+    .admin-header-actions {
+      display:flex;
+      align-items:center;
+      gap:9px;
+      flex:0 0 auto;
+    }
+    .admin-session {
+      display:flex;
+      align-items:center;
+      gap:9px;
+      padding:8px 10px 8px 8px;
+      border:1px solid #e2e8f0;
+      border-radius:13px;
+      background:rgba(255,255,255,.82);
+      box-shadow:0 7px 20px rgba(15,23,42,.05);
+    }
+    .admin-avatar {
+      width:34px;
+      height:34px;
+      display:grid;
+      place-items:center;
+      border-radius:11px;
+      background:linear-gradient(145deg,#dbeafe,#e0e7ff);
+      color:#1e3a8a;
+      font-size:12px;
+      font-weight:900;
+    }
+    .admin-session-name {
+      color:#0f172a;
+      font-size:11px;
+      font-weight:850;
+      max-width:150px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .admin-session-role {
+      margin-top:2px;
+      color:#64748b;
+      font-size:9px;
+    }
+    .admin-refresh {
+      min-height:48px;
+      min-width:48px;
+      display:grid;
+      place-items:center;
+      border:1px solid #dbe3ee;
+      border-radius:13px;
+      background:#fff;
+      color:#334155;
+      cursor:pointer;
+      box-shadow:0 7px 20px rgba(15,23,42,.05);
+    }
+    .admin-refresh svg {
+      width:18px;
+      height:18px;
+      fill:none;
+      stroke:currentColor;
+      stroke-width:1.9;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+    }
+
+    .admin-section { scroll-margin-top: 18px; }
+    .admin-section + .admin-section { margin-top:24px; }
+
+    .admin-kpis {
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:12px;
+    }
+    .admin-kpi {
+      position:relative;
+      overflow:hidden;
+      min-height:128px;
+      padding:17px 17px 15px;
+      border:1px solid #e2e8f0;
+      border-radius:18px;
+      background:rgba(255,255,255,.88);
+      box-shadow:0 12px 28px rgba(15,23,42,.055);
+    }
+    .admin-kpi::after {
+      content:"";
+      position:absolute;
+      width:100px;
+      height:100px;
+      right:-36px;
+      top:-38px;
+      border-radius:50%;
+      background:rgba(59,130,246,.06);
+    }
+    .admin-kpi-icon {
+      width:36px;
+      height:36px;
+      display:grid;
+      place-items:center;
+      margin-bottom:12px;
+      border-radius:11px;
+      background:#eff6ff;
+      color:#2563eb;
+    }
+    .admin-kpi-icon svg {
+      width:18px;
+      height:18px;
+      fill:none;
+      stroke:currentColor;
+      stroke-width:1.8;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+    }
+    .admin-kpi-label {
+      color:#64748b;
+      font-size:10px;
+      font-weight:800;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+    }
+    .admin-kpi-value {
+      margin-top:3px;
+      color:#0f172a;
+      font-size:26px;
+      font-weight:900;
+      letter-spacing:-.03em;
+    }
+    .admin-kpi-note {
+      margin-top:2px;
+      color:#94a3b8;
+      font-size:10px;
+    }
+    .admin-kpi[data-tone="indigo"] .admin-kpi-icon { background:#eef2ff; color:#4f46e5; }
+    .admin-kpi[data-tone="green"] .admin-kpi-icon { background:#ecfdf5; color:#059669; }
+    .admin-kpi[data-tone="amber"] .admin-kpi-icon { background:#fffbeb; color:#d97706; }
+
+    .admin-panel {
+      border:1px solid #e2e8f0;
+      border-radius:20px;
+      background:rgba(255,255,255,.91);
+      box-shadow:0 12px 32px rgba(15,23,42,.055);
+      overflow:hidden;
+    }
+    .admin-panel-head {
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      padding:19px 20px 16px;
+      border-bottom:1px solid #edf1f6;
+    }
+    .admin-panel-title {
+      margin:0;
+      color:#0f172a;
+      font-size:15px;
+      font-weight:880;
+      letter-spacing:-.015em;
+    }
+    .admin-panel-sub {
+      margin-top:4px;
+      color:#7b8798;
+      font-size:10px;
+      line-height:1.45;
+    }
+    .admin-status-pill {
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      min-height:28px;
+      padding:0 10px;
+      border-radius:999px;
+      background:#f0fdf4;
+      border:1px solid #dcfce7;
+      color:#15803d;
+      font-size:9px;
+      font-weight:850;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      white-space:nowrap;
+    }
+    .admin-status-pill::before {
+      content:"";
+      width:6px;
+      height:6px;
+      border-radius:50%;
+      background:#22c55e;
+    }
+
+    .admin-panel-body { padding:18px 20px 20px; }
+
+    .admin-control-grid {
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px;
+    }
+    .admin-control {
+      padding:15px;
+      border:1px solid #e7edf5;
+      border-radius:16px;
+      background:#fbfcfe;
+    }
+    .admin-control-head {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom:13px;
+    }
+    .admin-control-icon {
+      width:38px;
+      height:38px;
+      display:grid;
+      place-items:center;
+      flex:0 0 38px;
+      border-radius:12px;
+      background:#eff6ff;
+      color:#2563eb;
+    }
+    .admin-control-icon svg {
+      width:18px;
+      height:18px;
+      fill:none;
+      stroke:currentColor;
+      stroke-width:1.8;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+    }
+    .admin-control-name {
+      color:#0f172a;
+      font-size:12px;
+      font-weight:850;
+    }
+    .admin-control-hint {
+      margin-top:2px;
+      color:#8a96a8;
+      font-size:9px;
+    }
+    .admin-field-label {
+      display:block;
+      margin-bottom:6px;
+      color:#64748b;
+      font-size:9px;
+      font-weight:800;
+      letter-spacing:.05em;
+      text-transform:uppercase;
+    }
+    .admin-field {
+      width:100%;
+      min-height:44px;
+      padding:0 12px;
+      border:1px solid #dce4ee;
+      border-radius:11px;
+      outline:none;
+      background:#fff;
+      color:#0f172a;
+      font-size:15px;
+      font-weight:750;
+      transition:border-color .18s ease, box-shadow .18s ease;
+    }
+    .admin-field:focus {
+      border-color:#7aa7ff;
+      box-shadow:0 0 0 3px rgba(37,99,235,.10);
+    }
+    .admin-field-suffix {
+      position:relative;
+    }
+    .admin-field-unit {
+      position:absolute;
+      right:12px;
+      top:50%;
+      transform:translateY(-50%);
+      color:#94a3b8;
+      font-size:9px;
+      font-weight:800;
+      text-transform:uppercase;
+    }
+    .admin-field-suffix .admin-field { padding-right:65px; }
+
+    .admin-action-bar {
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:10px;
+      margin-top:15px;
+      padding-top:15px;
+      border-top:1px solid #edf1f6;
+    }
+    .admin-save {
+      min-height:43px;
+      padding:0 16px;
+      border:0;
+      border-radius:11px;
+      background:linear-gradient(180deg,#2563eb,#1d4ed8);
+      color:#fff;
+      font-size:11px;
+      font-weight:850;
+      cursor:pointer;
+      box-shadow:0 9px 20px rgba(37,99,235,.18);
+    }
+    .admin-save:hover { filter:brightness(1.03); }
+    .admin-save:active { transform:translateY(1px); }
+    .admin-save.secondary {
+      background:#f8fafc;
+      color:#334155;
+      border:1px solid #dce4ee;
+      box-shadow:none;
+    }
+
+    .admin-automation {
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      align-items:center;
+      gap:20px;
+      padding:16px;
+      border:1px solid #e5ebf3;
+      border-radius:16px;
+      background:linear-gradient(145deg,#fcfdff,#f8fafc);
+    }
+    .admin-automation-copy {
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      min-width:0;
+    }
+    .admin-automation-icon {
+      width:40px;
+      height:40px;
+      flex:0 0 40px;
+      display:grid;
+      place-items:center;
+      border-radius:12px;
+      background:#eff6ff;
+      color:#2563eb;
+    }
+    .admin-automation-icon svg {
+      width:19px;
+      height:19px;
+      fill:none;
+      stroke:currentColor;
+      stroke-width:1.8;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+    }
+    .admin-automation-title {
+      color:#0f172a;
+      font-size:13px;
+      font-weight:850;
+    }
+    .admin-automation-sub {
+      margin-top:4px;
+      color:#7b8798;
+      font-size:10px;
+      line-height:1.5;
+      max-width:540px;
+    }
+    .admin-switch {
+      position:relative;
+      width:54px;
+      height:30px;
+      flex:0 0 54px;
+      display:inline-flex;
+      cursor:pointer;
+    }
+    .admin-switch input {
+      position:absolute;
+      opacity:0;
+      width:1px;
+      height:1px;
+    }
+    .admin-switch-track {
+      position:absolute;
+      inset:0;
+      border-radius:999px;
+      background:#cbd5e1;
+      transition:background .2s ease;
+    }
+    .admin-switch-thumb {
+      position:absolute;
+      top:4px;
+      left:4px;
+      width:22px;
+      height:22px;
+      border-radius:50%;
+      background:#fff;
+      box-shadow:0 3px 10px rgba(15,23,42,.18);
+      transition:transform .2s ease;
+    }
+    .admin-switch input:checked + .admin-switch-track { background:#2563eb; }
+    .admin-switch input:checked + .admin-switch-track .admin-switch-thumb { transform:translateX(24px); }
+
+    .admin-section-nav-note {
+      margin-top:10px;
+      color:#94a3b8;
+      font-size:9px;
+    }
+
+    .admin-empty-note {
+      padding:12px 0 0;
+      color:#94a3b8;
+      font-size:10px;
+    }
+
+    body.admin-mode {
+      padding: 0;
+    }
+    body.admin-mode::before,
+    body.admin-mode::after {
+      display: none;
+    }
+    .admin-mode {
+      color-scheme: light;
+      min-height:100vh;
+      background:
+        radial-gradient(circle at 88% 4%, rgba(59,130,246,.12), transparent 23%),
+        radial-gradient(circle at 8% 78%, rgba(99,102,241,.08), transparent 28%),
+        #f5f7fb;
+      color:#0f172a;
+    }
+    .admin-mode #app.wrap {
+      max-width:none;
+      margin:0;
+    }
+    .admin-mode .top,
+    .admin-mode #stats-card,
+    .admin-mode #limits-card,
+    .admin-mode #counts-card,
+    .admin-mode #reminder-card {
+      display:none !important;
+    }
+    .admin-mode #admin-shell.panel-only-private,
+    .admin-mode #admin-shell.panel-only-private.visible {
+      display:grid !important;
+      grid-template-columns:238px minmax(0,1fr);
+    }
+    .admin-mode #notice {
+      position:fixed;
+      z-index:200;
+      top:max(13px,env(safe-area-inset-top));
+      left:50%;
+      transform:translateX(-50%);
+      width:min(520px,calc(100% - 30px));
+      margin:0;
+      box-shadow:0 16px 36px rgba(15,23,42,.12);
+    }
+    .admin-mode #user-loading {
+      background:rgba(241,245,249,.56);
+    }
+    .admin-mode .user-loading,
+    .admin-mode .user-mode .user-loading { z-index:300; }
+
+    @media (max-width: 980px) {
+      .admin-sidebar { width:208px; flex-basis:208px; }
+      .admin-mode #admin-shell.panel-only-private,
+      .admin-mode #admin-shell.panel-only-private.visible {
+        grid-template-columns:208px minmax(0,1fr);
+      }
+      .admin-kpis { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .admin-control-grid { grid-template-columns:1fr; }
+    }
+
+    @media (max-width: 700px) {
+      .admin-mode #admin-shell.panel-only-private,
+      .admin-mode #admin-shell.panel-only-private.visible {
+        display:block !important;
+      }
+      .admin-sidebar {
+        position:sticky;
+        top:0;
+        width:100%;
+        height:auto;
+        padding:10px 12px;
+        flex-direction:row;
+        align-items:center;
+        gap:8px;
+        border-right:0;
+        border-bottom:1px solid rgba(148,163,184,.16);
+      }
+      .admin-brand { padding:0 2px; }
+      .admin-brand-mark { width:34px; height:34px; border-radius:11px; }
+      .admin-brand-copy { display:none; }
+      .admin-nav-label,
+      .admin-sidebar-footer { display:none; }
+      .admin-nav {
+        display:flex;
+        gap:5px;
+        flex:1;
+        justify-content:flex-end;
+      }
+      .admin-nav-item {
+        width:43px;
+        min-height:39px;
+        justify-content:center;
+        padding:0;
+      }
+      .admin-nav-item span:not(.admin-nav-icon) { display:none; }
+      .admin-main {
+        padding:18px 12px 30px;
+      }
+      .admin-header { flex-direction:column; gap:12px; margin-bottom:18px; }
+      .admin-header-actions { width:100%; justify-content:space-between; }
+      .admin-session { flex:1; min-width:0; }
+      .admin-session-name { max-width:none; }
+      .admin-kpis { grid-template-columns:1fr 1fr; gap:9px; }
+      .admin-kpi { min-height:118px; padding:14px; }
+      .admin-kpi-value { font-size:23px; }
+      .admin-panel-head { padding:16px; }
+      .admin-panel-body { padding:15px; }
+      .admin-automation { grid-template-columns:minmax(0,1fr) auto; }
+    }
+
+    @media (max-width: 420px) {
+      .admin-kpis { grid-template-columns:1fr; }
+      .admin-control { padding:13px; }
+      .admin-action-bar { flex-direction:column; align-items:stretch; }
+      .admin-save { width:100%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .admin-nav-item,
+      .admin-field,
+      .admin-switch-track,
+      .admin-switch-thumb { transition:none !important; }
+    }
   </style>
 </head>
 <body>
@@ -1650,6 +2360,209 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     </div>
 
     <div id="notice" class="notice" role="status" aria-live="polite"></div>
+
+    <section id="admin-shell" class="panel-only-private" aria-label="Administrator dashboard">
+      <aside class="admin-sidebar">
+        <div class="admin-brand">
+          <div class="admin-brand-mark">Z28</div>
+          <div class="admin-brand-copy">
+            <div class="admin-brand-title">Control Center</div>
+            <div class="admin-brand-sub">Attendance Bot</div>
+          </div>
+        </div>
+
+        <div class="admin-nav">
+          <div class="admin-nav-label">Workspace</div>
+          <button class="admin-nav-item active" type="button" data-admin-nav="overview">
+            <span class="admin-nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="3" width="7" height="7" rx="2"></rect><rect x="3" y="14" width="7" height="7" rx="2"></rect><rect x="14" y="14" width="7" height="7" rx="2"></rect></svg></span>
+            <span>Overview</span>
+          </button>
+          <button class="admin-nav-item" type="button" data-admin-nav="duration">
+            <span class="admin-nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7.5"></circle><path d="M9 3h6"></path><path d="M12 5.5v2"></path><path d="M12 13l3-2"></path></svg></span>
+            <span>Activity Limits</span>
+          </button>
+          <button class="admin-nav-item" type="button" data-admin-nav="counts">
+            <span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 21h16"></path><rect x="5" y="13" width="3" height="5" rx="1.5"></rect><rect x="10.5" y="9" width="3" height="9" rx="1.5"></rect><rect x="16" y="5" width="3" height="13" rx="1.5"></rect></svg></span>
+            <span>Daily Limits</span>
+          </button>
+          <button class="admin-nav-item" type="button" data-admin-nav="automation">
+            <span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg></span>
+            <span>Automation</span>
+          </button>
+        </div>
+
+        <div class="admin-sidebar-footer">
+          <div class="admin-secure-line"><span class="admin-secure-dot"></span><span>Protected workspace</span></div>
+          <div class="admin-role-caption" id="admin-sidebar-role">Authorized owner / administrator</div>
+        </div>
+      </aside>
+
+      <div class="admin-main">
+        <header class="admin-header">
+          <div class="admin-header-copy">
+            <div class="admin-eyebrow">Z28 Attendance Bot</div>
+            <h1 class="admin-heading">Administration</h1>
+            <div class="admin-heading-sub">Manage global activity policy, usage limits, and automated reminders.</div>
+          </div>
+
+          <div class="admin-header-actions">
+            <div class="admin-session">
+              <div class="admin-avatar" id="admin-avatar">A</div>
+              <div>
+                <div class="admin-session-name" id="admin-session-name">Administrator</div>
+                <div class="admin-session-role" id="admin-session-role">Authorized session</div>
+              </div>
+            </div>
+            <button class="admin-refresh action-button" id="admin-refresh" type="button" aria-label="Refresh dashboard">
+              <span class="button-content"><svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.9-4"></path><path d="M4 4v5h5"></path><path d="M4 13a8 8 0 0 0 14.9 4"></path><path d="M20 20v-5h-5"></path></svg></span>
+            </button>
+          </div>
+        </header>
+
+        <section class="admin-section" id="admin-overview">
+          <div class="admin-kpis">
+            <article class="admin-kpi">
+              <div class="admin-kpi-icon"><svg viewBox="0 0 24 24"><path d="M16 20v-1.7a4.3 4.3 0 0 0-4.3-4.3H7.3A4.3 4.3 0 0 0 3 18.3V20"></path><circle cx="9.5" cy="7.5" r="3.5"></circle><path d="M16 4.8a3.5 3.5 0 0 1 0 5.4"></path><path d="M21 19.8v-1.5a4.3 4.3 0 0 0-3.2-4.1"></path></svg></div>
+              <div class="admin-kpi-label">Private Users</div>
+              <div class="admin-kpi-value" id="admin-users">—</div>
+              <div class="admin-kpi-note">Users who opened the bot privately</div>
+            </article>
+
+            <article class="admin-kpi" data-tone="indigo">
+              <div class="admin-kpi-icon"><svg viewBox="0 0 24 24"><path d="M4 7.5A3.5 3.5 0 0 1 7.5 4h9A3.5 3.5 0 0 1 20 7.5v6A3.5 3.5 0 0 1 16.5 17H11l-4 3v-3.2A3.5 3.5 0 0 1 4 13.5z"></path><path d="M8 9h8"></path><path d="M8 12h5"></path></svg></div>
+              <div class="admin-kpi-label">Managed Groups</div>
+              <div class="admin-kpi-value" id="admin-groups">—</div>
+              <div class="admin-kpi-note">Groups currently known by the bot</div>
+            </article>
+
+            <article class="admin-kpi" data-tone="green">
+              <div class="admin-kpi-icon"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9"></path><path d="M12 7v5l3 2"></path><path d="M16 3h5v5"></path><path d="M21 3l-4 4"></path></svg></div>
+              <div class="admin-kpi-label">Active Activities</div>
+              <div class="admin-kpi-value" id="admin-active">—</div>
+              <div class="admin-kpi-note">Live member sessions across groups</div>
+            </article>
+
+            <article class="admin-kpi" data-tone="amber">
+              <div class="admin-kpi-icon"><svg viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg></div>
+              <div class="admin-kpi-label">Overdue Reminder</div>
+              <div class="admin-kpi-value" id="admin-reminder-status">—</div>
+              <div class="admin-kpi-note" id="admin-reminder-note">Automation status</div>
+            </article>
+          </div>
+        </section>
+
+        <section class="admin-section" id="admin-duration">
+          <div class="admin-panel">
+            <div class="admin-panel-head">
+              <div>
+                <h2 class="admin-panel-title">Activity duration policy</h2>
+                <div class="admin-panel-sub">Set the global time limit for each tracked activity. Group-specific settings remain separate.</div>
+              </div>
+              <div class="admin-status-pill">Global policy</div>
+            </div>
+            <div class="admin-panel-body">
+              <div class="admin-control-grid">
+                <div class="admin-control">
+                  <div class="admin-control-head"><div class="admin-control-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7.5"></circle><path d="M9 3h6"></path><path d="M12 5.5v2"></path><path d="M12 13l2.7-2"></path></svg></div><div><div class="admin-control-name">Eat</div><div class="admin-control-hint">Meal break duration</div></div></div>
+                  <label class="admin-field-label" for="admin-limit-eat">Minutes</label>
+                  <div class="admin-field-suffix"><input class="admin-field" id="admin-limit-eat" type="number" min="1" step="1"><span class="admin-field-unit">min</span></div>
+                </div>
+                <div class="admin-control">
+                  <div class="admin-control-head"><div class="admin-control-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7.5"></circle><path d="M9 3h6"></path><path d="M12 5.5v2"></path><path d="M12 13l2.7-2"></path></svg></div><div><div class="admin-control-name">WC</div><div class="admin-control-hint">Toilet break duration</div></div></div>
+                  <label class="admin-field-label" for="admin-limit-wc">Minutes</label>
+                  <div class="admin-field-suffix"><input class="admin-field" id="admin-limit-wc" type="number" min="1" step="1"><span class="admin-field-unit">min</span></div>
+                </div>
+                <div class="admin-control">
+                  <div class="admin-control-head"><div class="admin-control-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7.5"></circle><path d="M9 3h6"></path><path d="M12 5.5v2"></path><path d="M12 13l2.7-2"></path></svg></div><div><div class="admin-control-name">Smoke</div><div class="admin-control-hint">Smoke break duration</div></div></div>
+                  <label class="admin-field-label" for="admin-limit-smoke">Minutes</label>
+                  <div class="admin-field-suffix"><input class="admin-field" id="admin-limit-smoke" type="number" min="1" step="1"><span class="admin-field-unit">min</span></div>
+                </div>
+                <div class="admin-control">
+                  <div class="admin-control-head"><div class="admin-control-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7.5"></circle><path d="M9 3h6"></path><path d="M12 5.5v2"></path><path d="M12 13l2.7-2"></path></svg></div><div><div class="admin-control-name">WCD</div><div class="admin-control-hint">WCD duration</div></div></div>
+                  <label class="admin-field-label" for="admin-limit-wcd">Minutes</label>
+                  <div class="admin-field-suffix"><input class="admin-field" id="admin-limit-wcd" type="number" min="1" step="1"><span class="admin-field-unit">min</span></div>
+                </div>
+              </div>
+              <div class="admin-action-bar">
+                <span class="admin-empty-note">Changes apply globally to groups without an override.</span>
+                <button class="admin-save action-button" id="admin-save-duration" type="button"><span class="button-content">Save duration limits</span></button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="admin-section" id="admin-counts">
+          <div class="admin-panel">
+            <div class="admin-panel-head">
+              <div>
+                <h2 class="admin-panel-title">Daily activity usage policy</h2>
+                <div class="admin-panel-sub">Control how many times members can use each activity per day.</div>
+              </div>
+              <div class="admin-status-pill">Daily policy</div>
+            </div>
+            <div class="admin-panel-body">
+              <div class="admin-control-grid">
+                <div class="admin-control">
+                  <div class="admin-control-head"><div class="admin-control-icon"><svg viewBox="0 0 24 24"><path d="M4 21h16"></path><rect x="5" y="13" width="3" height="5" rx="1.5"></rect><rect x="10.5" y="9" width="3" height="9" rx="1.5"></rect><rect x="16" y="5" width="3" height="13" rx="1.5"></rect></svg></div><div><div class="admin-control-name">WC</div><div class="admin-control-hint">Uses per day</div></div></div>
+                  <label class="admin-field-label" for="admin-count-wc">Maximum uses</label>
+                  <input class="admin-field" id="admin-count-wc" type="number" min="1" step="1">
+                </div>
+                <div class="admin-control">
+                  <div class="admin-control-head"><div class="admin-control-icon"><svg viewBox="0 0 24 24"><path d="M4 21h16"></path><rect x="5" y="13" width="3" height="5" rx="1.5"></rect><rect x="10.5" y="9" width="3" height="9" rx="1.5"></rect><rect x="16" y="5" width="3" height="13" rx="1.5"></rect></svg></div><div><div class="admin-control-name">Smoke</div><div class="admin-control-hint">Uses per day</div></div></div>
+                  <label class="admin-field-label" for="admin-count-smoke">Maximum uses</label>
+                  <input class="admin-field" id="admin-count-smoke" type="number" min="1" step="1">
+                </div>
+                <div class="admin-control">
+                  <div class="admin-control-head"><div class="admin-control-icon"><svg viewBox="0 0 24 24"><path d="M4 21h16"></path><rect x="5" y="13" width="3" height="5" rx="1.5"></rect><rect x="10.5" y="9" width="3" height="9" rx="1.5"></rect><rect x="16" y="5" width="3" height="13" rx="1.5"></rect></svg></div><div><div class="admin-control-name">WCD</div><div class="admin-control-hint">Uses per day</div></div></div>
+                  <label class="admin-field-label" for="admin-count-wcd">Maximum uses</label>
+                  <input class="admin-field" id="admin-count-wcd" type="number" min="1" step="1">
+                </div>
+                <div class="admin-control">
+                  <div class="admin-control-head"><div class="admin-control-icon"><svg viewBox="0 0 24 24"><path d="M12 4v16"></path><path d="M4 12h16"></path></svg></div><div><div class="admin-control-name">Eat</div><div class="admin-control-hint">Unlimited by default</div></div></div>
+                  <label class="admin-field-label">Usage</label>
+                  <input class="admin-field" type="text" value="Unlimited" disabled aria-label="Eat daily limit">
+                </div>
+              </div>
+              <div class="admin-action-bar">
+                <span class="admin-empty-note">Eat remains unlimited by policy.</span>
+                <button class="admin-save action-button" id="admin-save-counts" type="button"><span class="button-content">Save daily limits</span></button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="admin-section" id="admin-automation">
+          <div class="admin-panel">
+            <div class="admin-panel-head">
+              <div>
+                <h2 class="admin-panel-title">Automation</h2>
+                <div class="admin-panel-sub">Configure automatic reminders when a member remains away past the allowed time.</div>
+              </div>
+              <div class="admin-status-pill">Live</div>
+            </div>
+            <div class="admin-panel-body">
+              <div class="admin-automation">
+                <div class="admin-automation-copy">
+                  <div class="admin-automation-icon"><svg viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg></div>
+                  <div>
+                    <div class="admin-automation-title">Overdue activity reminders</div>
+                    <div class="admin-automation-sub">A reminder is sent after the configured activity limit plus the 45-second grace period. Turning this off stops automatic reminder delivery.</div>
+                  </div>
+                </div>
+                <label class="admin-switch" aria-label="Enable overdue activity reminders">
+                  <input id="admin-reminder" type="checkbox">
+                  <span class="admin-switch-track"><span class="admin-switch-thumb"></span></span>
+                </label>
+              </div>
+              <div class="admin-action-bar">
+                <span class="admin-empty-note" id="admin-reminder-detail">Current automation state</span>
+                <button class="admin-save action-button" id="admin-save-reminder" type="button"><span class="button-content">Save automation</span></button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
 
     <section class="card panel-only-private" id="stats-card" data-section="stats">
       <h2>
@@ -2122,6 +3035,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         userMode = mode === "user";
         adminMode = mode === "admin";
         document.body.classList.toggle("user-mode", userMode);
+        document.body.classList.toggle("admin-mode", adminMode);
 
         document.querySelectorAll(".panel-only-group").forEach(function (element) {
           element.classList.toggle("visible", mode === "group");
@@ -2221,6 +3135,80 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       function positiveInteger(id) {
         var number = Number(document.getElementById(id).value);
         return Number.isSafeInteger(number) && number > 0 ? number : undefined;
+      }
+
+
+      async function load() {
+        var data = await api("/summary");
+
+        if (groupMode) {
+          var groupLimits = data.activityLimits || {};
+          var groupCounts = data.countLimits || {};
+          document.getElementById("limits-scope").textContent = "These settings apply only to the selected group.";
+          document.getElementById("limit-eat").value = groupLimits.eat !== undefined ? groupLimits.eat : "";
+          document.getElementById("limit-wc").value = groupLimits.wc !== undefined ? groupLimits.wc : "";
+          document.getElementById("limit-smoke").value = groupLimits.smoke !== undefined ? groupLimits.smoke : "";
+          document.getElementById("limit-wcd").value = groupLimits.wcd !== undefined ? groupLimits.wcd : "";
+          document.getElementById("count-eat").value = "Unlimited";
+          document.getElementById("count-wc").value = groupCounts.wc !== undefined ? groupCounts.wc : "";
+          document.getElementById("count-smoke").value = groupCounts.smoke !== undefined ? groupCounts.smoke : "";
+          document.getElementById("count-wcd").value = groupCounts.wcd !== undefined ? groupCounts.wcd : "";
+          var group = data.group || {};
+          document.getElementById("identity").textContent =
+            (group.title || "Group") + " • " + (group.id || "—");
+          document.getElementById("connection").innerHTML = data.connection
+            ? "<strong>Connected target</strong>" +
+              escapeHtml(String(data.connection.targetGroupName || data.connection.targetChatId || "—")) +
+              " <span>(" + escapeHtml(String(data.connection.targetChatId || "—")) + ")</span>"
+            : "No notification group is connected.";
+          document.getElementById("target").value =
+            data.connection && data.connection.targetChatId
+              ? String(data.connection.targetChatId)
+              : "";
+          return data;
+        }
+
+        var stats = data.stats || {};
+        var role = data.role === "owner" ? "Bot Owner" : "Administrator";
+        var user = data.user || {};
+        var displayName = [user.first_name, user.last_name].filter(Boolean).join(" ").trim() || "Administrator";
+        var initials = displayName.split(/\s+/).map(function(part){ return part.charAt(0); }).join("").slice(0,2).toUpperCase() || "A";
+
+        document.getElementById("users").textContent = stats.privateUsers === undefined ? "—" : String(stats.privateUsers);
+        document.getElementById("groups").textContent = stats.groups === undefined ? "—" : String(stats.groups);
+        document.getElementById("limit-eat").value = data.activityLimits && data.activityLimits.eat !== undefined ? data.activityLimits.eat : "";
+        document.getElementById("limit-wc").value = data.activityLimits && data.activityLimits.wc !== undefined ? data.activityLimits.wc : "";
+        document.getElementById("limit-smoke").value = data.activityLimits && data.activityLimits.smoke !== undefined ? data.activityLimits.smoke : "";
+        document.getElementById("limit-wcd").value = data.activityLimits && data.activityLimits.wcd !== undefined ? data.activityLimits.wcd : "";
+        document.getElementById("count-eat").value = "Unlimited";
+        document.getElementById("count-wc").value = data.countLimits && data.countLimits.wc !== undefined ? data.countLimits.wc : "";
+        document.getElementById("count-smoke").value = data.countLimits && data.countLimits.smoke !== undefined ? data.countLimits.smoke : "";
+        document.getElementById("count-wcd").value = data.countLimits && data.countLimits.wcd !== undefined ? data.countLimits.wcd : "";
+        document.getElementById("reminder").checked = data.reminderEnabled === true;
+
+        document.getElementById("admin-users").textContent = stats.privateUsers === undefined ? "—" : String(stats.privateUsers);
+        document.getElementById("admin-groups").textContent = stats.groups === undefined ? "—" : String(stats.groups);
+        document.getElementById("admin-active").textContent = stats.activeActivities === undefined ? "—" : String(stats.activeActivities);
+        document.getElementById("admin-reminder-status").textContent = data.reminderEnabled ? "ON" : "OFF";
+        document.getElementById("admin-reminder-note").textContent = data.reminderEnabled ? "Automatic reminders are enabled" : "Automatic reminders are disabled";
+        document.getElementById("admin-reminder-detail").textContent = data.reminderEnabled ? "Reminder service is enabled." : "Reminder service is currently disabled.";
+        document.getElementById("admin-session-name").textContent = displayName;
+        document.getElementById("admin-session-role").textContent = role;
+        document.getElementById("admin-sidebar-role").textContent = role + " access • Telegram ID " + (user.id || telegramUserId || "—");
+        document.getElementById("admin-avatar").textContent = initials;
+
+        return data;
+      }
+
+      var adminRefreshTimer = null;
+      function startAdminDashboardRefresh() {
+        if (adminRefreshTimer) return;
+        adminRefreshTimer = window.setInterval(function () {
+          if (!adminMode) return;
+          load().catch(function () {
+            // Keep the dashboard visible if a background refresh is temporarily unavailable.
+          });
+        }, 15000);
       }
 
       function showUserLoading(show) {
@@ -2635,8 +3623,16 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           var modeData = await apiUserMode();
           if (modeData.isConfiguredAdmin) {
             setPanelVisibility("admin");
-            title.textContent = "⚙️ Admin Panel";
-            await load();
+            title.textContent = "Administration";
+            try {
+              await load();
+            } catch (error) {
+              hideSplash();
+              showNotice(error && error.message ? error.message : "Unable to load the admin dashboard.", "error");
+              return;
+            }
+            hideSplash();
+            startAdminDashboardRefresh();
           } else {
             setPanelVisibility("user");
             title.textContent = telegramUserId ? String(telegramUserId) + " " + tUser("title") : tUser("title");
@@ -2722,6 +3718,94 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             showNotice(error && error.message ? error.message : "Save failed.", "error");
           }
         })();
+      });
+
+
+      document.querySelectorAll("[data-admin-nav]").forEach(function(button) {
+        button.addEventListener("click", function() {
+          var section = document.getElementById("admin-" + button.getAttribute("data-admin-nav"));
+          if (!section) return;
+          document.querySelectorAll("[data-admin-nav]").forEach(function(item) {
+            item.classList.toggle("active", item === button);
+          });
+          section.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+
+      document.getElementById("admin-refresh").addEventListener("click", function() {
+        runAction(
+          document.getElementById("admin-refresh"),
+          "Refreshing…",
+          load,
+          "Refresh"
+        ).catch(function(error) {
+          showNotice(error && error.message ? error.message : "Refresh failed.", "error");
+        });
+      });
+
+      document.getElementById("admin-save-duration").addEventListener("click", function() {
+        var button = document.getElementById("admin-save-duration");
+        runAction(button, "Saving…", async function() {
+          var operations = [
+            ["eat", "admin-limit-eat"],
+            ["wc", "admin-limit-wc"],
+            ["smoke", "admin-limit-smoke"],
+            ["wcd", "admin-limit-wcd"]
+          ];
+          for (var i = 0; i < operations.length; i += 1) {
+            var minutes = positiveInteger(operations[i][1]);
+            if (minutes === undefined) throw new Error("Enter a positive whole number for every duration.");
+            await api("/activity-limits", {
+              method: "PUT",
+              body: JSON.stringify({ kind: operations[i][0], minutes: minutes })
+            });
+          }
+          await load();
+        }, "Save duration limits").then(function() {
+          showNotice("Duration limits saved successfully.", "ok");
+        }).catch(function(error) {
+          showNotice(error && error.message ? error.message : "Unable to save duration limits.", "error");
+        });
+      });
+
+      document.getElementById("admin-save-counts").addEventListener("click", function() {
+        var button = document.getElementById("admin-save-counts");
+        runAction(button, "Saving…", async function() {
+          var operations = [
+            ["wc", "admin-count-wc"],
+            ["smoke", "admin-count-smoke"],
+            ["wcd", "admin-count-wcd"]
+          ];
+          for (var i = 0; i < operations.length; i += 1) {
+            var count = positiveInteger(operations[i][1]);
+            if (count === undefined) throw new Error("Enter a positive whole number for every daily limit.");
+            await api("/count-limits", {
+              method: "PUT",
+              body: JSON.stringify({ kind: operations[i][0], count: count })
+            });
+          }
+          await load();
+        }, "Save daily limits").then(function() {
+          showNotice("Daily activity limits saved successfully.", "ok");
+        }).catch(function(error) {
+          showNotice(error && error.message ? error.message : "Unable to save daily limits.", "error");
+        });
+      });
+
+      document.getElementById("admin-save-reminder").addEventListener("click", function() {
+        var button = document.getElementById("admin-save-reminder");
+        runAction(button, "Saving…", async function() {
+          var data = await api("/reminder", {
+            method: "PUT",
+            body: JSON.stringify({ enabled: document.getElementById("admin-reminder").checked })
+          });
+          document.getElementById("admin-reminder").checked = data.reminderEnabled;
+          await load();
+        }, "Save automation").then(function() {
+          showNotice("Automation settings saved successfully.", "ok");
+        }).catch(function(error) {
+          showNotice(error && error.message ? error.message : "Unable to save automation settings.", "error");
+        });
       });
 
       if (!groupMode) {
