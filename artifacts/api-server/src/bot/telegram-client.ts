@@ -127,6 +127,20 @@ export class TelegramClient {
     });
   }
 
+  setChatMenuButton(
+    chatId: number,
+    menuButton?: {
+      type: "default" | "commands" | "web_app";
+      text?: string;
+      web_app?: { url: string };
+    },
+  ) {
+    return this.call("setChatMenuButton", {
+      chat_id: chatId,
+      ...(menuButton ? { menu_button: menuButton } : {}),
+    });
+  }
+
   deleteWebhook() {
     return this.call("deleteWebhook", { drop_pending_updates: false });
   }
