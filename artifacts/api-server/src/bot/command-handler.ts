@@ -332,14 +332,24 @@ export class CommandHandler {
       case "back": {
         const result = await this.attendance.settle(profile);
         response = result.response;
-        if (result.timeoutNotification && result.notificationChatId) {
+        if (
+          result.timeoutNotification &&
+          result.notificationChatId &&
+          result.pendingActivityId
+        ) {
           try {
             await this.telegram.sendMessage(
               result.notificationChatId,
               result.timeoutNotification,
             );
+            await this.attendance.completePendingActivity(
+              profile.chatId,
+              profile.userId,
+              result.pendingActivityId,
+            );
           } catch {
-            // Connected target group may no longer be reachable.
+            // Keep the temporary activity when warning delivery fails so the
+            // warning can be retried on the next Back to Seat action.
           }
         }
         markup = keyboard(locale);
