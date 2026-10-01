@@ -2858,7 +2858,6 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         "";
       var groupMode = /^group_-\d+$/.test(startParam);
       var userMode = false;
-      var userMode = false;
       var adminMode = false;
       var adminVerificationMode = false;
       var apiBase = groupMode ? "/api/group-admin" : "/api/admin";
@@ -2868,6 +2867,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           : undefined;
       var userLoading = document.getElementById("user-loading");
       var userVerifiedKey = "z28_verified_user_id";
+      var adminVerifiedKey = "z28_verified_admin_id";
       var userLanguageKey = "z28_user_language";
       var userLanguage = "en";
       var userDashboardRefreshTimer = null;
@@ -3233,6 +3233,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         document.getElementById("count-smoke").value = data.countLimits && data.countLimits.smoke !== undefined ? data.countLimits.smoke : "";
         document.getElementById("count-wcd").value = data.countLimits && data.countLimits.wcd !== undefined ? data.countLimits.wcd : "";
         document.getElementById("reminder").checked = data.reminderEnabled === true;
+        document.getElementById("admin-reminder").checked = data.reminderEnabled === true;
 
         document.getElementById("admin-users").textContent = stats.privateUsers === undefined ? "—" : String(stats.privateUsers);
         document.getElementById("admin-groups").textContent = stats.groups === undefined ? "—" : String(stats.groups);
@@ -3274,6 +3275,22 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       function rememberVerifiedUserId(userId) {
         try {
           localStorage.setItem(userVerifiedKey, String(userId));
+        } catch {
+          // Local persistence is optional; server validation remains authoritative.
+        }
+      }
+
+      function getVerifiedAdminId() {
+        try {
+          return localStorage.getItem(adminVerifiedKey);
+        } catch {
+          return null;
+        }
+      }
+
+      function rememberVerifiedAdminId(userId) {
+        try {
+          localStorage.setItem(adminVerifiedKey, String(userId));
         } catch {
           // Local persistence is optional; server validation remains authoritative.
         }
@@ -3699,6 +3716,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
               setPanelVisibility("admin");
               document.body.classList.remove("admin-verification-page");
               title.textContent = "Administration";
+              rememberVerifiedAdminId(telegramUserId);
               await load();
               hideSplash();
               startAdminDashboardRefresh();
@@ -3726,9 +3744,19 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         try {
           var modeData = await apiUserMode();
           if (modeData.isConfiguredAdmin) {
-            setPanelVisibility("admin-verify");
-            showAdminVerificationPage();
-            hideSplash();
+            var storedAdminId = getVerifiedAdminId();
+            var currentAdminId = telegramUserId ? String(telegramUserId) : "";
+            if (storedAdminId && currentAdminId && storedAdminId === currentAdminId) {
+              setPanelVisibility("admin");
+              title.textContent = "Administration";
+              await load();
+              hideSplash();
+              startAdminDashboardRefresh();
+            } else {
+              setPanelVisibility("admin-verify");
+              showAdminVerificationPage();
+              hideSplash();
+            }
           } else {
             setPanelVisibility("user");
             title.textContent = telegramUserId ? String(telegramUserId) + " " + tUser("title") : tUser("title");
