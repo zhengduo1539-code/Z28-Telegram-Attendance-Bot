@@ -282,7 +282,7 @@ export class CommandHandler {
                     ? "⚙️ Open Admin Panel"
                     : "⚙️ 打开管理面板",
                 style: "primary",
-                url: this.config.adminMiniAppUrl,
+                web_app: { url: this.config.adminMiniAppUrl },
               },
             ],
           ],
