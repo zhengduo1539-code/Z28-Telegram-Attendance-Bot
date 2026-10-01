@@ -1,7 +1,7 @@
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import type { ActiveActivity, AuditLogEntry, BotState, MiniAppGroupAccess } from "../types";
-import type { BotStore } from "./types";
+import type { BotStore, StorageStats } from "./types";
 
 export const emptyState = (): BotState => ({
   users: {},
@@ -54,6 +54,10 @@ const miniAppAccessKey = (userId: number, groupId: number) =>
   `${userId}:${groupId}`;
 
 export class FileBotStore implements BotStore {
+  async getStorageStats(): Promise<StorageStats | undefined> {
+    return undefined;
+  }
+
   private state?: BotState;
   private readonly miniAppAccess = new Map<string, MiniAppGroupAccess>();
   private readonly auditLogs: AuditLogEntry[] = [];
