@@ -55,6 +55,8 @@ const ACTIVE_ACTIVITY_COLLECTION = "active_activities";
 const MINI_APP_ACCESS_COLLECTION = "mini_app_access";
 const AUDIT_LOG_COLLECTION = "audit_logs";
 const MINI_APP_ACCESS_TTL_MS = 5 * 60 * 1000;
+const AUDIT_LOG_RETENTION_DAYS = 180;
+const AUDIT_LOG_TTL_SECONDS = AUDIT_LOG_RETENTION_DAYS * 24 * 60 * 60;
 
 const activeActivityKey = (chatId: number, userId: number) =>
   `${chatId}:${userId}`;
@@ -396,7 +398,19 @@ export class MongoBotStore implements BotStore {
   async createAuditLog(entry: AuditLogEntry): Promise<void> {
     const collection = (await this.database()).collection<MongoAuditLogDocument>(AUDIT_LOG_COLLECTION);
     if (!this.auditLogIndexPromise) {
-      this.auditLogIndexPromise = collection.createIndex({ createdAt: -1 }, { name: "audit_logs_created_at" }).then(() => undefined).catch((error: unknown) => {
+      this.auditLogIndexPromise = Promise.all([
+        collection.createIndex(
+          { createdAt: -1 },
+          { name: "audit_logs_created_at" },
+        ),
+        collection.createIndex(
+          { createdAt: 1 },
+          {
+            name: "audit_logs_ttl_180_days",
+            expireAfterSeconds: AUDIT_LOG_TTL_SECONDS,
+          },
+        ),
+      ]).then(() => undefined).catch((error: unknown) => {
         this.auditLogIndexPromise = undefined;
         throw error;
       });
