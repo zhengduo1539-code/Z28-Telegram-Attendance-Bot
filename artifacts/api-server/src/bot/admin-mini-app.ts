@@ -3658,7 +3658,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         var list=document.getElementById("admin-notification-list"), badge=document.getElementById("admin-notification-badge"), button=document.getElementById("admin-notifications-button"), sub=document.getElementById("admin-notification-sub");
         if(!list||!badge||!button)return;
         var notifications=Array.isArray(data.notifications)?data.notifications:[], lastSeen=getAdminNotificationLastSeen(), latest=data.latestCreatedAt||"";
-        var unread=latest && (!lastSeen || latest>lastSeen) ? Number(data.total||0) : 0;
+        if (!lastSeen && latest) { setAdminNotificationLastSeen(latest); lastSeen=latest; }
+        var unread=lastSeen ? notifications.filter(function(item){ return String(item.createdAt||"")>lastSeen; }).length : 0;
         list.innerHTML=notifications.length ? notifications.map(function(item){
           var message=String(item.message||"");
           return '<article class="admin-notification-item"><div class="admin-notification-item-head"><div class="admin-notification-item-title">'+escapeHtml(String(item.title||"System Error"))+'</div><div class="admin-notification-time">'+escapeHtml(formatNotificationDate(item.createdAt))+'</div></div><div class="admin-notification-message">'+escapeHtml(message)+'</div><div class="admin-notification-actions"><button class="admin-notification-copy" type="button">Copy message</button></div></article>';
