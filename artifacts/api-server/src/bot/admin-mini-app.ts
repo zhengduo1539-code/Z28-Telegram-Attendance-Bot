@@ -2451,6 +2451,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             <span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 21h16"></path><rect x="5" y="13" width="3" height="5" rx="1.5"></rect><rect x="10.5" y="9" width="3" height="9" rx="1.5"></rect><rect x="16" y="5" width="3" height="13" rx="1.5"></rect></svg></span>
             <span>Daily Limits</span>
           </button>
+          <button class="admin-nav-item" type="button" data-admin-nav="maintenance"><span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M12 3v18"></path><path d="M3 12h18"></path><path d="m5 5 14 14"></path></svg></span><span>Maintenance</span></button>
           <button class="admin-nav-item" type="button" data-admin-nav="backup"><span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M4 20h16"></path></svg></span><span>Data Backup</span></button>
           <button class="admin-nav-item" type="button" data-admin-nav="broadcast"><span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="m4 4 16 8-16 8 3-8z"></path><path d="M7 12h10"></path></svg></span><span>Broadcast Center</span></button>
           <button class="admin-nav-item" type="button" data-admin-nav="health"><span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 12h3l2-6 4 12 2-6h5"></path><path d="M4 19h16"></path></svg></span><span>System Health</span></button>
@@ -2621,6 +2622,32 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
                 <div class="admin-users-pagination">
                   <button class="admin-users-page" id="admin-users-prev" type="button">Previous</button>
                   <button class="admin-users-page" id="admin-users-next" type="button">Next</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="admin-section" id="admin-maintenance">
+          <div class="admin-panel">
+            <div class="admin-panel-head"><div>
+              <h2 class="admin-panel-title">Maintenance</h2>
+              <div class="admin-panel-sub">Keep administrative history manageable by removing old audit entries.</div>
+            </div><div class="admin-status-pill">Admin only</div></div>
+            <div class="admin-panel-body">
+              <div class="admin-maintenance-box">
+                <div class="admin-maintenance-card">
+                  <div class="admin-maintenance-title">Audit log retention</div>
+                  <div class="admin-maintenance-note">Only audit logs older than the selected retention period are removed. This does not delete attendance records, users, groups, or active activities.</div>
+                </div>
+                <div class="admin-maintenance-controls">
+                  <select class="admin-maintenance-select" id="admin-retention-days" aria-label="Audit log retention">
+                    <option value="90">90 days</option>
+                    <option value="180" selected>180 days</option>
+                    <option value="365">1 year</option>
+                    <option value="730">2 years</option>
+                  </select>
+                  <button class="admin-save" id="admin-retention-cleanup" type="button">Clean old audit logs</button>
                 </div>
               </div>
             </div>
@@ -3495,6 +3522,33 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         if (checked) checked.textContent = "Last checked: " + (data.checkedAt ? formatAdminDate(data.checkedAt) : "—");
       }
 
+      async function cleanupAdminAuditLogs() {
+        var select = document.getElementById("admin-retention-days");
+        var button = document.getElementById("admin-retention-cleanup");
+        if (!select || !button) return;
+        var retentionDays = Number(select.value);
+        if (!window.confirm("Delete audit logs older than " + retentionDays + " days? This cannot be undone.")) return;
+        button.disabled = true;
+        button.textContent = "Cleaning…";
+        try {
+          var headers = new Headers();
+          headers.set("X-Telegram-Init-Data", initData);
+          headers.set("Content-Type", "application/json");
+          headers.set("Accept", "application/json");
+          var response = await fetch("/api/admin/maintenance/audit-retention", {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify({ retentionDays: retentionDays })
+          });
+          var data = await response.json().catch(function(){ return {}; });
+          if (!response.ok) throw new Error(data.error || "Cleanup failed.");
+          showNotice("Removed " + String(data.deleted || 0) + " old audit log(s).", "ok");
+        } finally {
+          button.disabled = false;
+          button.textContent = "Clean old audit logs";
+        }
+      }
+
       async function downloadAdminBackup() {
         var button = document.getElementById("admin-backup-download");
         if (!button) return;
@@ -4365,6 +4419,12 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       document.getElementById("admin-export-csv").addEventListener("click", function() {
         exportAdminCsv().catch(function(error) {
           showNotice(error && error.message ? error.message : "Unable to export report.", "error");
+        });
+      });
+
+      document.getElementById("admin-retention-cleanup").addEventListener("click", function() {
+        cleanupAdminAuditLogs().catch(function(error) {
+          showNotice(error && error.message ? error.message : "Cleanup failed.", "error");
         });
       });
 
