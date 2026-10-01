@@ -1242,14 +1242,33 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         new URLSearchParams(window.location.search).get("tgWebAppStartParam") ||
         "";
       var groupMode = /^group_-\d+$/.test(startParam);
+      var userMode = false;
+      var adminMode = false;
       var apiBase = groupMode ? "/api/group-admin" : "/api/admin";
+      var telegramUserId =
+        tg.initDataUnsafe && tg.initDataUnsafe.user
+          ? tg.initDataUnsafe.user.id
+          : undefined;
+      var userLoading = document.getElementById("user-loading");
+      var userVerifiedKey = "z28_verified_user_id";
 
-      document.querySelectorAll(".panel-only-group").forEach(function (element) {
-        element.classList.toggle("visible", groupMode);
-      });
-      document.querySelectorAll(".panel-only-private").forEach(function (element) {
-        element.classList.toggle("visible", !groupMode);
-      });
+      function setPanelVisibility(mode) {
+        userMode = mode === "user";
+        adminMode = mode === "admin";
+        document.body.classList.toggle("user-mode", userMode);
+
+        document.querySelectorAll(".panel-only-group").forEach(function (element) {
+          element.classList.toggle("visible", mode === "group");
+        });
+        document.querySelectorAll(".panel-only-private").forEach(function (element) {
+          element.classList.toggle("visible", mode === "admin");
+        });
+        document.querySelectorAll(".panel-only-user").forEach(function (element) {
+          element.classList.toggle("visible", mode === "user");
+        });
+      }
+
+      setPanelVisibility(groupMode ? "group" : "admin");
       title.textContent = groupMode ? "⚙️ Group Admin Panel" : "⚙️ Admin Panel";
       document.getElementById("limits-scope").textContent =
         groupMode ? "These settings use the same bot activity limits as the group commands." : "";
@@ -1335,7 +1354,145 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         return Number.isSafeInteger(number) && number > 0 ? number : undefined;
       }
 
+      function showUserLoading(show) {
+        userLoading.classList.toggle("visible", show);
+      }
+
+      function getVerifiedUserId() {
+        try {
+          return localStorage.getItem(userVerifiedKey);
+        } catch {
+          return null;
+        }
+      }
+
+      function rememberVerifiedUserId(userId) {
+        try {
+          localStorage.setItem(userVerifiedKey, String(userId));
+        } catch {
+          // Local persistence is optional; server validation remains authoritative.
+        }
+      }
+
+      function clearUserDashboard() {
+        document.getElementById("user-dashboard").classList.remove("visible");
+        document.getElementById("user-group-list").innerHTML = "";
+        document.getElementById("user-group-count").textContent = "0 Groups";
+      }
+
+      function renderUserDashboard(data) {
+        var dashboard = document.getElementById("user-dashboard");
+        var list = document.getElementById("user-group-list");
+        var count = document.getElementById("user-group-count");
+        var groups = Array.isArray(data.groups) ? data.groups : [];
+
+        dashboard.classList.add("visible");
+        count.textContent = groups.length + (groups.length === 1 ? " Group" : " Groups");
+
+        if (!groups.length) {
+          list.innerHTML =
+            '<div class="user-empty">' +
+              '<div class="user-empty-icon">' +
+                '<svg viewBox="0 0 24 24"><path d="M7 20h10"></path><path d="M5 20v-7a7 7 0 0 1 14 0v7"></path><path d="M3 20h18"></path><path d="M9 16h6"></path></svg>' +
+              '</div>' +
+              '<strong>No eligible group found</strong>' +
+              '<p>Add this bot to a group, then make sure your Telegram account is a group owner or administrator. Groups where the bot is no longer available are not shown.</p>' +
+            '</div>';
+          return;
+        }
+
+        list.innerHTML = groups.map(function (group) {
+          var role = group.memberStatus === "creator" ? "Owner" : "Admin";
+          var target = group.connectedTarget
+            ? escapeHtml(group.connectedTarget.name)
+            : "Not connected";
+          var active = group.activeCount > 0
+            ? '<div class="user-active">' + group.activeCount + ' active ' + (group.activeCount === 1 ? 'activity' : 'activities') + ' right now.</div>'
+            : "";
+          return (
+            '<article class="user-group">' +
+              '<div class="user-group-head">' +
+                '<div>' +
+                  '<div class="user-group-name">' + escapeHtml(group.title) + '</div>' +
+                  '<div class="user-group-meta">' + escapeHtml(String(group.id)) + ' · ' + role + '</div>' +
+                '</div>' +
+                '<span class="user-status">' + role + '</span>' +
+              '</div>' +
+              '<div class="user-metrics">' +
+                '<div class="user-metric"><div class="user-metric-label">Today</div><div class="user-metric-value">' + String(group.today.total) + '</div></div>' +
+                '<div class="user-metric"><div class="user-metric-label">WC</div><div class="user-metric-value">' + String(group.today.wc) + '</div></div>' +
+                '<div class="user-metric"><div class="user-metric-label">Smoke</div><div class="user-metric-value">' + String(group.today.smoke) + '</div></div>' +
+              '</div>' +
+              active +
+              '<div class="user-connection">Notification target: ' + target + '</div>' +
+            '</article>'
+          );
+        }).join("");
+      }
+
+      async function apiUserMode() {
+        var headers = new Headers();
+        headers.set("X-Telegram-Init-Data", initData);
+        headers.set("Accept", "application/json");
+        var response = await fetch("/api/user/mode", { headers: headers });
+        var data = await response.json().catch(function () { return {}; });
+        if (!response.ok) {
+          throw new Error(typeof data.error === "string" ? data.error : "Unable to identify access mode.");
+        }
+        return data;
+      }
+
+      async function apiUserDashboard(userId) {
+        var headers = new Headers();
+        headers.set("X-Telegram-Init-Data", initData);
+        headers.set("Accept", "application/json");
+        var response = await fetch("/api/user/dashboard", {
+          method: "POST",
+          headers: headers,
+          body: JSON.stringify({ userId: Number(userId) })
+        });
+        var data = await response.json().catch(function () { return {}; });
+        if (!response.ok) {
+          throw new Error(typeof data.error === "string" ? data.error : "Unable to load your dashboard.");
+        }
+        return data;
+      }
+
+      async function loadUserDashboard() {
+        if (!telegramUserId) {
+          throw new Error("Unable to identify your Telegram account.");
+        }
+        showUserLoading(true);
+        try {
+          var data = await apiUserDashboard(telegramUserId);
+          rememberVerifiedUserId(telegramUserId);
+          document.getElementById("user-verify-card").classList.remove("visible");
+          renderUserDashboard(data);
+          return true;
+        } finally {
+          showUserLoading(false);
+        }
+      }
+
       async function load() {
+        if (userMode) {
+          var storedUserId = getVerifiedUserId();
+          var currentUserId = telegramUserId ? String(telegramUserId) : "";
+          if (storedUserId && currentUserId && storedUserId === currentUserId) {
+            try {
+              await loadUserDashboard();
+            } catch (error) {
+              document.getElementById("user-verify-card").classList.add("visible");
+              showNotice(error && error.message ? error.message : "Unable to load your dashboard.", "error");
+            }
+          } else {
+            document.getElementById("user-verify-card").classList.add("visible");
+            clearUserDashboard();
+          }
+          hideSplash();
+          return;
+        }
+
         setBusy(true);
         try {
           var data = await api("/summary");
@@ -1385,13 +1542,94 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           button,
           "Refreshing…",
           async function () {
-            await load();
+            if (userMode) {
+              var verified = getVerifiedUserId();
+              if (verified) {
+                await loadUserDashboard();
+              } else {
+                clearUserDashboard();
+                document.getElementById("user-verify-card").classList.add("visible");
+              }
+            } else {
+              await load();
+            }
           },
           "Refresh"
         ).catch(function (error) {
           showNotice(error && error.message ? error.message : "Refresh failed.", "error");
         });
       });
+
+      var userIdInput = document.getElementById("user-id-input");
+      var userConfirm = document.getElementById("user-confirm");
+
+      if (userIdInput && userConfirm) {
+        userIdInput.addEventListener("input", function () {
+          var value = userIdInput.value.trim().replace(/\D/g, "");
+          userIdInput.value = value;
+          var ready = value.length > 0;
+          userConfirm.disabled = !ready;
+          userConfirm.classList.toggle("ready", ready);
+        });
+
+        userConfirm.addEventListener("click", async function () {
+          var entered = userIdInput.value.trim();
+          if (!entered || !/^\d+$/.test(entered) || !telegramUserId) return;
+
+          if (Number(entered) !== Number(telegramUserId)) {
+            showNotice("The entered ID does not match your Telegram account.", "error");
+            return;
+          }
+
+          userConfirm.disabled = true;
+          userConfirm.classList.remove("ready");
+          try {
+            await loadUserDashboard();
+            userConfirm.innerHTML = "Confirmed";
+          } catch (error) {
+            showNotice(error && error.message ? error.message : "Verification failed.", "error");
+            userConfirm.disabled = false;
+            userConfirm.classList.add("ready");
+          }
+        });
+      }
+
+      async function initializeMode() {
+        if (groupMode) {
+          setPanelVisibility("group");
+          title.textContent = "⚙️ Group Admin Panel";
+          await load();
+          return;
+        }
+
+        try {
+          var modeData = await apiUserMode();
+          if (modeData.isConfiguredAdmin) {
+            setPanelVisibility("admin");
+            title.textContent = "⚙️ Admin Panel";
+            await load();
+          } else {
+            setPanelVisibility("user");
+            title.textContent = "User Dashboard";
+            var stored = getVerifiedUserId();
+            var current = telegramUserId ? String(telegramUserId) : "";
+            if (stored && current && stored === current) {
+              await loadUserDashboard();
+            } else {
+              document.getElementById("user-verify-card").classList.add("visible");
+              clearUserDashboard();
+            }
+            hideSplash();
+          }
+        } catch (error) {
+          setPanelVisibility("user");
+          title.textContent = "User Dashboard";
+          document.getElementById("user-verify-card").classList.add("visible");
+          clearUserDashboard();
+          hideSplash();
+          showNotice(error && error.message ? error.message : "Unable to open the user dashboard.", "error");
+        }
+      }
 
       document.getElementById("save-limits").addEventListener("click", function () {
         var operations = [
@@ -1505,7 +1743,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         });
       }
 
-      load();
+      initializeMode();
     })();
   </script>
 </body>
