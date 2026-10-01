@@ -4,6 +4,7 @@ import { AttendanceService } from "./attendance-service";
 import { CommandHandler } from "./command-handler";
 import { getBotConfig } from "./config";
 import { TelegramPollingBot } from "./polling";
+import { setAdminApiContext } from "./admin-runtime";
 import { setBotStatus } from "./runtime";
 import { FileBotStore } from "./store/file-store";
 import { TelegramClient } from "./telegram-client";
@@ -34,6 +35,7 @@ export const startTelegramBot = async (logger: Logger) => {
         config.token,
         config.telegramRequestTimeoutMs,
       );
+      setAdminApiContext({ attendance, config });
       const handler = new CommandHandler(telegram, attendance, config);
       const bot = new TelegramPollingBot(config, logger, handler, telegram);
       await bot.start();
