@@ -184,6 +184,58 @@ adminApiRouter.get("/users", async (req, res) => {
   });
 });
 
+adminApiRouter.get("/groups", async (req, res) => {
+  const auth = requireAdmin(req, res);
+  if (!auth) return;
+  const snapshot = await auth.context.attendance.snapshot();
+  const activeActivities = await auth.context.attendance.listActiveActivities();
+  const search = typeof req.query.search === "string" ? req.query.search.trim().toLowerCase().slice(0, 100) : "";
+  const requestedPage = Number(req.query.page);
+  const requestedPageSize = Number(req.query.pageSize);
+  const page = Number.isSafeInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
+  const pageSize = Number.isSafeInteger(requestedPageSize) && requestedPageSize > 0 ? Math.min(requestedPageSize, 50) : 20;
+
+  const groups = Object.values(snapshot.managedGroups || {})
+    .map((group) => {
+      const memberIds = new Set<number>();
+      for (const profile of Object.values(snapshot.users)) {
+        if (profile.chatId === group.chatId) memberIds.add(profile.userId);
+      }
+      const activeCount = activeActivities.filter((activity) => activity.chatId === group.chatId).length;
+      const connection = snapshot.connectedGroups?.[String(group.chatId)];
+      return {
+        chatId: group.chatId,
+        title: group.title,
+        username: group.username || null,
+        addedAt: group.addedAt,
+        updatedAt: group.updatedAt,
+        memberCount: memberIds.size,
+        activeCount,
+        connection: connection ? {
+          targetChatId: connection.targetChatId,
+          targetGroupName: connection.targetGroupName,
+          targetUsername: connection.targetUsername || null,
+          connectedAt: connection.connectedAt,
+        } : null,
+      };
+    })
+    .filter((group) => !search || [
+      String(group.chatId), group.title, group.username || "",
+      group.connection?.targetGroupName || "", group.connection?.targetUsername || "",
+    ].some((value) => value.toLowerCase().includes(search)))
+    .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
+
+  const total = groups.length;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const safePage = Math.min(page, totalPages);
+  const offset = (safePage - 1) * pageSize;
+  res.setHeader("Cache-Control", "no-store");
+  res.json({
+    groups: groups.slice(offset, offset + pageSize),
+    pagination: { page: safePage, pageSize, total, totalPages },
+  });
+});
+
 adminApiRouter.put("/activity-limits", async (req, res) => {
   const auth = requireAdmin(req, res);
   if (!auth) return;
