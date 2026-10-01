@@ -1128,20 +1128,20 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       padding-bottom:82px;
     }
 
-    .user-selected-dashboard .user-page-head {
+    #user-selected-dashboard .user-page-head {
       position: relative;
       padding-right: 54px;
     }
 
-    .user-selected-dashboard .user-page-head > div:first-child {
+    #user-selected-dashboard .user-page-head > div:first-child {
       min-width: 0;
     }
 
-    .user-selected-dashboard .user-page-title {
+    #user-selected-dashboard .user-page-title {
       overflow-wrap: anywhere;
     }
 
-    .dashboard-language-switcher {
+    #user-selected-dashboard .dashboard-language-switcher {
       top: 0;
       right: 0;
     }
