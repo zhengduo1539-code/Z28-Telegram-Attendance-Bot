@@ -14,6 +14,7 @@ export type TelegramWebAppUser = {
 export type ValidatedAdminUser = {
   user: TelegramWebAppUser;
   authDate: number;
+  startParam?: string;
 };
 
 const hexHmac = (key: string | Buffer, value: string) =>
@@ -84,9 +85,12 @@ export const validateTelegramInitData = (
     return undefined;
   }
 
+  const startParam = params.get("start_param")?.trim() || undefined;
+
   return {
     user: user as TelegramWebAppUser,
     authDate,
+    ...(startParam ? { startParam } : {}),
   };
 };
 
