@@ -75,6 +75,19 @@ const buttonCommand = (value: string): Command | undefined => {
   return name ? { name } : undefined;
 };
 
+export const DEFAULT_MENU_COMMANDS = [
+  { command: "start", description: "开始 / Start" },
+  { command: "work", description: "上班 / Start work" },
+  { command: "back", description: "回座 / Return to seat" },
+  { command: "eat", description: "吃饭 / Meal break" },
+  { command: "wc", description: "上厕所 / Toilet" },
+  { command: "smoke", description: "抽烟 / Smoke break" },
+  { command: "wcd", description: "WCD" },
+  { command: "offwork", description: "下班 / End work" },
+  { command: "help", description: "帮助 / Help" },
+  { command: "lang", description: "语言 / Language" },
+];
+
 export const ADMIN_MENU_COMMANDS = [
   { command: "start", description: "开始 / Start" },
   { command: "limit", description: "Set activity time limits" },
@@ -243,6 +256,39 @@ export class CommandHandler {
         }
         break;
       }
+      case "admin": {
+        const isConfiguredAdmin =
+          this.config.botOwnerId === profile.userId ||
+          this.config.adminIds.includes(profile.userId);
+        if (!isConfiguredAdmin) {
+          response = text.adminOnly;
+          break;
+        }
+        if (message.chat.type !== "private") {
+          response = text.adminPrivate;
+          break;
+        }
+        if (!this.config.adminMiniAppUrl) {
+          response = text.adminMiniAppUnavailable;
+          break;
+        }
+        response = text.adminPanelPrompt;
+        markup = {
+          inline_keyboard: [
+            [
+              {
+                text:
+                  locale === "en"
+                    ? "⚙️ Open Admin Panel"
+                    : "⚙️ 打开管理面板",
+                style: "primary",
+                web_app: { url: this.config.adminMiniAppUrl },
+              },
+            ],
+          ],
+        };
+        break;
+      }
       case "help":
         response = text.help;
         markup = keyboard(locale);
@@ -375,6 +421,9 @@ export class CommandHandler {
     userId: number,
     locale: Locale,
   ): Promise<void> {
+    const isConfiguredAdmin =
+      this.config.botOwnerId === userId || this.config.adminIds.includes(userId);
+
     if (message.chat.type === "private") {
       await this.ensurePrivateMenuButton(
         message.chat.id,
@@ -384,32 +433,34 @@ export class CommandHandler {
       );
     }
 
-    const isConfiguredAdmin =
-      this.config.botOwnerId === userId || this.config.adminIds.includes(userId);
-    if (!isConfiguredAdmin) return;
+    const commands = isConfiguredAdmin
+      ? ADMIN_MENU_COMMANDS
+      : DEFAULT_MENU_COMMANDS;
 
     const scope =
       message.chat.type === "private"
         ? { type: "chat" as const, chat_id: message.chat.id }
         : message.chat.type === "group" || message.chat.type === "supergroup"
-          ? {
-              type: "chat_member" as const,
-              chat_id: message.chat.id,
-              user_id: userId,
-            }
+          ? isConfiguredAdmin
+            ? {
+                type: "chat_member" as const,
+                chat_id: message.chat.id,
+                user_id: userId,
+              }
+            : undefined
           : undefined;
 
     if (!scope) return;
 
     const scopeKey =
       scope.type === "chat"
-        ? `private:${scope.chat_id}`
-        : `member:${scope.chat_id}:${scope.user_id}`;
+        ? `private:${scope.chat_id}:${isConfiguredAdmin ? "admin" : "default"}`
+        : `member:${scope.chat_id}:${scope.user_id}:admin`;
 
     if (this.adminMenuScopes.has(scopeKey)) return;
 
     try {
-      await this.telegram.setMyCommands(ADMIN_MENU_COMMANDS, scope);
+      await this.telegram.setMyCommands(commands, scope);
       this.adminMenuScopes.add(scopeKey);
     } catch {
       // Command-menu configuration must not interrupt normal bot handling.
