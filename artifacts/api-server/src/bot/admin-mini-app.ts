@@ -2451,6 +2451,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             <span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 21h16"></path><rect x="5" y="13" width="3" height="5" rx="1.5"></rect><rect x="10.5" y="9" width="3" height="9" rx="1.5"></rect><rect x="16" y="5" width="3" height="13" rx="1.5"></rect></svg></span>
             <span>Daily Limits</span>
           </button>
+          <button class="admin-nav-item" type="button" data-admin-nav="backup"><span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M4 20h16"></path></svg></span><span>Data Backup</span></button>
           <button class="admin-nav-item" type="button" data-admin-nav="broadcast"><span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="m4 4 16 8-16 8 3-8z"></path><path d="M7 12h10"></path></svg></span><span>Broadcast Center</span></button>
           <button class="admin-nav-item" type="button" data-admin-nav="health"><span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 12h3l2-6 4 12 2-6h5"></path><path d="M4 19h16"></path></svg></span><span>System Health</span></button>
           <button class="admin-nav-item" type="button" data-admin-nav="automation">
@@ -2621,6 +2622,24 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
                   <button class="admin-users-page" id="admin-users-prev" type="button">Previous</button>
                   <button class="admin-users-page" id="admin-users-next" type="button">Next</button>
                 </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="admin-section" id="admin-backup">
+          <div class="admin-panel">
+            <div class="admin-panel-head"><div>
+              <h2 class="admin-panel-title">Data Backup</h2>
+              <div class="admin-panel-sub">Create a complete JSON snapshot of the bot's stored attendance data and current live activities.</div>
+            </div><div class="admin-status-pill">Admin only</div></div>
+            <div class="admin-panel-body">
+              <div class="admin-backup-box">
+                <div class="admin-backup-card">
+                  <div class="admin-backup-title">Full backup</div>
+                  <div class="admin-backup-note">The backup contains users, attendance records, group settings, warning history, connected groups, and active activities. Bot credentials are not included.</div>
+                </div>
+                <button class="admin-save" id="admin-backup-download" type="button">Download JSON Backup</button>
               </div>
             </div>
           </div>
@@ -3476,6 +3495,36 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         if (checked) checked.textContent = "Last checked: " + (data.checkedAt ? formatAdminDate(data.checkedAt) : "—");
       }
 
+      async function downloadAdminBackup() {
+        var button = document.getElementById("admin-backup-download");
+        if (!button) return;
+        button.disabled = true;
+        button.textContent = "Preparing…";
+        try {
+          var headers = new Headers();
+          headers.set("X-Telegram-Init-Data", initData);
+          headers.set("Accept", "application/json");
+          var response = await fetch("/api/admin/backup", { method: "GET", headers: headers });
+          if (!response.ok) {
+            var data = await response.json().catch(function(){ return {}; });
+            throw new Error(data.error || "Backup failed.");
+          }
+          var blob = await response.blob();
+          var url = URL.createObjectURL(blob);
+          var link = document.createElement("a");
+          link.href = url;
+          link.download = "z28-attendance-backup.json";
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          URL.revokeObjectURL(url);
+          showNotice("Backup downloaded.", "ok");
+        } finally {
+          button.disabled = false;
+          button.textContent = "Download JSON Backup";
+        }
+      }
+
       async function sendAdminBroadcast() {
         var messageBox = document.getElementById("admin-broadcast-message");
         var button = document.getElementById("admin-broadcast-send");
@@ -4316,6 +4365,12 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       document.getElementById("admin-export-csv").addEventListener("click", function() {
         exportAdminCsv().catch(function(error) {
           showNotice(error && error.message ? error.message : "Unable to export report.", "error");
+        });
+      });
+
+      document.getElementById("admin-backup-download").addEventListener("click", function() {
+        downloadAdminBackup().catch(function(error) {
+          showNotice(error && error.message ? error.message : "Backup failed.", "error");
         });
       });
 
