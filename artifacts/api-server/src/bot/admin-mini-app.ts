@@ -2249,6 +2249,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           return '<article class="user-warning-item">' +
             '<div class="user-warning-item-head"><strong>' + escapeHtml(tUser("warningTitle")) + '</strong><span>' +
             escapeHtml(formatWarningTime(warning.createdAt)) + '</span></div>' +
+            '<div class="user-warning-item-message">' + escapeHtml(warning.message || tUser("warningStatus")) + '</div>' +
             '<div class="user-warning-details">' +
               '<div><span>' + escapeHtml(tUser("group")) + '</span><strong>' + escapeHtml(document.getElementById("user-warning-group-name").textContent || tUser("group")) + '</strong></div>' +
               '<div><span>' + escapeHtml(tUser("user")) + '</span><strong>' + escapeHtml(warning.displayName || "Member") + '</strong></div>' +
