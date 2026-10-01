@@ -1123,6 +1123,20 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       font-weight:850;
     }
 
+    .user-live-value {
+      transition: transform .25s ease, opacity .25s ease;
+    }
+
+    .user-live-value.metric-updated {
+      animation: metricUpdate .42s ease-out;
+    }
+
+    @keyframes metricUpdate {
+      0% { transform: scale(.94); opacity:.55; }
+      55% { transform: scale(1.06); opacity:1; }
+      100% { transform: scale(1); opacity:1; }
+    }
+
     .user-live-value.active {
       color:#55d89b;
       text-shadow:0 0 16px rgba(85,216,155,.22);
@@ -1731,6 +1745,12 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         <div class="user-tab-shell">
           <div class="user-tab-panel active" id="user-settings-tab">
             <div class="user-dashboard-section-label">Admin Settings</div>
+            <div class="user-setting-card" id="user-settings-limits-card"></div>
+            <div class="user-setting-card counts" id="user-settings-counts-card"></div>
+          </div>
+
+          <div class="user-tab-panel user-warning-tab-panel" id="user-warning-tab">
+            <div class="user-dashboard-section-label warning">Warning</div>
             <div class="user-group-box compact">
               <div class="user-group-box-title" id="user-group-activities-title">Group Activities</div>
               <div class="user-group-name" id="user-warning-group-name"></div>
@@ -1745,11 +1765,6 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
                 </div>
               </div>
             </div>
-            <div class="user-setting-card" id="user-settings-limits-card"></div>
-            <div class="user-setting-card counts" id="user-settings-counts-card"></div>
-          </div>
-
-          <div class="user-tab-panel user-warning-tab-panel" id="user-warning-tab">
             <div class="user-warning-feed" id="user-warning-feed"></div>
           </div>
         </div>
@@ -2368,8 +2383,20 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         document.getElementById("switch-group").textContent = tUser("switch");
         document.getElementById("user-selected-group-title").textContent = group.title + " " + tUser("title");
         document.getElementById("user-warning-group-name").textContent = group.title;
-        document.getElementById("user-member-count").textContent = String(group.memberCount);
-        document.getElementById("user-active-count").textContent = String(group.activeCount);
+        function updateLiveMetric(id, value) {
+          var element = document.getElementById(id);
+          if (!element) return;
+          var next = String(value);
+          var changed = element.textContent !== next;
+          element.textContent = next;
+          if (changed) {
+            element.classList.remove("metric-updated");
+            void element.offsetWidth;
+            element.classList.add("metric-updated");
+          }
+        }
+        updateLiveMetric("user-member-count", group.memberCount);
+        updateLiveMetric("user-active-count", group.activeCount);
 
         var activityLimits = data.activityLimits || {};
         var countLimits = data.countLimits || {};
