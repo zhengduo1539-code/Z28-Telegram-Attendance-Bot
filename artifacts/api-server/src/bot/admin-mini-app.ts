@@ -759,6 +759,24 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
     .panel-only-user { display: none; }
 
+    /* User Mini App must never expose admin/group settings. */
+    .user-mode .panel-only-private,
+    .user-mode .panel-only-group {
+      display: none !important;
+    }
+
+    .user-mode .panel-only-user {
+      display: block;
+    }
+
+    .user-mode .panel-only-user#user-dashboard {
+      display: none;
+    }
+
+    .user-mode .panel-only-user#user-dashboard.visible {
+      display: block;
+    }
+
     .user-mode {
       background: linear-gradient(145deg, #f7fbff 0%, #edf5ff 52%, #f8fbff 100%);
       color: #132238;
