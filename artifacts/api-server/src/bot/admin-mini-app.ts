@@ -436,11 +436,138 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 14px;
-      min-height: 44px;
+      gap: 16px;
+      min-height: 54px;
+      padding: 12px 13px;
+      border: 1px solid rgba(255, 191, 72, 0.12);
+      border-radius: 15px;
+      background: rgba(18, 18, 12, 0.34);
     }
 
-    .toggle input { width: 22px; height: 22px; }
+    .toggle-copy {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      width: 54px;
+      height: 30px;
+      flex: 0 0 54px;
+      cursor: pointer;
+    }
+
+    .switch input {
+      position: absolute;
+      opacity: 0;
+      width: 1px;
+      height: 1px;
+      pointer-events: none;
+    }
+
+    .switch-track {
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: #1b2432;
+      border: 1px solid rgba(144, 169, 198, 0.25);
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.28);
+      transition: background 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+    }
+
+    .switch-thumb {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #b8c4d4;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.34);
+      transition: transform 0.22s ease, background 0.22s ease;
+    }
+
+    .switch input:checked + .switch-track {
+      background: linear-gradient(90deg, #c88918, #ffb52e);
+      border-color: rgba(255, 209, 102, 0.55);
+      box-shadow: 0 0 16px rgba(255, 171, 44, 0.22);
+    }
+
+    .switch input:checked + .switch-track .switch-thumb {
+      transform: translateX(24px);
+      background: #fff7db;
+    }
+
+    .switch input:focus-visible + .switch-track {
+      outline: 3px solid rgba(255, 190, 64, 0.18);
+      outline-offset: 2px;
+    }
+
+    .action-button {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      overflow: hidden;
+    }
+
+    .action-button .button-content {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: opacity 0.16s ease;
+    }
+
+    .action-button.is-loading .button-content {
+      opacity: 0.98;
+    }
+
+    .button-spinner {
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.32);
+      border-top-color: #ffffff;
+      animation: buttonSpin 0.75s linear infinite;
+    }
+
+    @keyframes buttonSpin {
+      to { transform: rotate(360deg); }
+    }
+
+    .success-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 12px;
+      border-radius: 12px;
+      margin-left: auto;
+      background: rgba(63, 220, 149, 0.10);
+      border: 1px solid rgba(85, 216, 155, 0.22);
+      color: #7cf2bc;
+      font-size: 13px;
+      font-weight: 750;
+      animation: successIn 0.28s ease-out;
+    }
+
+    .success-badge svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    @keyframes successIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
     .notice {
       padding: 11px 13px;
@@ -503,7 +630,9 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         <h1 id="title">⚙️ Admin Panel</h1>
         <div class="sub" id="identity">Checking access…</div>
       </div>
-      <button class="refresh" id="refresh" type="button">Refresh</button>
+      <button class="refresh action-button" id="refresh" type="button">
+        <span class="button-content"><span>Refresh</span></span>
+      </button>
     </div>
 
     <div id="notice" class="notice" role="status" aria-live="polite"></div>
@@ -535,7 +664,15 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         <div class="row"><div><label for="limit-smoke">Smoke</label><span class="hint">minutes</span></div><input id="limit-smoke" type="number" min="1" step="1"></div>
         <div class="row"><div><label for="limit-wcd">WCD</label><span class="hint">minutes</span></div><input id="limit-wcd" type="number" min="1" step="1"></div>
       </div>
-      <div class="actions"><button class="save save-limits" id="save-limits" type="button">Save Limits</button></div>
+      <div class="actions">
+        <button class="save save-limits action-button" id="save-limits" type="button">
+          <span class="button-content"><span>Save Limits</span></span>
+        </button>
+        <span class="success-badge" id="success-limits" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"></path></svg>
+          Successfully saved
+        </span>
+      </div>
     </section>
 
     <section class="card" id="counts-card" data-section="counts">
@@ -558,7 +695,15 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         <div class="row"><div><label for="count-smoke">Smoke</label><span class="hint">times per day</span></div><input id="count-smoke" type="number" min="1" step="1"></div>
         <div class="row"><div><label for="count-wcd">WCD</label><span class="hint">times per day</span></div><input id="count-wcd" type="number" min="1" step="1"></div>
       </div>
-      <div class="actions"><button class="save save-counts" id="save-counts" type="button">Save Count Limits</button></div>
+      <div class="actions">
+        <button class="save save-counts action-button" id="save-counts" type="button">
+          <span class="button-content"><span>Save Count Limits</span></span>
+        </button>
+        <span class="success-badge" id="success-counts" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"></path></svg>
+          Successfully saved
+        </span>
+      </div>
     </section>
 
     <section class="card panel-only-private" id="reminder-card" data-section="reminder">
@@ -572,10 +717,24 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         <span class="section-title"><span>Overdue Reminder</span><small>Automatic Notification</small></span>
       </h2>
       <div class="toggle">
-        <div><label for="reminder">Reminder</label><span class="hint">45-second grace period</span></div>
-        <input id="reminder" type="checkbox">
+        <div class="toggle-copy">
+          <label for="reminder">Reminder</label>
+          <span class="hint">45-second grace period</span>
+        </div>
+        <label class="switch" aria-label="Enable overdue reminder">
+          <input id="reminder" type="checkbox">
+          <span class="switch-track"><span class="switch-thumb"></span></span>
+        </label>
       </div>
-      <div class="actions"><button class="save save-reminder" id="save-reminder" type="button">Save Reminder</button></div>
+      <div class="actions">
+        <button class="save save-reminder action-button" id="save-reminder" type="button">
+          <span class="button-content"><span>Save Reminder</span></span>
+        </button>
+        <span class="success-badge" id="success-reminder" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"></path></svg>
+          Successfully saved
+        </span>
+      </div>
     </section>
 
     <section class="card panel-only-group" id="connect-card">
@@ -650,6 +809,50 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         });
       }
 
+      function setButtonState(button, state, label) {
+        if (!button) return;
+        var content = button.querySelector(".button-content");
+        if (!content) return;
+
+        button.classList.toggle("is-loading", state === "loading");
+        button.disabled = state === "loading";
+
+        if (state === "loading") {
+          content.innerHTML = '<span class="button-spinner" aria-hidden="true"></span><span>' + escapeHtml(label || "Loading…") + '</span>';
+        } else if (state === "success") {
+          content.innerHTML = '<span>✓</span><span>' + escapeHtml(label || "Successfully") + '</span>';
+        } else {
+          content.innerHTML = '<span>' + escapeHtml(label || "Save") + '</span>';
+        }
+      }
+
+      function showSuccessBadge(id) {
+        var badge = document.getElementById(id);
+        if (!badge) return;
+        badge.hidden = false;
+        window.clearTimeout(showSuccessBadge.timers[id]);
+        showSuccessBadge.timers[id] = window.setTimeout(function () {
+          badge.hidden = true;
+        }, 2600);
+      }
+      showSuccessBadge.timers = {};
+
+      async function runAction(button, loadingText, action, defaultText, successBadgeId) {
+        setButtonState(button, "loading", loadingText);
+        try {
+          var result = await action();
+          setButtonState(button, "success", "Successfully");
+          if (successBadgeId) showSuccessBadge(successBadgeId);
+          window.setTimeout(function () {
+            setButtonState(button, "idle", defaultText);
+          }, 1500);
+          return result;
+        } catch (error) {
+          setButtonState(button, "idle", defaultText);
+          throw error;
+        }
+      }
+
       async function api(path, options) {
         var requestOptions = options || {};
         var headers = new Headers(requestOptions.headers || {});
@@ -715,7 +918,19 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         });
       }
 
-      document.getElementById("refresh").addEventListener("click", load);
+      document.getElementById("refresh").addEventListener("click", function () {
+        var button = document.getElementById("refresh");
+        runAction(
+          button,
+          "Refreshing…",
+          async function () {
+            await load();
+          },
+          "Refresh"
+        ).catch(function (error) {
+          showNotice(error && error.message ? error.message : "Refresh failed.", "error");
+        });
+      });
 
       document.getElementById("save-limits").addEventListener("click", function () {
         var operations = [
@@ -725,22 +940,27 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           ["wcd", "limit-wcd"]
         ];
         (async function () {
-          setBusy(true);
+          var button = document.getElementById("save-limits");
           try {
-            for (var i = 0; i < operations.length; i += 1) {
-              var minutes = positiveInteger(operations[i][1]);
-              if (minutes === undefined) throw new Error("Enter positive integers for all activity limits.");
-              await api("/activity-limits", {
-                method: "PUT",
-                body: JSON.stringify({ kind: operations[i][0], minutes: minutes })
-              });
-            }
-            showNotice("Activity limits saved.", "ok");
+            await runAction(
+              button,
+              "Saving…",
+              async function () {
+                for (var i = 0; i < operations.length; i += 1) {
+                  var minutes = positiveInteger(operations[i][1]);
+                  if (minutes === undefined) throw new Error("Enter positive integers for all activity limits.");
+                  await api("/activity-limits", {
+                    method: "PUT",
+                    body: JSON.stringify({ kind: operations[i][0], minutes: minutes })
+                  });
+                }
+                await load();
+              },
+              "Save Limits",
+              "success-limits"
+            );
           } catch (error) {
             showNotice(error && error.message ? error.message : "Save failed.", "error");
-          } finally {
-            setBusy(false);
-            load();
           }
         })();
       });
@@ -752,22 +972,27 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           ["wcd", "count-wcd"]
         ];
         (async function () {
-          setBusy(true);
+          var button = document.getElementById("save-counts");
           try {
-            for (var i = 0; i < operations.length; i += 1) {
-              var count = positiveInteger(operations[i][1]);
-              if (count === undefined) throw new Error("Enter positive integers for all count limits.");
-              await api("/count-limits", {
-                method: "PUT",
-                body: JSON.stringify({ kind: operations[i][0], count: count })
-              });
-            }
-            showNotice("Daily count limits saved.", "ok");
+            await runAction(
+              button,
+              "Saving…",
+              async function () {
+                for (var i = 0; i < operations.length; i += 1) {
+                  var count = positiveInteger(operations[i][1]);
+                  if (count === undefined) throw new Error("Enter positive integers for all count limits.");
+                  await api("/count-limits", {
+                    method: "PUT",
+                    body: JSON.stringify({ kind: operations[i][0], count: count })
+                  });
+                }
+                await load();
+              },
+              "Save Count Limits",
+              "success-counts"
+            );
           } catch (error) {
             showNotice(error && error.message ? error.message : "Save failed.", "error");
-          } finally {
-            setBusy(false);
-            load();
           }
         })();
       });
@@ -775,18 +1000,23 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       if (!groupMode) {
         document.getElementById("save-reminder").addEventListener("click", function () {
           (async function () {
-            setBusy(true);
+            var button = document.getElementById("save-reminder");
             try {
-              var data = await api("/reminder", {
-                method: "PUT",
-                body: JSON.stringify({ enabled: document.getElementById("reminder").checked })
-              });
-              document.getElementById("reminder").checked = data.reminderEnabled;
-              showNotice("Reminder setting saved.", "ok");
+              await runAction(
+                button,
+                "Saving…",
+                async function () {
+                  var data = await api("/reminder", {
+                    method: "PUT",
+                    body: JSON.stringify({ enabled: document.getElementById("reminder").checked })
+                  });
+                  document.getElementById("reminder").checked = data.reminderEnabled;
+                },
+                "Save Reminder",
+                "success-reminder"
+              );
             } catch (error) {
               showNotice(error && error.message ? error.message : "Save failed.", "error");
-            } finally {
-              setBusy(false);
             }
           })();
         });
