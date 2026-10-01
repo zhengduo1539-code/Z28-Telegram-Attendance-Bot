@@ -250,13 +250,19 @@ export class CommandHandler {
         break;
       }
       case "stats": {
-        const dailyStats = await this.attendance.getDailyStats(profile);
-        response = text.stats(
-          dailyStats.date,
-          dailyStats.stats,
-          dailyStats.totalSeconds,
-          dailyStats.activeKind,
-        );
+        const isAdmin =
+          this.config.botOwnerId === profile.userId ||
+          this.config.adminIds.includes(profile.userId);
+        if (!isAdmin) {
+          response = text.adminOnly;
+          break;
+        }
+        if (message.chat.type !== "private") {
+          response = text.botStatsPrivate;
+          break;
+        }
+        const stats = await this.attendance.getBotStats();
+        response = text.botStats(stats.privateUsers, stats.groups);
         break;
       }
       case "work":
