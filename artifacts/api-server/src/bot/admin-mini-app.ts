@@ -4510,6 +4510,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
               document.body.classList.remove("admin-verification-page");
               title.textContent = "Administration";
               rememberVerifiedAdminId(telegramUserId);
+              await createAdminSession();
               await load();
               hideSplash();
               startAdminDashboardRefresh();
