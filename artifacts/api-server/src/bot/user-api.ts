@@ -5,9 +5,8 @@ import {
   isConfiguredAdmin,
 } from "./admin-auth";
 import { getAdminApiContext } from "./admin-runtime";
-import type { ActivityKind, ActiveActivity, BotState } from "./types";
+import type { ActiveActivity, BotState } from "./types";
 
-const trackedActivities: ActivityKind[] = ["eat", "wc", "smoke", "wcd"];
 
 const localDateKey = (date: Date, timeZone: string): string => {
   const parts = new Intl.DateTimeFormat("en-CA", {
