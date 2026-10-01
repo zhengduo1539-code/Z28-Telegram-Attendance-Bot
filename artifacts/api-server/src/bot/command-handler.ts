@@ -219,6 +219,7 @@ export class CommandHandler {
 
     switch (command.name) {
       case "start": {
+        response = text.startWelcome;
         markup = keyboard(locale);
         if (message.chat.type === "private") {
           const botUsername = await this.telegram.getBotUsername();
@@ -351,8 +352,7 @@ export class CommandHandler {
       default:
         response = text.unknownCommand;
     }
-    if (response) {
-      await this.telegram.sendMessage(
+    await this.telegram.sendMessage(
         message.chat.id,
         response,
         markup,
