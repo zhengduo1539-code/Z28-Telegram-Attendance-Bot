@@ -9,7 +9,6 @@ import type {
 
 type LocaleText = {
   title: string;
-  startWelcome: string;
   help: string;
   idInfo: (chatId: number, userId: number) => string;
   botStats: (privateUsers: number, groups: number) => string;
@@ -358,10 +357,6 @@ const zh: LocaleText = {
 
 const en: LocaleText = {
   title: "Attendance Bot M58",
-  startWelcome: [
-    "Welcome to the Attendance Bot!",
-    `Use ${inlineCode("/help")} to view all available commands and usage instructions.`,
-  ].join("\n"),
   help: [
     "Available commands:",
     `${inlineCode("/work")} — Start work`,
