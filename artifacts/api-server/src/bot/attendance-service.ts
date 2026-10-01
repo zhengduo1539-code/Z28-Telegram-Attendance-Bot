@@ -60,6 +60,16 @@ const formatDateTime = (date: Date, timeZone: string) =>
     .format(date)
     .replace(",", "");
 
+const formatWarningDateTime = (date: Date, timeZone: string) =>
+  new Intl.DateTimeFormat("en-GB", {
+    timeZone,
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(date);
+
 const formatDuration = (seconds: number) => {
   const safeSeconds = Math.max(0, Math.floor(seconds));
   const hours = Math.floor(safeSeconds / 3600);
@@ -243,6 +253,7 @@ export class AttendanceService {
             active.userId,
             activityName,
             timeoutSeconds,
+            formatWarningDateTime(now, this.config.timeZone),
           );
           notificationChatId = connection.targetChatId;
         }
