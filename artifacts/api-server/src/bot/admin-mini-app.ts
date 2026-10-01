@@ -694,6 +694,12 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     <div class="top">
       <div>
         <h1 id="title">⚙️ Admin Panel</h1>
+        <div class="credit-marquee" aria-label="Creator credit">
+          <div class="credit-track">
+            <span class="credit-text"><strong>This bot was created by Chan Myae</strong></span>
+            <span class="credit-text" aria-hidden="true"><strong>This bot was created by Chan Myae</strong></span>
+          </div>
+        </div>
         <div class="sub" id="identity">Checking access…</div>
       </div>
       <button class="refresh action-button" id="refresh" type="button">
