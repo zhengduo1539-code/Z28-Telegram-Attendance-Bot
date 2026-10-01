@@ -1221,8 +1221,16 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       padding:0 15px; background:linear-gradient(180deg,#2b8cff,#1268e6); color:#fff; font-weight:750; cursor:pointer;
     }
     .user-warning-feed {
-      min-height:220px; max-height:430px; overflow:auto; padding:12px;
+      min-height:220px; max-height:none; overflow:auto; padding:12px;
       border:1px solid rgba(255,180,45,.22); border-radius:18px; background:rgba(26,18,6,.45);
+    }
+
+    .user-warning-tab-panel {
+      min-height: calc(100vh - 150px);
+    }
+
+    .user-warning-tab-panel .user-warning-feed {
+      min-height: calc(100vh - 190px);
     }
     .user-warning-item { padding:12px; margin-bottom:9px; border-radius:14px; border:1px solid rgba(255,180,45,.17); background:rgba(77,46,8,.22); }
     .user-warning-item:last-child { margin-bottom:0; }
@@ -1376,7 +1384,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         </div></div>
 
         <div class="user-tab-shell">
-          <div class="user-tab-panel active" id="user-warning-tab">
+          <div class="user-tab-panel active" id="user-settings-tab">
             <div class="user-group-box compact">
               <div class="user-group-box-title">Group Activities</div>
               <div class="user-group-name" id="user-warning-group-name"></div>
@@ -1385,18 +1393,18 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
                 <div class="user-live-metric"><div class="user-live-label">Member active</div><div class="user-live-value active" id="user-active-count">—</div></div>
               </div>
             </div>
-            <div class="user-warning-feed" id="user-warning-feed"><div class="user-warning-empty">No warning messages yet.</div></div>
-          </div>
-
-          <div class="user-tab-panel" id="user-settings-tab">
             <div class="user-setting-card" id="user-settings-limits-card"></div>
             <div class="user-setting-card counts" id="user-settings-counts-card"></div>
+          </div>
+
+          <div class="user-tab-panel user-warning-tab-panel" id="user-warning-tab">
+            <div class="user-warning-feed" id="user-warning-feed"><div class="user-warning-empty">No warning messages yet.</div></div>
           </div>
         </div>
 
         <nav class="user-tabbar" aria-label="Dashboard sections">
-          <button class="user-tab" id="user-settings-tab-button" type="button">Admin Settings</button>
-          <button class="user-tab active" id="user-warning-tab-button" type="button">Warning</button>
+          <button class="user-tab active" id="user-settings-tab-button" type="button">Admin Settings</button>
+          <button class="user-tab" id="user-warning-tab-button" type="button">Warning</button>
         </nav>
       </div>
     </section>
@@ -1936,6 +1944,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         document.getElementById("user-settings-tab-button").classList.toggle("active", settings);
         document.getElementById("user-warning-tab-button").classList.toggle("active", !settings);
       }
+
+      activateUserTab("settings");
 
       document.getElementById("user-settings-tab-button").addEventListener("click", function () {
         activateUserTab("settings");
