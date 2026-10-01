@@ -12,6 +12,7 @@ export interface BotStore {
   ): Promise<MiniAppGroupAccess>;
   clearMiniAppGroupAccess(userId: number, groupId: number): Promise<void>;
   createAuditLog(entry: AuditLogEntry): Promise<void>;
+  deleteAuditLogsBefore(cutoff: Date): Promise<number>;
   listAuditLogs(options: { search?: string; action?: string; page: number; pageSize: number }): Promise<{ logs: AuditLogEntry[]; total: number; totalPages: number; page: number; pageSize: number }>;
   getActiveActivity(chatId: number, userId: number): Promise<ActiveActivity | undefined>;
   listActiveActivities(): Promise<ActiveActivity[]>;

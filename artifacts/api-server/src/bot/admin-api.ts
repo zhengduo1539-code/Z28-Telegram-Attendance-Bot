@@ -76,6 +76,30 @@ const serializeCountLimits = (
 
 export const adminApiRouter: IRouter = Router();
 
+adminApiRouter.post("/maintenance/audit-retention", async (req, res) => {
+  const auth = requireAdmin(req, res);
+  if (!auth) return;
+
+  const requestedDays = Number(req.body?.retentionDays);
+  const retentionDays =
+    Number.isSafeInteger(requestedDays) && requestedDays >= 30 && requestedDays <= 3650
+      ? requestedDays
+      : 180;
+
+  const cutoff = new Date(Date.now() - retentionDays * 86_400_000);
+  const deleted = await auth.context.attendance.deleteAuditLogsBefore(cutoff);
+
+  await recordAdminAudit(
+    auth,
+    "audit_logs.retention_cleanup",
+    "audit_logs",
+    "Deleted " + deleted + " audit log(s) older than " + retentionDays + " days.",
+  );
+
+  res.setHeader("Cache-Control", "no-store");
+  res.json({ retentionDays, deleted, cutoff: cutoff.toISOString() });
+});
+
 adminApiRouter.get("/backup", async (req, res) => {
   const auth = requireAdmin(req, res);
   if (!auth) return;

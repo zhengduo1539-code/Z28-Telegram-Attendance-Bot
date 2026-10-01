@@ -213,6 +213,13 @@ export class FileBotStore implements BotStore {
     if (this.auditLogs.length > 1000) this.auditLogs.splice(0, this.auditLogs.length - 1000);
   }
 
+  async deleteAuditLogsBefore(cutoff: Date): Promise<number> {
+    const before = this.auditLogs.length;
+    const kept = this.auditLogs.filter((entry) => new Date(entry.createdAt).getTime() >= cutoff.getTime());
+    this.auditLogs.splice(0, this.auditLogs.length, ...kept);
+    return before - kept.length;
+  }
+
   async listAuditLogs(options: { search?: string; action?: string; page: number; pageSize: number }): Promise<{ logs: AuditLogEntry[]; total: number; totalPages: number; page: number; pageSize: number }> {
     const search = (options.search || "").trim().toLowerCase();
     const filtered = this.auditLogs.filter((entry) => !options.action || entry.action === options.action).filter((entry) => !search || [entry.actorName, entry.action, entry.target, entry.details, String(entry.actorUserId)].some((value) => value.toLowerCase().includes(search))).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
