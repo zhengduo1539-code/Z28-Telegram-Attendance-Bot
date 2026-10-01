@@ -2211,6 +2211,13 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       font-size:10px;
     }
 
+    body.admin-mode {
+      padding: 0;
+    }
+    body.admin-mode::before,
+    body.admin-mode::after {
+      display: none;
+    }
     .admin-mode {
       color-scheme: light;
       min-height:100vh;
