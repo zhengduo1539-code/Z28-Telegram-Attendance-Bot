@@ -105,6 +105,7 @@ export type InlineKeyboardButton = {
   style?: "danger" | "success" | "primary";
   url?: string;
   callback_data?: string;
+  web_app?: { url: string };
 };
 
 export type InlineKeyboardMarkup = {
