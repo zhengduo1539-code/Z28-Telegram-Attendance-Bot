@@ -757,6 +757,12 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       border-color: rgba(85,216,155,.2);
     }
 
+    .notice.warning {
+      background: rgba(77,46,8,.22);
+      color: #ffd98a;
+      border-color: rgba(255,180,45,.24);
+    }
+
     .panel-only-user { display: none; }
     .panel-only-private,
     .panel-only-group {
@@ -2148,7 +2154,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             clearUserDashboard();
             document.getElementById("user-id-input").value="";
             document.getElementById("user-confirm").disabled=true;
-            showNotice(tUser("noGroupMessage"),"error");
+            showNotice(tUser("noGroupMessage"),"warning");
             window.setTimeout(function() {
               document.getElementById("user-verify-card").classList.add("visible");
               title.textContent = tUser("verifySubtitle");
@@ -2196,7 +2202,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           document.getElementById("user-group-options").hidden=false;
           document.getElementById("user-selected-dashboard").hidden=true;
           button.hidden=true;
-          title.textContent = "Group Options";
+          title.textContent = tUser("groupOptions");
           renderGroupOptions(data.groups || []);
         }).catch(function(error){
           showNotice(error && error.message ? error.message : "Unable to load groups.","error");
