@@ -102,6 +102,7 @@ export const ADMIN_MENU_COMMANDS = [
 export class CommandHandler {
   private readonly adminMenuScopes = new Set<string>();
   private readonly privateMenuButtonScopes = new Set<string>();
+  private readonly settlementQueues = new Map<string, Promise<void>>();
 
   constructor(
     private readonly telegram: TelegramClient,
@@ -329,22 +330,10 @@ export class CommandHandler {
         response = await this.attendance.workCheckIn(profile);
         markup = keyboard(locale);
         break;
-      case "back": {
-        const result = await this.attendance.settle(profile);
-        response = result.response;
-        if (result.timeoutNotification && result.notificationChatId) {
-          try {
-            await this.telegram.sendMessage(
-              result.notificationChatId,
-              result.timeoutNotification,
-            );
-          } catch {
-            // Connected target group may no longer be reachable.
-          }
-        }
+      case "back":
+        response = await this.handleSettlement(profile, "back");
         markup = keyboard(locale);
         break;
-      }
       case "eat":
       case "wc":
       case "smoke":
@@ -353,7 +342,7 @@ export class CommandHandler {
         markup = keyboard(locale);
         break;
       case "offwork":
-        response = (await this.attendance.offWork(profile)).response;
+        response = await this.handleSettlement(profile, "offwork");
         markup = keyboard(locale);
         break;
       case "connect":
@@ -445,6 +434,51 @@ export class CommandHandler {
             : "团队需要使用活动打卡功能？请先将 Bot 添加到群组：",
         addGroupMarkup,
       );
+    }
+  }
+
+  private async handleSettlement(
+    profile: Omit<UserProfile, "createdAt" | "updatedAt">,
+    settledBy: "back" | "offwork",
+  ): Promise<string> {
+    const key = `${profile.chatId}:${profile.userId}`;
+    const previous = this.settlementQueues.get(key) || Promise.resolve();
+    let release!: () => void;
+    const current = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    this.settlementQueues.set(key, current);
+
+    await previous;
+    try {
+      const result = await this.attendance.settle(profile, settledBy);
+      if (
+        settledBy === "back" &&
+        result.timeoutNotification &&
+        result.notificationChatId &&
+        result.pendingActivityId
+      ) {
+        try {
+          await this.telegram.sendMessage(
+            result.notificationChatId,
+            result.timeoutNotification,
+          );
+          await this.attendance.completePendingActivity(
+            profile.chatId,
+            profile.userId,
+            result.pendingActivityId,
+          );
+        } catch {
+          // Keep the temporary activity when warning delivery fails so the
+          // warning can be retried on the next Back to Seat action.
+        }
+      }
+      return result.response;
+    } finally {
+      release();
+      if (this.settlementQueues.get(key) === current) {
+        this.settlementQueues.delete(key);
+      }
     }
   }
 

@@ -28,6 +28,7 @@ export type ActivityRecord = {
 };
 
 export type ActiveActivity = {
+  id: string;
   chatId: number;
   userId: number;
   displayName: string;
