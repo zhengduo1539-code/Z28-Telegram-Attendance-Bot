@@ -251,6 +251,29 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       stroke-linejoin: round;
     }
 
+    .stats-icon {
+      color: #73d2ff;
+      background: linear-gradient(145deg, rgba(25, 160, 255, 0.24), rgba(8, 53, 82, 0.88));
+    }
+
+    .stats-icon::before {
+      content: "";
+      position: absolute;
+      width: 9px;
+      height: 9px;
+      right: 6px;
+      top: 6px;
+      border-radius: 50%;
+      background: #6fe7ff;
+      box-shadow: 0 0 12px rgba(111, 231, 255, 0.7);
+      animation: statsPulse 1.8s ease-in-out infinite;
+    }
+
+    @keyframes statsPulse {
+      0%, 100% { opacity: 0.45; transform: scale(0.82); }
+      50% { opacity: 1; transform: scale(1); }
+    }
+
     .activity-icon {
       color: #54b4ff;
       background: linear-gradient(145deg, rgba(38, 150, 255, 0.24), rgba(9, 43, 82, 0.88));
@@ -278,6 +301,10 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     @keyframes reminderPulse {
       0%, 100% { transform: scale(0.92); opacity: 0.28; }
       50% { transform: scale(1.08); opacity: 0.72; }
+    }
+
+    .card[data-section="stats"]::before {
+      background: linear-gradient(180deg, #58d8ff, #1476e8);
     }
 
     .card[data-section="activity"]::before {
@@ -639,8 +666,20 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
     <div id="notice" class="notice" role="status" aria-live="polite"></div>
 
-    <section class="card panel-only-private" id="stats-card">
-      <h2>📊 Bot Statistics</h2>
+    <section class="card panel-only-private" id="stats-card" data-section="stats">
+      <h2>
+        <span class="section-icon stats-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M4 19V10"></path>
+            <path d="M10 19V6"></path>
+            <path d="M16 19v-8"></path>
+            <path d="M22 19V3"></path>
+            <path d="M2.5 21h20"></path>
+            <path d="M4 7l4-3 6 3 7-5"></path>
+          </svg>
+        </span>
+        <span class="section-title"><span>Bot Statistics</span><small>System Overview</small></span>
+      </h2>
       <div class="stats">
         <div class="stat"><div class="stat-label">Users (PM)</div><div class="stat-value" id="users">—</div></div>
         <div class="stat"><div class="stat-label">Groups</div><div class="stat-value" id="groups">—</div></div>
