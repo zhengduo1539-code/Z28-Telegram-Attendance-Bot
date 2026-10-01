@@ -69,6 +69,7 @@ export type GroupWarning = {
   displayName: string;
   kind: ActivityKind;
   message: string;
+  timeoutSeconds?: number;
   createdAt: string;
 };
 
