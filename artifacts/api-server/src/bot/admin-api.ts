@@ -135,6 +135,20 @@ adminApiRouter.get("/backup", async (req, res) => {
   res.send(JSON.stringify(backup, null, 2));
 });
 
+adminApiRouter.get("/storage-health", async (req, res) => {
+  const auth = requireAdmin(req, res);
+  if (!auth) return;
+
+  const health = await auth.context.attendance.getStorageHealth();
+  if (!health) {
+    res.status(503).json({ error: "MongoDB storage metrics are unavailable." });
+    return;
+  }
+
+  res.setHeader("Cache-Control", "no-store");
+  res.json(health);
+});
+
 adminApiRouter.post("/maintenance/history-retention", async (req, res) => {
   const auth = requireAdmin(req, res);
   if (!auth) return;
