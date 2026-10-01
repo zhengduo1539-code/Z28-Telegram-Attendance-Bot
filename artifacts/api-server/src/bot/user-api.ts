@@ -2,6 +2,7 @@ import { Router, type IRouter, type Request, type Response } from "express";
 import {
   getTelegramInitData,
   validateTelegramInitData,
+  isConfiguredAdmin,
 } from "./admin-auth";
 import { getAdminApiContext } from "./admin-runtime";
 import type { ActiveActivity, ActivityKind, BotState } from "./types";
@@ -161,7 +162,11 @@ userApiRouter.get("/mode", (req, res) => {
   res.setHeader("Cache-Control", "no-store");
   res.json({
     user: auth.user,
-    isConfiguredAdmin: false,
+    isConfiguredAdmin: isConfiguredAdmin(
+      auth.user.id,
+      auth.context.config.botOwnerId,
+      auth.context.config.adminIds,
+    ),
   });
 });
 
