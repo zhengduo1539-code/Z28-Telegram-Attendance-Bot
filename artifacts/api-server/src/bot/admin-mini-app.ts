@@ -2529,6 +2529,10 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             </select></div>
             <div class="admin-panel-body">
               <div class="admin-kpi-grid" id="admin-analytics-kpis"></div>
+              <div class="admin-report-actions">
+                <button class="admin-report-button" id="admin-export-csv" type="button">Export CSV</button>
+                <span class="admin-panel-sub">Exports completed attendance records for the selected period.</span>
+              </div>
               <div class="admin-analytics-grid">
                 <div class="admin-analytics-card"><h3>Daily activity</h3><div id="admin-analytics-daily" class="admin-analytics-list"></div></div>
                 <div class="admin-analytics-card"><h3>Activity types</h3><div id="admin-analytics-kinds" class="admin-analytics-list"></div></div>
@@ -3460,6 +3464,40 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
       var adminAnalyticsDays = 30;
 
+      async function exportAdminCsv() {
+        var button = document.getElementById("admin-export-csv");
+        if (!button) return;
+        var original = button.textContent;
+        button.disabled = true;
+        button.textContent = "Preparing…";
+        try {
+          var headers = new Headers();
+          headers.set("X-Telegram-Init-Data", initData);
+          headers.set("Accept", "text/csv");
+          var response = await fetch("/api/admin/export?days=" + encodeURIComponent(String(adminAnalyticsDays)), {
+            method: "GET",
+            headers: headers
+          });
+          if (!response.ok) {
+            var errorText = await response.text();
+            throw new Error(errorText || "Unable to export report.");
+          }
+          var blob = await response.blob();
+          var url = URL.createObjectURL(blob);
+          var link = document.createElement("a");
+          link.href = url;
+          link.download = "z28-attendance-" + adminAnalyticsDays + "d.csv";
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+          showNotice("CSV report exported.", "ok");
+        } finally {
+          button.disabled = false;
+          button.textContent = original;
+        }
+      }
+
       function renderAdminAnalytics(data) {
         var s=data.summary||{}, kpis=document.getElementById("admin-analytics-kpis"), daily=document.getElementById("admin-analytics-daily"), kinds=document.getElementById("admin-analytics-kinds");
         if(!kpis||!daily||!kinds)return;
@@ -4222,6 +4260,12 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
       document.getElementById("admin-analytics-period").addEventListener("change", function(){
         adminAnalyticsDays=Number(this.value)||30; loadAdminAnalytics().catch(function(error){showNotice(error&&error.message?error.message:"Unable to load analytics.","error");});
+      });
+
+      document.getElementById("admin-export-csv").addEventListener("click", function() {
+        exportAdminCsv().catch(function(error) {
+          showNotice(error && error.message ? error.message : "Unable to export report.", "error");
+        });
       });
 
       document.getElementById("admin-health-refresh").addEventListener("click", function() {
