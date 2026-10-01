@@ -15,5 +15,7 @@ services:
         sync: false
       - key: ADMIN_MINI_APP_URL
         sync: false
+      - key: MONGODB_URI
+        sync: false
       - key: BOT_DATA_PATH
         value: data/m58-bot-state.json

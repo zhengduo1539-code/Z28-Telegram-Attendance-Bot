@@ -6,7 +6,7 @@ import { getBotConfig } from "./config";
 import { TelegramPollingBot } from "./polling";
 import { setAdminApiContext } from "./admin-runtime";
 import { setBotStatus } from "./runtime";
-import { FileBotStore } from "./store/file-store";
+import { MongoBotStore } from "./store/mongo-store";
 import { TelegramClient } from "./telegram-client";
 
 const MAX_START_RETRY_DELAY_MS = 30_000;
@@ -24,12 +24,20 @@ export const startTelegramBot = async (logger: Logger) => {
     return undefined;
   }
 
+  if (!config.mongodbUri) {
+    const message = "MONGODB_URI is required when Telegram bot polling is enabled.";
+    setBotStatus({ enabled: true, running: false, lastError: message });
+    logger.error(message);
+    return undefined;
+  }
+
   setBotStatus({ enabled: true, running: false, lastError: undefined });
 
   let retryDelayMs = config.pollIntervalMs;
   while (true) {
     try {
-      const store = new FileBotStore(config.dataPath);
+      const store = new MongoBotStore(config.mongodbUri, config.dataPath);
+      await store.load();
       const attendance = new AttendanceService(store, config);
       const telegram = new TelegramClient(
         config.token,

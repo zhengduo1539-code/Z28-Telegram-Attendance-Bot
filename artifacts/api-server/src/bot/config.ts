@@ -30,6 +30,7 @@ export type BotConfig = {
   telegramRequestTimeoutMs: number;
   activityLimits: ActivityLimits;
   dataPath: string;
+  mongodbUri?: string;
   timeZone: string;
   botOwnerId?: number;
   adminIds: number[];
@@ -68,8 +69,9 @@ export const getBotConfig = (): BotConfig => ({
   ),
   activityLimits: { ...DEFAULT_ACTIVITY_LIMITS },
   dataPath: path.resolve(
-    process.env["BOT_DATA_PATH"]?.trim() || "data/m58-bot-state.json",
+    process.env["BOT_DATA_PATH"]?.trim() || "data/z28-bot-state.json",
   ),
+  mongodbUri: process.env["MONGODB_URI"]?.trim() || undefined,
   timeZone: "Asia/Rangoon",
   botOwnerId: parseUserId(process.env["BOT_OWNER_ID"]),
   adminIds: parseAdminIds(process.env["ADMIN_IDS"]),

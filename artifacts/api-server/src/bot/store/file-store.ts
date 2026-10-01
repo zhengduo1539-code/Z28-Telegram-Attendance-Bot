@@ -3,7 +3,7 @@ import path from "node:path";
 import type { BotState } from "../types";
 import type { BotStore } from "./types";
 
-const emptyState = (): BotState => ({
+export const emptyState = (): BotState => ({
   users: {},
   activeActivities: {},
   records: [],
@@ -15,7 +15,7 @@ const emptyState = (): BotState => ({
 const isObjectRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
-const isBotState = (value: unknown): value is BotState => {
+export const isBotState = (value: unknown): value is BotState => {
   if (!isObjectRecord(value)) return false;
   const candidate = value as Partial<BotState>;
   return (
@@ -30,7 +30,17 @@ const isBotState = (value: unknown): value is BotState => {
     (candidate.connectedGroups === undefined ||
       isObjectRecord(candidate.connectedGroups)) &&
     (candidate.pendingConnects === undefined ||
-      isObjectRecord(candidate.pendingConnects))
+      isObjectRecord(candidate.pendingConnects)) &&
+    (candidate.groupActivityLimits === undefined ||
+      isObjectRecord(candidate.groupActivityLimits)) &&
+    (candidate.groupActivityCountLimits === undefined ||
+      isObjectRecord(candidate.groupActivityCountLimits)) &&
+    (candidate.groupWarnings === undefined ||
+      isObjectRecord(candidate.groupWarnings)) &&
+    (candidate.reminderEnabled === undefined ||
+      typeof candidate.reminderEnabled === "boolean") &&
+    (candidate.managedGroups === undefined ||
+      isObjectRecord(candidate.managedGroups))
   );
 };
 
