@@ -1647,6 +1647,190 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       .refresh { padding: 0 13px; }
     }
 
+
+    /* Neon admin dashboard theme. Scoped to admin mode only. */
+    body.admin-mode {
+      color-scheme: dark;
+      background:
+        radial-gradient(circle at 12% 8%, rgba(0,229,255,.13), transparent 25%),
+        radial-gradient(circle at 90% 14%, rgba(168,85,247,.15), transparent 28%),
+        radial-gradient(circle at 50% 100%, rgba(59,130,246,.10), transparent 34%),
+        #030712;
+      color:#e8f7ff;
+    }
+    body.admin-mode .admin-shell { background:transparent; color:#e8f7ff; }
+    body.admin-mode .admin-sidebar {
+      width:252px; flex-basis:252px; padding:20px 14px;
+      background:rgba(3,7,18,.88);
+      border-right:1px solid rgba(34,211,238,.16);
+      box-shadow:18px 0 45px rgba(0,0,0,.34), inset -1px 0 0 rgba(168,85,247,.08);
+      backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+    }
+    body.admin-mode .admin-brand-mark {
+      background:linear-gradient(135deg,#06b6d4,#2563eb 52%,#a855f7);
+      box-shadow:0 0 24px rgba(34,211,238,.22),0 0 36px rgba(168,85,247,.12);
+    }
+    body.admin-mode .admin-brand-title { color:#f0fdff; }
+    body.admin-mode .admin-brand-sub { color:#6e8da5; }
+    body.admin-mode .admin-nav { gap:7px; }
+    body.admin-mode .admin-nav-label { color:#46677e; }
+    body.admin-mode .admin-nav-item {
+      min-height:46px; border:1px solid transparent; border-radius:13px;
+      color:#7594aa; background:rgba(7,15,30,.44);
+    }
+    body.admin-mode .admin-nav-item:hover {
+      color:#d9fbff; border-color:rgba(34,211,238,.20);
+      background:rgba(34,211,238,.055); box-shadow:0 0 20px rgba(34,211,238,.05);
+    }
+    body.admin-mode .admin-nav-item.active {
+      color:#eaffff; border-color:rgba(34,211,238,.32);
+      background:linear-gradient(100deg,rgba(6,182,212,.17),rgba(59,130,246,.10),rgba(168,85,247,.12));
+      box-shadow:inset 3px 0 0 #22d3ee,0 0 24px rgba(34,211,238,.08);
+    }
+    body.admin-mode .admin-nav-icon { color:#5ddcf1; }
+    body.admin-mode .admin-sidebar-footer { border-color:rgba(34,211,238,.13); background:rgba(8,18,34,.58); }
+    body.admin-mode .admin-secure-line { color:#a9d8e7; }
+    body.admin-mode .admin-role-caption { color:#5e7b90; }
+    body.admin-mode .admin-main { padding:24px clamp(16px,3vw,38px) 42px; }
+    body.admin-mode .admin-eyebrow { color:#35cfe6; }
+    body.admin-mode .admin-heading { color:#ecfeff; text-shadow:0 0 22px rgba(34,211,238,.12); }
+    body.admin-mode .admin-heading-sub { color:#6f8ba0; }
+
+    .admin-folder-strip {
+      display:flex; gap:8px; overflow-x:auto; padding:5px; margin:0 0 18px;
+      border:1px solid rgba(34,211,238,.14); border-radius:15px;
+      background:rgba(3,10,23,.66); box-shadow:0 12px 30px rgba(0,0,0,.20);
+      scrollbar-width:thin;
+    }
+    .admin-folder-tab {
+      min-height:40px; flex:1 0 auto; padding:0 15px; border:1px solid transparent;
+      border-radius:11px; background:transparent; color:#648399;
+      font-size:11px; font-weight:850; cursor:pointer; transition:.18s ease;
+    }
+    .admin-folder-tab:hover { color:#c9faff; background:rgba(34,211,238,.05); }
+    .admin-folder-tab.active {
+      color:#eaffff; border-color:rgba(34,211,238,.30);
+      background:linear-gradient(100deg,rgba(6,182,212,.16),rgba(59,130,246,.10),rgba(168,85,247,.13));
+      box-shadow:0 0 18px rgba(34,211,238,.08);
+    }
+    .admin-folder-tab span { pointer-events:none; }
+
+    body.admin-mode .admin-section { display:none; scroll-margin-top:18px; }
+    body.admin-mode .admin-section.admin-folder-visible { display:block; }
+    body.admin-mode .admin-kpi,
+    body.admin-mode .admin-panel {
+      color:#e6f7ff; border-color:rgba(76,201,240,.16);
+      background:linear-gradient(145deg,rgba(7,17,33,.90),rgba(5,13,28,.82));
+      box-shadow:0 16px 34px rgba(0,0,0,.30),inset 0 1px 0 rgba(255,255,255,.035),0 0 24px rgba(34,211,238,.025);
+      backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    }
+    body.admin-mode .admin-kpi::after { background:rgba(34,211,238,.045); }
+    body.admin-mode .admin-kpi-icon,
+    body.admin-mode .admin-control-icon,
+    body.admin-mode .admin-automation-icon {
+      background:rgba(6,182,212,.08); color:#67e8f9; border:1px solid rgba(34,211,238,.14);
+    }
+    body.admin-mode .admin-kpi[data-tone="indigo"] .admin-kpi-icon { background:rgba(139,92,246,.10); color:#c4b5fd; }
+    body.admin-mode .admin-kpi[data-tone="green"] .admin-kpi-icon { background:rgba(34,197,94,.10); color:#86efac; }
+    body.admin-mode .admin-kpi[data-tone="amber"] .admin-kpi-icon { background:rgba(245,158,11,.10); color:#fcd34d; }
+    body.admin-mode .admin-kpi-label,
+    body.admin-mode .admin-panel-sub,
+    body.admin-mode .admin-kpi-note,
+    body.admin-mode .admin-control-hint,
+    body.admin-mode .admin-empty-note { color:#668196; }
+    body.admin-mode .admin-kpi-value,
+    body.admin-mode .admin-panel-title,
+    body.admin-mode .admin-control-name,
+    body.admin-mode .admin-automation-title { color:#ecfeff; }
+    body.admin-mode .admin-panel-head { border-bottom-color:rgba(76,201,240,.10); }
+    body.admin-mode .admin-control { border-color:rgba(76,201,240,.12); background:rgba(7,20,37,.66); }
+    body.admin-mode .admin-field {
+      border-color:rgba(76,201,240,.16); background:rgba(2,8,20,.80); color:#eaffff;
+    }
+    body.admin-mode .admin-field:focus {
+      border-color:rgba(34,211,238,.65);
+      box-shadow:0 0 0 3px rgba(34,211,238,.10),0 0 20px rgba(34,211,238,.07);
+    }
+    body.admin-mode .admin-action-bar { border-top-color:rgba(76,201,240,.10); }
+    body.admin-mode .admin-save {
+      background:linear-gradient(100deg,#0891b2,#2563eb 52%,#7c3aed);
+      box-shadow:0 10px 25px rgba(37,99,235,.20),0 0 18px rgba(34,211,238,.08);
+    }
+    body.admin-mode .admin-save.secondary,
+    body.admin-mode .admin-refresh {
+      color:#bdeaf4; background:rgba(8,18,34,.78); border-color:rgba(76,201,240,.16);
+    }
+    body.admin-mode .admin-refresh:hover { border-color:rgba(34,211,238,.34); color:#eaffff; }
+    body.admin-mode .admin-automation { border-color:rgba(76,201,240,.12); background:rgba(7,20,37,.60); }
+    body.admin-mode .admin-switch-track { background:#152536; }
+    body.admin-mode .admin-switch input:checked + .admin-switch-track {
+      background:linear-gradient(90deg,#06b6d4,#2563eb,#8b5cf6);
+      box-shadow:0 0 18px rgba(34,211,238,.20);
+    }
+    body.admin-mode .admin-status-pill {
+      background:rgba(34,197,94,.08); border-color:rgba(34,197,94,.18); color:#86efac;
+    }
+    body.admin-mode .admin-session {
+      border-color:rgba(76,201,240,.14); background:rgba(7,18,34,.78); box-shadow:0 10px 26px rgba(0,0,0,.22);
+    }
+    body.admin-mode .admin-session-name { color:#eaffff; }
+    body.admin-mode .admin-session-role { color:#668196; }
+    body.admin-mode .admin-avatar {
+      background:linear-gradient(145deg,rgba(6,182,212,.18),rgba(124,58,237,.18));
+      color:#a5f3fc; border:1px solid rgba(34,211,238,.18);
+    }
+    body.admin-mode .admin-users-search,
+    body.admin-mode .admin-users-filter {
+      border-color:rgba(76,201,240,.15); background:rgba(2,9,20,.72); color:#dffbff;
+    }
+    body.admin-mode .admin-users-search:focus {
+      border-color:rgba(34,211,238,.55); box-shadow:0 0 0 3px rgba(34,211,238,.08);
+    }
+    body.admin-mode .admin-users-table-wrap,
+    body.admin-mode .admin-analytics-card,
+    body.admin-mode .admin-health-card,
+    body.admin-mode .admin-health-meta-card,
+    body.admin-mode .admin-health-result {
+      border-color:rgba(76,201,240,.13); background:rgba(4,13,27,.72); color:#dffbff;
+    }
+    body.admin-mode .admin-users-table th { background:rgba(8,24,43,.88); color:#6e9ab0; border-bottom-color:rgba(76,201,240,.11); }
+    body.admin-mode .admin-users-table td { color:#b9d4df; border-bottom-color:rgba(76,201,240,.08); }
+    body.admin-mode .admin-user-name,
+    body.admin-mode .admin-user-primary,
+    body.admin-mode .admin-health-result-title { color:#eaffff; }
+    body.admin-mode .admin-users-page,
+    body.admin-mode .admin-health-button {
+      border-color:rgba(76,201,240,.15); background:rgba(7,18,34,.80); color:#a9d8e7;
+    }
+    body.admin-mode .admin-users-page:hover,
+    body.admin-mode .admin-health-button:hover { border-color:rgba(34,211,238,.34); color:#eaffff; }
+    body.admin-mode .admin-broadcast-textarea,
+    body.admin-mode .admin-maintenance-box,
+    body.admin-mode .admin-backup-box {
+      border-color:rgba(76,201,240,.14); background:rgba(5,15,29,.72); color:#eaffff;
+    }
+    @media (max-width:980px) {
+      body.admin-mode .admin-sidebar { width:220px; flex-basis:220px; }
+      body.admin-mode .admin-kpis { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    }
+    @media (max-width:700px) {
+      body.admin-mode .admin-sidebar { width:100%; height:auto; padding:9px 10px; flex-direction:row; }
+      body.admin-mode .admin-brand { flex:0 0 auto; }
+      body.admin-mode .admin-nav { overflow-x:auto; flex:1; justify-content:flex-start; }
+      body.admin-mode .admin-nav-label { display:none; }
+      body.admin-mode .admin-nav-item { width:auto; min-width:44px; min-height:38px; padding:0 10px; justify-content:center; }
+      body.admin-mode .admin-nav-item span:not(.admin-nav-icon) { display:none; }
+      body.admin-mode .admin-nav-icon { width:18px; }
+      body.admin-mode .admin-main { padding:14px 10px 28px; }
+      .admin-folder-strip { margin-bottom:14px; }
+      .admin-folder-tab { min-height:38px; padding:0 12px; }
+      body.admin-mode .admin-kpis { grid-template-columns:1fr 1fr; }
+    }
+    @media (max-width:420px) {
+      body.admin-mode .admin-kpis { grid-template-columns:1fr; }
+      body.admin-mode .admin-folder-tab { padding:0 10px; }
+    }
+
     /* Professional global admin dashboard. User Dashboard styles intentionally remain separate. */
     .admin-shell {
       display: none;
@@ -2433,38 +2617,14 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           </div>
         </div>
 
-        <div class="admin-nav">
-          <div class="admin-nav-label">Workspace</div>
-          <button class="admin-nav-item active" type="button" data-admin-nav="overview">
-            <span class="admin-nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="3" width="7" height="7" rx="2"></rect><rect x="3" y="14" width="7" height="7" rx="2"></rect><rect x="14" y="14" width="7" height="7" rx="2"></rect></svg></span>
-            <span>Overview</span>
-          </button>
-          <button class="admin-nav-item" type="button" data-admin-nav="analytics"><span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h16"></path><path d="m7 15 4-4 3 2 5-6"></path></svg></span><span>Analytics</span></button>
-          <button class="admin-nav-item" type="button" data-admin-nav="audit"><span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5z"></path><path d="M8 8h8M8 12h8M8 16h5"></path></svg></span><span>Audit Log</span></button>
-          <button class="admin-nav-item" type="button" data-admin-nav="groups">
-            <span class="admin-nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"></rect><path d="M8 9h8M8 13h5"></path></svg></span>
-            <span>Group Management</span>
-          </button>
-          <button class="admin-nav-item" type="button" data-admin-nav="users">
-            <span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M16 20v-1.7a4.3 4.3 0 0 0-4.3-4.3H7.3A4.3 4.3 0 0 0 3 18.3V20"></path><circle cx="9.5" cy="7.5" r="3.5"></circle><path d="M16 4.8a3.5 3.5 0 0 1 0 5.4"></path><path d="M21 19.8v-1.5a4.3 4.3 0 0 0-3.2-4.1"></path></svg></span>
-            <span>User Management</span>
-          </button>
-          <button class="admin-nav-item" type="button" data-admin-nav="duration">
-            <span class="admin-nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7.5"></circle><path d="M9 3h6"></path><path d="M12 5.5v2"></path><path d="M12 13l3-2"></path></svg></span>
-            <span>Activity Limits</span>
-          </button>
-          <button class="admin-nav-item" type="button" data-admin-nav="counts">
-            <span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 21h16"></path><rect x="5" y="13" width="3" height="5" rx="1.5"></rect><rect x="10.5" y="9" width="3" height="9" rx="1.5"></rect><rect x="16" y="5" width="3" height="13" rx="1.5"></rect></svg></span>
-            <span>Daily Limits</span>
-          </button>
-          <button class="admin-nav-item" type="button" data-admin-nav="maintenance"><span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M12 3v18"></path><path d="M3 12h18"></path><path d="m5 5 14 14"></path></svg></span><span>Maintenance</span></button>
-          <button class="admin-nav-item" type="button" data-admin-nav="backup"><span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M4 20h16"></path></svg></span><span>Data Backup</span></button>
-          <button class="admin-nav-item" type="button" data-admin-nav="broadcast"><span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="m4 4 16 8-16 8 3-8z"></path><path d="M7 12h10"></path></svg></span><span>Broadcast Center</span></button>
-          <button class="admin-nav-item" type="button" data-admin-nav="health"><span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 12h3l2-6 4 12 2-6h5"></path><path d="M4 19h16"></path></svg></span><span>System Health</span></button>
-          <button class="admin-nav-item" type="button" data-admin-nav="automation">
-            <span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg></span>
-            <span>Automation</span>
-          </button>
+        <div class="admin-nav" aria-label="Admin folders">
+          <div class="admin-nav-label">Folders</div>
+          <button class="admin-nav-item admin-folder-item active" type="button" data-admin-folder="dashboard"><span class="admin-nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="3" width="7" height="7" rx="2"></rect><rect x="3" y="14" width="7" height="7" rx="2"></rect><rect x="14" y="14" width="7" height="7" rx="2"></rect></svg></span><span>Dashboard</span></button>
+          <button class="admin-nav-item admin-folder-item" type="button" data-admin-folder="management"><span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 19V9"></path><path d="M10 19V5"></path><path d="M16 19v-7"></path><path d="M22 19V3"></path></svg></span><span>Management</span></button>
+          <button class="admin-nav-item admin-folder-item" type="button" data-admin-folder="analytics"><span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h16"></path><path d="m7 15 4-4 3 2 5-6"></path></svg></span><span>Analytics</span></button>
+          <button class="admin-nav-item admin-folder-item" type="button" data-admin-folder="configuration"><span class="admin-nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19 12a7 7 0 0 1-1 3.5"></path><path d="M5 12a7 7 0 0 1 1-3.5"></path><path d="M12 5V3M12 21v-2"></path></svg></span><span>Configuration</span></button>
+          <button class="admin-nav-item admin-folder-item" type="button" data-admin-folder="operations"><span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"></path><path d="M8 8h8M8 12h6M8 16h4"></path></svg></span><span>Operations</span></button>
+          <button class="admin-nav-item admin-folder-item" type="button" data-admin-folder="security"><span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.6-2.8 8.2-7 10-4.2-1.8-7-5.4-7-10V6l7-3z"></path><path d="M9.5 12l1.7 1.7 3.6-4"></path></svg></span><span>Security</span></button>
         </div>
 
         <div class="admin-sidebar-footer">
@@ -2474,6 +2634,15 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       </aside>
 
       <div class="admin-main">
+        <div class="admin-folder-strip" aria-label="Admin folder tabs">
+          <button class="admin-folder-tab active" type="button" data-admin-folder="dashboard"><span>Dashboard</span></button>
+          <button class="admin-folder-tab" type="button" data-admin-folder="management"><span>Management</span></button>
+          <button class="admin-folder-tab" type="button" data-admin-folder="analytics"><span>Analytics</span></button>
+          <button class="admin-folder-tab" type="button" data-admin-folder="configuration"><span>Configuration</span></button>
+          <button class="admin-folder-tab" type="button" data-admin-folder="operations"><span>Operations</span></button>
+          <button class="admin-folder-tab" type="button" data-admin-folder="security"><span>Security</span></button>
+        </div>
+
         <header class="admin-header">
           <div class="admin-header-copy">
             <div class="admin-eyebrow">Z28 Attendance Bot</div>
@@ -4414,22 +4583,80 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       });
 
 
-      document.querySelectorAll("[data-admin-nav]").forEach(function(button) {
-        button.addEventListener("click", function() {
-          var section = document.getElementById("admin-" + button.getAttribute("data-admin-nav"));
-          if (!section) return;
-          document.querySelectorAll("[data-admin-nav]").forEach(function(item) {
-            item.classList.toggle("active", item === button);
+      var adminFolders = {
+        dashboard: ["admin-overview", "admin-health"],
+        management: ["admin-users-management", "admin-groups-management"],
+        analytics: ["admin-analytics"],
+        configuration: ["admin-duration", "admin-counts", "admin-automation"],
+        operations: ["admin-broadcast", "admin-backup", "admin-maintenance"],
+        security: ["admin-audit"]
+      };
+
+      var adminFolderLabels = {
+        dashboard: "Dashboard",
+        management: "Management",
+        analytics: "Analytics",
+        configuration: "Configuration",
+        operations: "Operations",
+        security: "Security"
+      };
+
+      var activeAdminFolder = "dashboard";
+
+      function loadAdminFolder(folder) {
+        if (folder === "dashboard") {
+          return Promise.all([load(), loadAdminHealth().catch(function () {})]);
+        }
+        if (folder === "management") {
+          return Promise.all([loadAdminUsers(true), loadAdminGroups(true)]);
+        }
+        if (folder === "analytics") return loadAdminAnalytics();
+        if (folder === "security") return loadAdminAudit(true);
+        return load();
+      }
+
+      function setAdminFolder(folder, shouldLoad) {
+        if (!adminFolders[folder]) folder = "dashboard";
+        activeAdminFolder = folder;
+
+        document.querySelectorAll("[data-admin-folder]").forEach(function(button) {
+          button.classList.toggle("active", button.getAttribute("data-admin-folder") === folder);
+        });
+
+        Object.keys(adminFolders).forEach(function(key) {
+          adminFolders[key].forEach(function(sectionId) {
+            var section = document.getElementById(sectionId);
+            if (section) section.classList.toggle("admin-folder-visible", key === folder);
           });
-          if (button.getAttribute("data-admin-nav") === "health") {
-            loadAdminHealth().catch(function(error){showNotice(error && error.message ? error.message : "Unable to load system health.","error");});
-          }
-          if (button.getAttribute("data-admin-nav") === "users") {
-            loadAdminUsers(true).catch(function(error){showNotice(error && error.message ? error.message : "Unable to load users.","error");});
-          }
-          section.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+
+        var heading = document.querySelector(".admin-heading");
+        var subtitle = document.querySelector(".admin-heading-sub");
+        var descriptions = {
+          dashboard: "Live bot overview and infrastructure diagnostics.",
+          management: "Manage users and groups from one protected workspace.",
+          analytics: "Review activity trends and export attendance reports.",
+          configuration: "Configure global activity limits and automation.",
+          operations: "Run announcements, backups, and maintenance tasks.",
+          security: "Review protected administrative history and controls."
+        };
+        if (heading) heading.textContent = adminFolderLabels[folder];
+        if (subtitle) subtitle.textContent = descriptions[folder];
+
+        if (shouldLoad !== false) {
+          loadAdminFolder(folder).catch(function(error) {
+            showNotice(error && error.message ? error.message : "Unable to load this folder.", "error");
+          });
+        }
+      }
+
+      document.querySelectorAll("[data-admin-folder]").forEach(function(button) {
+        button.addEventListener("click", function() {
+          setAdminFolder(button.getAttribute("data-admin-folder"));
         });
       });
+
+      setAdminFolder("dashboard", false);
 
       var adminGroupsSearchTimer = null;
       document.getElementById("admin-groups-search").addEventListener("input", function(){
