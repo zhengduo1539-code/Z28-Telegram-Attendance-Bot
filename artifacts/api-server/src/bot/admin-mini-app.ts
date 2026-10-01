@@ -539,6 +539,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       to { transform: rotate(360deg); }
     }
 
+    .success-badge[hidden] { display: none !important; }
+
     .success-badge {
       display: inline-flex;
       align-items: center;
