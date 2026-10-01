@@ -12,7 +12,7 @@ type LocaleText = {
   startWelcome: string;
   help: string;
   idInfo: (chatId: number, userId: number) => string;
-  stats: (date: string, stats: Record<ActivityKind, ActivitySummary>, totalSeconds: number, activeKind?: ActivityKind) => string;
+  botStats: (privateUsers: number, groups: number) => string;
   noActive: (displayName: string, userId: number) => string;
   alreadyActive: (
     displayName: string,
@@ -154,7 +154,7 @@ const zh: LocaleText = {
     `${inlineCode("/lang en")} — 切换英文`,
     `${inlineCode("/lang zh")} — 切换中文`,
     `${inlineCode("/id")} — 查看当前群组 ID 或用户 ID（私聊中显示用户 ID）`,
-    `${inlineCode("/stats")} — 查看今日活动统计`,
+    `${inlineCode("/stats")} — 查看 Bot Statistics`,
     "",
     "群组连接：",
     `${inlineCode("/connect")} — 在当前群组设置超时通知目标群组`,
@@ -169,14 +169,11 @@ const zh: LocaleText = {
     `活动开始后请在回座时使用 ${inlineCode("/back")}。`,
   ].join("\n"),
   idInfo: (chatId, userId) => `群组标识：${inlineCode(chatId)}\n用户标识：${inlineCode(userId)}`,
-  stats: (date, stats, totalSeconds, activeKind) => [
-    `📊 今日统计：${inlineCode(date)}`,
-    `吃饭：${inlineCode(String(stats.eat.count))} 次 / ${inlineCode(formatChineseDuration(stats.eat.seconds))}`,
-    `上厕所：${inlineCode(String(stats.wc.count))} 次 / ${inlineCode(formatChineseDuration(stats.wc.seconds))}`,
-    `抽烟：${inlineCode(String(stats.smoke.count))} 次 / ${inlineCode(formatChineseDuration(stats.smoke.seconds))}`,
-    `WCD：${inlineCode(String(stats.wcd.count))} 次 / ${inlineCode(formatChineseDuration(stats.wcd.seconds))}`,
-    `活动总时间：${inlineCode(formatChineseDuration(totalSeconds))}`,
-    ...(activeKind ? [`当前进行中：${inlineCode(activityLabel(activeKind, "zh"))}`] : []),
+  botStats: (privateUsers, groups) => [
+    "📊 Bot Statistics",
+    "",
+    `👤 Users (PM): ${inlineCode(privateUsers)}`,
+    `👥 Groups: ${inlineCode(groups)}`,
   ].join("\n"),
   noActive: (displayName, userId) => [
     "用户：" + userLink(displayName, userId),
@@ -375,7 +372,7 @@ const en: LocaleText = {
     `${inlineCode("/lang en")} — Switch to English`,
     `${inlineCode("/lang zh")} — Switch to Chinese`,
     `${inlineCode("/id")} — View the current group ID or user ID (in private chat, shows your user ID)`,
-    `${inlineCode("/stats")} — View today’s activity statistics`,
+    `${inlineCode("/stats")} — View Bot Statistics`,
     "",
     "Group Connection:",
     `${inlineCode("/connect")} — Set the target group for activity timeout notifications`,
@@ -390,14 +387,11 @@ const en: LocaleText = {
     `Use ${inlineCode("/back")} when you return.`,
   ].join("\n"),
   idInfo: (chatId, userId) => `Chat ID: ${inlineCode(chatId)}\nUser ID: ${inlineCode(userId)}`,
-  stats: (date, stats, totalSeconds, activeKind) => [
-    `📊 Today's Stats: ${inlineCode(date)}`,
-    `Meal: ${inlineCode(String(stats.eat.count))} times / ${inlineCode(formatEnglishDuration(stats.eat.seconds))}`,
-    `Toilet: ${inlineCode(String(stats.wc.count))} times / ${inlineCode(formatEnglishDuration(stats.wc.seconds))}`,
-    `Smoke: ${inlineCode(String(stats.smoke.count))} times / ${inlineCode(formatEnglishDuration(stats.smoke.seconds))}`,
-    `WCD: ${inlineCode(String(stats.wcd.count))} times / ${inlineCode(formatEnglishDuration(stats.wcd.seconds))}`,
-    `Total Activity Time: ${inlineCode(formatEnglishDuration(totalSeconds))}`,
-    ...(activeKind ? [`Currently Active: ${inlineCode(activityLabel(activeKind, "en"))}`] : []),
+  botStats: (privateUsers, groups) => [
+    "📊 Bot Statistics",
+    "",
+    `👤 Users (PM): ${inlineCode(privateUsers)}`,
+    `👥 Groups: ${inlineCode(groups)}`,
   ].join("\n"),
   noActive: (displayName, userId) => [
     "User: " + userLink(displayName, userId),
