@@ -26,6 +26,8 @@ const MAX_QUEUE_SIZE = 500;
 const MAX_RETRIES = 3;
 const RETRY_BASE_MS = 500;
 const RETRY_MAX_MS = 30_000;
+const CHAT_CACHE_TTL_MS = 30_000;
+const MEMBER_COUNT_CACHE_TTL_MS = 15_000;
 
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 const isRetryableStatus = (status: number) => status === 408 || status === 425 || status === 429 || status >= 500;
@@ -36,6 +38,8 @@ export class TelegramClient {
   private queue: Array<QueuedRequest<unknown>> = [];
   private processing = false;
   private lastRequestAt = 0;
+  private readonly responseCache = new Map<string, { expiresAt: number; value: unknown }>();
+  private readonly inFlight = new Map<string, Promise<unknown>>();
 
   constructor(
     private readonly token: string,
@@ -87,6 +91,50 @@ export class TelegramClient {
       this.processing = false;
       if (this.queue.length) void this.processQueue();
     }
+  }
+
+  private cacheKey(method: string, payload: Record<string, unknown>): string {
+    return method + ":" + JSON.stringify(payload, Object.keys(payload).sort());
+  }
+
+  private getCached<T>(key: string): T | undefined {
+    const entry = this.responseCache.get(key);
+    if (!entry) return undefined;
+    if (entry.expiresAt <= Date.now()) {
+      this.responseCache.delete(key);
+      return undefined;
+    }
+    return entry.value as T;
+  }
+
+  private setCached<T>(key: string, value: T, ttlMs: number): void {
+    this.responseCache.set(key, { expiresAt: Date.now() + ttlMs, value });
+  }
+
+  private callCached<T>(
+    method: string,
+    payload: Record<string, unknown>,
+    ttlMs: number,
+    priority: RequestPriority,
+  ): Promise<T> {
+    const key = this.cacheKey(method, payload);
+    const cached = this.getCached<T>(key);
+    if (cached !== undefined) return Promise.resolve(cached);
+
+    const existing = this.inFlight.get(key);
+    if (existing) return existing as Promise<T>;
+
+    const request = this.call<T>(method, payload, priority).then((value) => {
+      this.setCached(key, value, ttlMs);
+      this.inFlight.delete(key);
+      return value;
+    }).catch((error) => {
+      this.inFlight.delete(key);
+      throw error;
+    });
+
+    this.inFlight.set(key, request);
+    return request;
   }
 
   private async performCall<T>(method: string, payload: Record<string, unknown>): Promise<T> {
@@ -164,12 +212,12 @@ export class TelegramClient {
   }
 
   getChat(chatId: number | string) {
-    return this.call<{
+    return this.callCached<{
       id: number;
       type: string;
       title?: string;
       username?: string;
-    }>("getChat", { chat_id: chatId }, "low");
+    }>("getChat", { chat_id: chatId }, CHAT_CACHE_TTL_MS, "low");
   }
 
   getChatMember(chatId: number, userId: number) {
@@ -180,9 +228,12 @@ export class TelegramClient {
   }
 
   getChatMemberCount(chatId: number) {
-    return this.call<number>("getChatMemberCount", {
-      chat_id: chatId,
-    });
+    return this.callCached<number>(
+      "getChatMemberCount",
+      { chat_id: chatId },
+      MEMBER_COUNT_CACHE_TTL_MS,
+      "low",
+    );
   }
 
   getUpdates(offset: number | undefined, timeoutSeconds: number) {
