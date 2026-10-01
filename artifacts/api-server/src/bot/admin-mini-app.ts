@@ -2426,6 +2426,10 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             <span class="admin-nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="3" width="7" height="7" rx="2"></rect><rect x="3" y="14" width="7" height="7" rx="2"></rect><rect x="14" y="14" width="7" height="7" rx="2"></rect></svg></span>
             <span>Overview</span>
           </button>
+          <button class="admin-nav-item" type="button" data-admin-nav="groups">
+            <span class="admin-nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"></rect><path d="M8 9h8M8 13h5"></path></svg></span>
+            <span>Group Management</span>
+          </button>
           <button class="admin-nav-item" type="button" data-admin-nav="users">
             <span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M16 20v-1.7a4.3 4.3 0 0 0-4.3-4.3H7.3A4.3 4.3 0 0 0 3 18.3V20"></path><circle cx="9.5" cy="7.5" r="3.5"></circle><path d="M16 4.8a3.5 3.5 0 0 1 0 5.4"></path><path d="M21 19.8v-1.5a4.3 4.3 0 0 0-3.2-4.1"></path></svg></span>
             <span>User Management</span>
@@ -2501,6 +2505,34 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
               <div class="admin-kpi-value" id="admin-reminder-status">—</div>
               <div class="admin-kpi-note" id="admin-reminder-note">Automation status</div>
             </article>
+          </div>
+        </section>
+
+        <section class="admin-section" id="admin-groups-management">
+          <div class="admin-panel">
+            <div class="admin-panel-head"><div>
+              <h2 class="admin-panel-title">Group Management</h2>
+              <div class="admin-panel-sub">Monitor managed groups, live attendance activity, and connected destinations.</div>
+            </div><div class="admin-status-pill">Managed groups</div></div>
+            <div class="admin-panel-body">
+              <div class="admin-users-toolbar">
+                <input class="admin-users-search" id="admin-groups-search" type="search" autocomplete="off" placeholder="Search group name, username, or chat ID">
+                <span class="admin-users-meta" id="admin-groups-meta">Loading groups…</span>
+              </div>
+              <div class="admin-users-table-wrap">
+                <table class="admin-users-table">
+                  <thead><tr><th>Group</th><th>Chat ID</th><th>Members</th><th>Active</th><th>Connection</th><th>Last Updated</th></tr></thead>
+                  <tbody id="admin-groups-table-body"><tr><td colspan="6"><div class="admin-users-empty">Loading groups…</div></td></tr></tbody>
+                </table>
+              </div>
+              <div class="admin-users-footer">
+                <span class="admin-users-meta" id="admin-groups-page-meta">—</span>
+                <div class="admin-users-pagination">
+                  <button class="admin-users-page" id="admin-groups-prev" type="button">Previous</button>
+                  <button class="admin-users-page" id="admin-groups-next" type="button">Next</button>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -3305,11 +3337,44 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         document.getElementById("admin-session-role").textContent = role;
         document.getElementById("admin-sidebar-role").textContent = role + " access • Telegram ID " + (user.id || telegramUserId || "—");
         document.getElementById("admin-avatar").textContent = initials;
+        loadAdminGroups(false).catch(function () {
+          // Keep the main dashboard usable if group data is temporarily unavailable.
+        });
         loadAdminUsers(false).catch(function () {
           // Keep the main dashboard usable if the user list is temporarily unavailable.
         });
 
         return data;
+      }
+
+      var adminGroupsState = { search:"", page:1, pageSize:20, totalPages:1 };
+
+      function renderAdminGroups(data) {
+        var groups=data.groups||[], pagination=data.pagination||{};
+        var body=document.getElementById("admin-groups-table-body"), meta=document.getElementById("admin-groups-meta");
+        var pageMeta=document.getElementById("admin-groups-page-meta"), prev=document.getElementById("admin-groups-prev"), next=document.getElementById("admin-groups-next");
+        if(!body||!meta||!pageMeta||!prev||!next)return;
+        adminGroupsState.page=pagination.page||1; adminGroupsState.totalPages=pagination.totalPages||1;
+        if(!groups.length) body.innerHTML='<tr><td colspan="6"><div class="admin-users-empty">No managed groups match the current search.</div></td></tr>';
+        else body.innerHTML=groups.map(function(group){
+          var connection=group.connection ? "→ "+(group.connection.targetGroupName||String(group.connection.targetChatId)) : "Not connected";
+          return '<tr><td><div class="admin-user-primary"><div class="admin-user-avatar">GR</div><div><div class="admin-user-name">'+escapeHtml(group.title||"Group")+
+            '</div><div class="admin-user-sub">'+escapeHtml(group.username ? "@"+group.username : "Managed group")+'</div></div></div></td><td class="admin-user-id">'+escapeHtml(String(group.chatId))+
+            '</td><td>'+escapeHtml(String(group.memberCount||0))+'</td><td><span class="admin-user-status '+(Number(group.activeCount||0)>0?"active":"inactive")+'">'+escapeHtml(String(group.activeCount||0))+
+            '</span></td><td><span class="admin-user-status '+(group.connection?"active":"inactive")+'">'+escapeHtml(connection)+'</span></td><td class="admin-user-muted">'+escapeHtml(formatAdminDate(group.updatedAt))+'</td></tr>';
+        }).join("");
+        var total=Number(pagination.total||0);
+        meta.textContent=total+(total===1?" group":" groups");
+        pageMeta.textContent="Page "+String(adminGroupsState.page)+" of "+String(adminGroupsState.totalPages);
+        prev.disabled=adminGroupsState.page<=1; next.disabled=adminGroupsState.page>=adminGroupsState.totalPages;
+      }
+
+      async function loadAdminGroups(resetPage) {
+        if(resetPage) adminGroupsState.page=1;
+        var query=new URLSearchParams();
+        query.set("page",String(adminGroupsState.page)); query.set("pageSize",String(adminGroupsState.pageSize));
+        if(adminGroupsState.search) query.set("search",adminGroupsState.search);
+        var data=await api("/groups?"+query.toString()); renderAdminGroups(data); return data;
       }
 
       var adminUsersState = { search:"", status:"all", page:1, pageSize:20, totalPages:1 };
@@ -3979,6 +4044,20 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           }
           section.scrollIntoView({ behavior: "smooth", block: "start" });
         });
+      });
+
+      var adminGroupsSearchTimer = null;
+      document.getElementById("admin-groups-search").addEventListener("input", function(){
+        adminGroupsState.search=this.value.trim(); window.clearTimeout(adminGroupsSearchTimer);
+        adminGroupsSearchTimer=window.setTimeout(function(){loadAdminGroups(true).catch(function(error){showNotice(error&&error.message?error.message:"Unable to load groups.","error");});},250);
+      });
+      document.getElementById("admin-groups-prev").addEventListener("click", function(){
+        if(adminGroupsState.page<=1)return; adminGroupsState.page-=1;
+        loadAdminGroups(false).catch(function(error){showNotice(error&&error.message?error.message:"Unable to load groups.","error");});
+      });
+      document.getElementById("admin-groups-next").addEventListener("click", function(){
+        if(adminGroupsState.page>=adminGroupsState.totalPages)return; adminGroupsState.page+=1;
+        loadAdminGroups(false).catch(function(error){showNotice(error&&error.message?error.message:"Unable to load groups.","error");});
       });
 
       var adminUsersSearchTimer = null;
