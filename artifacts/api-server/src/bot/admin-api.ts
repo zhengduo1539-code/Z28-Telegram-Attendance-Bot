@@ -76,6 +76,65 @@ const serializeCountLimits = (
 
 export const adminApiRouter: IRouter = Router();
 
+adminApiRouter.post("/broadcast", async (req, res) => {
+  const auth = requireAdmin(req, res);
+  if (!auth) return;
+
+  const message = typeof req.body?.message === "string" ? req.body.message.trim() : "";
+  if (!message || message.length > 4000) {
+    res.status(400).json({ error: "Message must be between 1 and 4000 characters." });
+    return;
+  }
+
+  const snapshot = await auth.context.attendance.snapshot();
+  const chatIds = Array.from(
+    new Set(
+      Object.values(snapshot.users)
+        .filter((profile) => profile.chatId > 0)
+        .map((profile) => profile.chatId),
+    ),
+  );
+
+  const escapeHtml = (value: string) =>
+    value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+  const safeMessage = escapeHtml(message).replace(/\r?\n/g, "<br>");
+  let sent = 0;
+  let failed = 0;
+  const failures: Array<{ chatId: number; error: string }> = [];
+
+  for (const chatId of chatIds) {
+    try {
+      await auth.context.telegram.sendMessage(chatId, safeMessage);
+      sent += 1;
+    } catch (error: unknown) {
+      failed += 1;
+      failures.push({
+        chatId,
+        error: error instanceof Error ? error.message.slice(0, 200) : "Telegram delivery failed",
+      });
+    }
+    if (sent + failed < chatIds.length) {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }
+  }
+
+  await recordAdminAudit(
+    auth,
+    "broadcast.sent",
+    "private_users",
+    "Broadcast delivered to " + sent + " users; " + failed + " failed.",
+  );
+
+  res.setHeader("Cache-Control", "no-store");
+  res.json({
+    total: chatIds.length,
+    sent,
+    failed,
+    failures: failures.slice(0, 20),
+  });
+});
+
 adminApiRouter.get("/health", async (req, res) => {
   const auth = requireAdmin(req, res);
   if (!auth) return;
