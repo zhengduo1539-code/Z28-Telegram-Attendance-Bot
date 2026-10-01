@@ -1548,7 +1548,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         if (userDashboardRefreshTimer) return;
         userDashboardRefreshTimer = window.setInterval(function () {
           if (!userMode || !getVerifiedUserId()) return;
-          loadUserDashboard(false).catch(function () {
+          loadUserDashboard(false, window.__z28SelectedGroupId).catch(function () {
             // Keep the current dashboard visible if a background refresh temporarily fails.
           });
         }, 5000);
