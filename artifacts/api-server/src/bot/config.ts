@@ -35,6 +35,7 @@ export type BotConfig = {
   botOwnerId?: number;
   adminIds: number[];
   adminMiniAppUrl?: string;
+  historyRetentionDays: number;
 };
 
 const resolveAdminMiniAppUrl = (): string | undefined => {
@@ -76,4 +77,5 @@ export const getBotConfig = (): BotConfig => ({
   botOwnerId: parseUserId(process.env["BOT_OWNER_ID"]),
   adminIds: parseAdminIds(process.env["ADMIN_IDS"]),
   adminMiniAppUrl: resolveAdminMiniAppUrl(),
+  historyRetentionDays: positiveInteger(process.env["HISTORY_RETENTION_DAYS"], 365),
 });
