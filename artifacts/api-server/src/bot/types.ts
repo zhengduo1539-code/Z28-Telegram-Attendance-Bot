@@ -62,12 +62,25 @@ export type ManagedGroup = {
   updatedAt: string;
 };
 
+export type GroupWarning = {
+  id: string;
+  chatId: number;
+  userId: number;
+  displayName: string;
+  kind: ActivityKind;
+  message: string;
+  createdAt: string;
+};
+
 export type BotState = {
   users: Record<string, UserProfile>;
   activeActivities: Record<string, ActiveActivity>;
   records: ActivityRecord[];
   activityLimits?: Partial<ActivityLimits>;
   activityCountLimits?: Partial<ActivityCountLimits>;
+  groupActivityLimits?: Record<string, Partial<ActivityLimits>>;
+  groupActivityCountLimits?: Record<string, Partial<ActivityCountLimits>>;
+  groupWarnings?: Record<string, GroupWarning[]>;
   reminderEnabled?: boolean;
   connectedGroups?: Record<string, ConnectedGroup>;
   pendingConnects?: Record<string, PendingConnect>;
