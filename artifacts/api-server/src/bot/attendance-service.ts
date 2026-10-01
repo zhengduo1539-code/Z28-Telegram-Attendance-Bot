@@ -179,6 +179,39 @@ export class AttendanceService {
     return this.config.historyRetentionDays;
   }
 
+  async getStorageHealth() {
+    const stats = await this.store.getStorageStats();
+    if (!stats) return undefined;
+    const limitBytes = this.config.mongodbStorageLimitMb * 1024 * 1024;
+    const usagePercent = limitBytes > 0 ? (stats.storageBytes / limitBytes) * 100 : 0;
+    const status = usagePercent >= this.config.mongodbStorageCriticalPercent
+      ? "critical"
+      : usagePercent >= this.config.mongodbStorageWarnPercent
+        ? "warning"
+        : "healthy";
+    return {
+      ...stats,
+      limitBytes,
+      limitMb: this.config.mongodbStorageLimitMb,
+      usagePercent: Math.round(usagePercent * 100) / 100,
+      status,
+      warnPercent: this.config.mongodbStorageWarnPercent,
+      criticalPercent: this.config.mongodbStorageCriticalPercent,
+      emergencyRetentionDays: this.config.mongodbEmergencyRetentionDays,
+    } as const;
+  }
+
+  async enforceStorageProtection() {
+    const health = await this.getStorageHealth();
+    if (!health || health.status === "healthy") return { health, cleanup: undefined };
+    const days = health.status === "critical"
+      ? this.config.mongodbEmergencyRetentionDays
+      : Math.max(this.config.mongodbEmergencyRetentionDays, Math.floor(this.config.historyRetentionDays / 2));
+    const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+    const cleanup = await this.pruneHistoryBefore(cutoff);
+    return { health, cleanup: { ...cleanup, retentionDays: days } };
+  }
+
   async pruneHistoryBefore(cutoff: Date): Promise<{ records: number; warnings: number; pendingConnects: number }> {
     let removedRecords = 0;
     let removedWarnings = 0;
