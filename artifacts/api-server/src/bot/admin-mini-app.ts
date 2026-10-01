@@ -1385,8 +1385,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         </div>
 
         <nav class="user-tabbar" aria-label="Dashboard sections">
-          <button class="user-tab active" id="user-settings-tab-button" type="button">Admin Settings</button>
-          <button class="user-tab" id="user-warning-tab-button" type="button">Warning</button>
+          <button class="user-tab" id="user-settings-tab-button" type="button">Admin Settings</button>
+          <button class="user-tab active" id="user-warning-tab-button" type="button">Warning</button>
         </nav>
       </div>
     </section>
