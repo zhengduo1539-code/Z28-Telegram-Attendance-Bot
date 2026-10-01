@@ -135,6 +135,29 @@ adminApiRouter.get("/backup", async (req, res) => {
   res.send(JSON.stringify(backup, null, 2));
 });
 
+adminApiRouter.post("/maintenance/history-retention", async (req, res) => {
+  const auth = requireAdmin(req, res);
+  if (!auth) return;
+
+  const requestedDays = Number(req.body?.days);
+  const days = Number.isInteger(requestedDays) && requestedDays >= 30 && requestedDays <= 3650
+    ? requestedDays
+    : auth.context.config.historyRetentionDays;
+
+  const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+  const removed = await auth.context.attendance.pruneHistoryBefore(cutoff);
+
+  await recordAdminAudit(
+    auth,
+    "history_retention.cleaned",
+    "attendance_history",
+    "Removed " + removed.records + " records, " + removed.warnings + " warnings, and " + removed.pendingConnects + " stale connection requests using a " + days + "-day retention window.",
+  );
+
+  res.setHeader("Cache-Control", "no-store");
+  res.json({ retentionDays: days, cutoff: cutoff.toISOString(), removed });
+});
+
 adminApiRouter.post("/broadcast", async (req, res) => {
   const auth = requireAdmin(req, res);
   if (!auth) return;
