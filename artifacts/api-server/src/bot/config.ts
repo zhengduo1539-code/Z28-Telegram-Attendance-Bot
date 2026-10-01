@@ -38,13 +38,22 @@ export type BotConfig = {
 
 const resolveAdminMiniAppUrl = (): string | undefined => {
   const explicit = process.env["ADMIN_MINI_APP_URL"]?.trim();
-  const base = explicit || process.env["RENDER_EXTERNAL_URL"]?.trim();
+  const renderBase = process.env["RENDER_EXTERNAL_URL"]?.trim();
+  const base = explicit || renderBase;
   if (!base) return undefined;
+
   try {
-    const url = new URL(explicit ? base : base + "/admin");
+    const url = new URL(base);
     if (url.protocol !== "https:") return undefined;
-    if (explicit) url.pathname = url.pathname.replace(/\\/+$/, "") + "/admin";
-    return url.toString().replace(/\\/$/, "");
+
+    const normalizedPath = url.pathname.replace(/\/+$/, "");
+    if (!normalizedPath.endsWith("/admin")) {
+      url.pathname = normalizedPath + "/admin";
+    } else {
+      url.pathname = normalizedPath;
+    }
+
+    return url.toString().replace(/\/$/, "");
   } catch {
     return undefined;
   }
