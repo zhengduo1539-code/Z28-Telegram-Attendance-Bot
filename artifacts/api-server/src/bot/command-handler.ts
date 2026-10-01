@@ -249,6 +249,16 @@ export class CommandHandler {
         response = text.idInfo(message.chat.id, message.from.id);
         break;
       }
+      case "stats": {
+        const dailyStats = await this.attendance.getDailyStats(profile);
+        response = text.stats(
+          dailyStats.date,
+          dailyStats.stats,
+          dailyStats.totalSeconds,
+          dailyStats.activeKind,
+        );
+        break;
+      }
       case "work":
         response = await this.attendance.workCheckIn(profile);
         markup = keyboard(locale);
