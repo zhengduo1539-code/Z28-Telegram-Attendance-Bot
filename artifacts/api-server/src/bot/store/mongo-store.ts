@@ -295,13 +295,14 @@ export class MongoBotStore implements BotStore {
 
   async listDueActiveActivities(
     now: Date,
-    _graceMs: number,
+    graceMs: number,
   ): Promise<ActiveActivity[]> {
+    const dueBefore = new Date(now.getTime() - graceMs);
     const documents = await (
       await this.activeActivityCollection()
     )
       .find({
-        dueAt: { $lte: now },
+        dueAt: { $lte: dueBefore },
         reminderSentAt: { $exists: false },
       })
       .toArray();
@@ -311,7 +312,7 @@ export class MongoBotStore implements BotStore {
   async claimActiveActivityReminder(
     candidate: Pick<ActiveActivity, "chatId" | "userId" | "startedAt">,
     now: Date,
-    _graceMs: number,
+    graceMs: number,
     leaseMs: number,
   ): Promise<{ activity: ActiveActivity; claimedAt: string } | undefined> {
     const claimedAt = now.toISOString();
@@ -323,7 +324,7 @@ export class MongoBotStore implements BotStore {
         _id: activeActivityKey(candidate.chatId, candidate.userId),
         startedAt: new Date(candidate.startedAt),
         reminderSentAt: { $exists: false },
-        dueAt: { $lte: now },
+        dueAt: { $lte: new Date(now.getTime() - graceMs) },
         $or: [
           { reminderClaimedAt: { $exists: false } },
           { reminderClaimedAt: { $lte: claimableBefore } },
