@@ -1,6 +1,6 @@
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
-import type { ActiveActivity, BotState, MiniAppGroupAccess } from "../types";
+import type { ActiveActivity, AuditLogEntry, BotState, MiniAppGroupAccess } from "../types";
 import type { BotStore } from "./types";
 
 export const emptyState = (): BotState => ({
@@ -56,6 +56,7 @@ const miniAppAccessKey = (userId: number, groupId: number) =>
 export class FileBotStore implements BotStore {
   private state?: BotState;
   private readonly miniAppAccess = new Map<string, MiniAppGroupAccess>();
+  private readonly auditLogs: AuditLogEntry[] = [];
   private writeQueue: Promise<void> = Promise.resolve();
   private updateQueue: Promise<void> = Promise.resolve();
 
@@ -205,6 +206,22 @@ export class FileBotStore implements BotStore {
         delete activity.reminderClaimedAt;
       }
     });
+  }
+
+  async createAuditLog(entry: AuditLogEntry): Promise<void> {
+    this.auditLogs.push({ ...entry });
+    if (this.auditLogs.length > 1000) this.auditLogs.splice(0, this.auditLogs.length - 1000);
+  }
+
+  async listAuditLogs(options: { search?: string; action?: string; page: number; pageSize: number }): Promise<{ logs: AuditLogEntry[]; total: number; totalPages: number; page: number; pageSize: number }> {
+    const search = (options.search || "").trim().toLowerCase();
+    const filtered = this.auditLogs.filter((entry) => !options.action || entry.action === options.action).filter((entry) => !search || [entry.actorName, entry.action, entry.target, entry.details, String(entry.actorUserId)].some((value) => value.toLowerCase().includes(search))).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    const pageSize = Math.min(Math.max(options.pageSize, 1), 50);
+    const total = filtered.length;
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+    const page = Math.min(Math.max(options.page, 1), totalPages);
+    const offset = (page - 1) * pageSize;
+    return { logs: filtered.slice(offset, offset + pageSize).map((entry) => ({ ...entry })), total, totalPages, page, pageSize };
   }
 
   async getMiniAppGroupAccess(
