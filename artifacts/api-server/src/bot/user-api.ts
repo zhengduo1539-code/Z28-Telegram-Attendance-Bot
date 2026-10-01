@@ -106,6 +106,35 @@ type DashboardGroup = {
   connectedTarget: { chatId: number; name: string; username?: string } | null;
 };
 
+const getVerifiedGroupRole = async (
+  context: NonNullable<ReturnType<typeof getAdminApiContext>>,
+  groupId: number,
+  userId: number,
+): Promise<"creator" | "administrator" | undefined> => {
+  const cached = await context.attendance.getMiniAppGroupAccess(userId, groupId);
+  if (cached && new Date(cached.expiresAt).getTime() > Date.now()) {
+    return cached.role;
+  }
+
+  try {
+    const member = await context.telegram.getChatMember(groupId, userId);
+    if (member.status !== "creator" && member.status !== "administrator") {
+      await context.attendance.clearMiniAppGroupAccess(userId, groupId);
+      return undefined;
+    }
+
+    await context.attendance.cacheMiniAppGroupAccess(
+      userId,
+      groupId,
+      member.status,
+    );
+    return member.status;
+  } catch {
+    await context.attendance.clearMiniAppGroupAccess(userId, groupId);
+    return undefined;
+  }
+};
+
 const buildGroup = async (
   context: NonNullable<ReturnType<typeof getAdminApiContext>>,
   snapshot: BotState,
@@ -113,10 +142,13 @@ const buildGroup = async (
   userId: number,
 ): Promise<DashboardGroup | undefined> => {
   const chat = await context.telegram.getChat(groupId);
-  if (chat.type !== "group" && chat.type !== "supergroup") return undefined;
+  if (chat.type !== "group" && chat.type !== "supergroup") {
+    await context.attendance.clearMiniAppGroupAccess(userId, groupId);
+    return undefined;
+  }
 
-  const member = await context.telegram.getChatMember(groupId, userId);
-  if (member.status !== "creator" && member.status !== "administrator") return undefined;
+  const memberStatus = await getVerifiedGroupRole(context, groupId, userId);
+  if (!memberStatus) return undefined;
 
   const dayKey = localDateKey(new Date(), context.config.timeZone);
   const todayRecords = snapshot.records.filter(
@@ -130,7 +162,7 @@ const buildGroup = async (
     id: chat.id,
     title: chat.title || String(chat.id),
     ...(chat.username ? { username: chat.username } : {}),
-    memberStatus: member.status as "creator" | "administrator",
+    memberStatus,
     today: {
       total: todayRecords.length,
       eat: todayRecords.filter((record) => record.kind === "eat").length,
