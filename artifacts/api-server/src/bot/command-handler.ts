@@ -88,6 +88,7 @@ export const ADMIN_MENU_COMMANDS = [
 
 export class CommandHandler {
   private readonly adminMenuScopes = new Set<string>();
+  private readonly privateMenuButtonScopes = new Set<string>();
 
   constructor(
     private readonly telegram: TelegramClient,
@@ -416,6 +417,9 @@ export class CommandHandler {
   ): Promise<void> {
     const isConfiguredAdmin =
       this.config.botOwnerId === userId || this.config.adminIds.includes(userId);
+    const scopeKey = `private:${chatId}:${isConfiguredAdmin && miniAppUrl ? "admin" : "default"}`;
+    if (this.privateMenuButtonScopes.has(scopeKey)) return;
+
     try {
       if (isConfiguredAdmin && miniAppUrl) {
         await this.telegram.setChatMenuButton(chatId, {
@@ -426,6 +430,7 @@ export class CommandHandler {
       } else {
         await this.telegram.setChatMenuButton(chatId);
       }
+      this.privateMenuButtonScopes.add(scopeKey);
     } catch {
       // Menu-button configuration must not interrupt normal bot handling.
     }
