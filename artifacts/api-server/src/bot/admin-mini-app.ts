@@ -1514,6 +1514,15 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           <div class="user-page-sub" id="user-dashboard-sub">Live activity overview</div>
         </div></div>
 
+        <div class="user-group-box compact">
+          <div class="user-group-box-title" id="user-group-activities-title">Group Activities</div>
+          <div class="user-group-name" id="user-warning-group-name"></div>
+          <div class="user-group-metrics">
+            <div class="user-live-metric"><div class="user-live-label" id="user-group-member-label">Group member</div><div class="user-live-value" id="user-member-count">—</div></div>
+            <div class="user-live-metric"><div class="user-live-label" id="user-member-active-label">Member active</div><div class="user-live-value active" id="user-active-count">—</div></div>
+          </div>
+        </div>
+
         <div class="user-tab-shell">
           <div class="user-tab-panel active" id="user-settings-tab">
             <div class="user-setting-card" id="user-settings-limits-card"></div>
@@ -1521,14 +1530,6 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           </div>
 
           <div class="user-tab-panel user-warning-tab-panel" id="user-warning-tab">
-            <div class="user-group-box compact">
-              <div class="user-group-box-title" id="user-group-activities-title">Group Activities</div>
-              <div class="user-group-name" id="user-warning-group-name"></div>
-              <div class="user-group-metrics">
-                <div class="user-live-metric"><div class="user-live-label" id="user-group-member-label">Group member</div><div class="user-live-value" id="user-member-count">—</div></div>
-                <div class="user-live-metric"><div class="user-live-label" id="user-member-active-label">Member active</div><div class="user-live-value active" id="user-active-count">—</div></div>
-              </div>
-            </div>
             <div class="user-warning-feed" id="user-warning-feed"><div class="user-warning-empty">No warning messages yet.</div></div>
           </div>
         </div>
