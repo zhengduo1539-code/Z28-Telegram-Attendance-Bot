@@ -151,6 +151,43 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       to { background-position: 220% center; }
     }
 
+    .credit-marquee {
+      position: relative;
+      width: min(440px, 68vw);
+      margin-top: 4px;
+      overflow: hidden;
+      white-space: nowrap;
+      mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    }
+
+    .credit-track {
+      display: inline-flex;
+      width: max-content;
+      min-width: max-content;
+      will-change: transform;
+      animation: creditScroll 13s linear infinite;
+    }
+
+    .credit-text {
+      display: inline-block;
+      padding-right: 90px;
+      color: #8395ad;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.035em;
+    }
+
+    .credit-text strong {
+      color: #b3c3d8;
+      font-weight: 700;
+    }
+
+    @keyframes creditScroll {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
     .sub {
       color: #93a4ba;
       margin-top: 5px;
