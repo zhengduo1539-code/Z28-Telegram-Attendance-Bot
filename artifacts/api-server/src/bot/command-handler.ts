@@ -51,7 +51,7 @@ const keyboard = (locale: Locale): ReplyKeyboardMarkup => {
         { text: text.smoke },
         { text: text.wcd },
       ],
-      [{ text: text.back, style: "primary" }],
+      [{ text: text.back }],
     ],
     resize_keyboard: true,
     is_persistent: true,
