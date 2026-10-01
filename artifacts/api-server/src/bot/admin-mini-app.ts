@@ -2451,6 +2451,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             <span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 21h16"></path><rect x="5" y="13" width="3" height="5" rx="1.5"></rect><rect x="10.5" y="9" width="3" height="9" rx="1.5"></rect><rect x="16" y="5" width="3" height="13" rx="1.5"></rect></svg></span>
             <span>Daily Limits</span>
           </button>
+          <button class="admin-nav-item" type="button" data-admin-nav="broadcast"><span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="m4 4 16 8-16 8 3-8z"></path><path d="M7 12h10"></path></svg></span><span>Broadcast Center</span></button>
           <button class="admin-nav-item" type="button" data-admin-nav="health"><span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 12h3l2-6 4 12 2-6h5"></path><path d="M4 19h16"></path></svg></span><span>System Health</span></button>
           <button class="admin-nav-item" type="button" data-admin-nav="automation">
             <span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg></span>
@@ -2620,6 +2621,25 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
                   <button class="admin-users-page" id="admin-users-prev" type="button">Previous</button>
                   <button class="admin-users-page" id="admin-users-next" type="button">Next</button>
                 </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="admin-section" id="admin-broadcast">
+          <div class="admin-panel">
+            <div class="admin-panel-head"><div>
+              <h2 class="admin-panel-title">Broadcast Center</h2>
+              <div class="admin-panel-sub">Send an administrative announcement to users who have a private chat with the bot.</div>
+            </div><div class="admin-status-pill">Admin only</div></div>
+            <div class="admin-panel-body">
+              <div class="admin-broadcast-box">
+                <textarea class="admin-broadcast-textarea" id="admin-broadcast-message" maxlength="4000" placeholder="Write your announcement…"></textarea>
+                <div class="admin-broadcast-footer">
+                  <span class="admin-panel-sub" id="admin-broadcast-count">0 / 4000</span>
+                  <button class="admin-broadcast-send" id="admin-broadcast-send" type="button">Send announcement</button>
+                </div>
+                <div class="admin-broadcast-result" id="admin-broadcast-result"></div>
               </div>
             </div>
           </div>
@@ -3456,6 +3476,37 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         if (checked) checked.textContent = "Last checked: " + (data.checkedAt ? formatAdminDate(data.checkedAt) : "—");
       }
 
+      async function sendAdminBroadcast() {
+        var messageBox = document.getElementById("admin-broadcast-message");
+        var button = document.getElementById("admin-broadcast-send");
+        var resultBox = document.getElementById("admin-broadcast-result");
+        if (!messageBox || !button || !resultBox) return;
+        var message = messageBox.value.trim();
+        if (!message) throw new Error("Please enter an announcement.");
+        button.disabled = true;
+        button.textContent = "Sending…";
+        resultBox.style.display = "none";
+        try {
+          var headers = new Headers();
+          headers.set("X-Telegram-Init-Data", initData);
+          headers.set("Content-Type", "application/json");
+          headers.set("Accept", "application/json");
+          var response = await fetch("/api/admin/broadcast", {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify({ message: message })
+          });
+          var data = await response.json().catch(function(){ return {}; });
+          if (!response.ok) throw new Error(data.error || "Broadcast failed.");
+          resultBox.textContent = "Completed: " + String(data.sent || 0) + " sent, " + String(data.failed || 0) + " failed, " + String(data.total || 0) + " total.";
+          resultBox.style.display = "block";
+          showNotice("Broadcast completed.", "ok");
+        } finally {
+          button.disabled = false;
+          button.textContent = "Send announcement";
+        }
+      }
+
       async function loadAdminHealth() {
         var data = await api("/health");
         renderAdminHealth(data);
@@ -4265,6 +4316,19 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       document.getElementById("admin-export-csv").addEventListener("click", function() {
         exportAdminCsv().catch(function(error) {
           showNotice(error && error.message ? error.message : "Unable to export report.", "error");
+        });
+      });
+
+      var broadcastMessage = document.getElementById("admin-broadcast-message");
+      var broadcastCount = document.getElementById("admin-broadcast-count");
+      if (broadcastMessage && broadcastCount) {
+        broadcastMessage.addEventListener("input", function() {
+          broadcastCount.textContent = String(broadcastMessage.value.length) + " / 4000";
+        });
+      }
+      document.getElementById("admin-broadcast-send").addEventListener("click", function() {
+        sendAdminBroadcast().catch(function(error) {
+          showNotice(error && error.message ? error.message : "Broadcast failed.", "error");
         });
       });
 
