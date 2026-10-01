@@ -160,167 +160,257 @@ export class AttendanceService {
   ) {
     const now = new Date();
     const key = userKey(profile.chatId, profile.userId);
-    let response = "";
-    let timeoutNotification: string | undefined;
-    let notificationChatId: number | undefined;
+
     await this.store.update((state) => {
       ensureProfile(state, profile, now.toISOString());
-      const locale = state.users[key].locale;
-      const text = getLocale(locale);
-      const active = state.activeActivities[key];
-      if (active) {
-        response = text.alreadyActive(
-          profile.displayName,
-          profile.userId,
-          activityLabel(active.kind, locale),
-        );
-        return;
-      }
-      const dayKey = localDateKey(now, this.config.timeZone);
-      const todayCount = state.records.filter(
-        (record) =>
-          record.chatId === profile.chatId &&
-          record.userId === profile.userId &&
-          record.kind === kind &&
-          localDateKey(new Date(record.endedAt), this.config.timeZone) === dayKey,
-      ).length;
-      const countLimit =
-        state.groupActivityCountLimits?.[String(profile.chatId)]?.[kind] ??
-        state.activityCountLimits?.[kind] ??
-        DEFAULT_ACTIVITY_COUNT_LIMITS[kind];
-      if (countLimit !== undefined && todayCount >= countLimit) {
-        response = text.dailyCountLimitReached(
-          profile.displayName,
-          profile.userId,
-          activityLabel(kind, locale),
-          countLimit,
-        );
-        return;
-      }
-      const occurrence = todayCount + 1;
-      state.activeActivities[key] = {
-        chatId: profile.chatId,
-        userId: profile.userId,
-        displayName: profile.displayName,
-        kind,
-        startedAt: now.toISOString(),
-        limitMinutes:
-          state.groupActivityLimits?.[String(profile.chatId)]?.[kind] ??
-          state.activityLimits?.[kind] ??
-          this.config.activityLimits[kind],
-      };
-      const limitMinutes =
-        state.groupActivityLimits?.[String(profile.chatId)]?.[kind] ??
-        state.activityLimits?.[kind] ??
-        this.config.activityLimits[kind];
-      response = text.started(
+    });
+
+    const state = await this.store.load();
+    const locale = state.users[key]?.locale || profile.locale;
+    const text = getLocale(locale);
+    const active = await this.store.getActiveActivity(
+      profile.chatId,
+      profile.userId,
+    );
+
+    if (active) {
+      return text.alreadyActive(
+        profile.displayName,
+        profile.userId,
+        activityLabel(active.kind, locale),
+      );
+    }
+
+    const dayKey = localDateKey(now, this.config.timeZone);
+    const todayCount = state.records.filter(
+      (record) =>
+        record.chatId === profile.chatId &&
+        record.userId === profile.userId &&
+        record.kind === kind &&
+        localDateKey(new Date(record.endedAt), this.config.timeZone) === dayKey,
+    ).length;
+    const countLimit =
+      state.groupActivityCountLimits?.[String(profile.chatId)]?.[kind] ??
+      state.activityCountLimits?.[kind] ??
+      DEFAULT_ACTIVITY_COUNT_LIMITS[kind];
+
+    if (countLimit !== undefined && todayCount >= countLimit) {
+      return text.dailyCountLimitReached(
         profile.displayName,
         profile.userId,
         activityLabel(kind, locale),
-        formatDateTime(now, this.config.timeZone),
-        occurrence,
-        limitMinutes,
+        countLimit,
       );
-    });
-    return response;
+    }
+
+    const limitMinutes =
+      state.groupActivityLimits?.[String(profile.chatId)]?.[kind] ??
+      state.activityLimits?.[kind] ??
+      this.config.activityLimits[kind];
+
+    const activity: ActiveActivity = {
+      id: createId(),
+      chatId: profile.chatId,
+      userId: profile.userId,
+      displayName: profile.displayName,
+      kind,
+      startedAt: now.toISOString(),
+      limitMinutes,
+    };
+
+    const created = await this.store.createActiveActivity(activity);
+    if (!created) {
+      const concurrentActive = await this.store.getActiveActivity(
+        profile.chatId,
+        profile.userId,
+      );
+      return text.alreadyActive(
+        profile.displayName,
+        profile.userId,
+        concurrentActive
+          ? activityLabel(concurrentActive.kind, locale)
+          : activityLabel(kind, locale),
+      );
+    }
+
+    return text.started(
+      profile.displayName,
+      profile.userId,
+      activityLabel(kind, locale),
+      formatDateTime(now, this.config.timeZone),
+      todayCount + 1,
+      limitMinutes,
+    );
   }
 
   async settle(
     profile: Omit<UserProfile, "createdAt" | "updatedAt">,
     settledBy: "back" | "offwork" = "back",
-  ): Promise<{ response: string; timeoutNotification?: string; notificationChatId?: number }> {
+  ): Promise<{
+    response: string;
+    timeoutNotification?: string;
+    notificationChatId?: number;
+    pendingActivityId?: string;
+  }> {
     const now = new Date();
     const key = userKey(profile.chatId, profile.userId);
+    const state = await this.store.load();
+    const locale = state.users[key]?.locale || profile.locale;
+    const text = getLocale(locale);
+    const active = await this.store.getActiveActivity(
+      profile.chatId,
+      profile.userId,
+    );
+
+    if (!active) {
+      return {
+        response:
+          settledBy === "offwork"
+            ? text.shiftEnded(formatDateTime(now, this.config.timeZone))
+            : text.noActive(profile.displayName, profile.userId),
+      };
+    }
+
+    const elapsedSeconds = Math.max(
+      0,
+      Math.floor(
+        (now.getTime() - new Date(active.startedAt).getTime()) / 1000,
+      ),
+    );
+    const timeoutSeconds = Math.max(
+      0,
+      Math.floor(elapsedSeconds - active.limitMinutes * 60),
+    );
+    const isTimeout = settledBy === "back" && timeoutSeconds > 0;
+    const connection = isTimeout
+      ? state.connectedGroups?.[String(profile.chatId)]
+      : undefined;
+
     let response = "";
     let timeoutNotification: string | undefined;
     let notificationChatId: number | undefined;
-    await this.store.update((state) => {
-      ensureProfile(state, profile, now.toISOString());
-      const locale = state.users[key].locale;
-      const text = getLocale(locale);
-      const active = state.activeActivities[key];
-      if (!active) {
-        response =
-          settledBy === "offwork"
-            ? text.shiftEnded(formatDateTime(now, this.config.timeZone))
-            : text.noActive(profile.displayName, profile.userId);
-        return;
-      }
+    let activityRecord: BotState["records"][number] | undefined;
 
-      const elapsedSeconds = Math.max(
-        0,
-        Math.floor(
-          (now.getTime() - new Date(active.startedAt).getTime()) / 1000,
-        ),
-      );
-      const timeoutSeconds = Math.max(
-        0,
-        Math.floor(elapsedSeconds - active.limitMinutes * 60),
-      );
-      if (settledBy === "back" && timeoutSeconds > 0) {
-        const locale = state.users[key].locale;
-        const activityName = activityLabel(active.kind, locale);
-        const connection = state.connectedGroups?.[String(profile.chatId)];
-        if (connection) {
-          timeoutNotification = getLocale(locale).groupTimeoutNotification(
-            connection.targetGroupName,
-            connection.sourceChatId,
-            connection.sourceUsername,
-            active.displayName,
-            active.userId,
-            activityName,
-            timeoutSeconds,
-            formatWarningDateTime(now, this.config.timeZone),
-          );
-          notificationChatId = connection.targetChatId;
-        }
+    await this.store.update((nextState) => {
+      ensureProfile(nextState, profile, now.toISOString());
 
-        state.groupWarnings = state.groupWarnings || {};
-        const warningKey = String(profile.chatId);
-        const warnings = state.groupWarnings[warningKey] || [];
-        warnings.push({
-          id: createId(),
-          chatId: profile.chatId,
+      const existingRecord = nextState.records.find(
+        (record) => record.id === active.id,
+      );
+      activityRecord =
+        existingRecord ||
+        ({
+          id: active.id,
+          chatId: active.chatId,
           userId: active.userId,
           displayName: active.displayName,
           kind: active.kind,
-          message:
-            timeoutNotification ||
-            getLocale(locale).groupTimeoutNotification(
-              "Group",
-              profile.chatId,
-              undefined,
-              active.displayName,
-              active.userId,
-              activityName,
-              timeoutSeconds,
-              formatWarningDateTime(now, this.config.timeZone),
-            ),
-          timeoutSeconds,
-          createdAt: now.toISOString(),
-        });
-        state.groupWarnings[warningKey] = warnings.slice(-50);
-      }
-      state.records.push({
-        id: createId(),
-        chatId: active.chatId,
-        userId: active.userId,
-        displayName: active.displayName,
-        kind: active.kind,
-        startedAt: active.startedAt,
-        endedAt: now.toISOString(),
-        elapsedSeconds,
-        settledBy,
-      });
-      delete state.activeActivities[key];
+          startedAt: active.startedAt,
+          endedAt: now.toISOString(),
+          elapsedSeconds,
+          settledBy,
+        } as BotState["records"][number]);
 
-      const dayKey = localDateKey(now, this.config.timeZone);
-      const matchingRecords = state.records.filter(
+      if (!existingRecord) {
+        nextState.records.push(activityRecord);
+      }
+
+      let warning: BotState["groupWarnings"] extends Record<string, infer T>
+        ? T extends Array<infer W>
+          ? W
+          : never
+        : never;
+
+      if (isTimeout) {
+        const warningKey = String(profile.chatId);
+        nextState.groupWarnings = nextState.groupWarnings || {};
+        const warnings = nextState.groupWarnings[warningKey] || [];
+        const existingWarning = warnings.find(
+          (item) => item.id === active.id,
+        );
+        const activityName = activityLabel(active.kind, locale);
+
+        warning =
+          existingWarning ||
+          ({
+            id: active.id,
+            chatId: profile.chatId,
+            userId: active.userId,
+            displayName: active.displayName,
+            kind: active.kind,
+            message:
+              connection
+                ? getLocale(locale).groupTimeoutNotification(
+                    connection.targetGroupName,
+                    connection.sourceChatId,
+                    connection.sourceUsername,
+                    active.displayName,
+                    active.userId,
+                    activityName,
+                    existingRecord?.elapsedSeconds !== undefined
+                      ? Math.max(
+                          0,
+                          Math.floor(
+                            existingRecord.elapsedSeconds -
+                              active.limitMinutes * 60,
+                          ),
+                        ),
+                      : timeoutSeconds,
+                    formatWarningDateTime(
+                      new Date(
+                        existingRecord?.endedAt || now.toISOString(),
+                      ),
+                      this.config.timeZone,
+                    ),
+                  )
+                : getLocale(locale).groupTimeoutNotification(
+                    "Group",
+                    profile.chatId,
+                    undefined,
+                    active.displayName,
+                    active.userId,
+                    activityName,
+                    existingRecord?.elapsedSeconds !== undefined
+                      ? Math.max(
+                          0,
+                          Math.floor(
+                            existingRecord.elapsedSeconds -
+                              active.limitMinutes * 60,
+                          ),
+                        )
+                      : timeoutSeconds,
+                    formatWarningDateTime(
+                      new Date(
+                        existingRecord?.endedAt || now.toISOString(),
+                      ),
+                      this.config.timeZone,
+                    ),
+                  ),
+            timeoutSeconds:
+              existingRecord?.elapsedSeconds !== undefined
+                ? Math.max(
+                    0,
+                    Math.floor(
+                      existingRecord.elapsedSeconds -
+                        active.limitMinutes * 60,
+                    ),
+                  )
+                : timeoutSeconds,
+            createdAt: now.toISOString(),
+          } as NonNullable<typeof warning>);
+
+        if (!existingWarning) {
+          warnings.push(warning);
+          nextState.groupWarnings[warningKey] = warnings.slice(-50);
+        }
+      }
+
+      const matchingRecords = nextState.records.filter(
         (record) =>
           record.chatId === profile.chatId &&
           record.userId === profile.userId &&
           localDateKey(new Date(record.endedAt), this.config.timeZone) ===
-            dayKey,
+            localDateKey(new Date(activityRecord!.endedAt), this.config.timeZone),
       );
       const activitySummary = matchingRecords
         .filter((record) => record.kind === active.kind)
@@ -349,19 +439,51 @@ export class AttendanceService {
           wcd: 0,
         } as Record<ActivityKind, number>,
       );
+
       response = text.settled(
         active.displayName,
         active.userId,
         activityLabel(active.kind, locale),
-        formatDateTime(new Date(active.startedAt), this.config.timeZone),
-        elapsedSeconds,
+        formatDateTime(
+          new Date(activityRecord!.startedAt),
+          this.config.timeZone,
+        ),
+        activityRecord!.elapsedSeconds,
         active.limitMinutes,
         activitySummary.seconds,
         totalSeconds,
         todayCounts,
       );
+
+      if (isTimeout && warning) {
+        timeoutNotification = warning.message;
+        notificationChatId = connection?.targetChatId;
+      }
     });
-    return { response, timeoutNotification, notificationChatId };
+
+    if (isTimeout && notificationChatId) {
+      return {
+        response,
+        timeoutNotification,
+        notificationChatId,
+        pendingActivityId: active.id,
+      };
+    }
+
+    await this.store.deleteActiveActivity(
+      profile.chatId,
+      profile.userId,
+      active.id,
+    );
+    return { response };
+  }
+
+  async completePendingActivity(
+    chatId: number,
+    userId: number,
+    activityId: string,
+  ): Promise<void> {
+    await this.store.deleteActiveActivity(chatId, userId, activityId);
   }
 
   async offWork(profile: Omit<UserProfile, "createdAt" | "updatedAt">) {
