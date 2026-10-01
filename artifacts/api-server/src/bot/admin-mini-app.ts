@@ -1376,7 +1376,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         </div></div>
 
         <div class="user-tab-shell">
-          <div class="user-tab-panel active" id="user-warning-tab">
+          <div class="user-tab-panel active" id="user-settings-tab">
             <div class="user-group-box compact">
               <div class="user-group-box-title">Group Activities</div>
               <div class="user-group-name" id="user-warning-group-name"></div>
@@ -1385,18 +1385,18 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
                 <div class="user-live-metric"><div class="user-live-label">Member active</div><div class="user-live-value active" id="user-active-count">—</div></div>
               </div>
             </div>
-            <div class="user-warning-feed" id="user-warning-feed"><div class="user-warning-empty">No warning messages yet.</div></div>
-          </div>
-
-          <div class="user-tab-panel" id="user-settings-tab">
             <div class="user-setting-card" id="user-settings-limits-card"></div>
             <div class="user-setting-card counts" id="user-settings-counts-card"></div>
+          </div>
+
+          <div class="user-tab-panel" id="user-warning-tab">
+            <div class="user-warning-feed" id="user-warning-feed"><div class="user-warning-empty">No warning messages yet.</div></div>
           </div>
         </div>
 
         <nav class="user-tabbar" aria-label="Dashboard sections">
-          <button class="user-tab" id="user-settings-tab-button" type="button">Admin Settings</button>
-          <button class="user-tab active" id="user-warning-tab-button" type="button">Warning</button>
+          <button class="user-tab active" id="user-settings-tab-button" type="button">Admin Settings</button>
+          <button class="user-tab" id="user-warning-tab-button" type="button">Warning</button>
         </nav>
       </div>
     </section>
