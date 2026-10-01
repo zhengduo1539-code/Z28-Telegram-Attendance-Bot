@@ -1397,7 +1397,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             <div class="user-setting-card counts" id="user-settings-counts-card"></div>
           </div>
 
-          <div class="user-tab-panel" id="user-warning-tab">
+          <div class="user-tab-panel user-warning-tab-panel" id="user-warning-tab">
             <div class="user-warning-feed" id="user-warning-feed"><div class="user-warning-empty">No warning messages yet.</div></div>
           </div>
         </div>
