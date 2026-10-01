@@ -758,6 +758,16 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     }
 
     .panel-only-user { display: none; }
+    .panel-only-private,
+    .panel-only-group {
+      display: none;
+    }
+
+    .panel-only-private.visible,
+    .panel-only-group.visible,
+    .panel-only-user.visible {
+      display: block;
+    }
 
     /* Regular users have two distinct screens: verification first, dashboard after verification. */
     .user-mode .panel-only-private,
@@ -1571,8 +1581,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         });
       }
 
-      // Non-group launches stay on a dedicated verification page until the server confirms the user mode.
-      setPanelVisibility(groupMode ? "group" : "user");
+      // Non-group launches stay hidden until the server confirms whether this is an admin or regular-user session.
+      setPanelVisibility(groupMode ? "group" : "pending");
       document.body.classList.toggle("user-verification-page", !groupMode);
       document.body.classList.remove("user-dashboard-page");
       title.textContent = groupMode ? "⚙️ Group Admin Panel" : "User Access";
@@ -1725,6 +1735,15 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         });
       }
 
+      function formatWarningDuration(seconds) {
+        var total = Number(seconds);
+        if (!Number.isFinite(total) || total < 0) return "—";
+        total = Math.floor(total);
+        var minutes = Math.floor(total / 60);
+        var remainder = total % 60;
+        return String(minutes).padStart(2, "0") + "m " + String(remainder).padStart(2, "0") + "s";
+      }
+
       function renderWarnings(warnings) {
         var feed = document.getElementById("user-warning-feed");
         if (!warnings || !warnings.length) {
@@ -1732,10 +1751,19 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           return;
         }
         feed.innerHTML = warnings.map(function(warning) {
-          return '<div class="user-warning-item"><div class="user-warning-item-head"><span>' +
-            escapeHtml(warning.displayName || "Member") + ' · ' + escapeHtml(String(warning.kind || "").toUpperCase()) +
-            '</span><span>' + escapeHtml(formatWarningTime(warning.createdAt)) + '</span></div><div class="user-warning-item-message">' +
-            escapeHtml(warning.message) + '</div></div>';
+          var activity = String(warning.kind || "").toUpperCase();
+          var timeout = warning.timeoutSeconds;
+          return '<article class="user-warning-item">' +
+            '<div class="user-warning-item-head"><strong>⚠ Activity Warning</strong><span>' +
+            escapeHtml(formatWarningTime(warning.createdAt)) + '</span></div>' +
+            '<div class="user-warning-details">' +
+              '<div><span>Group</span><strong>' + escapeHtml(document.getElementById("user-warning-group-name").textContent || "Group") + '</strong></div>' +
+              '<div><span>User</span><strong>' + escapeHtml(warning.displayName || "Member") + '</strong></div>' +
+              '<div><span>Activity</span><strong>' + escapeHtml(activity) + '</strong></div>' +
+              '<div><span>Status</span><strong>Single activity exceeded time limit</strong></div>' +
+              '<div><span>Overtime</span><strong>' + escapeHtml(formatWarningDuration(timeout)) + '</strong></div>' +
+            '</div>' +
+          '</article>';
         }).join("");
       }
 
@@ -1873,7 +1901,12 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           if(userMode){
             var verified=getVerifiedUserId();
             if(verified) await loadUserDashboard(false,window.__z28SelectedGroupId);
-            else { clearUserDashboard(); document.getElementById("user-verify-card").classList.add("visible"); }
+            else {
+              clearUserDashboard();
+              document.body.classList.add("user-verification-page");
+              document.body.classList.remove("user-dashboard-page");
+              document.getElementById("user-verify-card").classList.add("visible");
+            }
           } else await load();
         },"Refresh").catch(function(error){showNotice(error && error.message ? error.message : "Refresh failed.","error");});
       });

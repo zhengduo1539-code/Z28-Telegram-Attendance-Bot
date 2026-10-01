@@ -267,6 +267,7 @@ export class AttendanceService {
               activityName,
               timeoutSeconds,
             ),
+          timeoutSeconds,
           createdAt: now.toISOString(),
         });
         state.groupWarnings[warningKey] = warnings.slice(-50);
