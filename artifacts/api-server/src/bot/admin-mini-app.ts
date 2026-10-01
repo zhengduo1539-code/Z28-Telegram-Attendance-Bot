@@ -3275,6 +3275,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       var userMode = false;
       var adminMode = false;
       var adminVerificationMode = false;
+      var adminSessionToken = "";
       var apiBase = groupMode ? "/api/group-admin" : "/api/admin";
       var telegramUserId =
         tg.initDataUnsafe && tg.initDataUnsafe.user
@@ -3582,8 +3583,12 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       async function api(path, options) {
         var requestOptions = options || {};
         var headers = new Headers(requestOptions.headers || {});
-        headers.set("X-Telegram-Init-Data", initData);
-        if (startParam) headers.set("X-Telegram-Start-Param", startParam);
+        if (adminSessionToken && !groupMode) {
+          headers.set("X-Admin-Session", adminSessionToken);
+        } else {
+          headers.set("X-Telegram-Init-Data", initData);
+          if (startParam) headers.set("X-Telegram-Start-Param", startParam);
+        }
         headers.set("Accept", "application/json");
         if (requestOptions.body) headers.set("Content-Type", "application/json");
         var response = await fetch(apiBase + path, Object.assign({}, requestOptions, { headers: headers }));
@@ -4311,6 +4316,20 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         });
       }
 
+      async function createAdminSession() {
+        var headers = new Headers();
+        headers.set("X-Telegram-Init-Data", initData);
+        headers.set("Accept", "application/json");
+        var response = await fetch("/api/admin/session", { method: "POST", headers: headers });
+        var data = await response.json().catch(function () { return {}; });
+        if (!response.ok) {
+          throw new Error(typeof data.error === "string" ? data.error : "Unable to create admin session.");
+        }
+        if (!data.session) throw new Error("Unable to create admin session.");
+        adminSessionToken = String(data.session);
+        return data;
+      }
+
       async function apiUserMode() {
         var headers = new Headers();
         headers.set("X-Telegram-Init-Data", initData);
@@ -4491,6 +4510,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
               document.body.classList.remove("admin-verification-page");
               title.textContent = "Administration";
               rememberVerifiedAdminId(telegramUserId);
+              await createAdminSession();
               await load();
               hideSplash();
               startAdminDashboardRefresh();
@@ -4523,6 +4543,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             if (storedAdminId && currentAdminId && storedAdminId === currentAdminId) {
               setPanelVisibility("admin");
               title.textContent = "Administration";
+              await createAdminSession();
               await load();
               hideSplash();
               startAdminDashboardRefresh();

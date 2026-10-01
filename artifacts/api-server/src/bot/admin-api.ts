@@ -1,6 +1,6 @@
 import { Router, type IRouter, type Request, type Response } from "express";
 import { getHeapStatistics } from "node:v8";
-import { isConfiguredAdmin, getTelegramInitData, validateTelegramInitData } from "./admin-auth";
+import { isConfiguredAdmin, getTelegramInitData, validateTelegramInitData, createAdminSession, getAdminSession } from "./admin-auth";
 import { getAdminApiContext } from "./admin-runtime";
 import { adminMiniAppHtml } from "./admin-mini-app";
 import type { ActivityKind, AuditLogEntry } from "./types";
@@ -21,6 +21,10 @@ const requireAdmin = (req: Request, res: Response) => {
     sendUnauthorized(res, 503, "Admin API is not available.");
     return undefined;
   }
+
+  const sessionToken = req.header("x-admin-session")?.trim() || "";
+  const sessionUser = sessionToken ? getAdminSession(sessionToken) : undefined;
+  if (sessionUser) return { context, user: sessionUser };
 
   const validated = validateTelegramInitData(
     getTelegramInitData(req),
@@ -76,6 +80,26 @@ const serializeCountLimits = (
 });
 
 export const adminApiRouter: IRouter = Router();
+
+adminApiRouter.post("/session", async (req, res) => {
+  const context = getAdminApiContext();
+  if (!context?.config.token) {
+    sendUnauthorized(res, 503, "Admin API is not available.");
+    return;
+  }
+  const validated = validateTelegramInitData(getTelegramInitData(req), context.config.token);
+  if (!validated) {
+    sendUnauthorized(res, 401, "Invalid or expired Telegram session.");
+    return;
+  }
+  if (!isConfiguredAdmin(validated.user.id, context.config.botOwnerId, context.config.adminIds)) {
+    sendUnauthorized(res, 403, "Admin access required.");
+    return;
+  }
+  const session = createAdminSession(validated.user);
+  res.setHeader("Cache-Control", "no-store");
+  res.json({ session, expiresInSeconds: 30 * 60 });
+});
 
 adminApiRouter.post("/maintenance/audit-retention", async (req, res) => {
   const auth = requireAdmin(req, res);
