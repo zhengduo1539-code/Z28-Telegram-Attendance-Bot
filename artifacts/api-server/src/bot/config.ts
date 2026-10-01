@@ -36,6 +36,10 @@ export type BotConfig = {
   adminIds: number[];
   adminMiniAppUrl?: string;
   historyRetentionDays: number;
+  mongodbStorageLimitMb: number;
+  mongodbStorageWarnPercent: number;
+  mongodbStorageCriticalPercent: number;
+  mongodbEmergencyRetentionDays: number;
 };
 
 const resolveAdminMiniAppUrl = (): string | undefined => {
@@ -78,4 +82,8 @@ export const getBotConfig = (): BotConfig => ({
   adminIds: parseAdminIds(process.env["ADMIN_IDS"]),
   adminMiniAppUrl: resolveAdminMiniAppUrl(),
   historyRetentionDays: positiveInteger(process.env["HISTORY_RETENTION_DAYS"], 365),
+  mongodbStorageLimitMb: positiveInteger(process.env["MONGODB_STORAGE_LIMIT_MB"], 500),
+  mongodbStorageWarnPercent: Math.min(Math.max(Number(process.env["MONGODB_STORAGE_WARN_PERCENT"]) || 70, 1), 99),
+  mongodbStorageCriticalPercent: Math.min(Math.max(Number(process.env["MONGODB_STORAGE_CRITICAL_PERCENT"]) || 90, 1), 99),
+  mongodbEmergencyRetentionDays: Math.max(7, positiveInteger(process.env["MONGODB_EMERGENCY_RETENTION_DAYS"], 30)),
 });

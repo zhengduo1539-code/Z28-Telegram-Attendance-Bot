@@ -2878,6 +2878,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
                 <div class="admin-health-card"><div class="admin-health-head"><div class="admin-health-name">Admin API</div><span class="admin-health-dot" id="health-api-dot"></span></div><div class="admin-health-value" id="health-api-value">Checking…</div></div>
                 <div class="admin-health-card"><div class="admin-health-head"><div class="admin-health-name">Persistent Storage</div><span class="admin-health-dot" id="health-storage-dot"></span></div><div class="admin-health-value" id="health-storage-value">Checking…</div></div>
                 <div class="admin-health-card"><div class="admin-health-head"><div class="admin-health-name">Telegram API</div><span class="admin-health-dot" id="health-telegram-dot"></span></div><div class="admin-health-value" id="health-telegram-value">Checking…</div></div>
+                <div class="admin-health-card"><div class="admin-health-head"><div class="admin-health-name">MongoDB Storage</div><span class="admin-health-dot" id="health-mongodb-dot"></span></div><div class="admin-health-value" id="health-mongodb-value">Checking…</div><div class="admin-health-meta" id="health-mongodb-meta">Storage protection status</div></div>
               </div>
               <div class="admin-health-meta">
                 <div class="admin-health-meta-card"><div class="admin-health-meta-label">Overall status</div><div class="admin-health-meta-value" id="health-overall">Checking…</div></div>
@@ -3688,6 +3689,23 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           dot.className = "admin-health-dot " + (healthy ? "healthy" : "error");
           value.textContent = (healthy ? "Operational" : "Unavailable") + " · " + String(service.latencyMs || 0) + " ms";
         });
+        var mongoDot = document.getElementById("health-mongodb-dot");
+        var mongoValue = document.getElementById("health-mongodb-value");
+        var mongoMeta = document.getElementById("health-mongodb-meta");
+        if (mongoDot) mongoDot.className = "admin-health-dot " + (data.mongodbStorage && data.mongodbStorage.status === "healthy" ? "healthy" : "error");
+        if (mongoValue) {
+          var mongo = data.mongodbStorage;
+          mongoValue.textContent = mongo
+            ? String(mongo.usagePercent) + "% used · " + (Number(mongo.storageBytes || 0) / 1048576).toFixed(1) + " / " + String(mongo.limitMb) + " MB"
+            : "Unavailable";
+        }
+        if (mongoMeta) {
+          var mongo = data.mongodbStorage;
+          mongoMeta.textContent = mongo
+            ? "Warn " + String(mongo.warnPercent) + "% · Critical " + String(mongo.criticalPercent) + "% · Emergency retention " + String(mongo.emergencyRetentionDays) + " days"
+            : "MongoDB storage metrics unavailable";
+        }
+
         var overall = document.getElementById("health-overall");
         var uptime = document.getElementById("health-uptime");
         var memory = document.getElementById("health-memory");
@@ -3787,7 +3805,12 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       }
 
       async function loadAdminHealth() {
-        var data = await api("/health");
+        var results = await Promise.all([
+          api("/health"),
+          api("/storage-health").catch(function () { return undefined; })
+        ]);
+        var data = results[0] || {};
+        data.mongodbStorage = results[1];
         renderAdminHealth(data);
         return data;
       }

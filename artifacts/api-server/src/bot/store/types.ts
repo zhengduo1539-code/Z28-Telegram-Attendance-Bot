@@ -1,6 +1,16 @@
+export type StorageStats = {
+  storageBytes: number;
+  dataBytes: number;
+  indexBytes: number;
+  collections: number;
+  objects: number;
+  measuredAt: string;
+};
+
 import type { ActiveActivity, AuditLogEntry, BotState, MiniAppGroupAccess } from "../types";
 
 export interface BotStore {
+  getStorageStats(): Promise<StorageStats | undefined>;
   load(): Promise<BotState>;
   save(state: BotState): Promise<void>;
   update(mutator: (state: BotState) => void): Promise<BotState>;

@@ -7,7 +7,7 @@ import type {
   BotState,
   MiniAppGroupAccess,
 } from "../types";
-import type { BotStore } from "./types";
+import type { BotStore, StorageStats } from "./types";
 
 type MongoStateDocument = {
   _id: "bot-state";
@@ -166,6 +166,20 @@ export class MongoBotStore implements BotStore {
     }
     await this.miniAppAccessIndexPromise;
     return collection;
+  }
+
+  async getStorageStats(): Promise<StorageStats> {
+    const db = await this.database();
+    const stats = await db.command({ dbStats: 1 });
+    const storageBytes = Number(stats.storageSize || 0) + Number(stats.indexSize || 0);
+    return {
+      storageBytes: Number.isFinite(storageBytes) ? storageBytes : 0,
+      dataBytes: Number(stats.dataSize || 0),
+      indexBytes: Number(stats.indexSize || 0),
+      collections: Number(stats.collections || 0),
+      objects: Number(stats.objects || 0),
+      measuredAt: new Date().toISOString(),
+    };
   }
 
   async load(): Promise<BotState> {
