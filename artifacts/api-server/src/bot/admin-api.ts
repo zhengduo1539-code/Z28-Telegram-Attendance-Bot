@@ -76,6 +76,41 @@ const serializeCountLimits = (
 
 export const adminApiRouter: IRouter = Router();
 
+adminApiRouter.get("/backup", async (req, res) => {
+  const auth = requireAdmin(req, res);
+  if (!auth) return;
+
+  const snapshot = await auth.context.attendance.snapshot();
+  const activeActivities = await auth.context.attendance.listActiveActivities();
+  const backup = {
+    schemaVersion: 1,
+    exportedAt: new Date().toISOString(),
+    source: "z28-telegram-attendance-bot",
+    state: {
+      ...snapshot,
+      activeActivities: Object.fromEntries(
+        activeActivities.map((activity) => [
+          `${activity.chatId}:${activity.userId}`,
+          activity,
+        ]),
+      ),
+    },
+  };
+
+  await recordAdminAudit(
+    auth,
+    "backup.exported",
+    "bot_state",
+    "Full data backup exported.",
+  );
+
+  const filename = "z28-attendance-backup-" + new Date().toISOString().replace(/[:.]/g, "-") + ".json";
+  res.setHeader("Cache-Control", "no-store");
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.setHeader("Content-Disposition", 'attachment; filename="' + filename + '"');
+  res.send(JSON.stringify(backup, null, 2));
+});
+
 adminApiRouter.post("/broadcast", async (req, res) => {
   const auth = requireAdmin(req, res);
   if (!auth) return;
