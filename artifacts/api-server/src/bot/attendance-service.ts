@@ -307,6 +307,33 @@ export class AttendanceService {
     return this.settle(profile, "offwork");
   }
 
+  async recordManagedGroup(
+    chatId: number,
+    title: string,
+    username?: string,
+  ): Promise<void> {
+    if (chatId >= 0) return;
+    await this.store.update((state) => {
+      state.managedGroups = state.managedGroups || {};
+      const key = String(chatId);
+      const existing = state.managedGroups[key];
+      const now = new Date().toISOString();
+      state.managedGroups[key] = {
+        chatId,
+        title,
+        ...(username ? { username } : {}),
+        addedAt: existing?.addedAt || now,
+        updatedAt: now,
+      };
+    });
+  }
+
+  async removeManagedGroup(chatId: number): Promise<void> {
+    await this.store.update((state) => {
+      delete state.managedGroups?.[String(chatId)];
+    });
+  }
+
   async beginConnect(chatId: number, userId: number): Promise<void> {
     await this.store.update((state) => {
       state.pendingConnects = state.pendingConnects || {};
