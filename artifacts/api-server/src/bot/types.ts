@@ -86,6 +86,7 @@ export type TelegramChat = {
   id: number;
   type?: string;
   title?: string;
+  username?: string;
 };
 
 export type TelegramMessage = {
