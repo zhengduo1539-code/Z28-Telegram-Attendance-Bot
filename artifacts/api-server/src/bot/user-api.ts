@@ -49,13 +49,28 @@ const requireTelegramUser = (req: Request, res: Response) => {
 
 const discoverGroupIds = (snapshot: Awaited<ReturnType<NonNullable<ReturnType<typeof getAdminApiContext>>["attendance"]["snapshot"]>>) => {
   const ids = new Set<number>();
+
+  for (const group of Object.values(snapshot.managedGroups || {})) {
+    if (Number.isSafeInteger(group.chatId) && group.chatId < 0) {
+      ids.add(group.chatId);
+    }
+  }
+
+  // Backward-compatible discovery for groups recorded before managedGroups was introduced.
   for (const profile of Object.values(snapshot.users)) {
     if (profile.chatId < 0) ids.add(profile.chatId);
+  }
+  for (const activity of Object.values(snapshot.activeActivities)) {
+    if (activity.chatId < 0) ids.add(activity.chatId);
+  }
+  for (const record of snapshot.records) {
+    if (record.chatId < 0) ids.add(record.chatId);
   }
   for (const sourceChatId of Object.keys(snapshot.connectedGroups || {})) {
     const id = Number(sourceChatId);
     if (Number.isSafeInteger(id) && id < 0) ids.add(id);
   }
+
   return [...ids];
 };
 
