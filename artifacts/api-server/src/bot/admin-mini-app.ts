@@ -2212,6 +2212,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     }
 
     .admin-mode {
+      color-scheme: light;
       min-height:100vh;
       background:
         radial-gradient(circle at 88% 4%, rgba(59,130,246,.12), transparent 23%),
@@ -2405,8 +2406,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
                 <div class="admin-session-role" id="admin-session-role">Authorized session</div>
               </div>
             </div>
-            <button class="admin-refresh" id="admin-refresh" type="button" aria-label="Refresh dashboard">
-              <svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.9-4"></path><path d="M4 4v5h5"></path><path d="M4 13a8 8 0 0 0 14.9 4"></path><path d="M20 20v-5h-5"></path></svg>
+            <button class="admin-refresh action-button" id="admin-refresh" type="button" aria-label="Refresh dashboard">
+              <span class="button-content"><svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.9-4"></path><path d="M4 4v5h5"></path><path d="M4 13a8 8 0 0 0 14.9 4"></path><path d="M20 20v-5h-5"></path></svg></span>
             </button>
           </div>
         </header>
@@ -2477,7 +2478,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
               </div>
               <div class="admin-action-bar">
                 <span class="admin-empty-note">Changes apply globally to groups without an override.</span>
-                <button class="admin-save" id="admin-save-duration" type="button">Save duration limits</button>
+                <button class="admin-save action-button" id="admin-save-duration" type="button"><span class="button-content">Save duration limits</span></button>
               </div>
             </div>
           </div>
@@ -2517,7 +2518,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
               </div>
               <div class="admin-action-bar">
                 <span class="admin-empty-note">Eat remains unlimited by policy.</span>
-                <button class="admin-save" id="admin-save-counts" type="button">Save daily limits</button>
+                <button class="admin-save action-button" id="admin-save-counts" type="button"><span class="button-content">Save daily limits</span></button>
               </div>
             </div>
           </div>
@@ -2548,7 +2549,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
               </div>
               <div class="admin-action-bar">
                 <span class="admin-empty-note" id="admin-reminder-detail">Current automation state</span>
-                <button class="admin-save" id="admin-save-reminder" type="button">Save automation</button>
+                <button class="admin-save action-button" id="admin-save-reminder" type="button"><span class="button-content">Save automation</span></button>
               </div>
             </div>
           </div>
@@ -3131,10 +3132,35 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
 
       async function load() {
-        if (!adminMode && groupMode) {
-          // Group Admin Panel uses the same legacy controls below.
-        }
         var data = await api("/summary");
+
+        if (groupMode) {
+          var groupLimits = data.activityLimits || {};
+          var groupCounts = data.countLimits || {};
+          document.getElementById("limits-scope").textContent = "These settings apply only to the selected group.";
+          document.getElementById("limit-eat").value = groupLimits.eat !== undefined ? groupLimits.eat : "";
+          document.getElementById("limit-wc").value = groupLimits.wc !== undefined ? groupLimits.wc : "";
+          document.getElementById("limit-smoke").value = groupLimits.smoke !== undefined ? groupLimits.smoke : "";
+          document.getElementById("limit-wcd").value = groupLimits.wcd !== undefined ? groupLimits.wcd : "";
+          document.getElementById("count-eat").value = "Unlimited";
+          document.getElementById("count-wc").value = groupCounts.wc !== undefined ? groupCounts.wc : "";
+          document.getElementById("count-smoke").value = groupCounts.smoke !== undefined ? groupCounts.smoke : "";
+          document.getElementById("count-wcd").value = groupCounts.wcd !== undefined ? groupCounts.wcd : "";
+          var group = data.group || {};
+          document.getElementById("identity").textContent =
+            (group.title || "Group") + " • " + (group.id || "—");
+          document.getElementById("connection").innerHTML = data.connection
+            ? "<strong>Connected target</strong>" +
+              escapeHtml(String(data.connection.targetGroupName || data.connection.targetChatId || "—")) +
+              " <span>(" + escapeHtml(String(data.connection.targetChatId || "—")) + ")</span>"
+            : "No notification group is connected.";
+          document.getElementById("target").value =
+            data.connection && data.connection.targetChatId
+              ? String(data.connection.targetChatId)
+              : "";
+          return data;
+        }
+
         var stats = data.stats || {};
         var role = data.role === "owner" ? "Bot Owner" : "Administrator";
         var user = data.user || {};
