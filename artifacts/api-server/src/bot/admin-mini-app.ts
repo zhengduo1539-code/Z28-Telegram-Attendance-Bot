@@ -1446,6 +1446,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         var headers = new Headers();
         headers.set("X-Telegram-Init-Data", initData);
         headers.set("Accept", "application/json");
+        headers.set("Content-Type", "application/json");
         var response = await fetch("/api/user/dashboard", {
           method: "POST",
           headers: headers,
