@@ -1,4 +1,5 @@
 import { Router, type IRouter, type Request, type Response } from "express";
+import { getHeapStatistics } from "node:v8";
 import { isConfiguredAdmin, getTelegramInitData, validateTelegramInitData } from "./admin-auth";
 import { getAdminApiContext } from "./admin-runtime";
 import { adminMiniAppHtml } from "./admin-mini-app";
@@ -627,17 +628,28 @@ adminApiRouter.get("/analytics", async (req, res) => {
     eat: { count: 0, seconds: 0 }, wc: { count: 0, seconds: 0 },
     smoke: { count: 0, seconds: 0 }, wcd: { count: 0, seconds: 0 },
   };
+  const validKinds = new Set<ActivityKind>(["eat", "wc", "smoke", "wcd"]);
   for (const record of snapshot.records) {
-    const ended = new Date(record.endedAt).getTime();
-    if (!Number.isFinite(ended) || ended < start || ended > now) continue;
-    const day = record.endedAt.slice(0, 10);
+    const endedDate = new Date(record.endedAt);
+    const ended = endedDate.getTime();
+    if (
+      !Number.isFinite(ended) ||
+      ended < start ||
+      ended > now ||
+      !validKinds.has(record.kind)
+    ) continue;
+    const day = endedDate.toISOString().slice(0, 10);
+    const elapsedSeconds = Number(record.elapsedSeconds);
+    const safeSeconds = Number.isFinite(elapsedSeconds)
+      ? Math.max(0, elapsedSeconds)
+      : 0;
     const bucket = daily.get(day) || { activities: 0, seconds: 0, users: new Set<number>() };
     bucket.activities += 1;
-    bucket.seconds += Math.max(0, record.elapsedSeconds || 0);
+    bucket.seconds += safeSeconds;
     bucket.users.add(record.userId);
     daily.set(day, bucket);
     kindTotals[record.kind].count += 1;
-    kindTotals[record.kind].seconds += Math.max(0, record.elapsedSeconds || 0);
+    kindTotals[record.kind].seconds += safeSeconds;
   }
   const dailySeries = Array.from({ length: days }, (_, index) => {
     const date = new Date(now - (days - 1 - index) * 24 * 60 * 60 * 1000);
