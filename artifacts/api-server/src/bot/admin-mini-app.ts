@@ -1569,7 +1569,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           loadUserDashboard(false, window.__z28SelectedGroupId).catch(function () {
             // Keep the current dashboard visible if a background refresh temporarily fails.
           });
-        }, 5000);
+        }, 2000);
       }
 
 
