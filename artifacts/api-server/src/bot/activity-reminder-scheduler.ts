@@ -5,10 +5,12 @@ import { TelegramClient } from "./telegram-client";
 import type { ActiveActivity } from "./types";
 
 const CHECK_INTERVAL_MS = 1_000;
+const CLEANUP_INTERVAL_MS = 24 * 60 * 60 * 1_000;
 
 export class ActivityReminderScheduler {
   private timer?: ReturnType<typeof setInterval>;
   private checking = false;
+  private lastCleanupAt = 0;
 
   constructor(
     private readonly attendance: AttendanceService,
@@ -32,6 +34,16 @@ export class ActivityReminderScheduler {
     if (this.checking) return;
     this.checking = true;
     try {
+      const now = Date.now();
+      if (now - this.lastCleanupAt >= CLEANUP_INTERVAL_MS) {
+        const cutoff = new Date(now - this.attendance.getHistoryRetentionDays() * 24 * 60 * 60 * 1_000);
+        const removed = await this.attendance.pruneHistoryBefore(cutoff);
+        this.lastCleanupAt = now;
+        if (removed.records || removed.warnings || removed.pendingConnects) {
+          this.logger.info({ removed, cutoff: cutoff.toISOString() }, "Historical attendance data pruned");
+        }
+      }
+
       const dueActivities = await this.attendance.dueActivityReminders();
       for (const candidate of dueActivities) {
         await this.sendReminder(candidate);
