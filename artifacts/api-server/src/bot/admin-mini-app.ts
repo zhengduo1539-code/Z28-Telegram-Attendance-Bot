@@ -1564,6 +1564,25 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       }
     }
 
+    /* Structured warning cards */
+    .user-warning-feed { display:grid; gap:12px; min-height:220px; max-height:none; overflow:visible; padding:0; border:0; background:transparent; }
+    .user-warning-tab-panel .user-warning-feed { min-height:calc(100vh - 210px); padding:2px 0 96px; }
+    .user-warning-item { position:relative; padding:14px 14px 15px 16px; margin:0; border:1px solid rgba(255,180,45,.22); border-radius:18px; background:linear-gradient(145deg,rgba(42,27,8,.82),rgba(17,17,20,.88)); box-shadow:0 14px 30px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.035); overflow:hidden; }
+    .user-warning-item::before { content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:linear-gradient(180deg,#ffd166,#ff9f0a); box-shadow:0 0 18px rgba(255,180,45,.16); }
+    .user-warning-item-head { display:flex; align-items:center; justify-content:space-between; gap:12px; min-width:0; padding-bottom:11px; border-bottom:1px solid rgba(255,180,45,.12); }
+    .user-warning-item-title { display:inline-flex; align-items:center; gap:8px; min-width:0; color:#fff3cf; font-size:14px; font-weight:850; }
+    .user-warning-item-title .warning-symbol { display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; flex:0 0 24px; border-radius:8px; background:rgba(255,180,45,.13); border:1px solid rgba(255,209,102,.18); color:#ffd166; font-size:13px; box-shadow:0 0 14px rgba(255,180,45,.10); }
+    .user-warning-item-time { flex:0 0 auto; color:#b99a5e; font-size:10px; font-weight:750; white-space:nowrap; }
+    .user-warning-details { display:grid; gap:0; margin:10px 0 0; }
+    .user-warning-detail { display:grid; grid-template-columns:86px minmax(0,1fr); gap:10px; align-items:baseline; min-width:0; padding:8px 0; }
+    .user-warning-detail + .user-warning-detail { border-top:1px solid rgba(255,180,45,.08); }
+    .user-warning-detail-label { color:#9e8352; font-size:10px; font-weight:800; letter-spacing:.035em; text-transform:uppercase; }
+    .user-warning-detail-value { min-width:0; color:#fff0c4; font-size:12px; font-weight:750; line-height:1.45; overflow-wrap:anywhere; }
+    .user-warning-detail-value .warning-meta { display:block; margin-top:2px; color:#9f8759; font-size:10px; font-weight:650; }
+    .user-warning-detail.overtime .user-warning-detail-value { color:#ffd166; font-weight:850; text-shadow:0 0 12px rgba(255,180,45,.12); }
+    .user-warning-item-message { display:none !important; }
+    @media (max-width:480px) { .user-warning-item { padding:13px 12px 14px 14px; } .user-warning-item-head { align-items:flex-start; } .user-warning-item-title { font-size:13px; } .user-warning-detail { grid-template-columns:72px minmax(0,1fr); gap:8px; } }
+
     .panel-only-group,
     .panel-only-private { display: none; }
 
@@ -1930,6 +1949,10 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           user: "User",
           activity: "Activity",
           group: "Group",
+          activityEat: "Eat",
+          activityWc: "WC",
+          activitySmoke: "Smoke",
+          activityWcd: "WCD",
           switch: "Switch",
           noGroup: "No eligible group found",
           noGroupLead: "Add this bot to a group, then make sure your Telegram account is a group owner or administrator.",
@@ -1969,6 +1992,10 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           user: "User",
           activity: "Activity",
           group: "Group",
+          activityEat: "ထမင်းစား",
+          activityWc: "အိမ်သာ",
+          activitySmoke: "ဆေးလိပ်",
+          activityWcd: "WCD",
           switch: "ပြောင်းမည်",
           noGroup: "သင့်အတွက် အသုံးပြုနိုင်သော Group မရှိပါ",
           noGroupLead: "Bot ကို Group တစ်ခုထဲသို့ ထည့်ပြီး သင့် Telegram account ကို Group owner သို့မဟုတ် administrator ဖြစ်ကြောင်း သေချာပါစေ။",
@@ -2008,6 +2035,10 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           user: "用户",
           activity: "活动",
           group: "群组",
+          activityEat: "吃饭",
+          activityWc: "上厕所",
+          activitySmoke: "抽烟",
+          activityWcd: "大号",
           switch: "切换",
           noGroup: "没有找到可用的群组",
           noGroupLead: "请将 Bot 添加到群组，并确保您的 Telegram 账号是群主或管理员。",
@@ -2279,23 +2310,50 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         return String(minutes).padStart(2, "0") + "m " + String(remainder).padStart(2, "0") + "s";
       }
 
-      function renderWarnings(warnings) {
+      function getUserActivityLabel(kind) {
+        var labels = {
+          eat: tUser("activityEat"),
+          wc: tUser("activityWc"),
+          smoke: tUser("activitySmoke"),
+          wcd: tUser("activityWcd")
+        };
+        return labels[kind] || String(kind || "—");
+      }
+
+      function renderWarnings(warnings, group) {
         var feed = document.getElementById("user-warning-feed");
         if (!feed) return;
         if (!warnings || !warnings.length) {
-          feed.innerHTML = "";
+          feed.innerHTML = '<div class="user-warning-empty">' + escapeHtml(tUser("noWarnings")) + '</div>';
           return;
         }
+        var groupName = group && group.title ? String(group.title) : "—";
+        var groupId = group && group.id !== undefined ? String(group.id) : "";
         feed.innerHTML = warnings.map(function(warning) {
-          /*
-           * warning.message is generated by the same locale formatter used for
-           * the Telegram Bot notification. It is already HTML-escaped at the
-           * value level where user-controlled fields are inserted, so keeping
-           * the generated HTML here preserves the exact notification format.
-           */
+          var displayName = String(warning.displayName || "—");
+          var userId = warning.userId !== undefined ? String(warning.userId) : "";
+          var activity = getUserActivityLabel(warning.kind);
+          var createdAt = formatWarningTime(warning.createdAt);
+          var overtime = formatWarningDuration(warning.timeoutSeconds);
           return '<article class="user-warning-item">' +
-            '<div class="user-warning-item-message">' + String(warning.message || "") + '</div>' +
-            '</article>';
+            '<div class="user-warning-item-head">' +
+              '<div class="user-warning-item-title"><span class="warning-symbol" aria-hidden="true">⚠</span><span>' +
+                escapeHtml(tUser("warningTitle").replace(/^⚠\\s*/, "")) + '</span></div>' +
+              '<span class="user-warning-item-time">' + escapeHtml(createdAt) + '</span>' +
+            '</div>' +
+            '<div class="user-warning-details">' +
+              '<div class="user-warning-detail"><span class="user-warning-detail-label">' + escapeHtml(tUser("group")) + '</span><strong class="user-warning-detail-value">' +
+                escapeHtml(groupName) + (groupId ? '<span class="warning-meta">ID: ' + escapeHtml(groupId) + '</span>' : '') + '</strong></div>' +
+              '<div class="user-warning-detail"><span class="user-warning-detail-label">' + escapeHtml(tUser("user")) + '</span><strong class="user-warning-detail-value">' +
+                escapeHtml(displayName) + (userId ? '<span class="warning-meta">ID: ' + escapeHtml(userId) + '</span>' : '') + '</strong></div>' +
+              '<div class="user-warning-detail"><span class="user-warning-detail-label">' + escapeHtml(tUser("activity")) + '</span><strong class="user-warning-detail-value">' +
+                escapeHtml(activity) + '</strong></div>' +
+              '<div class="user-warning-detail"><span class="user-warning-detail-label">' + escapeHtml(tUser("status")) + '</span><strong class="user-warning-detail-value">' +
+                escapeHtml(tUser("warningStatus")) + '</strong></div>' +
+              '<div class="user-warning-detail overtime"><span class="user-warning-detail-label">' + escapeHtml(tUser("overtime")) + '</span><strong class="user-warning-detail-value">' +
+                escapeHtml(overtime) + '</strong></div>' +
+            '</div>' +
+          '</article>';
         }).join("");
       }
 
@@ -2320,7 +2378,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         document.getElementById("user-settings-counts-card").innerHTML =
           settingEditorMarkup("count", countLimits, group.id);
 
-        renderWarnings(data.warnings || []);
+        renderWarnings(data.warnings || [], group);
         bindUserSettingButtons();
       }
 
