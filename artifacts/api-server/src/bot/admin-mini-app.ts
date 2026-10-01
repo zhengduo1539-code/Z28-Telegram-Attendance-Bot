@@ -186,7 +186,124 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       -webkit-backdrop-filter: blur(18px);
     }
 
-    .card h2 { margin: 0 0 12px; font-size: 18px; }
+    .card {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 4px;
+      height: 100%;
+      background: linear-gradient(180deg, #42a5ff, #1677ff, #6f5cff);
+      opacity: 0.9;
+    }
+
+    .card h2 {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 14px;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    .section-icon {
+      width: 38px;
+      height: 38px;
+      flex: 0 0 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      background: linear-gradient(145deg, rgba(39, 132, 255, 0.24), rgba(20, 65, 130, 0.34));
+      border: 1px solid rgba(91, 155, 255, 0.26);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+      font-size: 18px;
+    }
+
+    .section-title {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      min-width: 0;
+    }
+
+    .section-title small {
+      color: #7f91a8;
+      font-size: 11px;
+      font-weight: 650;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .card[data-section="activity"]::before {
+      background: linear-gradient(180deg, #35a8ff, #1677ff);
+    }
+
+    .card[data-section="counts"]::before {
+      background: linear-gradient(180deg, #8b7cff, #4f62ff);
+    }
+
+    .card[data-section="reminder"]::before {
+      background: linear-gradient(180deg, #ffd166, #ff9f0a);
+    }
+
+    .rows {
+      display: grid;
+      gap: 0;
+      overflow: hidden;
+      border: 1px solid rgba(91, 155, 255, 0.13);
+      border-radius: 15px;
+      background: rgba(2, 9, 20, 0.28);
+    }
+
+    .row {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0,1fr) 120px;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 12px 12px 14px;
+      border-bottom: 1px solid rgba(91, 155, 255, 0.10);
+    }
+
+    .row:last-child { border-bottom: 0; }
+
+    .row:hover {
+      background: rgba(36, 122, 255, 0.055);
+    }
+
+    .row > div:first-child {
+      min-width: 0;
+    }
+
+    .row label {
+      display: inline-block;
+      font-weight: 750;
+      color: #eef4ff;
+    }
+
+    .row .hint {
+      color: #8294ab;
+    }
+
+    .section-caption {
+      margin: -5px 0 12px;
+      color: #8497b0;
+      font-size: 12px;
+    }
+
+    .save-limits,
+    .save-counts,
+    .save-reminder {
+      min-width: 150px;
+    }
 
     .stats {
       display: grid;
@@ -361,36 +478,46 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       </div>
     </section>
 
-    <section class="card" id="limits-card">
-      <h2>⏱ Activity Limits</h2>
-      <div class="hint" id="limits-scope"></div>
+    <section class="card" id="limits-card" data-section="activity">
+      <h2>
+        <span class="section-icon">⏱</span>
+        <span class="section-title"><span>Activity Limits</span><small>Duration Control</small></span>
+      </h2>
+      <div class="section-caption" id="limits-scope"></div>
       <div class="rows">
         <div class="row"><div><label for="limit-eat">Eat</label><span class="hint">minutes</span></div><input id="limit-eat" type="number" min="1" step="1"></div>
         <div class="row"><div><label for="limit-wc">WC</label><span class="hint">minutes</span></div><input id="limit-wc" type="number" min="1" step="1"></div>
         <div class="row"><div><label for="limit-smoke">Smoke</label><span class="hint">minutes</span></div><input id="limit-smoke" type="number" min="1" step="1"></div>
         <div class="row"><div><label for="limit-wcd">WCD</label><span class="hint">minutes</span></div><input id="limit-wcd" type="number" min="1" step="1"></div>
       </div>
-      <div class="actions"><button class="save" id="save-limits" type="button">Save Limits</button></div>
+      <div class="actions"><button class="save save-limits" id="save-limits" type="button">Save Limits</button></div>
     </section>
 
-    <section class="card" id="counts-card">
-      <h2>🔢 Daily Count Limits</h2>
+    <section class="card" id="counts-card" data-section="counts">
+      <h2>
+        <span class="section-icon">🔢</span>
+        <span class="section-title"><span>Daily Count Limits</span><small>Daily Usage Control</small></span>
+      </h2>
+      <div class="section-caption">Set how many times each activity can be used in one day.</div>
       <div class="rows">
         <div class="row"><div><label for="count-eat">Eat</label><span class="hint">unlimited by default</span></div><input id="count-eat" type="number" min="1" step="1" disabled></div>
         <div class="row"><div><label for="count-wc">WC</label><span class="hint">times per day</span></div><input id="count-wc" type="number" min="1" step="1"></div>
         <div class="row"><div><label for="count-smoke">Smoke</label><span class="hint">times per day</span></div><input id="count-smoke" type="number" min="1" step="1"></div>
         <div class="row"><div><label for="count-wcd">WCD</label><span class="hint">times per day</span></div><input id="count-wcd" type="number" min="1" step="1"></div>
       </div>
-      <div class="actions"><button class="save" id="save-counts" type="button">Save Count Limits</button></div>
+      <div class="actions"><button class="save save-counts" id="save-counts" type="button">Save Count Limits</button></div>
     </section>
 
-    <section class="card panel-only-private" id="reminder-card">
-      <h2>🔔 Overdue Reminder</h2>
+    <section class="card panel-only-private" id="reminder-card" data-section="reminder">
+      <h2>
+        <span class="section-icon">🔔</span>
+        <span class="section-title"><span>Overdue Reminder</span><small>Automatic Notification</small></span>
+      </h2>
       <div class="toggle">
         <div><label for="reminder">Reminder</label><span class="hint">45-second grace period</span></div>
         <input id="reminder" type="checkbox">
       </div>
-      <div class="actions"><button class="save" id="save-reminder" type="button">Save Reminder</button></div>
+      <div class="actions"><button class="save save-reminder" id="save-reminder" type="button">Save Reminder</button></div>
     </section>
 
     <section class="card panel-only-group" id="connect-card">
