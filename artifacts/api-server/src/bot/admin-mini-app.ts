@@ -757,6 +757,249 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       border-color: rgba(85,216,155,.2);
     }
 
+    .panel-only-user { display: none; }
+
+    .user-mode {
+      background: linear-gradient(145deg, #f7fbff 0%, #edf5ff 52%, #f8fbff 100%);
+      color: #132238;
+    }
+
+    .user-mode h1 {
+      color: #0d2542;
+      background: none;
+      -webkit-text-fill-color: initial;
+      animation: none;
+      font-size: clamp(26px, 7vw, 34px);
+    }
+
+    .user-mode .sub { color: #6f8299; }
+    .user-mode .refresh {
+      background: #2563eb;
+      border-color: rgba(37,99,235,.16);
+      box-shadow: 0 8px 22px rgba(37,99,235,.18);
+    }
+
+    .user-card {
+      background: rgba(255,255,255,.90);
+      border: 1px solid rgba(105,145,185,.20);
+      border-radius: 24px;
+      box-shadow: 0 18px 45px rgba(62,91,126,.13);
+    }
+
+    .user-card::before { display: none; }
+
+    .user-lead {
+      margin: 0 0 15px;
+      color: #6b8098;
+      font-size: 13px;
+    }
+
+    .user-id-wrap { display: grid; gap: 8px; }
+
+    .user-id-input {
+      width: 100%;
+      min-height: 50px;
+      padding: 11px 14px;
+      border-radius: 14px;
+      border: 1px solid #c8d8e8;
+      background: #fff;
+      color: #122843;
+      font-size: 17px;
+      outline: none;
+    }
+
+    .user-id-input:focus {
+      border-color: #5e98ed;
+      box-shadow: 0 0 0 4px rgba(37,99,235,.10);
+    }
+
+    .user-id-hint {
+      color: #7a8ea4;
+      font-size: 11px;
+    }
+
+    .user-confirm {
+      width: 100%;
+      min-height: 48px;
+      margin-top: 14px;
+      border: 0;
+      border-radius: 14px;
+      background: #aebdce;
+      color: #fff;
+      font-weight: 800;
+      box-shadow: none;
+      transition: background .2s ease, box-shadow .2s ease;
+    }
+
+    .user-confirm.ready {
+      background: linear-gradient(180deg,#2f80ed,#2563eb);
+      box-shadow: 0 10px 24px rgba(37,99,235,.20);
+      cursor: pointer;
+    }
+
+    .user-dashboard { display: none; }
+    .user-dashboard.visible { display: block; }
+
+    .user-dashboard-head {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:14px;
+    }
+
+    .user-dashboard-title {
+      margin:0;
+      color:#102b4b;
+      font-size:20px;
+      font-weight:850;
+    }
+
+    .user-dashboard-count {
+      padding:7px 10px;
+      border-radius:999px;
+      background:#e7f0ff;
+      color:#2d6fd6;
+      font-size:11px;
+      font-weight:800;
+    }
+
+    .user-empty {
+      padding:26px 18px;
+      text-align:center;
+      border-radius:18px;
+      border:1px dashed #c5d5e5;
+      background:rgba(247,251,255,.9);
+    }
+
+    .user-empty-icon {
+      width:52px;
+      height:52px;
+      margin:0 auto 12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:17px;
+      background:#e9f2ff;
+      color:#4f82ce;
+    }
+
+    .user-empty-icon svg {
+      width:26px;
+      height:26px;
+      fill:none;
+      stroke:currentColor;
+      stroke-width:1.8;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+    }
+
+    .user-empty strong {
+      display:block;
+      margin-bottom:5px;
+      color:#16304e;
+      font-size:16px;
+    }
+
+    .user-empty p {
+      margin:0 auto;
+      max-width:430px;
+      color:#71869b;
+      font-size:12px;
+      line-height:1.65;
+    }
+
+    .user-group-list { display:grid; gap:12px; }
+
+    .user-group {
+      padding:15px;
+      border-radius:18px;
+      border:1px solid #d8e3ef;
+      background:rgba(255,255,255,.92);
+      box-shadow:0 9px 24px rgba(68,97,129,.08);
+    }
+
+    .user-group-head {
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .user-group-name { color:#173657; font-weight:800; }
+
+    .user-group-meta {
+      margin-top:3px;
+      color:#7b8fa5;
+      font-size:11px;
+    }
+
+    .user-status {
+      padding:6px 9px;
+      border-radius:999px;
+      background:#e9f8f1;
+      color:#198754;
+      font-size:10px;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+
+    .user-metrics {
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:8px;
+      margin-top:13px;
+    }
+
+    .user-metric {
+      padding:10px;
+      border-radius:13px;
+      background:#f5f9fd;
+      border:1px solid #e5edf5;
+    }
+
+    .user-metric-label { color:#7c91a7; font-size:10px; }
+    .user-metric-value { margin-top:2px; color:#193a5f; font-size:17px; font-weight:850; }
+
+    .user-active {
+      margin-top:10px;
+      padding:9px 11px;
+      border-radius:12px;
+      background:#fff8e7;
+      color:#8b6a1d;
+      font-size:11px;
+      font-weight:700;
+    }
+
+    .user-connection { margin-top:10px; color:#71869b; font-size:10px; }
+
+    .user-loading {
+      position:fixed;
+      inset:0;
+      z-index:10000;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      background:rgba(247,251,255,.78);
+      backdrop-filter:blur(8px);
+      -webkit-backdrop-filter:blur(8px);
+    }
+
+    .user-loading.visible { display:flex; }
+
+    .user-loader {
+      width:48px;
+      height:48px;
+      border-radius:50%;
+      border:4px solid #dbe8f8;
+      border-top-color:#2563eb;
+      animation:userSpin .8s linear infinite;
+      box-shadow:0 0 22px rgba(37,99,235,.13);
+    }
+
+    @keyframes userSpin { to { transform:rotate(360deg); } }
+
     .panel-only-group,
     .panel-only-private { display: none; }
 
@@ -785,6 +1028,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
   </style>
 </head>
 <body>
+  <div id="user-loading" class="user-loading" aria-live="polite" aria-label="Loading"><div class="user-loader"></div></div>
+
   <div id="splash" aria-label="Loading">
     <h1 id="splash-title">Welcome from Zheng Duo</h1>
   </div>
@@ -826,6 +1071,33 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         <div class="stat"><div class="stat-label">Users (PM)</div><div class="stat-value" id="users">—</div></div>
         <div class="stat"><div class="stat-label">Groups</div><div class="stat-value" id="groups">—</div></div>
       </div>
+    </section>
+
+    <section class="card user-card panel-only-user" id="user-verify-card">
+      <h2>
+        <span class="section-icon stats-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 3l7 3v5c0 4.6-2.8 8.2-7 10-4.2-1.8-7-5.4-7-10V6l7-3z"></path>
+            <path d="M9.5 12l1.7 1.7 3.6-4"></path>
+          </svg>
+        </span>
+        <span class="section-title"><span>Verify Your Telegram ID</span><small>User Access</small></span>
+      </h2>
+      <p class="user-lead">Enter your Telegram user ID to open the groups where you are a group owner or administrator.</p>
+      <div class="user-id-wrap">
+        <label for="user-id-input">Telegram User ID</label>
+        <input class="user-id-input" id="user-id-input" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="Enter your Telegram ID">
+        <span class="user-id-hint">Your ID must match the Telegram account currently opening this Mini App.</span>
+      </div>
+      <button class="user-confirm" id="user-confirm" type="button" disabled>Confirm</button>
+    </section>
+
+    <section class="user-dashboard panel-only-user" id="user-dashboard">
+      <div class="user-dashboard-head">
+        <h2 class="user-dashboard-title">Group Activities</h2>
+        <span class="user-dashboard-count" id="user-group-count">0 Groups</span>
+      </div>
+      <div id="user-group-list" class="user-group-list"></div>
     </section>
 
     <section class="card" id="limits-card" data-section="activity">
