@@ -278,8 +278,31 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
       document.getElementById("refresh").addEventListener("click", load);
       document.querySelector('[data-save="limits"]').addEventListener("click", function () {
-        saveLimit("eat", "limit-eat");
-        saveLimit("wc", "limit-wc");
+        var operations = [
+          ["eat", "limit-eat"],
+          ["wc", "limit-wc"],
+          ["smoke", "limit-smoke"],
+          ["wcd", "limit-wcd"]
+        ];
+        (async function () {
+          setBusy(true);
+          try {
+            for (var i = 0; i < operations.length; i += 1) {
+              var minutes = value(operations[i][1]);
+              if (minutes === undefined) throw new Error("Enter positive integers for all activity limits.");
+              await api("/activity-limits", {
+                method: "PUT",
+                body: JSON.stringify({ kind: operations[i][0], minutes: minutes })
+              });
+            }
+            showNotice("Activity limits saved.", "ok");
+          } catch (error) {
+            showNotice(error && error.message ? error.message : "Save failed.", "error");
+          } finally {
+            setBusy(false);
+            load();
+          }
+        })();
       });
       document.querySelector('[data-save="counts"]').addEventListener("click", function () {
         var operations = [
