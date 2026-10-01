@@ -63,6 +63,17 @@ export type ManagedGroup = {
   updatedAt: string;
 };
 
+export type AuditLogEntry = {
+  id: string;
+  actorUserId: number;
+  actorName: string;
+  role: "owner" | "administrator";
+  action: string;
+  target: string;
+  details: string;
+  createdAt: string;
+};
+
 export type GroupWarning = {
   id: string;
   chatId: number;
