@@ -1,8 +1,10 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createHmac, timingSafeEqual, randomBytes } from "node:crypto";
 import type { Request } from "express";
 
 const MAX_INIT_DATA_AGE_MS = 10 * 60 * 1000;
 const FUTURE_CLOCK_SKEW_MS = 60 * 1000;
+const ADMIN_SESSION_TTL_MS = 30 * 60 * 1000;
+const adminSessions = new Map<string, { user: TelegramWebAppUser; expiresAt: number }>();
 
 export type TelegramWebAppUser = {
   id: number;
@@ -105,3 +107,24 @@ export const isConfiguredAdmin = (
   ownerId: number | undefined,
   adminIds: number[],
 ): boolean => ownerId === userId || adminIds.includes(userId);
+
+
+export const createAdminSession = (user: TelegramWebAppUser): string => {
+  const token = randomBytes(32).toString("base64url");
+  adminSessions.set(token, { user, expiresAt: Date.now() + ADMIN_SESSION_TTL_MS });
+  return token;
+};
+
+export const getAdminSession = (token: string): TelegramWebAppUser | undefined => {
+  const session = adminSessions.get(token);
+  if (!session) return undefined;
+  if (session.expiresAt <= Date.now()) {
+    adminSessions.delete(token);
+    return undefined;
+  }
+  return session.user;
+};
+
+export const deleteAdminSession = (token: string): void => {
+  adminSessions.delete(token);
+};
