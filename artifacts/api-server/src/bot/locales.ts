@@ -138,10 +138,6 @@ const getTimeoutSeconds = (durationSeconds: number, limitMinutes: number) =>
 
 const zh: LocaleText = {
   title: "打卡机器人 M58",
-  startWelcome: [
-    "欢迎使用打卡机器人！",
-    `请使用 ${inlineCode("/help")} 查看所有可用命令及使用说明。`,
-  ].join("\n"),
   help: [
     "可用命令：",
     `${inlineCode("/work")} — 上班`,
