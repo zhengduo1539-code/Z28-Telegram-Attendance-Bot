@@ -97,6 +97,65 @@ const ensureProfile = (
   return state.users[key];
 };
 
+const buildSettlementResponse = (
+  state: BotState,
+  record: BotState["records"][number],
+  active: ActiveActivity,
+  locale: Locale,
+  text: ReturnType<typeof getLocale>,
+  timeZone: string,
+): string => {
+  const dayKey = localDateKey(
+    new Date(record.endedAt),
+    timeZone,
+  );
+  const matchingRecords = state.records.filter(
+    (item) =>
+      item.chatId === record.chatId &&
+      item.userId === record.userId &&
+      localDateKey(new Date(item.endedAt), timeZone) === dayKey,
+  );
+  const activitySummary = matchingRecords
+    .filter((item) => item.kind === active.kind)
+    .reduce<ActivitySummary>(
+      (summary, item) => ({
+        count: summary.count + 1,
+        seconds: summary.seconds + item.elapsedSeconds,
+      }),
+      { count: 0, seconds: 0 },
+    );
+  const totalSeconds = matchingRecords.reduce(
+    (total, item) => total + item.elapsedSeconds,
+    0,
+  );
+  const todayCounts = trackedActivities.reduce(
+    (counts, kind) => {
+      counts[kind] = matchingRecords.filter(
+        (item) => item.kind === kind,
+      ).length;
+      return counts;
+    },
+    {
+      eat: 0,
+      wc: 0,
+      smoke: 0,
+      wcd: 0,
+    } as Record<ActivityKind, number>,
+  );
+
+  return text.settled(
+    record.displayName,
+    record.userId,
+    activityLabel(record.kind, locale),
+    formatDateTime(new Date(record.startedAt), timeZone),
+    record.elapsedSeconds,
+    active.limitMinutes,
+    activitySummary.seconds,
+    totalSeconds,
+    todayCounts,
+  );
+};
+
 export class AttendanceService {
   constructor(
     private readonly store: BotStore,
@@ -272,6 +331,72 @@ export class AttendanceService {
       };
     }
 
+    const existingRecord = state.records.find(
+      (record) => record.id === active.id,
+    );
+    const warningKey = String(profile.chatId);
+    const existingWarning = state.groupWarnings?.[warningKey]?.find(
+      (warning) => warning.id === active.id,
+    );
+
+    // A completed record plus no warning means the previous settlement already
+    // finished and only temporary cleanup was interrupted by a restart.
+    if (existingRecord && !existingWarning) {
+      await this.store.deleteActiveActivity(
+        profile.chatId,
+        profile.userId,
+        active.id,
+      );
+      return {
+        response: buildSettlementResponse(
+          state,
+          existingRecord,
+          active,
+          locale,
+          text,
+          this.config.timeZone,
+        ),
+      };
+    }
+
+    // A completed record with a warning means warning delivery was the only
+    // step left when the process stopped. Reuse the original warning message.
+    if (existingRecord && existingWarning) {
+      const notificationChatId =
+        state.connectedGroups?.[String(profile.chatId)]?.targetChatId;
+      if (notificationChatId) {
+        return {
+          response: buildSettlementResponse(
+            state,
+            existingRecord,
+            active,
+            locale,
+            text,
+            this.config.timeZone,
+          ),
+          timeoutNotification: existingWarning.message,
+          notificationChatId,
+          pendingActivityId: active.id,
+        };
+      }
+
+      await this.store.deleteActiveActivity(
+        profile.chatId,
+        profile.userId,
+        active.id,
+      );
+      return {
+        response: buildSettlementResponse(
+          state,
+          existingRecord,
+          active,
+          locale,
+          text,
+          this.config.timeZone,
+        ),
+      };
+    }
+
     const elapsedSeconds = Math.max(
       0,
       Math.floor(
@@ -290,166 +415,71 @@ export class AttendanceService {
     let response = "";
     let timeoutNotification: string | undefined;
     let notificationChatId: number | undefined;
-    let activityRecord: BotState["records"][number] | undefined;
 
     await this.store.update((nextState) => {
       ensureProfile(nextState, profile, now.toISOString());
 
-      const existingRecord = nextState.records.find(
-        (record) => record.id === active.id,
-      );
-      activityRecord =
-        existingRecord ||
-        ({
+      const record = {
+        id: active.id,
+        chatId: active.chatId,
+        userId: active.userId,
+        displayName: active.displayName,
+        kind: active.kind,
+        startedAt: active.startedAt,
+        endedAt: now.toISOString(),
+        elapsedSeconds,
+        settledBy,
+      } as BotState["records"][number];
+      nextState.records.push(record);
+
+      let warning: GroupWarning | undefined;
+      if (isTimeout) {
+        nextState.groupWarnings = nextState.groupWarnings || {};
+        const warnings = nextState.groupWarnings[warningKey] || [];
+        const activityName = activityLabel(active.kind, locale);
+        const message = connection
+          ? getLocale(locale).groupTimeoutNotification(
+              connection.targetGroupName,
+              connection.sourceChatId,
+              connection.sourceUsername,
+              active.displayName,
+              active.userId,
+              activityName,
+              timeoutSeconds,
+              formatWarningDateTime(now, this.config.timeZone),
+            )
+          : getLocale(locale).groupTimeoutNotification(
+              "Group",
+              profile.chatId,
+              undefined,
+              active.displayName,
+              active.userId,
+              activityName,
+              timeoutSeconds,
+              formatWarningDateTime(now, this.config.timeZone),
+            );
+
+        warning = {
           id: active.id,
-          chatId: active.chatId,
+          chatId: profile.chatId,
           userId: active.userId,
           displayName: active.displayName,
           kind: active.kind,
-          startedAt: active.startedAt,
-          endedAt: now.toISOString(),
-          elapsedSeconds,
-          settledBy,
-        } as BotState["records"][number]);
-
-      if (!existingRecord) {
-        nextState.records.push(activityRecord);
+          message,
+          timeoutSeconds,
+          createdAt: now.toISOString(),
+        };
+        warnings.push(warning);
+        nextState.groupWarnings[warningKey] = warnings.slice(-50);
       }
 
-      let warning: GroupWarning | undefined;
-
-      if (isTimeout) {
-        const warningKey = String(profile.chatId);
-        nextState.groupWarnings = nextState.groupWarnings || {};
-        const warnings = nextState.groupWarnings[warningKey] || [];
-        const existingWarning = warnings.find(
-          (item) => item.id === active.id,
-        );
-        const activityName = activityLabel(active.kind, locale);
-
-        warning =
-          existingWarning ||
-          ({
-            id: active.id,
-            chatId: profile.chatId,
-            userId: active.userId,
-            displayName: active.displayName,
-            kind: active.kind,
-            message:
-              connection
-                ? getLocale(locale).groupTimeoutNotification(
-                    connection.targetGroupName,
-                    connection.sourceChatId,
-                    connection.sourceUsername,
-                    active.displayName,
-                    active.userId,
-                    activityName,
-                    existingRecord?.elapsedSeconds !== undefined
-                      ? Math.max(
-                          0,
-                          Math.floor(
-                            existingRecord.elapsedSeconds -
-                              active.limitMinutes * 60,
-                          ),
-                        ),
-                      : timeoutSeconds,
-                    formatWarningDateTime(
-                      new Date(
-                        existingRecord?.endedAt || now.toISOString(),
-                      ),
-                      this.config.timeZone,
-                    ),
-                  )
-                : getLocale(locale).groupTimeoutNotification(
-                    "Group",
-                    profile.chatId,
-                    undefined,
-                    active.displayName,
-                    active.userId,
-                    activityName,
-                    existingRecord?.elapsedSeconds !== undefined
-                      ? Math.max(
-                          0,
-                          Math.floor(
-                            existingRecord.elapsedSeconds -
-                              active.limitMinutes * 60,
-                          ),
-                        )
-                      : timeoutSeconds,
-                    formatWarningDateTime(
-                      new Date(
-                        existingRecord?.endedAt || now.toISOString(),
-                      ),
-                      this.config.timeZone,
-                    ),
-                  ),
-            timeoutSeconds:
-              existingRecord?.elapsedSeconds !== undefined
-                ? Math.max(
-                    0,
-                    Math.floor(
-                      existingRecord.elapsedSeconds -
-                        active.limitMinutes * 60,
-                    ),
-                  )
-                : timeoutSeconds,
-            createdAt: now.toISOString(),
-          } as NonNullable<typeof warning>);
-
-        if (!existingWarning) {
-          warnings.push(warning);
-          nextState.groupWarnings[warningKey] = warnings.slice(-50);
-        }
-      }
-
-      const matchingRecords = nextState.records.filter(
-        (record) =>
-          record.chatId === profile.chatId &&
-          record.userId === profile.userId &&
-          localDateKey(new Date(record.endedAt), this.config.timeZone) ===
-            localDateKey(new Date(activityRecord!.endedAt), this.config.timeZone),
-      );
-      const activitySummary = matchingRecords
-        .filter((record) => record.kind === active.kind)
-        .reduce<ActivitySummary>(
-          (summary, record) => ({
-            count: summary.count + 1,
-            seconds: summary.seconds + record.elapsedSeconds,
-          }),
-          { count: 0, seconds: 0 },
-        );
-      const totalSeconds = matchingRecords.reduce(
-        (total, record) => total + record.elapsedSeconds,
-        0,
-      );
-      const todayCounts = trackedActivities.reduce(
-        (counts, kind) => {
-          counts[kind] = matchingRecords.filter(
-            (record) => record.kind === kind,
-          ).length;
-          return counts;
-        },
-        {
-          eat: 0,
-          wc: 0,
-          smoke: 0,
-          wcd: 0,
-        } as Record<ActivityKind, number>,
-      );
-
-      response = text.settled(
-        active.displayName,
-        active.userId,
-        activityLabel(active.kind, locale),
-        formatDateTime(
-          new Date(activityRecord!.startedAt),
-          this.config.timeZone,
-        ),
-        activityRecord!.elapsedSeconds,
-        active.limitMinutes,
-        activitySummary.seconds,
-        totalSeconds,
-        todayCounts,
+      response = buildSettlementResponse(
+        nextState,
+        record,
+        active,
+        locale,
+        text,
+        this.config.timeZone,
       );
 
       if (isTimeout && warning) {
