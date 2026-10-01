@@ -264,7 +264,7 @@ export class CommandHandler {
           break;
         }
         if (message.chat.type !== "private") {
-          response = text.botStatsPrivate;
+          response = text.adminPrivate;
           break;
         }
         if (!this.config.adminMiniAppUrl) {
