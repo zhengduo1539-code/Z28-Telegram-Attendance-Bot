@@ -1745,13 +1745,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         <div class="user-tab-shell">
           <div class="user-tab-panel active" id="user-settings-tab">
             <div class="user-dashboard-section-label">Admin Settings</div>
-            <div class="user-setting-card" id="user-settings-limits-card"></div>
-            <div class="user-setting-card counts" id="user-settings-counts-card"></div>
-          </div>
 
-          <div class="user-tab-panel user-warning-tab-panel" id="user-warning-tab">
-            <div class="user-dashboard-section-label warning">Warning</div>
-            <div class="user-group-box compact">
+            <div class="user-group-box compact" id="user-group-activities-card">
               <div class="user-group-box-title" id="user-group-activities-title">Group Activities</div>
               <div class="user-group-name" id="user-warning-group-name"></div>
               <div class="user-group-metrics">
@@ -1765,6 +1760,13 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
                 </div>
               </div>
             </div>
+
+            <div class="user-setting-card" id="user-settings-limits-card"></div>
+            <div class="user-setting-card counts" id="user-settings-counts-card"></div>
+          </div>
+
+          <div class="user-tab-panel user-warning-tab-panel" id="user-warning-tab">
+            <div class="user-dashboard-section-label warning">Warning</div>
             <div class="user-warning-feed" id="user-warning-feed"></div>
           </div>
         </div>
