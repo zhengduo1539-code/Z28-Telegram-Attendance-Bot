@@ -1,6 +1,7 @@
 import type { AttendanceService } from "./attendance-service";
 import type { BotConfig } from "./config";
 import type { TelegramClient } from "./telegram-client";
+import type { TelegramClient } from "./telegram-client";
 
 export type AdminApiContext = {
   attendance: AttendanceService;
