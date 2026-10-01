@@ -1480,7 +1480,40 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     }
     .user-warning-item { padding:12px; margin-bottom:9px; border-radius:14px; border:1px solid rgba(255,180,45,.17); background:rgba(77,46,8,.22); }
     .user-warning-item:last-child { margin-bottom:0; }
-    .user-warning-item-head { display:flex; justify-content:space-between; gap:8px; color:#ffd98a; font-size:11px; font-weight:800; }
+    .user-warning-item-head {
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:10px;
+      color:#ffd98a;
+      font-size:12px;
+      font-weight:850;
+    }
+    .user-warning-item-head strong { color:#fff3cf; }
+    .user-warning-item-head span { color:#b99a5e; font-size:10px; white-space:nowrap; }
+    .user-warning-details {
+      display:grid;
+      gap:6px;
+      margin-top:10px;
+      padding-top:9px;
+      border-top:1px solid rgba(255,180,45,.12);
+    }
+    .user-warning-details > div {
+      display:grid;
+      grid-template-columns:86px minmax(0,1fr);
+      gap:8px;
+      align-items:baseline;
+      font-size:11px;
+    }
+    .user-warning-details > div span {
+      color:#9e8352;
+      font-weight:700;
+    }
+    .user-warning-details > div strong {
+      color:#fff0c4;
+      font-weight:800;
+      overflow-wrap:anywhere;
+    }
     .user-warning-item-message { margin-top:6px; color:#fff0c4; font-size:12px; line-height:1.55; }
     .user-warning-empty { min-height:190px; display:flex; align-items:center; justify-content:center; text-align:center; color:#d5b77a; font-size:12px; }
     .switch-group {
@@ -2283,15 +2316,25 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         window.__z28SelectedGroupId = group.id;
         document.getElementById("user-group-options").hidden = true;
         document.getElementById("user-selected-dashboard").hidden = false;
-        title.textContent = String(telegramUserId) + " " + tUser("title");
+        title.textContent = tUser("title");
         document.getElementById("switch-group").hidden = false;
         document.getElementById("switch-group").textContent = tUser("switch");
         document.getElementById("user-selected-group-title").textContent = group.title + " " + tUser("title");
         document.getElementById("user-warning-group-name").textContent = group.title;
         document.getElementById("user-member-count").textContent = String(group.memberCount);
         document.getElementById("user-active-count").textContent = String(group.activeCount);
-        document.getElementById("user-settings-limits-card").innerHTML = settingEditorMarkup("duration", data.activityLimits || {}, group.id);
-        document.getElementById("user-settings-counts-card").innerHTML = settingEditorMarkup("count", data.countLimits || {}, group.id);
+
+        var activityLimits = data.activityLimits || {};
+        var countLimits = data.countLimits || {};
+        document.getElementById("user-settings-limits-card").innerHTML =
+          settingEditorMarkup("duration", activityLimits, group.id);
+        document.getElementById("user-settings-counts-card").innerHTML =
+          settingEditorMarkup("count", countLimits, group.id);
+        document.getElementById("user-warning-limits-card").innerHTML =
+          settingEditorMarkup("duration", activityLimits, group.id);
+        document.getElementById("user-warning-counts-card").innerHTML =
+          settingEditorMarkup("count", countLimits, group.id);
+
         renderWarnings(data.warnings || []);
         bindUserSettingButtons();
       }
