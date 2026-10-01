@@ -873,7 +873,22 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       position: absolute;
       top: 13px;
       right: 13px;
-      z-index: 4;
+      z-index: 10;
+    }
+
+    /* Keep the verification heading clear of the top-right language button. */
+    .user-card#user-verify-card > h2 {
+      padding-right: 58px;
+      min-width: 0;
+    }
+
+    .user-card#user-verify-card > h2 .section-title {
+      min-width: 0;
+    }
+
+    .user-card#user-verify-card > h2 .section-title > span {
+      min-width: 0;
+      overflow-wrap: anywhere;
     }
 
     .user-language-button {
