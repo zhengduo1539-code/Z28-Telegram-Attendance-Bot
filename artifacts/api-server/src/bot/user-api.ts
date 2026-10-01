@@ -118,17 +118,19 @@ const getVerifiedGroupRole = async (
 
   try {
     const member = await context.telegram.getChatMember(groupId, userId);
-    if (member.status !== "creator" && member.status !== "administrator") {
+    const role =
+      member.status === "creator"
+        ? "creator"
+        : member.status === "administrator"
+          ? "administrator"
+          : undefined;
+    if (!role) {
       await context.attendance.clearMiniAppGroupAccess(userId, groupId);
       return undefined;
     }
 
-    await context.attendance.cacheMiniAppGroupAccess(
-      userId,
-      groupId,
-      member.status,
-    );
-    return member.status;
+    await context.attendance.cacheMiniAppGroupAccess(userId, groupId, role);
+    return role;
   } catch {
     await context.attendance.clearMiniAppGroupAccess(userId, groupId);
     return undefined;
@@ -141,7 +143,13 @@ const buildGroup = async (
   groupId: number,
   userId: number,
 ): Promise<DashboardGroup | undefined> => {
-  const chat = await context.telegram.getChat(groupId);
+  let chat;
+  try {
+    chat = await context.telegram.getChat(groupId);
+  } catch {
+    await context.attendance.clearMiniAppGroupAccess(userId, groupId);
+    return undefined;
+  }
   if (chat.type !== "group" && chat.type !== "supergroup") {
     await context.attendance.clearMiniAppGroupAccess(userId, groupId);
     return undefined;
