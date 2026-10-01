@@ -83,6 +83,107 @@ adminApiRouter.get("/summary", async (req, res) => {
   });
 });
 
+adminApiRouter.get("/users", async (req, res) => {
+  const auth = requireAdmin(req, res);
+  if (!auth) return;
+
+  const snapshot = await auth.context.attendance.snapshot();
+  const activeActivities = await auth.context.attendance.listActiveActivities();
+  const search = typeof req.query.search === "string"
+    ? req.query.search.trim().toLowerCase().slice(0, 100)
+    : "";
+  const status =
+    req.query.status === "active" || req.query.status === "inactive"
+      ? req.query.status
+      : "all";
+  const requestedPage = Number(req.query.page);
+  const requestedPageSize = Number(req.query.pageSize);
+  const page = Number.isSafeInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
+  const pageSize =
+    Number.isSafeInteger(requestedPageSize) && requestedPageSize > 0
+      ? Math.min(requestedPageSize, 50)
+      : 20;
+
+  const warningsByUser = new Map<number, number>();
+  for (const warnings of Object.values(snapshot.groupWarnings || {})) {
+    for (const warning of warnings) {
+      if (warning.chatId > 0) {
+        warningsByUser.set(
+          warning.userId,
+          (warningsByUser.get(warning.userId) || 0) + 1,
+        );
+      }
+    }
+  }
+
+  const users = Object.values(snapshot.users)
+    .filter((profile) => profile.chatId > 0)
+    .map((profile) => {
+      const userRecords = snapshot.records.filter(
+        (record) =>
+          record.chatId === profile.chatId && record.userId === profile.userId,
+      );
+      const active = activeActivities.find(
+        (activity) =>
+          activity.chatId === profile.chatId && activity.userId === profile.userId,
+      );
+      const lastRecord = userRecords.reduce<string | undefined>(
+        (latest, record) =>
+          !latest || record.endedAt > latest ? record.endedAt : latest,
+        undefined,
+      );
+      return {
+        userId: profile.userId,
+        chatId: profile.chatId,
+        displayName: profile.displayName,
+        username: profile.username || null,
+        firstSeen: profile.createdAt,
+        lastActive:
+          active?.startedAt || lastRecord || profile.updatedAt || profile.createdAt,
+        totalActivities: userRecords.length,
+        warningCount: warningsByUser.get(profile.userId) || 0,
+        status: active ? "active" : "inactive",
+        currentActivity: active
+          ? {
+              kind: active.kind,
+              startedAt: active.startedAt,
+              limitMinutes: active.limitMinutes,
+            }
+          : null,
+      };
+    })
+    .filter((user) => {
+      if (status !== "all" && user.status !== status) return false;
+      if (!search) return true;
+      return [
+        String(user.userId),
+        String(user.chatId),
+        user.displayName,
+        user.username || "",
+      ].some((value) => value.toLowerCase().includes(search));
+    })
+    .sort((left, right) => {
+      if (left.status !== right.status) return left.status === "active" ? -1 : 1;
+      return left.displayName.localeCompare(right.displayName);
+    });
+
+  const total = users.length;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const safePage = Math.min(page, totalPages);
+  const offset = (safePage - 1) * pageSize;
+
+  res.setHeader("Cache-Control", "no-store");
+  res.json({
+    users: users.slice(offset, offset + pageSize),
+    pagination: {
+      page: safePage,
+      pageSize,
+      total,
+      totalPages,
+    },
+  });
+});
+
 adminApiRouter.put("/activity-limits", async (req, res) => {
   const auth = requireAdmin(req, res);
   if (!auth) return;

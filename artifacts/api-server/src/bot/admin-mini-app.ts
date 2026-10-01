@@ -2283,6 +2283,31 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     .admin-mode .user-loading,
     .admin-mode .user-mode .user-loading { z-index:300; }
 
+    .admin-users-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+    .admin-users-search{flex:1 1 260px;min-width:0;height:42px;padding:0 13px;border:1px solid #dbe3ef;border-radius:12px;background:#fff;color:#0f172a;outline:none;font-size:13px;box-shadow:0 2px 8px rgba(15,23,42,.03)}
+    .admin-users-search:focus{border-color:#7aaaf7;box-shadow:0 0 0 4px rgba(37,99,235,.09)}
+    .admin-users-filter{height:42px;padding:0 12px;border:1px solid #dbe3ef;border-radius:12px;background:#fff;color:#334155;font-weight:700;outline:none}
+    .admin-users-meta{color:#64748b;font-size:11px;white-space:nowrap}
+    .admin-users-table-wrap{overflow:auto;border:1px solid #e2e8f0;border-radius:14px;background:#fff}
+    .admin-users-table{width:100%;min-width:760px;border-collapse:collapse}
+    .admin-users-table th,.admin-users-table td{padding:12px 14px;border-bottom:1px solid #edf1f6;text-align:left;vertical-align:middle;font-size:12px}
+    .admin-users-table th{color:#64748b;background:#f8fafc;font-size:10px;text-transform:uppercase;letter-spacing:.07em;font-weight:800;position:sticky;top:0;z-index:1}
+    .admin-users-table tr:last-child td{border-bottom:0}
+    .admin-user-primary{display:flex;align-items:center;gap:10px;min-width:180px}
+    .admin-user-avatar{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;border-radius:11px;background:#eff6ff;color:#2563eb;font-size:11px;font-weight:900}
+    .admin-user-name{color:#0f172a;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px}
+    .admin-user-sub{margin-top:2px;color:#94a3b8;font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px}
+    .admin-user-id{color:#475569;font-variant-numeric:tabular-nums}
+    .admin-user-status{display:inline-flex;align-items:center;gap:6px;min-height:25px;padding:0 8px;border-radius:999px;font-size:10px;font-weight:800;text-transform:capitalize}
+    .admin-user-status::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+    .admin-user-status.active{color:#15803d;background:#f0fdf4}.admin-user-status.inactive{color:#64748b;background:#f1f5f9}
+    .admin-user-activity{color:#334155;font-weight:700}.admin-user-muted{color:#94a3b8}
+    .admin-users-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px}
+    .admin-users-pagination{display:flex;gap:7px}
+    .admin-users-page{min-width:72px;height:36px;padding:0 11px;border:1px solid #dbe3ef;border-radius:10px;background:#fff;color:#334155;font-size:11px;font-weight:800;cursor:pointer}
+    .admin-users-page:disabled{opacity:.45;cursor:not-allowed}
+    .admin-users-empty{padding:34px 16px;text-align:center;color:#64748b;font-size:12px}
+
     @media (max-width: 980px) {
       .admin-sidebar { width:208px; flex-basis:208px; }
       .admin-mode #admin-shell.panel-only-private,
@@ -2401,6 +2426,10 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             <span class="admin-nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="3" width="7" height="7" rx="2"></rect><rect x="3" y="14" width="7" height="7" rx="2"></rect><rect x="14" y="14" width="7" height="7" rx="2"></rect></svg></span>
             <span>Overview</span>
           </button>
+          <button class="admin-nav-item" type="button" data-admin-nav="users">
+            <span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M16 20v-1.7a4.3 4.3 0 0 0-4.3-4.3H7.3A4.3 4.3 0 0 0 3 18.3V20"></path><circle cx="9.5" cy="7.5" r="3.5"></circle><path d="M16 4.8a3.5 3.5 0 0 1 0 5.4"></path><path d="M21 19.8v-1.5a4.3 4.3 0 0 0-3.2-4.1"></path></svg></span>
+            <span>User Management</span>
+          </button>
           <button class="admin-nav-item" type="button" data-admin-nav="duration">
             <span class="admin-nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7.5"></circle><path d="M9 3h6"></path><path d="M12 5.5v2"></path><path d="M12 13l3-2"></path></svg></span>
             <span>Activity Limits</span>
@@ -2472,6 +2501,37 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
               <div class="admin-kpi-value" id="admin-reminder-status">—</div>
               <div class="admin-kpi-note" id="admin-reminder-note">Automation status</div>
             </article>
+          </div>
+        </section>
+
+        <section class="admin-section" id="admin-users-management">
+          <div class="admin-panel">
+            <div class="admin-panel-head"><div>
+              <h2 class="admin-panel-title">User Management</h2>
+              <div class="admin-panel-sub">Search private users, inspect activity usage, and monitor current sessions.</div>
+            </div><div class="admin-status-pill">Live data</div></div>
+            <div class="admin-panel-body">
+              <div class="admin-users-toolbar">
+                <input class="admin-users-search" id="admin-users-search" type="search" autocomplete="off" placeholder="Search name, username, or Telegram ID">
+                <select class="admin-users-filter" id="admin-users-filter" aria-label="Filter users">
+                  <option value="all">All users</option><option value="active">Active now</option><option value="inactive">Inactive</option>
+                </select>
+                <span class="admin-users-meta" id="admin-users-meta">Loading users…</span>
+              </div>
+              <div class="admin-users-table-wrap">
+                <table class="admin-users-table">
+                  <thead><tr><th>User</th><th>Telegram ID</th><th>Status</th><th>Current Activity</th><th>Activities</th><th>Warnings</th><th>Last Active</th></tr></thead>
+                  <tbody id="admin-users-table-body"><tr><td colspan="7"><div class="admin-users-empty">Loading users…</div></td></tr></tbody>
+                </table>
+              </div>
+              <div class="admin-users-footer">
+                <span class="admin-users-meta" id="admin-users-page-meta">—</span>
+                <div class="admin-users-pagination">
+                  <button class="admin-users-page" id="admin-users-prev" type="button">Previous</button>
+                  <button class="admin-users-page" id="admin-users-next" type="button">Next</button>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -3245,7 +3305,69 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         document.getElementById("admin-session-role").textContent = role;
         document.getElementById("admin-sidebar-role").textContent = role + " access • Telegram ID " + (user.id || telegramUserId || "—");
         document.getElementById("admin-avatar").textContent = initials;
+        loadAdminUsers(false).catch(function () {
+          // Keep the main dashboard usable if the user list is temporarily unavailable.
+        });
 
+        return data;
+      }
+
+      var adminUsersState = { search:"", status:"all", page:1, pageSize:20, totalPages:1 };
+
+      function formatAdminDate(value) {
+        if (!value) return "—";
+        try { return new Intl.DateTimeFormat("en-GB",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit",hour12:false}).format(new Date(value)); }
+        catch { return "—"; }
+      }
+
+      function adminInitials(name) {
+        return String(name || "User").trim().split(/\s+/).map(function(part){return part.charAt(0);}).join("").slice(0,2).toUpperCase() || "U";
+      }
+
+      function renderAdminUsers(data) {
+        var users = data.users || [];
+        var pagination = data.pagination || {};
+        var body = document.getElementById("admin-users-table-body");
+        var meta = document.getElementById("admin-users-meta");
+        var pageMeta = document.getElementById("admin-users-page-meta");
+        var prev = document.getElementById("admin-users-prev");
+        var next = document.getElementById("admin-users-next");
+        if (!body || !meta || !pageMeta || !prev || !next) return;
+        adminUsersState.page = pagination.page || 1;
+        adminUsersState.totalPages = pagination.totalPages || 1;
+        if (!users.length) {
+          body.innerHTML = '<tr><td colspan="7"><div class="admin-users-empty">No users match the current filter.</div></td></tr>';
+        } else {
+          body.innerHTML = users.map(function(user){
+            var username = user.username ? "@" + user.username : "Telegram user";
+            var activity = user.currentActivity ? String(user.currentActivity.kind || "").toUpperCase() : "—";
+            var status = user.status === "active" ? "active" : "inactive";
+            return '<tr><td><div class="admin-user-primary"><div class="admin-user-avatar">' +
+              escapeHtml(adminInitials(user.displayName)) + '</div><div><div class="admin-user-name">' +
+              escapeHtml(user.displayName || "User") + '</div><div class="admin-user-sub">' + escapeHtml(username) +
+              '</div></div></div></td><td class="admin-user-id">' + escapeHtml(String(user.userId)) +
+              '</td><td><span class="admin-user-status ' + status + '">' + status + '</span></td><td class="admin-user-activity">' +
+              escapeHtml(activity) + '</td><td>' + escapeHtml(String(user.totalActivities || 0)) + '</td><td>' +
+              escapeHtml(String(user.warningCount || 0)) + '</td><td class="admin-user-muted">' +
+              escapeHtml(formatAdminDate(user.lastActive)) + '</td></tr>';
+          }).join("");
+        }
+        var total = Number(pagination.total || 0);
+        meta.textContent = total + (total === 1 ? " user" : " users");
+        pageMeta.textContent = "Page " + String(adminUsersState.page) + " of " + String(adminUsersState.totalPages);
+        prev.disabled = adminUsersState.page <= 1;
+        next.disabled = adminUsersState.page >= adminUsersState.totalPages;
+      }
+
+      async function loadAdminUsers(resetPage) {
+        if (resetPage) adminUsersState.page = 1;
+        var query = new URLSearchParams();
+        query.set("page",String(adminUsersState.page));
+        query.set("pageSize",String(adminUsersState.pageSize));
+        query.set("status",adminUsersState.status);
+        if (adminUsersState.search) query.set("search",adminUsersState.search);
+        var data = await api("/users?" + query.toString());
+        renderAdminUsers(data);
         return data;
       }
 
@@ -3852,8 +3974,34 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           document.querySelectorAll("[data-admin-nav]").forEach(function(item) {
             item.classList.toggle("active", item === button);
           });
+          if (button.getAttribute("data-admin-nav") === "users") {
+            loadAdminUsers(true).catch(function(error){showNotice(error && error.message ? error.message : "Unable to load users.","error");});
+          }
           section.scrollIntoView({ behavior: "smooth", block: "start" });
         });
+      });
+
+      var adminUsersSearchTimer = null;
+      document.getElementById("admin-users-search").addEventListener("input", function(){
+        adminUsersState.search = this.value.trim();
+        window.clearTimeout(adminUsersSearchTimer);
+        adminUsersSearchTimer = window.setTimeout(function(){
+          loadAdminUsers(true).catch(function(error){showNotice(error && error.message ? error.message : "Unable to load users.","error");});
+        },250);
+      });
+      document.getElementById("admin-users-filter").addEventListener("change", function(){
+        adminUsersState.status = this.value;
+        loadAdminUsers(true).catch(function(error){showNotice(error && error.message ? error.message : "Unable to load users.","error");});
+      });
+      document.getElementById("admin-users-prev").addEventListener("click", function(){
+        if (adminUsersState.page <= 1) return;
+        adminUsersState.page -= 1;
+        loadAdminUsers(false).catch(function(error){showNotice(error && error.message ? error.message : "Unable to load users.","error");});
+      });
+      document.getElementById("admin-users-next").addEventListener("click", function(){
+        if (adminUsersState.page >= adminUsersState.totalPages) return;
+        adminUsersState.page += 1;
+        loadAdminUsers(false).catch(function(error){showNotice(error && error.message ? error.message : "Unable to load users.","error");});
       });
 
       document.getElementById("admin-refresh").addEventListener("click", function() {
