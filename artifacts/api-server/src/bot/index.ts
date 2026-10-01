@@ -35,7 +35,7 @@ export const startTelegramBot = async (logger: Logger) => {
         config.token,
         config.telegramRequestTimeoutMs,
       );
-      setAdminApiContext({ attendance, config });
+      setAdminApiContext({ attendance, config, telegram });
       const handler = new CommandHandler(telegram, attendance, config);
       const bot = new TelegramPollingBot(config, logger, handler, telegram);
       await bot.start();
