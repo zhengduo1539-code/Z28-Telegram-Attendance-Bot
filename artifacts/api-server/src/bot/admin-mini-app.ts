@@ -2288,6 +2288,13 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     .admin-users-search:focus{border-color:#7aaaf7;box-shadow:0 0 0 4px rgba(37,99,235,.09)}
     .admin-users-filter{height:42px;padding:0 12px;border:1px solid #dbe3ef;border-radius:12px;background:#fff;color:#334155;font-weight:700;outline:none}
     .admin-users-meta{color:#64748b;font-size:11px;white-space:nowrap}
+    .admin-analytics-grid { display:grid; grid-template-columns:1.35fr 1fr; gap:16px; margin-top:16px; }
+    .admin-analytics-card { border:1px solid var(--admin-line); border-radius:16px; padding:16px; background:var(--admin-surface); }
+    .admin-analytics-card h3 { margin:0 0 12px; font-size:15px; }
+    .admin-analytics-list { display:grid; gap:8px; max-height:430px; overflow:auto; }
+    .admin-analytics-row { display:flex; justify-content:space-between; gap:12px; padding:10px 12px; border:1px solid var(--admin-line); border-radius:11px; font-size:13px; }
+    .admin-analytics-row span { color:var(--admin-muted); }
+    @media (max-width:700px){ .admin-analytics-grid { grid-template-columns:1fr; } }
     .admin-users-table-wrap{overflow:auto;border:1px solid #e2e8f0;border-radius:14px;background:#fff}
     .admin-users-table{width:100%;min-width:760px;border-collapse:collapse}
     .admin-users-table th,.admin-users-table td{padding:12px 14px;border-bottom:1px solid #edf1f6;text-align:left;vertical-align:middle;font-size:12px}
@@ -2426,6 +2433,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             <span class="admin-nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="3" width="7" height="7" rx="2"></rect><rect x="3" y="14" width="7" height="7" rx="2"></rect><rect x="14" y="14" width="7" height="7" rx="2"></rect></svg></span>
             <span>Overview</span>
           </button>
+          <button class="admin-nav-item" type="button" data-admin-nav="analytics"><span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h16"></path><path d="m7 15 4-4 3 2 5-6"></path></svg></span><span>Analytics</span></button>
           <button class="admin-nav-item" type="button" data-admin-nav="audit"><span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5z"></path><path d="M8 8h8M8 12h8M8 16h5"></path></svg></span><span>Audit Log</span></button>
           <button class="admin-nav-item" type="button" data-admin-nav="groups">
             <span class="admin-nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"></rect><path d="M8 9h8M8 13h5"></path></svg></span>
@@ -2506,6 +2514,25 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
               <div class="admin-kpi-value" id="admin-reminder-status">—</div>
               <div class="admin-kpi-note" id="admin-reminder-note">Automation status</div>
             </article>
+          </div>
+        </section>
+
+        <section class="admin-section" id="admin-analytics">
+          <div class="admin-panel">
+            <div class="admin-panel-head"><div>
+              <h2 class="admin-panel-title">Analytics & Reports</h2>
+              <div class="admin-panel-sub">Attendance activity trends and usage summaries for the selected period.</div>
+            </div>
+            <select class="admin-users-filter" id="admin-analytics-period" aria-label="Analytics period">
+              <option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option>
+            </select></div>
+            <div class="admin-panel-body">
+              <div class="admin-kpi-grid" id="admin-analytics-kpis"></div>
+              <div class="admin-analytics-grid">
+                <div class="admin-analytics-card"><h3>Daily activity</h3><div id="admin-analytics-daily" class="admin-analytics-list"></div></div>
+                <div class="admin-analytics-card"><h3>Activity types</h3><div id="admin-analytics-kinds" class="admin-analytics-list"></div></div>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -3373,6 +3400,28 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         return data;
       }
 
+      var adminAnalyticsDays = 30;
+
+      function renderAdminAnalytics(data) {
+        var s=data.summary||{}, kpis=document.getElementById("admin-analytics-kpis"), daily=document.getElementById("admin-analytics-daily"), kinds=document.getElementById("admin-analytics-kinds");
+        if(!kpis||!daily||!kinds)return;
+        kpis.innerHTML=[
+          ["Activities",String(s.totalActivities||0)],
+          ["Minutes",String(s.totalMinutes||0)],
+          ["Active Users",String(s.uniqueUsers||0)],
+          ["Groups",String(s.uniqueGroups||0)],
+          ["Active Now",String(s.activeNow||0)]
+        ].map(function(item){return '<div class="admin-kpi"><div class="admin-kpi-label">'+escapeHtml(item[0])+'</div><div class="admin-kpi-value">'+escapeHtml(item[1])+'</div></div>';}).join("");
+        var rows=data.daily||[];
+        daily.innerHTML=rows.length?rows.map(function(x){return '<div class="admin-analytics-row"><span>'+escapeHtml(x.date)+'</span><strong>'+String(x.activities)+' · '+String(x.minutes)+' min</strong></div>';}).join(""):'<div class="admin-users-empty">No activity in this period.</div>';
+        var labels={eat:"Eat",wc:"WC",smoke:"Smoke",wcd:"WCD"};
+        kinds.innerHTML=Object.keys(labels).map(function(key){var x=(data.kinds||{})[key]||{};return '<div class="admin-analytics-row"><span>'+labels[key]+'</span><strong>'+String(x.count||0)+' · '+String(Math.round((x.seconds||0)/60))+' min</strong></div>';}).join("");
+      }
+
+      async function loadAdminAnalytics() {
+        var data=await api("/analytics?days="+String(adminAnalyticsDays)); renderAdminAnalytics(data); return data;
+      }
+
       var adminAuditState = { search:"", action:"", page:1, pageSize:20, totalPages:1 };
 
       function renderAdminAudit(data) {
@@ -4108,6 +4157,10 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       document.getElementById("admin-groups-next").addEventListener("click", function(){
         if(adminGroupsState.page>=adminGroupsState.totalPages)return; adminGroupsState.page+=1;
         loadAdminGroups(false).catch(function(error){showNotice(error&&error.message?error.message:"Unable to load groups.","error");});
+      });
+
+      document.getElementById("admin-analytics-period").addEventListener("change", function(){
+        adminAnalyticsDays=Number(this.value)||30; loadAdminAnalytics().catch(function(error){showNotice(error&&error.message?error.message:"Unable to load analytics.","error");});
       });
 
       var adminAuditSearchTimer = null;
