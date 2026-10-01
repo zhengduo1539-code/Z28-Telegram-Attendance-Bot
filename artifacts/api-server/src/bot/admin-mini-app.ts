@@ -264,7 +264,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       function escapeHtml(value) {
         var text = String(value);
         return text.replace(/[&<>"']/g, function (char) {
-          return { "&": "&amp;", "<": "&lt;", ">": "&gt;", """: "&quot;", "'": "&#39;" }[char];
+          return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[char];
         });
       }
 
