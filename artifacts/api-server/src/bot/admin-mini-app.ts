@@ -1179,6 +1179,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
     .user-loading.visible { display:flex; }
 
+    @keyframes userSpin { to { transform:rotate(360deg); } }
+
     .user-loader {
       width:48px;
       height:48px;
@@ -1473,7 +1475,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         if (userDashboardRefreshTimer) return;
         userDashboardRefreshTimer = window.setInterval(function () {
           if (!userMode || !getVerifiedUserId()) return;
-          loadUserDashboard().catch(function () {
+          loadUserDashboard(false).catch(function () {
             // Keep the current dashboard visible if a background refresh temporarily fails.
           });
         }, 10000);
@@ -1716,11 +1718,12 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         return data;
       }
 
-      async function loadUserDashboard() {
+      async function loadUserDashboard(withLoading) {
         if (!telegramUserId) {
           throw new Error("Unable to identify your Telegram account.");
         }
-        showUserLoading(true);
+        var showLoader = withLoading !== false;
+        if (showLoader) showUserLoading(true);
         try {
           var data = await apiUserDashboard(telegramUserId);
           if (!data.hasGroups) {
@@ -1750,7 +1753,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           renderUserDashboard(data);
           return true;
         } finally {
-          showUserLoading(false);
+          if (showLoader) showUserLoading(false);
         }
       }
 
