@@ -743,9 +743,12 @@ export class AttendanceService {
       if (profile.chatId < 0) groupIds.add(profile.chatId);
     }
 
+    const activeActivities = (await this.store.listActiveActivities()).length;
+
     return {
       privateUsers: privateUserIds.size,
       groups: groupIds.size,
+      activeActivities,
     };
   }
 
