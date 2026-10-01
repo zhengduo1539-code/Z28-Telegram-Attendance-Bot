@@ -669,114 +669,41 @@ export class AttendanceService {
 
   async dueActivityReminders(now = new Date()): Promise<ActiveActivity[]> {
     if (!(await this.isActivityReminderEnabled())) return [];
-
-    const state = await this.store.load();
-    const nowMs = now.getTime();
-    return Object.values(state.activeActivities)
-      .filter((activity) => {
-        const dueAt =
-          new Date(activity.startedAt).getTime() +
-          activity.limitMinutes * 60_000 +
-          REMINDER_GRACE_MS;
-        if (
-          !Number.isFinite(dueAt) ||
-          dueAt > nowMs ||
-          activity.reminderSentAt
-        ) {
-          return false;
-        }
-
-        const claimedAt = activity.reminderClaimedAt
-          ? new Date(activity.reminderClaimedAt).getTime()
-          : Number.NaN;
-        return (
-          !Number.isFinite(claimedAt) ||
-          nowMs - claimedAt >= REMINDER_CLAIM_LEASE_MS
-        );
-      })
-      .map((activity) => ({ ...activity }));
+    return this.store.listDueActiveActivities(now, REMINDER_GRACE_MS);
   }
 
   async claimActivityReminder(
     candidate: Pick<ActiveActivity, "chatId" | "userId" | "startedAt">,
     now = new Date(),
   ): Promise<ActivityReminderClaim | undefined> {
+    const claim = await this.store.claimActiveActivityReminder(
+      candidate,
+      now,
+      REMINDER_GRACE_MS,
+      REMINDER_CLAIM_LEASE_MS,
+    );
+    if (!claim) return undefined;
+
+    const state = await this.store.load();
     const key = userKey(candidate.chatId, candidate.userId);
-    const claimedAt = now.toISOString();
-    let claim: ActivityReminderClaim | undefined;
-
-    await this.store.update((state) => {
-      if (state.reminderEnabled === false) return;
-
-      const activity = state.activeActivities[key];
-      if (
-        !activity ||
-        activity.startedAt !== candidate.startedAt ||
-        activity.reminderSentAt
-      ) {
-        return;
-      }
-
-      const dueAt =
-        new Date(activity.startedAt).getTime() +
-        activity.limitMinutes * 60_000 +
-        REMINDER_GRACE_MS;
-      if (!Number.isFinite(dueAt) || dueAt > now.getTime()) return;
-
-      const existingClaim = activity.reminderClaimedAt
-        ? new Date(activity.reminderClaimedAt).getTime()
-        : Number.NaN;
-      if (
-        Number.isFinite(existingClaim) &&
-        now.getTime() - existingClaim < REMINDER_CLAIM_LEASE_MS
-      ) {
-        return;
-      }
-
-      activity.reminderClaimedAt = claimedAt;
-      claim = {
-        activity: { ...activity },
-        locale: state.users[key]?.locale || "zh",
-        claimedAt,
-      };
-    });
-
-    return claim;
+    return {
+      activity: claim.activity,
+      locale: state.users[key]?.locale || "zh",
+      claimedAt: claim.claimedAt,
+    };
   }
 
   async markActivityReminderSent(
     claim: ActivityReminderClaim,
     sentAt = new Date(),
   ): Promise<void> {
-    const key = userKey(claim.activity.chatId, claim.activity.userId);
-    await this.store.update((state) => {
-      const activity = state.activeActivities[key];
-      if (
-        !activity ||
-        activity.startedAt !== claim.activity.startedAt ||
-        activity.reminderClaimedAt !== claim.claimedAt
-      ) {
-        return;
-      }
-
-      activity.reminderSentAt = sentAt.toISOString();
-      delete activity.reminderClaimedAt;
-    });
+    await this.store.markActiveActivityReminderSent(claim, sentAt);
   }
 
   async releaseActivityReminderClaim(
     claim: ActivityReminderClaim,
   ): Promise<void> {
-    const key = userKey(claim.activity.chatId, claim.activity.userId);
-    await this.store.update((state) => {
-      const activity = state.activeActivities[key];
-      if (
-        activity?.startedAt === claim.activity.startedAt &&
-        activity.reminderClaimedAt === claim.claimedAt
-      ) {
-        delete activity.reminderClaimedAt;
-      }
-    });
+    await this.store.releaseActiveActivityReminderClaim(claim);
   }
 
   async getBotStats() {
@@ -799,12 +726,19 @@ export class AttendanceService {
     chatId: number,
     userId: number,
   ): Promise<ActiveActivity | undefined> {
-    const state = await this.store.load();
-    return state.activeActivities[userKey(chatId, userId)];
+    return this.store.getActiveActivity(chatId, userId);
   }
 
   async snapshot(): Promise<BotState> {
-    return this.store.load();
+    const state = structuredClone(await this.store.load());
+    const activities = await this.store.listActiveActivities();
+    state.activeActivities = Object.fromEntries(
+      activities.map((activity) => [
+        userKey(activity.chatId, activity.userId),
+        activity,
+      ]),
+    );
+    return state;
   }
 }
 
