@@ -1648,6 +1648,42 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     }
 
 
+    .admin-notification-button {
+      position: relative; width: 46px; height: 46px; display: inline-flex;
+      align-items: center; justify-content: center; border: 1px solid rgba(34,211,238,.24);
+      border-radius: 14px; color: #9feeff; background: rgba(5,18,34,.72); cursor: pointer;
+      box-shadow: 0 8px 24px rgba(0,0,0,.22); transition: transform .18s ease, border-color .18s ease;
+    }
+    .admin-notification-button:hover { transform: translateY(-1px); border-color: rgba(34,211,238,.46); }
+    .admin-notification-button svg { width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+    .admin-notification-button.has-unread { animation: adminBellPulse 1.8s ease-in-out infinite; }
+    .admin-notification-button.has-unread svg { animation: adminBellShake 1.9s ease-in-out infinite; transform-origin:50% 22%; }
+    @keyframes adminBellPulse { 0%,100%{box-shadow:0 8px 24px rgba(0,0,0,.22),0 0 0 0 rgba(255,70,85,0)} 50%{box-shadow:0 10px 30px rgba(255,70,85,.14),0 0 0 6px rgba(255,70,85,.045)} }
+    @keyframes adminBellShake { 0%,72%,100%{transform:rotate(0)} 76%{transform:rotate(-10deg)} 80%{transform:rotate(9deg)} 84%{transform:rotate(-6deg)} 88%{transform:rotate(3deg)} }
+    .admin-notification-badge { position:absolute; top:-5px; right:-5px; min-width:18px; height:18px; padding:0 5px; display:none; align-items:center; justify-content:center; border-radius:999px; background:#ff3b4f; color:#fff; border:2px solid #030712; font-size:10px; line-height:1; font-weight:850; box-shadow:0 0 14px rgba(255,59,79,.52); }
+    .admin-notification-badge.visible { display:inline-flex; animation:notificationBadgeIn .28s ease-out; }
+    @keyframes notificationBadgeIn { from{opacity:0;transform:scale(.65)} to{opacity:1;transform:scale(1)} }
+    .admin-notification-panel { position:fixed; z-index:1200; top:78px; right:24px; width:min(430px,calc(100vw - 28px)); max-height:min(650px,calc(100vh - 100px)); display:none; flex-direction:column; overflow:hidden; border:1px solid rgba(34,211,238,.25); border-radius:20px; background:rgba(3,10,23,.96); box-shadow:0 24px 70px rgba(0,0,0,.52),0 0 36px rgba(34,211,238,.08); backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px); }
+    .admin-notification-panel.open { display:flex; animation:notificationPanelIn .18s ease-out; }
+    @keyframes notificationPanelIn { from{opacity:0;transform:translateY(-7px) scale(.985)} to{opacity:1;transform:translateY(0) scale(1)} }
+    .admin-notification-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px 17px; border-bottom:1px solid rgba(34,211,238,.13); }
+    .admin-notification-title { font-size:17px; font-weight:850; color:#effcff; }
+    .admin-notification-sub { margin-top:2px; color:#6f8ba0; font-size:11px; }
+    .admin-notification-close { width:34px; height:34px; border:1px solid rgba(120,160,190,.20); border-radius:10px; background:rgba(255,255,255,.035); color:#8ca9bb; cursor:pointer; font-size:18px; }
+    .admin-notification-list { overflow:auto; padding:8px; }
+    .admin-notification-empty { padding:34px 18px; text-align:center; color:#71889a; font-size:13px; }
+    .admin-notification-item { position:relative; padding:13px; margin-bottom:7px; border-radius:15px; border:1px solid rgba(255,75,91,.13); background:rgba(38,10,18,.34); }
+    .admin-notification-item:last-child { margin-bottom:0; }
+    .admin-notification-item-head { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .admin-notification-item-title { color:#ff9aa6; font-size:12px; font-weight:850; }
+    .admin-notification-time { color:#667f91; font-size:10px; white-space:nowrap; }
+    .admin-notification-message { margin-top:7px; color:#dcebf2; font-size:12px; line-height:1.6; white-space:pre-wrap; overflow-wrap:anywhere; user-select:text; -webkit-user-select:text; }
+    .admin-notification-actions { display:flex; justify-content:flex-end; margin-top:9px; }
+    .admin-notification-copy { min-height:32px; padding:0 10px; border-radius:9px; border:1px solid rgba(91,155,255,.20); background:rgba(13,39,67,.62); color:#8edcff; font-size:11px; font-weight:750; cursor:pointer; }
+    .admin-notification-copy:hover { border-color:rgba(91,155,255,.45); background:rgba(13,55,90,.72); }
+    @media (max-width:620px) { .admin-notification-panel { top:72px; right:14px; width:calc(100vw - 28px); max-height:calc(100vh - 90px); } }
+    @media (prefers-reduced-motion:reduce) { .admin-notification-button.has-unread,.admin-notification-button.has-unread svg,.admin-notification-badge.visible,.admin-notification-panel.open { animation:none !important; } }
+
     /* Neon admin dashboard theme. Scoped to admin mode only. */
     body.admin-mode {
       color-scheme: dark;
@@ -2651,6 +2687,10 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           </div>
 
           <div class="admin-header-actions">
+            <button class="admin-notification-button" id="admin-notifications-button" type="button" aria-label="Notifications" aria-expanded="false">
+              <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg>
+              <span class="admin-notification-badge" id="admin-notification-badge">0</span>
+            </button>
             <div class="admin-session">
               <div class="admin-avatar" id="admin-avatar">A</div>
               <div>
@@ -2663,6 +2703,14 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             </button>
           </div>
         </header>
+
+        <div class="admin-notification-panel" id="admin-notification-panel" aria-label="Notifications" aria-hidden="true">
+          <div class="admin-notification-head">
+            <div><div class="admin-notification-title">Notifications</div><div class="admin-notification-sub" id="admin-notification-sub">System and dashboard errors</div></div>
+            <button class="admin-notification-close" id="admin-notification-close" type="button" aria-label="Close notifications">×</button>
+          </div>
+          <div class="admin-notification-list" id="admin-notification-list"><div class="admin-notification-empty">No notifications yet.</div></div>
+        </div>
 
         <section class="admin-section" id="admin-overview">
           <div class="admin-kpis">
@@ -3580,6 +3628,81 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         }
       }
 
+      var adminNotificationLastSeenKey = "z28_admin_notifications_last_seen";
+      var adminNotificationOpen = false;
+
+      function getAdminNotificationLastSeen() {
+        try { return localStorage.getItem(adminNotificationLastSeenKey) || ""; } catch { return ""; }
+      }
+      function setAdminNotificationLastSeen(value) {
+        if (!value) return;
+        try { localStorage.setItem(adminNotificationLastSeenKey, value); } catch {}
+      }
+      function formatNotificationDate(value) {
+        try { return new Date(value).toLocaleString(); } catch { return value || "—"; }
+      }
+      async function reportClientNotification(title, message, status, source) {
+        try {
+          var headers = new Headers();
+          if (adminSessionToken) headers.set("X-Admin-Session", adminSessionToken);
+          else headers.set("X-Telegram-Init-Data", initData);
+          headers.set("Accept", "application/json");
+          headers.set("Content-Type", "application/json");
+          await fetch("/api/admin/notifications", { method:"POST", headers:headers, body:JSON.stringify({
+            title:title || "Dashboard Error", message:String(message || "Request failed.").slice(0,2000),
+            status:Number(status) || 0, source:source || "Admin Dashboard"
+          }) });
+        } catch {}
+      }
+      function renderAdminNotifications(data) {
+        var list=document.getElementById("admin-notification-list"), badge=document.getElementById("admin-notification-badge"), button=document.getElementById("admin-notifications-button"), sub=document.getElementById("admin-notification-sub");
+        if(!list||!badge||!button)return;
+        var notifications=Array.isArray(data.notifications)?data.notifications:[], lastSeen=getAdminNotificationLastSeen(), latest=data.latestCreatedAt||"";
+        if (!lastSeen && latest) { setAdminNotificationLastSeen(latest); lastSeen=latest; }
+        var unread=lastSeen ? notifications.filter(function(item){ return String(item.createdAt||"")>lastSeen; }).length : 0;
+        list.innerHTML=notifications.length ? notifications.map(function(item){
+          var message=String(item.message||"");
+          return '<article class="admin-notification-item"><div class="admin-notification-item-head"><div class="admin-notification-item-title">'+escapeHtml(String(item.title||"System Error"))+'</div><div class="admin-notification-time">'+escapeHtml(formatNotificationDate(item.createdAt))+'</div></div><div class="admin-notification-message">'+escapeHtml(message)+'</div><div class="admin-notification-actions"><button class="admin-notification-copy" type="button">Copy message</button></div></article>';
+        }).join("") : '<div class="admin-notification-empty">No notifications yet.</div>';
+        if(unread>0){ badge.textContent=unread>99?"99+":String(unread); badge.classList.add("visible"); button.classList.add("has-unread"); sub.textContent=String(unread)+(unread===1?" unread notification":" unread notifications"); }
+        else { badge.classList.remove("visible"); button.classList.remove("has-unread"); sub.textContent="System and dashboard errors"; }
+      }
+      async function loadAdminNotifications() {
+        try { var data=await api("/notifications?pageSize=30"); renderAdminNotifications(data); return data; } catch { return null; }
+      }
+      async function copyAdminNotification(message, button) {
+        try {
+          if(navigator.clipboard&&navigator.clipboard.writeText) await navigator.clipboard.writeText(message);
+          else { var textarea=document.createElement("textarea"); textarea.value=message; textarea.style.position="fixed"; textarea.style.opacity="0"; document.body.appendChild(textarea); textarea.select(); document.execCommand("copy"); textarea.remove(); }
+          var original=button.textContent; button.textContent="Copied ✓"; window.setTimeout(function(){button.textContent=original;},1300);
+        } catch { button.textContent="Copy failed"; window.setTimeout(function(){button.textContent="Copy message";},1300); }
+      }
+      function openAdminNotifications() {
+        var panel=document.getElementById("admin-notification-panel"), button=document.getElementById("admin-notifications-button");
+        if(!panel||!button)return;
+        adminNotificationOpen=true; panel.classList.add("open"); panel.setAttribute("aria-hidden","false"); button.setAttribute("aria-expanded","true");
+        loadAdminNotifications().then(function(data){ if(data&&data.latestCreatedAt){setAdminNotificationLastSeen(data.latestCreatedAt);} document.getElementById("admin-notification-badge").classList.remove("visible"); button.classList.remove("has-unread"); document.getElementById("admin-notification-sub").textContent="System and dashboard errors"; });
+      }
+      function closeAdminNotifications() {
+        var panel=document.getElementById("admin-notification-panel"), button=document.getElementById("admin-notifications-button");
+        if(!panel||!button)return;
+        adminNotificationOpen=false; panel.classList.remove("open"); panel.setAttribute("aria-hidden","true"); button.setAttribute("aria-expanded","false");
+      }
+      document.getElementById("admin-notifications-button").addEventListener("click",function(){ if(adminNotificationOpen)closeAdminNotifications(); else openAdminNotifications(); });
+      document.getElementById("admin-notification-close").addEventListener("click",closeAdminNotifications);
+      document.getElementById("admin-notification-list").addEventListener("click",function(event){
+        var target=event.target;
+        if(target&&target.classList.contains("admin-notification-copy")){
+          var item=target.closest(".admin-notification-item"), message=item?item.querySelector(".admin-notification-message"):"";
+          copyAdminNotification(message?message.textContent:"",target);
+        }
+      });
+      document.addEventListener("click",function(event){
+        var panel=document.getElementById("admin-notification-panel"), button=document.getElementById("admin-notifications-button");
+        if(!panel||!button||!adminNotificationOpen)return;
+        if(!panel.contains(event.target)&&!button.contains(event.target))closeAdminNotifications();
+      });
+
       async function api(path, options) {
         var requestOptions = options || {};
         var headers = new Headers(requestOptions.headers || {});
@@ -3595,6 +3718,14 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         var data = await response.json().catch(function () { return {}; });
         if (!response.ok) {
           var message = typeof data.error === "string" ? data.error : "Request failed.";
+          if (path.indexOf("/notifications") !== 0) {
+            void reportClientNotification(
+              "Dashboard Request Failed",
+              message,
+              response.status,
+              (requestOptions.method ? String(requestOptions.method).toUpperCase() : "GET") + " " + path
+            );
+          }
           throw new Error(message);
         }
         return data;
@@ -4033,8 +4164,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         if (adminRefreshTimer) return;
         adminRefreshTimer = window.setInterval(function () {
           if (!adminMode) return;
-          load().catch(function () {
-            // Keep the dashboard visible if a background refresh is temporarily unavailable.
+          load().catch(function (error) {
+            void reportClientNotification("Background Refresh Failed", error && error.message ? error.message : "Dashboard refresh failed.", 0, "Background refresh");
           });
         }, 15000);
       }
@@ -4327,6 +4458,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         }
         if (!data.session) throw new Error("Unable to create admin session.");
         adminSessionToken = String(data.session);
+        void loadAdminNotifications();
         return data;
       }
 

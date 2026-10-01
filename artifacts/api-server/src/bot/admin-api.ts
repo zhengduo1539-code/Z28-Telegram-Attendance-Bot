@@ -81,6 +81,61 @@ const serializeCountLimits = (
 
 export const adminApiRouter: IRouter = Router();
 
+adminApiRouter.get("/notifications", async (req, res) => {
+  const auth = requireAdmin(req, res);
+  if (!auth) return;
+
+  const requestedPageSize = Number(req.query.pageSize);
+  const pageSize =
+    Number.isSafeInteger(requestedPageSize) && requestedPageSize > 0
+      ? Math.min(requestedPageSize, 50)
+      : 30;
+  const result = await auth.context.attendance.listAuditLogs({
+    action: "notification.error",
+    page: 1,
+    pageSize,
+  });
+
+  res.setHeader("Cache-Control", "no-store");
+  res.json({
+    notifications: result.logs.map((log) => ({
+      id: log.id,
+      title: log.target || "System Error",
+      message: log.details,
+      createdAt: log.createdAt,
+      severity: "error",
+    })),
+    total: result.total,
+    latestCreatedAt: result.logs[0]?.createdAt || null,
+  });
+});
+
+adminApiRouter.post("/notifications", async (req, res) => {
+  const auth = requireAdmin(req, res);
+  if (!auth) return;
+
+  const message = typeof req.body?.message === "string" ? req.body.message.trim() : "";
+  const title = typeof req.body?.title === "string" ? req.body.title.trim() : "System Error";
+  const source = typeof req.body?.source === "string" ? req.body.source.trim().slice(0, 120) : "Admin Dashboard";
+  const status = Number(req.body?.status);
+
+  if (!message || message.length > 2000) {
+    res.status(400).json({ error: "Notification message must be between 1 and 2000 characters." });
+    return;
+  }
+
+  const statusText = Number.isInteger(status) && status > 0 ? "HTTP " + String(status) : "Client error";
+  await recordAdminAudit(
+    auth,
+    "notification.error",
+    title.slice(0, 120) || "System Error",
+    "[" + source + "] " + statusText + ": " + message,
+  );
+
+  res.setHeader("Cache-Control", "no-store");
+  res.status(201).json({ ok: true });
+});
+
 adminApiRouter.post("/session", async (req, res) => {
   const context = getAdminApiContext();
   if (!context?.config.token) {
