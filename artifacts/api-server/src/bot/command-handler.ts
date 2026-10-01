@@ -83,6 +83,7 @@ export const ADMIN_MENU_COMMANDS = [
   { command: "countlimits", description: "View daily activity count limits" },
   { command: "reminder", description: "Turn overdue reminders on/off" },
   { command: "reminders", description: "View overdue reminder status" },
+  { command: "stats", description: "View bot statistics" },
 ];
 
 export class CommandHandler {
