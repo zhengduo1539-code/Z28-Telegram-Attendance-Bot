@@ -138,6 +138,10 @@ const getTimeoutSeconds = (durationSeconds: number, limitMinutes: number) =>
 
 const zh: LocaleText = {
   title: "打卡机器人 M58",
+  startWelcome: [
+    "欢迎使用打卡机器人！",
+    `请使用 ${inlineCode("/help")} 查看所有可用命令及使用说明。`,
+  ].join("\n"),
   help: [
     "可用命令：",
     `${inlineCode("/work")} — 上班`,
@@ -150,7 +154,6 @@ const zh: LocaleText = {
     `${inlineCode("/lang en")} — 切换英文`,
     `${inlineCode("/lang zh")} — 切换中文`,
     `${inlineCode("/id")} — 查看当前群组 ID 或用户 ID（私聊中显示用户 ID）`,
-    `${inlineCode("/stats")} — 查看 Bot Statistics`,
     "",
     "群组连接：",
     `${inlineCode("/connect")} — 在当前群组设置超时通知目标群组`,
@@ -353,6 +356,10 @@ const zh: LocaleText = {
 
 const en: LocaleText = {
   title: "Attendance Bot M58",
+  startWelcome: [
+    "Welcome to the Attendance Bot!",
+    `Use ${inlineCode("/help")} to view all available commands and usage instructions.`,
+  ].join("\n"),
   help: [
     "Available commands:",
     `${inlineCode("/work")} — Start work`,
@@ -365,7 +372,6 @@ const en: LocaleText = {
     `${inlineCode("/lang en")} — Switch to English`,
     `${inlineCode("/lang zh")} — Switch to Chinese`,
     `${inlineCode("/id")} — View the current group ID or user ID (in private chat, shows your user ID)`,
-    `${inlineCode("/stats")} — View Bot Statistics`,
     "",
     "Group Connection:",
     `${inlineCode("/connect")} — Set the target group for activity timeout notifications`,
