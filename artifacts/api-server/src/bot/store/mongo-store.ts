@@ -410,7 +410,7 @@ export class MongoBotStore implements BotStore {
     const filter: Record<string, unknown> = {};
     if (options.action) filter.action = options.action;
     if (options.search) {
-      const expression = new RegExp(options.search.replace(/[.*+?^\${}()|[\]\\]/g, "\\  async getMiniAppGroupAccess("), "i");
+      const expression = new RegExp(options.search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
       filter.$or = [{ actorName: expression }, { action: expression }, { target: expression }, { details: expression }];
       const numericSearch = Number(options.search);
       if (Number.isSafeInteger(numericSearch)) (filter.$or as unknown[]).push({ actorUserId: numericSearch });
