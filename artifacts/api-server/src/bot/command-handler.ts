@@ -84,11 +84,11 @@ export const ADMIN_MENU_COMMANDS = [
   { command: "reminder", description: "Turn overdue reminders on/off" },
   { command: "reminders", description: "View overdue reminder status" },
   { command: "stats", description: "View bot statistics" },
-  { command: "admin", description: "Open Admin Panel" },
 ];
 
 export class CommandHandler {
   private readonly adminMenuScopes = new Set<string>();
+  private readonly privateMenuButtonScopes = new Set<string>();
 
   constructor(
     private readonly telegram: TelegramClient,
@@ -116,7 +116,7 @@ export class CommandHandler {
 
     // Do not block normal update handling on Telegram's command-menu API.
     // A slow/failing setMyCommands call must never make the bot appear frozen.
-    void this.ensureAdminCommandMenu(message, profile.userId);
+    void this.ensureAdminCommandMenu(message, profile.userId, profile.locale);
 
     const pendingConnect = await this.attendance.getPendingConnect(
       message.chat.id,
@@ -224,65 +224,23 @@ export class CommandHandler {
         markup = keyboard(locale);
         if (message.chat.type === "private") {
           const botUsername = await this.telegram.getBotUsername();
-          const isAdmin =
-            this.config.botOwnerId === profile.userId ||
-            this.config.adminIds.includes(profile.userId);
-          const rows: import("./types").InlineKeyboardButton[][] = [];
-          if (isAdmin && this.config.adminMiniAppUrl) {
-            rows.push([
-              {
-                text: locale === "en" ? "⚙️ Open Admin Panel" : "⚙️ 打开管理面板",
-                style: "primary",
-                web_app: { url: this.config.adminMiniAppUrl },
-              },
-            ]);
-          }
           if (botUsername) {
-            rows.push([
-              {
-                text:
-                  locale === "en"
-                    ? "➕ Add Bot to Your Group"
-                    : "➕ 将 Bot 添加到群组",
-                style: "primary",
-                url: `https://t.me/${botUsername}?startgroup=attendance`,
-              },
-            ]);
+            addGroupMarkup = {
+              inline_keyboard: [
+                [
+                  {
+                    text:
+                      locale === "en"
+                        ? "➕ Add Bot to Your Group"
+                        : "➕ 将 Bot 添加到群组",
+                    style: "primary",
+                    url: `https://t.me/${botUsername}?startgroup=attendance`,
+                  },
+                ],
+              ],
+            };
           }
-          if (rows.length > 0) {
-            addGroupMarkup = { inline_keyboard: rows };
-          }
         }
-        break;
-      }
-      case "admin": {
-        const isAdmin =
-          this.config.botOwnerId === profile.userId ||
-          this.config.adminIds.includes(profile.userId);
-        if (!isAdmin) {
-          response = text.adminOnly;
-          break;
-        }
-        if (message.chat.type !== "private") {
-          response = text.adminPrivate;
-          break;
-        }
-        if (!this.config.adminMiniAppUrl) {
-          response = text.adminMiniAppUnavailable;
-          break;
-        }
-        response = text.adminPanelPrompt;
-        markup = {
-          inline_keyboard: [
-            [
-              {
-                text: locale === "en" ? "⚙️ Open Admin Panel" : "⚙️ 打开管理面板",
-                style: "primary",
-                web_app: { url: this.config.adminMiniAppUrl },
-              },
-            ],
-          ],
-        };
         break;
       }
       case "help":
@@ -415,7 +373,17 @@ export class CommandHandler {
   private async ensureAdminCommandMenu(
     message: TelegramMessage,
     userId: number,
+    locale: Locale,
   ): Promise<void> {
+    if (message.chat.type === "private") {
+      await this.ensurePrivateMenuButton(
+        message.chat.id,
+        userId,
+        locale,
+        this.config.adminMiniAppUrl,
+      );
+    }
+
     const isConfiguredAdmin =
       this.config.botOwnerId === userId || this.config.adminIds.includes(userId);
     if (!isConfiguredAdmin) return;
@@ -445,6 +413,33 @@ export class CommandHandler {
       this.adminMenuScopes.add(scopeKey);
     } catch {
       // Command-menu configuration must not interrupt normal bot handling.
+    }
+  }
+
+  private async ensurePrivateMenuButton(
+    chatId: number,
+    userId: number,
+    locale: Locale,
+    miniAppUrl: string | undefined,
+  ): Promise<void> {
+    const isConfiguredAdmin =
+      this.config.botOwnerId === userId || this.config.adminIds.includes(userId);
+    const scopeKey = `private:${chatId}:${isConfiguredAdmin && miniAppUrl ? "admin" : "default"}`;
+    if (this.privateMenuButtonScopes.has(scopeKey)) return;
+
+    try {
+      if (isConfiguredAdmin && miniAppUrl) {
+        await this.telegram.setChatMenuButton(chatId, {
+          type: "web_app",
+          text: locale === "en" ? "⚙️ Admin Panel" : "⚙️ 打开管理面板",
+          web_app: { url: miniAppUrl },
+        });
+      } else {
+        await this.telegram.setChatMenuButton(chatId);
+      }
+      this.privateMenuButtonScopes.add(scopeKey);
+    } catch {
+      // Menu-button configuration must not interrupt normal bot handling.
     }
   }
 
