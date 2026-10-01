@@ -778,7 +778,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     /* Regular users have two distinct screens: verification first, dashboard after verification. */
     .user-mode .panel-only-private,
     .user-mode .panel-only-group,
-    .user-mode .user-dashboard {
+    .user-mode .user-dashboard,
+    .user-mode .user-no-group-screen {
       display: none !important;
     }
 
@@ -1127,6 +1128,24 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       padding-bottom:82px;
     }
 
+    .user-selected-dashboard .user-page-head {
+      position: relative;
+      padding-right: 54px;
+    }
+
+    .user-selected-dashboard .user-page-head > div:first-child {
+      min-width: 0;
+    }
+
+    .user-selected-dashboard .user-page-title {
+      overflow-wrap: anywhere;
+    }
+
+    .dashboard-language-switcher {
+      top: 0;
+      right: 0;
+    }
+
     .user-tab-panel { display:none; }
     .user-tab-panel.active { display:block; }
 
@@ -1349,6 +1368,103 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     .user-warning-tab-panel .user-warning-feed {
       min-height: calc(100vh - 190px);
     }
+
+    .user-no-group-screen {
+      display: none;
+    }
+
+    .user-no-group-card {
+      width: min(650px, 100%);
+      padding: 28px 22px;
+      text-align: center;
+      border: 1px solid rgba(255,180,45,.28);
+      border-radius: 24px;
+      background: linear-gradient(145deg, rgba(37,24,5,.92), rgba(52,33,8,.74));
+      box-shadow: 0 20px 44px rgba(0,0,0,.36), inset 0 1px 0 rgba(255,255,255,.05);
+    }
+
+    .user-no-group-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 20px;
+      color: #ffd166;
+      background: linear-gradient(145deg, rgba(255,180,45,.18), rgba(77,46,8,.88));
+      border: 1px solid rgba(255,209,102,.28);
+      box-shadow: 0 0 28px rgba(255,171,44,.16);
+      animation: noGroupPulse 1.8s ease-in-out infinite;
+    }
+
+    .user-no-group-icon svg {
+      width: 31px;
+      height: 31px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    @keyframes noGroupPulse {
+      0%,100% { transform: scale(.96); box-shadow: 0 0 20px rgba(255,171,44,.10); }
+      50% { transform: scale(1); box-shadow: 0 0 34px rgba(255,171,44,.22); }
+    }
+
+    .user-no-group-title {
+      margin: 0;
+      color: #fff3cf;
+      font-size: clamp(21px, 5vw, 28px);
+      font-weight: 850;
+    }
+
+    .user-no-group-message {
+      margin: 10px auto 0;
+      max-width: 560px;
+      color: #dfc58e;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .user-no-group-message strong {
+      color: #ffffff;
+      font-weight: 850;
+    }
+
+    .user-no-group-message span {
+      display: block;
+      margin-top: 6px;
+    }
+
+    .user-mode.user-no-group-page .top,
+    .user-mode.user-no-group-page #notice,
+    .user-mode.user-no-group-page .user-card#user-verify-card,
+    .user-mode.user-no-group-page .user-dashboard {
+      display: none !important;
+    }
+
+    .user-mode.user-no-group-page .wrap {
+      min-height: calc(100vh - max(36px, env(safe-area-inset-top) + env(safe-area-inset-bottom)));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px 0;
+    }
+
+    .user-mode.user-no-group-page .user-no-group-screen {
+      display: flex !important;
+      min-height: calc(100vh - max(36px, env(safe-area-inset-top) + env(safe-area-inset-bottom)));
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 18px 0;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .user-no-group-icon { animation: none !important; }
+    }
     .user-warning-item { padding:12px; margin-bottom:9px; border-radius:14px; border:1px solid rgba(255,180,45,.17); background:rgba(77,46,8,.22); }
     .user-warning-item:last-child { margin-bottom:0; }
     .user-warning-item-head { display:flex; justify-content:space-between; gap:8px; color:#ffd98a; font-size:11px; font-weight:800; }
@@ -1499,6 +1615,23 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       <button class="user-confirm" id="user-confirm" type="button" disabled>Confirm</button>
     </section>
 
+    <section class="panel-only-user user-no-group-screen" id="user-no-group-screen">
+      <div class="user-no-group-card">
+        <div class="user-no-group-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9"></circle>
+            <path d="M12 7v6"></path>
+            <path d="M12 16.5h.01"></path>
+          </svg>
+        </div>
+        <h2 class="user-no-group-title" id="user-no-group-title">No eligible group found</h2>
+        <p class="user-no-group-message" id="user-no-group-message">
+          <strong>Add this bot to a group, then make sure your Telegram account is a group owner or administrator.</strong>
+          <span>Groups where the bot is no longer available are not shown.</span>
+        </p>
+      </div>
+    </section>
+
     <section class="panel-only-user user-dashboard" id="user-dashboard">
       <div class="user-group-options" id="user-group-options">
         <div class="user-page-head"><div>
@@ -1509,22 +1642,37 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       </div>
 
       <div id="user-selected-dashboard" hidden>
-        <div class="user-page-head"><div>
-          <h2 class="user-page-title" id="user-selected-group-title">Group Dashboard</h2>
-          <div class="user-page-sub" id="user-dashboard-sub">Live activity overview</div>
-        </div></div>
-
-        <div class="user-group-box compact">
-          <div class="user-group-box-title" id="user-group-activities-title">Group Activities</div>
-          <div class="user-group-name" id="user-warning-group-name"></div>
-          <div class="user-group-metrics">
-            <div class="user-live-metric"><div class="user-live-label" id="user-group-member-label">Group member</div><div class="user-live-value" id="user-member-count">—</div></div>
-            <div class="user-live-metric"><div class="user-live-label" id="user-member-active-label">Member active</div><div class="user-live-value active" id="user-active-count">—</div></div>
+        <div class="user-page-head">
+          <div>
+            <h2 class="user-page-title" id="user-selected-group-title">Group Dashboard</h2>
+            <div class="user-page-sub" id="user-dashboard-sub">Live activity overview</div>
+          </div>
+          <div class="user-language-switcher dashboard-language-switcher">
+            <button class="user-language-button" id="user-dashboard-language-button" type="button" aria-label="Change language" aria-expanded="false">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="9"></circle>
+                <path d="M3 12h18"></path>
+                <path d="M12 3c2.4 2.5 3.6 5.5 3.6 9s-1.2 6.5-3.6 9S9.6 15.5 9.6 12 10.8 5.5 12 3z"></path>
+              </svg>
+            </button>
+            <div class="user-language-menu" id="user-dashboard-language-menu" hidden>
+              <button class="user-language-option active" type="button" data-user-lang="en">English</button>
+              <button class="user-language-option" type="button" data-user-lang="my">Burmese</button>
+              <button class="user-language-option" type="button" data-user-lang="zh">Chinese (Simplified)</button>
+            </div>
           </div>
         </div>
 
         <div class="user-tab-shell">
           <div class="user-tab-panel active" id="user-settings-tab">
+            <div class="user-group-box compact">
+              <div class="user-group-box-title" id="user-group-activities-title">Group Activities</div>
+              <div class="user-group-name" id="user-warning-group-name"></div>
+              <div class="user-group-metrics">
+                <div class="user-live-metric"><div class="user-live-label" id="user-group-member-label">Group member</div><div class="user-live-value" id="user-member-count">—</div></div>
+                <div class="user-live-metric"><div class="user-live-label" id="user-member-active-label">Member active</div><div class="user-live-value active" id="user-active-count">—</div></div>
+              </div>
+            </div>
             <div class="user-setting-card" id="user-settings-limits-card"></div>
             <div class="user-setting-card counts" id="user-settings-counts-card"></div>
           </div>
@@ -1731,6 +1879,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           group: "Group",
           switch: "Switch",
           noGroup: "No eligible group found",
+          noGroupLead: "Add this bot to a group, then make sure your Telegram account is a group owner or administrator.",
+          noGroupTail: "Groups where the bot is no longer available are not shown.",
           noGroupMessage: "Add this bot to a group, then make sure your Telegram account is a group owner or administrator. Groups where the bot is no longer available are not shown.",
           idMismatch: "The entered ID does not match your Telegram account."
         },
@@ -1768,6 +1918,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           group: "Group",
           switch: "ပြောင်းမည်",
           noGroup: "သင့်အတွက် အသုံးပြုနိုင်သော Group မရှိပါ",
+          noGroupLead: "Bot ကို Group တစ်ခုထဲသို့ ထည့်ပြီး သင့် Telegram account ကို Group owner သို့မဟုတ် administrator ဖြစ်ကြောင်း သေချာပါစေ။",
+          noGroupTail: "Bot မရှိတော့သော Group များကို မပြပါ။",
           noGroupMessage: "Bot ကို Group တစ်ခုထဲသို့ ထည့်ပြီး သင့် Telegram account ကို Group owner သို့မဟုတ် administrator ဖြစ်ကြောင်း သေချာပါစေ။ Bot မရှိတော့သော Group များကို မပြပါ။",
           idMismatch: "ထည့်ထားသော ID သည် သင့် Telegram account နှင့် မကိုက်ညီပါ။"
         },
@@ -1805,6 +1957,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           group: "群组",
           switch: "切换",
           noGroup: "没有找到可用的群组",
+          noGroupLead: "请将 Bot 添加到群组，并确保您的 Telegram 账号是群主或管理员。",
+          noGroupTail: "Bot 已不在的群组不会显示。",
           noGroupMessage: "请将 Bot 添加到群组，并确保您的 Telegram 账号是群主或管理员。Bot 已不在的群组不会显示。",
           idMismatch: "输入的 ID 与您的 Telegram 账号不匹配。"
         }
@@ -1842,6 +1996,10 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         document.querySelector("#user-group-options .user-page-title").textContent = tUser("groupOptions");
         document.querySelector("#user-group-options .user-page-sub").textContent = tUser("groupOptionsSub");
         document.getElementById("user-dashboard-sub").textContent = tUser("dashboardSub");
+        document.getElementById("user-no-group-title").textContent = tUser("noGroup");
+        document.getElementById("user-no-group-message").innerHTML =
+          '<strong>' + escapeHtml(tUser("noGroupLead")) + '</strong>' +
+          '<span>' + escapeHtml(tUser("noGroupTail")) + '</span>';
         document.querySelectorAll(".user-language-option").forEach(function(option) {
           option.classList.toggle("active", option.getAttribute("data-user-lang") === userLanguage);
         });
@@ -1988,12 +2146,42 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       function clearUserDashboard() {
         document.getElementById("user-dashboard").classList.remove("visible");
         document.getElementById("user-group-options-list").innerHTML = "";
-        document.getElementById("user-dashboard-sub").textContent = "Live activity overview";
+        document.getElementById("user-dashboard-sub").textContent = tUser("dashboardSub");
         document.getElementById("user-group-options").hidden = false;
         document.getElementById("user-selected-dashboard").hidden = true;
         document.getElementById("switch-group").hidden = true;
         document.body.classList.remove("user-dashboard-page");
       }
+
+      function showUserVerificationPage() {
+        window.clearTimeout(showUserNoGroupScreen.timer);
+        document.getElementById("user-no-group-screen").classList.remove("visible");
+        clearUserDashboard();
+        document.body.classList.remove("user-no-group-page", "user-dashboard-page");
+        document.body.classList.add("user-verification-page");
+        document.getElementById("user-id-input").value = "";
+        document.getElementById("user-confirm").disabled = true;
+        document.getElementById("user-confirm").classList.remove("ready");
+        document.getElementById("user-confirm").textContent = tUser("confirm");
+        document.getElementById("user-verify-card").classList.add("visible");
+        title.textContent = tUser("verifySubtitle");
+      }
+
+      function showUserNoGroupScreen() {
+        window.clearTimeout(showUserNoGroupScreen.timer);
+        document.getElementById("user-verify-card").classList.remove("visible");
+        clearUserDashboard();
+        document.body.classList.remove("user-verification-page", "user-dashboard-page");
+        document.body.classList.add("user-no-group-page");
+        document.getElementById("user-no-group-screen").classList.add("visible");
+        window.clearTimeout(showUserNoGroupScreen.timer);
+        showUserNoGroupScreen.timer = window.setTimeout(function () {
+          if (!document.body.classList.contains("user-no-group-page")) return;
+          try { localStorage.removeItem(userVerifiedKey); } catch {}
+          showUserVerificationPage();
+        }, 2850);
+      }
+      showUserNoGroupScreen.timer = null;
 
       function formatWarningTime(value) {
         try { return new Intl.DateTimeFormat("en-GB",{month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"}).format(new Date(value)); }
@@ -2164,17 +2352,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         try {
           var data = await apiUserDashboard(telegramUserId,groupId);
           if (!data.hasGroups) {
-            try { localStorage.removeItem(userVerifiedKey); } catch {}
-            document.body.classList.remove("user-dashboard-page");
-            document.body.classList.add("user-verification-page");
-            clearUserDashboard();
-            document.getElementById("user-id-input").value="";
-            document.getElementById("user-confirm").disabled=true;
-            showNotice(tUser("noGroupMessage"),"warning");
-            window.setTimeout(function() {
-              document.getElementById("user-verify-card").classList.add("visible");
-              title.textContent = tUser("verifySubtitle");
-            }, 2850);
+            showUserNoGroupScreen();
             return false;
           }
           rememberVerifiedUserId(telegramUserId);
@@ -2202,10 +2380,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             var verified=getVerifiedUserId();
             if(verified) await loadUserDashboard(false,window.__z28SelectedGroupId);
             else {
-              clearUserDashboard();
-              document.body.classList.add("user-verification-page");
-              document.body.classList.remove("user-dashboard-page");
-              document.getElementById("user-verify-card").classList.add("visible");
+              showUserVerificationPage();
             }
           } else await load();
         },"Refresh").catch(function(error){showNotice(error && error.message ? error.message : "Refresh failed.","error");});
@@ -2243,12 +2418,19 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         activateUserTab("warning");
       });
 
-      document.getElementById("user-language-button").addEventListener("click", function () {
-        var menu = document.getElementById("user-language-menu");
-        var open = menu.hidden;
-        menu.hidden = !open;
-        this.setAttribute("aria-expanded", String(open));
-      });
+      function bindUserLanguageControl(buttonId, menuId) {
+        var button = document.getElementById(buttonId);
+        var menu = document.getElementById(menuId);
+        if (!button || !menu) return;
+        button.addEventListener("click", function () {
+          var open = menu.hidden;
+          menu.hidden = !open;
+          this.setAttribute("aria-expanded", String(open));
+        });
+      }
+
+      bindUserLanguageControl("user-language-button", "user-language-menu");
+      bindUserLanguageControl("user-dashboard-language-button", "user-dashboard-language-menu");
 
       document.querySelectorAll(".user-language-option").forEach(function (option) {
         option.addEventListener("click", function () {
@@ -2256,8 +2438,12 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           if (selected !== "en" && selected !== "my" && selected !== "zh") return;
           userLanguage = selected;
           try { localStorage.setItem(userLanguageKey, userLanguage); } catch {}
-          document.getElementById("user-language-menu").hidden = true;
-          document.getElementById("user-language-button").setAttribute("aria-expanded", "false");
+          document.querySelectorAll(".user-language-menu").forEach(function(menu) {
+            menu.hidden = true;
+          });
+          document.querySelectorAll(".user-language-button").forEach(function(button) {
+            button.setAttribute("aria-expanded", "false");
+          });
           applyUserLanguage();
           if (userMode && document.body.classList.contains("user-dashboard-page") && window.__z28SelectedGroupId) {
             loadUserDashboard(false, window.__z28SelectedGroupId).catch(function () {});
@@ -2321,21 +2507,15 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             if (stored && current && stored === current) {
               await loadUserDashboard();
             } else {
-              document.body.classList.add("user-verification-page");
-              document.body.classList.remove("user-dashboard-page");
-              document.getElementById("user-verify-card").classList.add("visible");
-              clearUserDashboard();
+              showUserVerificationPage();
             }
             hideSplash();
             startUserDashboardRefresh();
           }
         } catch (error) {
           setPanelVisibility("user");
-          document.body.classList.add("user-verification-page");
-          document.body.classList.remove("user-dashboard-page");
+          showUserVerificationPage();
           title.textContent = "User Access";
-          document.getElementById("user-verify-card").classList.add("visible");
-          clearUserDashboard();
           hideSplash();
           showNotice(error && error.message ? error.message : "Unable to open the user dashboard.", "error");
         }
