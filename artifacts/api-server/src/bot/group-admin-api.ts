@@ -1,5 +1,9 @@
 import { Router, type IRouter, type Request, type Response } from "express";
-import { getTelegramInitData, validateTelegramInitData } from "./admin-auth";
+import {
+  getTelegramInitData,
+  getTelegramStartParam,
+  validateTelegramInitData,
+} from "./admin-auth";
 import { getAdminApiContext } from "./admin-runtime";
 import type { ActivityKind } from "./types";
 
@@ -48,7 +52,9 @@ const requireGroupAdmin = async (req: Request, res: Response) => {
     return undefined;
   }
 
-  const groupId = parseGroupId(validated.startParam);
+  const groupId = parseGroupId(
+    validated.startParam || getTelegramStartParam(req),
+  );
   if (groupId === undefined) {
     res.status(400).json({ error: "A valid group Mini App context is required." });
     return undefined;
