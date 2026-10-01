@@ -8,6 +8,7 @@ import type {
   BotState,
   Locale,
   UserProfile,
+  MiniAppGroupAccess,
 } from "./types";
 import type { BotStore } from "./store/types";
 
@@ -100,6 +101,22 @@ export class AttendanceService {
     private readonly store: BotStore,
     private readonly config: BotConfig,
   ) {}
+
+  async getMiniAppGroupAccess(userId: number, groupId: number) {
+    return this.store.getMiniAppGroupAccess(userId, groupId);
+  }
+
+  async cacheMiniAppGroupAccess(
+    userId: number,
+    groupId: number,
+    role: MiniAppGroupAccess["role"],
+  ) {
+    return this.store.cacheMiniAppGroupAccess(userId, groupId, role);
+  }
+
+  async clearMiniAppGroupAccess(userId: number, groupId: number): Promise<void> {
+    await this.store.clearMiniAppGroupAccess(userId, groupId);
+  }
 
   async setLocale(
     profile: Omit<UserProfile, "createdAt" | "updatedAt">,
