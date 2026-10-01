@@ -1753,6 +1753,10 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         feed.innerHTML = warnings.map(function(warning) {
           var activity = String(warning.kind || "").toUpperCase();
           var timeout = warning.timeoutSeconds;
+          if (!Number.isFinite(Number(timeout))) {
+            var legacy = String(warning.message || "").match(/(?:Overtime|超时时长)[:：\\s]*<?(?:code)?[^>]*>?\\s*(\\d+)\\s*(?:m|分钟)\\s*(\\d+)\\s*(?:s|秒)/i);
+            if (legacy) timeout = Number(legacy[1]) * 60 + Number(legacy[2]);
+          }
           return '<article class="user-warning-item">' +
             '<div class="user-warning-item-head"><strong>⚠ Activity Warning</strong><span>' +
             escapeHtml(formatWarningTime(warning.createdAt)) + '</span></div>' +
