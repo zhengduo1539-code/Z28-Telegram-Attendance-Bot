@@ -1304,8 +1304,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         <div class="sub" id="identity">Checking access…</div>
       </div>
       <div style="display:flex;flex-direction:column;gap:8px;align-items:stretch;justify-content:flex-start">
-        <button class="switch-group" id="switch-group" type="button" hidden>Switch</button>
         <button class="refresh action-button" id="refresh" type="button"><span class="button-content"><span>Refresh</span></span></button>
+        <button class="switch-group" id="switch-group" type="button" hidden>Switch</button>
       </div>
     </div>
 
@@ -1682,7 +1682,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
       function clearUserDashboard() {
         document.getElementById("user-dashboard").classList.remove("visible");
-        document.getElementById("user-group-list").innerHTML = "";
+        document.getElementById("user-group-options-list").innerHTML = "";
         document.getElementById("user-dashboard-sub").textContent = "Live activity overview";
         document.getElementById("user-group-options").hidden = false;
         document.getElementById("user-selected-dashboard").hidden = true;
