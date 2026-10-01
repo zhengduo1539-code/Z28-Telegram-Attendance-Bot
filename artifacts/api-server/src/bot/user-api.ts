@@ -5,8 +5,11 @@ import {
   isConfiguredAdmin,
 } from "./admin-auth";
 import { getAdminApiContext } from "./admin-runtime";
-import type { ActiveActivity, BotState } from "./types";
+import type { ActiveActivity, ActivityKind, BotState } from "./types";
 
+const activityKinds: ActivityKind[] = ["eat", "wc", "smoke", "wcd"];
+const defaultActivityLimits = { eat: 30, wc: 7, smoke: 7, wcd: 15 };
+const defaultCountLimits = { eat: Number.POSITIVE_INFINITY, wc: 7, smoke: 7, wcd: 2 };
 
 const localDateKey = (date: Date, timeZone: string): string => {
   const parts = new Intl.DateTimeFormat("en-CA", {
@@ -16,9 +19,7 @@ const localDateKey = (date: Date, timeZone: string): string => {
     day: "2-digit",
   }).formatToParts(date);
   const values = Object.fromEntries(
-    parts
-      .filter((part) => part.type !== "literal")
-      .map((part) => [part.type, part.value]),
+    parts.filter((part) => part.type !== "literal").map((part) => [part.type, part.value]),
   );
   return `${values["year"]}-${values["month"]}-${values["day"]}`;
 };
@@ -50,12 +51,8 @@ const discoverGroupIds = (snapshot: BotState) => {
   const ids = new Set<number>();
 
   for (const group of Object.values(snapshot.managedGroups || {})) {
-    if (Number.isSafeInteger(group.chatId) && group.chatId < 0) {
-      ids.add(group.chatId);
-    }
+    if (Number.isSafeInteger(group.chatId) && group.chatId < 0) ids.add(group.chatId);
   }
-
-  // Backward-compatible discovery for groups recorded before managedGroups was introduced.
   for (const profile of Object.values(snapshot.users)) {
     if (profile.chatId < 0) ids.add(profile.chatId);
   }
@@ -73,6 +70,24 @@ const discoverGroupIds = (snapshot: BotState) => {
   return [...ids];
 };
 
+const isPositiveInteger = (value: unknown): value is number =>
+  typeof value === "number" && Number.isSafeInteger(value) && value > 0;
+
+const isGroupAdmin = async (
+  context: NonNullable<ReturnType<typeof getAdminApiContext>>,
+  groupId: number,
+  userId: number,
+) => {
+  try {
+    const chat = await context.telegram.getChat(groupId);
+    if (chat.type !== "group" && chat.type !== "supergroup") return false;
+    const member = await context.telegram.getChatMember(groupId, userId);
+    return member.status === "creator" || member.status === "administrator";
+  } catch {
+    return false;
+  }
+};
+
 type DashboardGroup = {
   id: number;
   title: string;
@@ -88,11 +103,54 @@ type DashboardGroup = {
   activeCount: number;
   memberCount: number;
   userActive: ActiveActivity | null;
-  connectedTarget: {
-    chatId: number;
-    name: string;
-    username?: string;
-  } | null;
+  connectedTarget: { chatId: number; name: string; username?: string } | null;
+};
+
+const buildGroup = async (
+  context: NonNullable<ReturnType<typeof getAdminApiContext>>,
+  snapshot: BotState,
+  groupId: number,
+  userId: number,
+): Promise<DashboardGroup | undefined> => {
+  const chat = await context.telegram.getChat(groupId);
+  if (chat.type !== "group" && chat.type !== "supergroup") return undefined;
+
+  const member = await context.telegram.getChatMember(groupId, userId);
+  if (member.status !== "creator" && member.status !== "administrator") return undefined;
+
+  const dayKey = localDateKey(new Date(), context.config.timeZone);
+  const todayRecords = snapshot.records.filter(
+    (record) =>
+      record.chatId === groupId &&
+      localDateKey(new Date(record.endedAt), context.config.timeZone) === dayKey,
+  );
+  const connected = snapshot.connectedGroups?.[String(groupId)];
+
+  return {
+    id: chat.id,
+    title: chat.title || String(chat.id),
+    ...(chat.username ? { username: chat.username } : {}),
+    memberStatus: member.status as "creator" | "administrator",
+    today: {
+      total: todayRecords.length,
+      eat: todayRecords.filter((record) => record.kind === "eat").length,
+      wc: todayRecords.filter((record) => record.kind === "wc").length,
+      smoke: todayRecords.filter((record) => record.kind === "smoke").length,
+      wcd: todayRecords.filter((record) => record.kind === "wcd").length,
+    },
+    activeCount: Object.values(snapshot.activeActivities).filter(
+      (activity) => activity.chatId === groupId,
+    ).length,
+    memberCount: await context.telegram.getChatMemberCount(groupId),
+    userActive: snapshot.activeActivities[`${groupId}:${userId}`] || null,
+    connectedTarget: connected
+      ? {
+          chatId: connected.targetChatId,
+          name: connected.targetGroupName,
+          ...(connected.targetUsername ? { username: connected.targetUsername } : {}),
+        }
+      : null,
+  };
 };
 
 export const userApiRouter: IRouter = Router();
@@ -117,110 +175,147 @@ userApiRouter.post("/dashboard", async (req, res) => {
   if (!auth) return;
 
   const requestedUserId = req.body?.userId;
-  if (
-    typeof requestedUserId !== "number" ||
-    !Number.isSafeInteger(requestedUserId) ||
-    requestedUserId <= 0
-  ) {
+  if (!isPositiveInteger(requestedUserId)) {
     sendError(res, 400, "Enter a valid Telegram user ID.");
     return;
   }
-
   if (requestedUserId !== auth.user.id) {
     sendError(res, 403, "The entered user ID does not match your Telegram account.");
     return;
   }
 
-  const snapshot = await auth.context.attendance.snapshot();
-  const dayKey = localDateKey(new Date(), auth.context.config.timeZone);
-  const groupIds = discoverGroupIds(snapshot);
-  const groups: DashboardGroup[] = [];
-
-  for (const groupId of groupIds) {
-    try {
-      const chat = await auth.context.telegram.getChat(groupId);
-      if (chat.type !== "group" && chat.type !== "supergroup") continue;
-
-      const member = await auth.context.telegram.getChatMember(
-        groupId,
-        requestedUserId,
-      );
-      if (member.status !== "creator" && member.status !== "administrator") {
-        continue;
-      }
-
-      const todayRecords = snapshot.records.filter(
-        (record) =>
-          record.chatId === groupId &&
-          localDateKey(new Date(record.endedAt), auth.context.config.timeZone) === dayKey,
-      );
-
-      const today = {
-        total: todayRecords.length,
-        eat: todayRecords.filter((record) => record.kind === "eat").length,
-        wc: todayRecords.filter((record) => record.kind === "wc").length,
-        smoke: todayRecords.filter((record) => record.kind === "smoke").length,
-        wcd: todayRecords.filter((record) => record.kind === "wcd").length,
-      };
-
-      const activeCount = Object.values(snapshot.activeActivities).filter(
-        (activity) => activity.chatId === groupId,
-      ).length;
-
-      const memberCount = await auth.context.telegram.getChatMemberCount(groupId);
-
-      const userActive =
-        snapshot.activeActivities[`${groupId}:${requestedUserId}`] || null;
-
-      const connected = snapshot.connectedGroups?.[String(groupId)];
-      const connectedTarget = connected
-        ? {
-            chatId: connected.targetChatId,
-            name: connected.targetGroupName,
-            ...(connected.targetUsername
-              ? { username: connected.targetUsername }
-              : {}),
-          }
-        : null;
-
-      groups.push({
-        id: chat.id,
-        title: chat.title || String(chat.id),
-        ...(chat.username ? { username: chat.username } : {}),
-        memberStatus: member.status as "creator" | "administrator",
-        today,
-        activeCount,
-        memberCount,
-        userActive,
-        connectedTarget,
-      });
-    } catch {
-      // A group the bot can no longer access is not available to the dashboard.
-    }
+  const requestedGroupId = req.body?.groupId;
+  if (
+    requestedGroupId !== undefined &&
+    (!Number.isSafeInteger(requestedGroupId) || requestedGroupId >= 0)
+  ) {
+    sendError(res, 400, "Invalid group.");
+    return;
   }
 
+  const snapshot = await auth.context.attendance.snapshot();
+  const groups: DashboardGroup[] = [];
+  for (const groupId of discoverGroupIds(snapshot)) {
+    try {
+      const group = await buildGroup(auth.context, snapshot, groupId, requestedUserId);
+      if (group) groups.push(group);
+    } catch {
+      // Groups that are no longer available to the bot are intentionally omitted.
+    }
+  }
   groups.sort((left, right) => left.title.localeCompare(right.title));
+
+  if (!groups.length) {
+    res.setHeader("Cache-Control", "no-store");
+    res.json({
+      user: auth.user,
+      groups: [],
+      hasGroups: false,
+      selectionRequired: false,
+      message:
+        "No eligible group found. Add this bot to a group, then make sure your Telegram account is a group owner or administrator. Groups where the bot is no longer available are not shown.",
+    });
+    return;
+  }
+
+  const selected =
+    requestedGroupId === undefined
+      ? groups.length === 1
+        ? groups[0]
+        : undefined
+      : groups.find((group) => group.id === requestedGroupId);
+
+  if (requestedGroupId !== undefined && !selected) {
+    sendError(res, 403, "You are not an owner or administrator of that group.");
+    return;
+  }
+
+  if (!selected) {
+    res.setHeader("Cache-Control", "no-store");
+    res.json({
+      user: auth.user,
+      groups,
+      hasGroups: true,
+      selectionRequired: true,
+      message: "Select a group to open its dashboard.",
+    });
+    return;
+  }
+
+  const activityLimits = await auth.context.attendance.getActivityLimits(selected.id);
+  const countLimits = await auth.context.attendance.getActivityCountLimits(selected.id);
+  const warnings = await auth.context.attendance.getGroupWarnings(selected.id, 30);
 
   res.setHeader("Cache-Control", "no-store");
   res.json({
     user: auth.user,
     groups,
-    hasGroups: groups.length > 0,
+    hasGroups: true,
+    selectionRequired: false,
+    selectedGroupId: selected.id,
+    selectedGroup: selected,
     activityLimits: {
-      eat: snapshot.activityLimits?.eat ?? 30,
-      wc: snapshot.activityLimits?.wc ?? 7,
-      smoke: snapshot.activityLimits?.smoke ?? 7,
-      wcd: snapshot.activityLimits?.wcd ?? 15,
+      eat: activityLimits.eat ?? defaultActivityLimits.eat,
+      wc: activityLimits.wc ?? defaultActivityLimits.wc,
+      smoke: activityLimits.smoke ?? defaultActivityLimits.smoke,
+      wcd: activityLimits.wcd ?? defaultActivityLimits.wcd,
     },
     countLimits: {
-      eat: snapshot.activityCountLimits?.eat ?? Number.POSITIVE_INFINITY,
-      wc: snapshot.activityCountLimits?.wc ?? 7,
-      smoke: snapshot.activityCountLimits?.smoke ?? 7,
-      wcd: snapshot.activityCountLimits?.wcd ?? 2,
+      eat: countLimits.eat ?? defaultCountLimits.eat,
+      wc: countLimits.wc ?? defaultCountLimits.wc,
+      smoke: countLimits.smoke ?? defaultCountLimits.smoke,
+      wcd: countLimits.wcd ?? defaultCountLimits.wcd,
     },
-    message:
-      groups.length > 0
-        ? undefined
-        : "No eligible group found. Add the bot to a group and make sure your Telegram account is a group owner or administrator.",
+    warnings,
+  });
+});
+
+userApiRouter.put("/settings", async (req, res) => {
+  const auth = requireTelegramUser(req, res);
+  if (!auth) return;
+
+  const groupId = req.body?.groupId;
+  if (!Number.isSafeInteger(groupId) || groupId >= 0) {
+    sendError(res, 400, "Invalid group.");
+    return;
+  }
+  if (!(await isGroupAdmin(auth.context, groupId, auth.user.id))) {
+    sendError(res, 403, "Group administrator access required.");
+    return;
+  }
+
+  const kind = typeof req.body?.kind === "string" ? req.body.kind : "";
+  const type = req.body?.type;
+  const value = req.body?.value;
+  if (!activityKinds.includes(kind as ActivityKind) || !["duration", "count"].includes(type)) {
+    sendError(res, 400, "Invalid group setting.");
+    return;
+  }
+  if (type === "count" && kind === "eat") {
+    sendError(res, 400, "Eat daily count is unlimited.");
+    return;
+  }
+  if (!isPositiveInteger(value)) {
+    sendError(res, 400, "Setting value must be a positive integer.");
+    return;
+  }
+
+  if (type === "duration") {
+    await auth.context.attendance.setActivityLimit(kind as ActivityKind, value, groupId);
+  } else {
+    await auth.context.attendance.setActivityCountLimit(kind as ActivityKind, value, groupId);
+  }
+
+  const activityLimits = await auth.context.attendance.getActivityLimits(groupId);
+  const countLimits = await auth.context.attendance.getActivityCountLimits(groupId);
+  res.setHeader("Cache-Control", "no-store");
+  res.json({
+    activityLimits,
+    countLimits: {
+      eat: countLimits.eat ?? defaultCountLimits.eat,
+      wc: countLimits.wc ?? defaultCountLimits.wc,
+      smoke: countLimits.smoke ?? defaultCountLimits.smoke,
+      wcd: countLimits.wcd ?? defaultCountLimits.wcd,
+    },
   });
 });

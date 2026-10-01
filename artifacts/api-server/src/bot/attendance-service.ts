@@ -158,7 +158,9 @@ export class AttendanceService {
           localDateKey(new Date(record.endedAt), this.config.timeZone) === dayKey,
       ).length;
       const countLimit =
-        state.activityCountLimits?.[kind] ?? DEFAULT_ACTIVITY_COUNT_LIMITS[kind];
+        state.groupActivityCountLimits?.[String(profile.chatId)]?.[kind] ??
+        state.activityCountLimits?.[kind] ??
+        DEFAULT_ACTIVITY_COUNT_LIMITS[kind];
       if (countLimit !== undefined && todayCount >= countLimit) {
         response = text.dailyCountLimitReached(
           profile.displayName,
@@ -176,10 +178,14 @@ export class AttendanceService {
         kind,
         startedAt: now.toISOString(),
         limitMinutes:
-          state.activityLimits?.[kind] || this.config.activityLimits[kind],
+          state.groupActivityLimits?.[String(profile.chatId)]?.[kind] ??
+          state.activityLimits?.[kind] ??
+          this.config.activityLimits[kind],
       };
       const limitMinutes =
-        state.activityLimits?.[kind] || this.config.activityLimits[kind];
+        state.groupActivityLimits?.[String(profile.chatId)]?.[kind] ??
+        state.activityLimits?.[kind] ??
+        this.config.activityLimits[kind];
       response = text.started(
         profile.displayName,
         profile.userId,
@@ -225,20 +231,45 @@ export class AttendanceService {
         Math.floor(elapsedSeconds - active.limitMinutes * 60),
       );
       if (settledBy === "back" && timeoutSeconds > 0) {
+        const locale = state.users[key].locale;
+        const activityName = activityLabel(active.kind, locale);
         const connection = state.connectedGroups?.[String(profile.chatId)];
         if (connection) {
-          const locale = state.users[key].locale;
           timeoutNotification = getLocale(locale).groupTimeoutNotification(
             connection.targetGroupName,
             connection.sourceChatId,
             connection.sourceUsername,
             active.displayName,
             active.userId,
-            activityLabel(active.kind, locale),
+            activityName,
             timeoutSeconds,
           );
           notificationChatId = connection.targetChatId;
         }
+
+        state.groupWarnings = state.groupWarnings || {};
+        const warningKey = String(profile.chatId);
+        const warnings = state.groupWarnings[warningKey] || [];
+        warnings.push({
+          id: createId(),
+          chatId: profile.chatId,
+          userId: active.userId,
+          displayName: active.displayName,
+          kind: active.kind,
+          message:
+            timeoutNotification ||
+            getLocale(locale).groupTimeoutNotification(
+              "Group",
+              profile.chatId,
+              undefined,
+              active.displayName,
+              active.userId,
+              activityName,
+              timeoutSeconds,
+            ),
+          createdAt: now.toISOString(),
+        });
+        state.groupWarnings[warningKey] = warnings.slice(-50);
       }
       state.records.push({
         id: createId(),
@@ -383,28 +414,54 @@ export class AttendanceService {
     return state.connectedGroups?.[String(sourceChatId)];
   }
 
-  async getActivityCountLimits(): Promise<Partial<ActivityCountLimits>> {
+  async getActivityCountLimits(
+    chatId?: number,
+  ): Promise<Partial<ActivityCountLimits>> {
     const state = await this.store.load();
+    if (chatId !== undefined) {
+      return {
+        ...(state.activityCountLimits || {}),
+        ...(state.groupActivityCountLimits?.[String(chatId)] || {}),
+      };
+    }
     return { ...state.activityCountLimits };
   }
 
   async setActivityCountLimit(
     kind: ActivityKind,
     count: number,
+    chatId?: number,
   ): Promise<Partial<ActivityCountLimits>> {
     let limits: Partial<ActivityCountLimits> = {};
     await this.store.update((state) => {
+      if (chatId !== undefined) {
+        state.groupActivityCountLimits = state.groupActivityCountLimits || {};
+        const key = String(chatId);
+        limits = {
+          ...(state.activityCountLimits || {}),
+          ...(state.groupActivityCountLimits[key] || {}),
+          [kind]: count,
+        };
+        state.groupActivityCountLimits[key] = {
+          ...(state.groupActivityCountLimits[key] || {}),
+          [kind]: count,
+        };
+        return;
+      }
       limits = { ...(state.activityCountLimits || {}), [kind]: count };
       state.activityCountLimits = limits;
     });
     return limits;
   }
 
-  async getActivityLimits(): Promise<ActivityLimits> {
+  async getActivityLimits(chatId?: number): Promise<ActivityLimits> {
     const state = await this.store.load();
     return {
       ...this.config.activityLimits,
       ...state.activityLimits,
+      ...(chatId !== undefined
+        ? state.groupActivityLimits?.[String(chatId)] || {}
+        : {}),
     };
   }
 
@@ -423,9 +480,24 @@ export class AttendanceService {
   async setActivityLimit(
     kind: ActivityKind,
     minutes: number,
+    chatId?: number,
   ): Promise<ActivityLimits> {
     let limits: ActivityLimits = { ...this.config.activityLimits };
     await this.store.update((state) => {
+      if (chatId !== undefined) {
+        state.groupActivityLimits = state.groupActivityLimits || {};
+        const key = String(chatId);
+        state.groupActivityLimits[key] = {
+          ...(state.groupActivityLimits[key] || {}),
+          [kind]: minutes,
+        };
+        limits = {
+          ...this.config.activityLimits,
+          ...state.activityLimits,
+          ...state.groupActivityLimits[key],
+        };
+        return;
+      }
       limits = {
         ...this.config.activityLimits,
         ...state.activityLimits,
@@ -434,6 +506,13 @@ export class AttendanceService {
       state.activityLimits = limits;
     });
     return limits;
+  }
+
+  async getGroupWarnings(chatId: number, limit = 30) {
+    const state = await this.store.load();
+    return (state.groupWarnings?.[String(chatId)] || [])
+      .slice(-Math.max(1, Math.min(limit, 100)))
+      .reverse();
   }
 
   async dueActivityReminders(now = new Date()): Promise<ActiveActivity[]> {
