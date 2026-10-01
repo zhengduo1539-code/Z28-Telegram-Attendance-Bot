@@ -306,6 +306,49 @@ adminApiRouter.get("/groups", async (req, res) => {
   });
 });
 
+adminApiRouter.get("/export", async (req, res) => {
+  const auth = requireAdmin(req, res);
+  if (!auth) return;
+
+  const requestedDays = Number(req.query.days);
+  const days = requestedDays === 7 || requestedDays === 30 || requestedDays === 90 ? requestedDays : 30;
+  const snapshot = await auth.context.attendance.snapshot();
+  const now = Date.now();
+  const start = now - days * 24 * 60 * 60 * 1000;
+
+  const csvCell = (value: unknown) => {
+    const text = String(value ?? "");
+    const safe = /^[=+@-]/.test(text) ? "'" + text : text;
+    return '"' + safe.replace(/"/g, '""') + '"';
+  };
+
+  const rows = [
+    ["Activity ID", "User ID", "Display Name", "Group ID", "Activity", "Started At", "Ended At", "Minutes", "Settled By"],
+  ];
+  for (const record of snapshot.records) {
+    const ended = new Date(record.endedAt).getTime();
+    if (!Number.isFinite(ended) || ended < start || ended > now) continue;
+    rows.push([
+      record.id,
+      record.userId,
+      record.displayName,
+      record.chatId,
+      record.kind.toUpperCase(),
+      record.startedAt,
+      record.endedAt,
+      (Math.max(0, record.elapsedSeconds || 0) / 60).toFixed(2),
+      record.settledBy,
+    ]);
+  }
+
+  const csv = rows.map((row) => row.map(csvCell).join(",")).join("\r\n") + "\r\n";
+  const filename = "z28-attendance-" + days + "d-" + new Date().toISOString().slice(0, 10) + ".csv";
+  res.setHeader("Cache-Control", "no-store");
+  res.setHeader("Content-Type", "text/csv; charset=utf-8");
+  res.setHeader("Content-Disposition", 'attachment; filename="' + filename + '"');
+  res.send("\uFEFF" + csv);
+});
+
 adminApiRouter.get("/analytics", async (req, res) => {
   const auth = requireAdmin(req, res);
   if (!auth) return;
