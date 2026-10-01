@@ -97,6 +97,9 @@ export const validateTelegramInitData = (
 export const getTelegramInitData = (request: Request): string =>
   request.header("x-telegram-init-data")?.trim() || "";
 
+export const getTelegramStartParam = (request: Request): string =>
+  request.header("x-telegram-start-param")?.trim() || "";
+
 export const isConfiguredAdmin = (
   userId: number,
   ownerId: number | undefined,
