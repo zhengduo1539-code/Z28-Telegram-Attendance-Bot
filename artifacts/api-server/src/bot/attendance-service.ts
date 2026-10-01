@@ -277,6 +277,7 @@ export class AttendanceService {
               active.userId,
               activityName,
               timeoutSeconds,
+              formatWarningDateTime(now, this.config.timeZone),
             ),
           timeoutSeconds,
           createdAt: now.toISOString(),
