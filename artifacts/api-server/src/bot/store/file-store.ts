@@ -1,6 +1,6 @@
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
-import type { BotState } from "../types";
+import type { BotState, MiniAppGroupAccess } from "../types";
 import type { BotStore } from "./types";
 
 export const emptyState = (): BotState => ({
@@ -44,8 +44,14 @@ export const isBotState = (value: unknown): value is BotState => {
   );
 };
 
+const MINI_APP_ACCESS_TTL_MS = 5 * 60 * 1000;
+
+const miniAppAccessKey = (userId: number, groupId: number) =>
+  `${userId}:${groupId}`;
+
 export class FileBotStore implements BotStore {
   private state?: BotState;
+  private readonly miniAppAccess = new Map<string, MiniAppGroupAccess>();
   private writeQueue: Promise<void> = Promise.resolve();
   private updateQueue: Promise<void> = Promise.resolve();
 
@@ -113,6 +119,39 @@ export class FileBotStore implements BotStore {
     this.updateQueue = update.catch(() => undefined);
     await update;
     return updatedState as BotState;
+  }
+
+  async getMiniAppGroupAccess(
+    userId: number,
+    groupId: number,
+  ): Promise<MiniAppGroupAccess | undefined> {
+    const key = miniAppAccessKey(userId, groupId);
+    const access = this.miniAppAccess.get(key);
+    if (!access) return undefined;
+    if (new Date(access.expiresAt).getTime() <= Date.now()) {
+      this.miniAppAccess.delete(key);
+      return undefined;
+    }
+    return { ...access };
+  }
+
+  async cacheMiniAppGroupAccess(
+    userId: number,
+    groupId: number,
+    role: MiniAppGroupAccess["role"],
+  ): Promise<MiniAppGroupAccess> {
+    const access: MiniAppGroupAccess = {
+      userId,
+      groupId,
+      role,
+      expiresAt: new Date(Date.now() + MINI_APP_ACCESS_TTL_MS).toISOString(),
+    };
+    this.miniAppAccess.set(miniAppAccessKey(userId, groupId), access);
+    return { ...access };
+  }
+
+  async clearMiniAppGroupAccess(userId: number, groupId: number): Promise<void> {
+    this.miniAppAccess.delete(miniAppAccessKey(userId, groupId));
   }
 
   private async quarantineCorruptState(): Promise<void> {
