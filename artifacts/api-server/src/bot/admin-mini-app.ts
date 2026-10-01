@@ -316,9 +316,64 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       background: linear-gradient(145deg, rgba(38, 150, 255, 0.24), rgba(9, 43, 82, 0.88));
     }
 
+    .activity-icon .clock-ring {
+      transform-origin: 12px 13px;
+      animation: clockPulse 2.4s ease-in-out infinite;
+    }
+
+    .activity-icon .clock-hand {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: clockHand 3.2s linear infinite;
+    }
+
+    @keyframes clockHand {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes clockPulse {
+      0%, 100% { opacity: 0.88; }
+      50% { opacity: 1; }
+    }
+
     .counts-icon {
       color: #9c8cff;
       background: linear-gradient(145deg, rgba(112, 93, 255, 0.24), rgba(31, 26, 80, 0.88));
+    }
+
+    .counts-icon .count-bar {
+      transform-box: fill-box;
+      transform-origin: center bottom;
+    }
+
+    .counts-icon .count-bar-1 {
+      animation: countBar 1.6s ease-in-out infinite;
+    }
+
+    .counts-icon .count-bar-2 {
+      animation: countBar 1.6s ease-in-out 0.18s infinite;
+    }
+
+    .counts-icon .count-bar-3 {
+      animation: countBar 1.6s ease-in-out 0.36s infinite;
+    }
+
+    .counts-icon .count-trend {
+      stroke-dasharray: 28;
+      stroke-dashoffset: 28;
+      animation: trendDraw 2.4s ease-in-out infinite;
+    }
+
+    @keyframes countBar {
+      0%, 100% { transform: scaleY(0.78); opacity: 0.72; }
+      50% { transform: scaleY(1.08); opacity: 1; }
+    }
+
+    @keyframes trendDraw {
+      0% { stroke-dashoffset: 28; opacity: 0.35; }
+      35%, 70% { stroke-dashoffset: 0; opacity: 1; }
+      100% { stroke-dashoffset: -28; opacity: 0.35; }
     }
 
     .reminder-icon {
@@ -335,9 +390,53 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       animation: reminderPulse 2.2s ease-in-out infinite;
     }
 
+    .reminder-icon .bell-shape {
+      transform-box: fill-box;
+      transform-origin: center 30%;
+      animation: bellSwing 2.8s ease-in-out infinite;
+    }
+
+    .reminder-icon .ring-wave {
+      transform-box: fill-box;
+      transform-origin: center;
+      opacity: 0;
+      animation: bellWave 2.8s ease-out infinite;
+    }
+
+    .reminder-icon .ring-wave-2 {
+      animation-delay: 0.32s;
+    }
+
+    @keyframes bellSwing {
+      0%, 100% { transform: rotate(0deg); }
+      8% { transform: rotate(-7deg); }
+      16% { transform: rotate(6deg); }
+      24% { transform: rotate(-4deg); }
+      32% { transform: rotate(2deg); }
+      40%, 100% { transform: rotate(0deg); }
+    }
+
+    @keyframes bellWave {
+      0%, 42%, 100% { opacity: 0; transform: scale(0.72); }
+      18% { opacity: 0.8; transform: scale(0.92); }
+      30% { opacity: 0; transform: scale(1.12); }
+    }
+
     @keyframes reminderPulse {
       0%, 100% { transform: scale(0.92); opacity: 0.28; }
       50% { transform: scale(1.08); opacity: 0.72; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .activity-icon .clock-ring,
+      .activity-icon .clock-hand,
+      .counts-icon .count-bar,
+      .counts-icon .count-trend,
+      .reminder-icon::before,
+      .reminder-icon .bell-shape,
+      .reminder-icon .ring-wave {
+        animation: none !important;
+      }
     }
 
     .card[data-section="stats"]::before {
@@ -733,10 +832,12 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       <h2>
         <span class="section-icon activity-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24">
-            <circle cx="12" cy="13" r="7.5"></circle>
+            <circle class="clock-ring" cx="12" cy="13" r="7.5"></circle>
             <path d="M9 3h6"></path>
             <path d="M12 5.5v2"></path>
-            <path d="M12 13l3-2"></path>
+            <g class="clock-hand">
+              <path d="M12 13l3-2"></path>
+            </g>
           </svg>
         </span>
         <span class="section-title"><span>Activity Limits</span><small>Duration Control</small></span>
@@ -763,11 +864,11 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       <h2>
         <span class="section-icon counts-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24">
-            <path d="M5 18v-5"></path>
-            <path d="M12 18V9"></path>
-            <path d="M19 18V5"></path>
             <path d="M4 21h16"></path>
-            <path d="M4 8l4-3 4 2 4-4 4 1"></path>
+            <rect class="count-bar count-bar-1" x="5" y="13" width="3" height="5" rx="1.5" fill="currentColor" stroke="none"></rect>
+            <rect class="count-bar count-bar-2" x="10.5" y="9" width="3" height="9" rx="1.5" fill="currentColor" stroke="none"></rect>
+            <rect class="count-bar count-bar-3" x="16" y="5" width="3" height="13" rx="1.5" fill="currentColor" stroke="none"></rect>
+            <path class="count-trend" d="M4.5 10l3.5-3 4 2 4-4 4.5 1"></path>
           </svg>
         </span>
         <span class="section-title"><span>Daily Count Limits</span><small>Daily Usage Control</small></span>
@@ -794,8 +895,12 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       <h2>
         <span class="section-icon reminder-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24">
-            <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
-            <path d="M10 21h4"></path>
+            <path class="ring-wave ring-wave-1" d="M4 8.5L2.7 7.2"></path>
+            <path class="ring-wave ring-wave-2" d="M20 8.5l1.3-1.3"></path>
+            <g class="bell-shape">
+              <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
+              <path d="M10 21h4"></path>
+            </g>
           </svg>
         </span>
         <span class="section-title"><span>Overdue Reminder</span><small>Automatic Notification</small></span>
