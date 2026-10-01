@@ -778,6 +778,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       min-height: 100vh;
     }
 
+    .user-mode.user-verification-page .top { display:none !important; }
     .user-mode.user-dashboard-page .top { display:flex; }
     .user-dashboard-page .top .credit-marquee,
     .user-dashboard-page .top .sub { display:none; }
@@ -1302,7 +1303,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         </div>
         <div class="sub" id="identity">Checking access…</div>
       </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:stretch;justify-content:flex-start">
         <button class="switch-group" id="switch-group" type="button" hidden>Switch</button>
         <button class="refresh action-button" id="refresh" type="button"><span class="button-content"><span>Refresh</span></span></button>
       </div>
@@ -1744,6 +1745,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         window.__z28SelectedGroupId = group.id;
         document.getElementById("user-group-options").hidden = true;
         document.getElementById("user-selected-dashboard").hidden = false;
+        title.textContent = group.title + " Dashboard";
         document.getElementById("switch-group").hidden = false;
         document.getElementById("user-selected-group-title").textContent = group.title + " Dashboard";
         document.getElementById("user-warning-group-name").textContent = group.title;
@@ -1763,6 +1765,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           document.getElementById("user-group-options").hidden = false;
           document.getElementById("user-selected-dashboard").hidden = true;
           document.getElementById("switch-group").hidden = true;
+          title.textContent = "Group Options";
           renderGroupOptions(data.groups);
           return;
         }
@@ -1837,10 +1840,13 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             document.body.classList.remove("user-dashboard-page");
             document.body.classList.add("user-verification-page");
             clearUserDashboard();
-            document.getElementById("user-verify-card").classList.add("visible");
-            showNotice(data.message || "No eligible group found.","error");
             document.getElementById("user-id-input").value="";
             document.getElementById("user-confirm").disabled=true;
+            showNotice(data.message || "No eligible group found.","error");
+            window.setTimeout(function() {
+              document.getElementById("user-verify-card").classList.add("visible");
+              title.textContent = "User Access";
+            }, 2850);
             return false;
           }
           rememberVerifiedUserId(telegramUserId);
@@ -1879,6 +1885,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           document.getElementById("user-group-options").hidden=false;
           document.getElementById("user-selected-dashboard").hidden=true;
           button.hidden=true;
+          title.textContent = "Group Options";
           renderGroupOptions(data.groups || []);
         }).catch(function(error){
           showNotice(error && error.message ? error.message : "Unable to load groups.","error");
