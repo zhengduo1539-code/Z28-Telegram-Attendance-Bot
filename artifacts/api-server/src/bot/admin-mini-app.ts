@@ -4196,7 +4196,10 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           document.querySelectorAll("[data-admin-nav]").forEach(function(item) {
             item.classList.toggle("active", item === button);
           });
-          if (button.getAttribute("data-admin-nav") === "health") {\n            loadAdminHealth().catch(function(error){showNotice(error && error.message ? error.message : "Unable to load system health.","error");});\n          }\n          if (button.getAttribute("data-admin-nav") === "users") {
+          if (button.getAttribute("data-admin-nav") === "health") {
+            loadAdminHealth().catch(function(error){showNotice(error && error.message ? error.message : "Unable to load system health.","error");});
+          }
+          if (button.getAttribute("data-admin-nav") === "users") {
             loadAdminUsers(true).catch(function(error){showNotice(error && error.message ? error.message : "Unable to load users.","error");});
           }
           section.scrollIntoView({ behavior: "smooth", block: "start" });
