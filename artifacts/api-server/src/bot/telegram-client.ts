@@ -13,6 +13,15 @@ type TelegramResponse<T> = {
 
 type RequestPriority = "high" | "normal" | "low";
 
+type TelegramApiMethodMetrics = { requests: number; successes: number; failures: number; retries: number; rateLimits: number; totalLatencyMs: number; };
+
+export type TelegramApiMetrics = {
+  since: string; requests: number; successes: number; failures: number; retries: number; rateLimits: number;
+  rejectedQueue: number; cacheHits: number; cacheMisses: number; dedupeHits: number;
+  queueDepth: number; peakQueueDepth: number; averageLatencyMs: number;
+  methods: Record<string, TelegramApiMethodMetrics>;
+};
+
 type QueuedRequest<T> = {
   method: string;
   payload: Record<string, unknown>;
@@ -40,6 +49,19 @@ export class TelegramClient {
   private lastRequestAt = 0;
   private readonly responseCache = new Map<string, { expiresAt: number; value: unknown }>();
   private readonly inFlight = new Map<string, Promise<unknown>>();
+  private readonly metricsStartedAt = Date.now();
+  private metricsRequests = 0;
+  private metricsSuccesses = 0;
+  private metricsFailures = 0;
+  private metricsRetries = 0;
+  private metricsRateLimits = 0;
+  private metricsRejectedQueue = 0;
+  private metricsCacheHits = 0;
+  private metricsCacheMisses = 0;
+  private metricsDedupeHits = 0;
+  private metricsPeakQueueDepth = 0;
+  private metricsTotalLatencyMs = 0;
+  private readonly methodMetrics = new Map<string, TelegramApiMethodMetrics>();
 
   constructor(
     private readonly token: string,
@@ -57,6 +79,7 @@ export class TelegramClient {
     if (method === "getUpdates") return this.performCall<T>(method, payload);
 
     if (this.queue.length >= MAX_QUEUE_SIZE) {
+      this.metricsRejectedQueue += 1;
       throw new Error(`Telegram API request queue is full; rejected ${method}`);
     }
 
@@ -69,6 +92,7 @@ export class TelegramClient {
         reject,
       });
       this.queue.sort((a, b) => ({ high: 0, normal: 1, low: 2 }[a.priority] - { high: 0, normal: 1, low: 2 }[b.priority]));
+      this.metricsPeakQueueDepth = Math.max(this.metricsPeakQueueDepth, this.queue.length);
       void this.processQueue();
     });
   }
@@ -119,10 +143,17 @@ export class TelegramClient {
   ): Promise<T> {
     const key = this.cacheKey(method, payload);
     const cached = this.getCached<T>(key);
-    if (cached !== undefined) return Promise.resolve(cached);
+    if (cached !== undefined) {
+      this.metricsCacheHits += 1;
+      return Promise.resolve(cached);
+    }
+    this.metricsCacheMisses += 1;
 
     const existing = this.inFlight.get(key);
-    if (existing) return existing as Promise<T>;
+    if (existing) {
+      this.metricsDedupeHits += 1;
+      return existing as Promise<T>;
+    }
 
     const request = this.call<T>(method, payload, priority).then((value) => {
       this.setCached(key, value, ttlMs);
@@ -143,14 +174,21 @@ export class TelegramClient {
         return await this.performSingleCall<T>(method, payload);
       } catch (error: unknown) {
         const retryAfterMs = error instanceof TelegramRateLimitError ? error.retryAfterMs : undefined;
+        if (error instanceof TelegramRateLimitError) this.metricsRateLimits += 1;
         const retryable = error instanceof TelegramRateLimitError || error instanceof TelegramRetryableError;
         if (!retryable || attempt >= MAX_RETRIES) throw error;
+        this.metricsRetries += 1;
         await sleep(retryAfterMs ?? retryDelay(attempt));
       }
     }
   }
 
   private async performSingleCall<T>(method: string, payload: Record<string, unknown>): Promise<T> {
+    const startedAt = Date.now();
+    this.metricsRequests += 1;
+    const methodMetric = this.methodMetrics.get(method) || { requests: 0, successes: 0, failures: 0, retries: 0, rateLimits: 0, totalLatencyMs: 0 };
+    methodMetric.requests += 1;
+    this.methodMetrics.set(method, methodMetric);
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), this.requestTimeoutMs);
     try {
@@ -183,7 +221,10 @@ export class TelegramClient {
         if (isRetryableStatus(response.status)) throw new TelegramRetryableError(message);
         throw new Error(message);
       }
-      return body.result as T;
+      const result = body.result as T;
+      this.metricsSuccesses += 1;
+      methodMetric.successes += 1;
+      return result;
     } catch (error: unknown) {
       if (error instanceof TelegramRateLimitError || error instanceof TelegramRetryableError) throw error;
       if (error instanceof Error && error.name === "AbortError") {
@@ -192,10 +233,29 @@ export class TelegramClient {
       if (error instanceof TypeError) {
         throw new TelegramRetryableError(`Telegram API ${method} network request failed: ${error.message}`);
       }
+      this.metricsFailures += 1;
+      methodMetric.failures += 1;
       throw error;
     } finally {
+      const latencyMs = Date.now() - startedAt;
+      this.metricsTotalLatencyMs += latencyMs;
+      methodMetric.totalLatencyMs += latencyMs;
       clearTimeout(timeout);
     }
+  }
+
+  getApiMetrics(): TelegramApiMetrics {
+    const methods: Record<string, TelegramApiMethodMetrics> = {};
+    for (const [method, metric] of this.methodMetrics.entries()) methods[method] = { ...metric };
+    return {
+      since: new Date(this.metricsStartedAt).toISOString(),
+      requests: this.metricsRequests, successes: this.metricsSuccesses, failures: this.metricsFailures,
+      retries: this.metricsRetries, rateLimits: this.metricsRateLimits, rejectedQueue: this.metricsRejectedQueue,
+      cacheHits: this.metricsCacheHits, cacheMisses: this.metricsCacheMisses, dedupeHits: this.metricsDedupeHits,
+      queueDepth: this.queue.length, peakQueueDepth: this.metricsPeakQueueDepth,
+      averageLatencyMs: this.metricsRequests ? Math.round((this.metricsTotalLatencyMs / this.metricsRequests) * 10) / 10 : 0,
+      methods,
+    };
   }
 
   private botUsername?: string;
