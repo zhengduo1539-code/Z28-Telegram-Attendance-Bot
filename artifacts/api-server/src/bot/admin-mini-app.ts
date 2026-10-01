@@ -3719,7 +3719,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         if (memoryMeta) {
           var statusLabel = memoryStatus === "critical" ? "Critical" : memoryStatus === "warning" ? "Warning" : "Healthy";
           memoryMeta.textContent =
-            statusLabel + " · Heap " + String(memoryData.heapUsagePercent || 0) + "% (Warn " +
+            statusLabel + " · Heap " + String(memoryData.heapUsagePercent || 0) + "% of " + String(memoryData.heapLimitMb || 0) + " MB (Warn " +
             String(memoryData.heapWarnPercent || 0) + "% · Critical " + String(memoryData.heapCriticalPercent || 0) +
             "%) · RSS " + String(memoryData.rssUsagePercent || 0) + "% of " + String(memoryData.rssLimitMb || 0) +
             " MB (Warn " + String(memoryData.rssWarnPercent || 0) + "% · Critical " +
