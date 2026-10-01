@@ -759,22 +759,45 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
     .panel-only-user { display: none; }
 
-    /* Regular-user Mini App uses a separate dashboard page with the same dark visual language as Admin Panel. */
+    /* Regular users have two distinct screens: verification first, dashboard after verification. */
     .user-mode .panel-only-private,
-    .user-mode .panel-only-group {
+    .user-mode .panel-only-group,
+    .user-mode .user-dashboard {
       display: none !important;
     }
 
-    .user-mode .panel-only-user {
-      display: block;
-    }
-
-    .user-mode .panel-only-user#user-dashboard {
+    .user-mode .user-card#user-verify-card {
       display: none;
     }
 
-    .user-mode .panel-only-user#user-dashboard.visible {
+    .user-mode.user-verification-page .user-card#user-verify-card {
       display: block;
+    }
+
+    .user-mode.user-dashboard-page {
+      min-height: 100vh;
+    }
+
+    .user-mode.user-dashboard-page .top {
+      display: none;
+    }
+
+    .user-mode.user-dashboard-page .user-card#user-verify-card {
+      display: none !important;
+    }
+
+    .user-mode.user-dashboard-page .panel-only-user#user-dashboard,
+    .user-mode.user-dashboard-page .panel-only-user#user-dashboard.visible {
+      display: block !important;
+    }
+
+    .user-mode.user-dashboard-page #notice {
+      position: fixed;
+      top: max(12px, env(safe-area-inset-top));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 200;
+      width: min(680px, calc(100% - 28px));
     }
 
     .user-mode {
@@ -1498,9 +1521,11 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         });
       }
 
-      // Default non-group launches to user mode so admin controls never flash for regular users.
+      // Non-group launches stay on a dedicated verification page until the server confirms the user mode.
       setPanelVisibility(groupMode ? "group" : "user");
-      title.textContent = groupMode ? "⚙️ Group Admin Panel" : "User Dashboard";
+      document.body.classList.toggle("user-verification-page", !groupMode);
+      document.body.classList.remove("user-dashboard-page");
+      title.textContent = groupMode ? "⚙️ Group Admin Panel" : "User Access";
       document.getElementById("limits-scope").textContent =
         groupMode ? "These settings use the same bot activity limits as the group commands." : "";
 
@@ -1609,6 +1634,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         document.getElementById("user-dashboard").classList.remove("visible");
         document.getElementById("user-group-list").innerHTML = "";
         document.getElementById("user-dashboard-sub").textContent = "Live activity overview";
+        document.body.classList.remove("user-dashboard-page");
       }
 
       function settingCardMarkup(kind, titleText, subtitle, values) {
@@ -1728,27 +1754,28 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           var data = await apiUserDashboard(telegramUserId);
           if (!data.hasGroups) {
             try { localStorage.removeItem(userVerifiedKey); } catch {}
-            document.getElementById("user-verify-card").classList.remove("visible");
-            renderUserDashboard(data);
-            window.setTimeout(function () {
-              clearUserDashboard();
-              document.getElementById("user-verify-card").classList.add("visible");
-              var input = document.getElementById("user-id-input");
-              var confirm = document.getElementById("user-confirm");
-              if (input) {
-                input.value = "";
-                input.focus();
-              }
-              if (confirm) {
-                confirm.disabled = true;
-                confirm.classList.remove("ready");
-                confirm.textContent = "Confirm";
-              }
-            }, 2800);
+            document.body.classList.remove("user-dashboard-page");
+            document.body.classList.add("user-verification-page");
+            clearUserDashboard();
+            document.getElementById("user-verify-card").classList.add("visible");
+            showNotice(
+              "No eligible group found. Add this bot to a group, then make sure your Telegram account is a group owner or administrator. Groups where the bot is no longer available are not shown.",
+              "error"
+            );
+            var input = document.getElementById("user-id-input");
+            var confirm = document.getElementById("user-confirm");
+            if (input) input.value = "";
+            if (confirm) {
+              confirm.disabled = true;
+              confirm.classList.remove("ready");
+              confirm.textContent = "Confirm";
+            }
             return false;
           }
 
           rememberVerifiedUserId(telegramUserId);
+          document.body.classList.remove("user-verification-page");
+          document.body.classList.add("user-dashboard-page");
           document.getElementById("user-verify-card").classList.remove("visible");
           renderUserDashboard(data);
           return true;
@@ -1883,8 +1910,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           userConfirm.disabled = true;
           userConfirm.classList.remove("ready");
           try {
-            await loadUserDashboard();
-            userConfirm.innerHTML = "Confirmed";
+            var opened = await loadUserDashboard();
+            if (opened) userConfirm.innerHTML = "Confirmed";
           } catch (error) {
             showNotice(error && error.message ? error.message : "Verification failed.", "error");
             userConfirm.disabled = false;
@@ -1915,6 +1942,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             if (stored && current && stored === current) {
               await loadUserDashboard();
             } else {
+              document.body.classList.add("user-verification-page");
+              document.body.classList.remove("user-dashboard-page");
               document.getElementById("user-verify-card").classList.add("visible");
               clearUserDashboard();
             }
@@ -1923,7 +1952,9 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           }
         } catch (error) {
           setPanelVisibility("user");
-          title.textContent = "User Dashboard";
+          document.body.classList.add("user-verification-page");
+          document.body.classList.remove("user-dashboard-page");
+          title.textContent = "User Access";
           document.getElementById("user-verify-card").classList.add("visible");
           clearUserDashboard();
           hideSplash();
