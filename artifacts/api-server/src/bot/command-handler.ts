@@ -353,12 +353,11 @@ export class CommandHandler {
         response = text.unknownCommand;
     }
     await this.telegram.sendMessage(
-        message.chat.id,
-        response,
-        markup,
-        message.message_id,
-      );
-    }
+      message.chat.id,
+      response,
+      markup,
+      message.message_id,
+    );
     if (addGroupMarkup) {
       await this.telegram.sendMessage(
         message.chat.id,
