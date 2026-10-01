@@ -5,7 +5,7 @@ import {
   isConfiguredAdmin,
 } from "./admin-auth";
 import { getAdminApiContext } from "./admin-runtime";
-import type { ActivityKind, ActiveActivity } from "./types";
+import type { ActivityKind, ActiveActivity, BotState } from "./types";
 
 const trackedActivities: ActivityKind[] = ["eat", "wc", "smoke", "wcd"];
 
@@ -47,7 +47,7 @@ const requireTelegramUser = (req: Request, res: Response) => {
   return { context, user: validated.user };
 };
 
-const discoverGroupIds = (snapshot: Awaited<ReturnType<NonNullable<ReturnType<typeof getAdminApiContext>>["attendance"]["snapshot"]>>) => {
+const discoverGroupIds = (snapshot: BotState) => {
   const ids = new Set<number>();
 
   for (const group of Object.values(snapshot.managedGroups || {})) {
