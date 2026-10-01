@@ -213,53 +213,6 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         }
       }
 
-      async function saveLimit(kind, inputId) {
-        var minutes = value(inputId);
-        if (minutes === undefined) {
-          showNotice("Enter a positive integer.", "error");
-          return;
-        }
-        setBusy(true);
-        try {
-          var data = await api("/activity-limits", {
-            method: "PUT",
-            body: JSON.stringify({ kind: kind, minutes: minutes })
-          });
-          document.getElementById("limit-eat").value = data.activityLimits.eat;
-          document.getElementById("limit-wc").value = data.activityLimits.wc;
-          document.getElementById("limit-smoke").value = data.activityLimits.smoke;
-          document.getElementById("limit-wcd").value = data.activityLimits.wcd;
-          showNotice("Activity limit saved.", "ok");
-        } catch (error) {
-          showNotice(error && error.message ? error.message : "Save failed.", "error");
-        } finally {
-          setBusy(false);
-        }
-      }
-
-      async function saveCount(kind, inputId) {
-        var count = value(inputId);
-        if (count === undefined) {
-          showNotice("Enter a positive integer.", "error");
-          return;
-        }
-        setBusy(true);
-        try {
-          var data = await api("/count-limits", {
-            method: "PUT",
-            body: JSON.stringify({ kind: kind, count: count })
-          });
-          document.getElementById("count-wc").value = data.countLimits.wc;
-          document.getElementById("count-smoke").value = data.countLimits.smoke;
-          document.getElementById("count-wcd").value = data.countLimits.wcd;
-          showNotice("Daily count limit saved.", "ok");
-        } catch (error) {
-          showNotice(error && error.message ? error.message : "Save failed.", "error");
-        } finally {
-          setBusy(false);
-        }
-      }
-
       async function saveReminder() {
         setBusy(true);
         try {
