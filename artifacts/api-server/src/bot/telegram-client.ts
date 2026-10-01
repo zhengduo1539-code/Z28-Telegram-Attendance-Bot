@@ -176,7 +176,7 @@ export class TelegramClient {
     return this.call<{ status: string }>("getChatMember", {
       chat_id: chatId,
       user_id: userId,
-    });
+    }, "high");
   }
 
   getChatMemberCount(chatId: number) {
@@ -212,13 +212,13 @@ export class TelegramClient {
             },
           }
         : {}),
-    });
+    }, "normal");
   }
 
   answerCallbackQuery(callbackQueryId: string) {
     return this.call("answerCallbackQuery", {
       callback_query_id: callbackQueryId,
-    });
+    }, "high");
   }
 
   setChatMenuButton(
