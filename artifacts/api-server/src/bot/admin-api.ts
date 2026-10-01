@@ -257,6 +257,57 @@ adminApiRouter.get("/groups", async (req, res) => {
   });
 });
 
+adminApiRouter.get("/analytics", async (req, res) => {
+  const auth = requireAdmin(req, res);
+  if (!auth) return;
+  const requestedDays = Number(req.query.days);
+  const days = requestedDays === 7 || requestedDays === 30 || requestedDays === 90 ? requestedDays : 30;
+  const snapshot = await auth.context.attendance.snapshot();
+  const activeActivities = await auth.context.attendance.listActiveActivities();
+  const now = Date.now();
+  const start = now - days * 24 * 60 * 60 * 1000;
+  const daily = new Map<string, { activities: number; seconds: number; users: Set<number> }>();
+  const kindTotals: Record<ActivityKind, { count: number; seconds: number }> = {
+    eat: { count: 0, seconds: 0 }, wc: { count: 0, seconds: 0 },
+    smoke: { count: 0, seconds: 0 }, wcd: { count: 0, seconds: 0 },
+  };
+  for (const record of snapshot.records) {
+    const ended = new Date(record.endedAt).getTime();
+    if (!Number.isFinite(ended) || ended < start || ended > now) continue;
+    const day = record.endedAt.slice(0, 10);
+    const bucket = daily.get(day) || { activities: 0, seconds: 0, users: new Set<number>() };
+    bucket.activities += 1;
+    bucket.seconds += Math.max(0, record.elapsedSeconds || 0);
+    bucket.users.add(record.userId);
+    daily.set(day, bucket);
+    kindTotals[record.kind].count += 1;
+    kindTotals[record.kind].seconds += Math.max(0, record.elapsedSeconds || 0);
+  }
+  const dailySeries = Array.from({ length: days }, (_, index) => {
+    const date = new Date(now - (days - 1 - index) * 24 * 60 * 60 * 1000);
+    const key = date.toISOString().slice(0, 10);
+    const bucket = daily.get(key);
+    return { date: key, activities: bucket?.activities || 0, minutes: Math.round((bucket?.seconds || 0) / 60), users: bucket?.users.size || 0 };
+  });
+  const totalActivities = dailySeries.reduce((sum, item) => sum + item.activities, 0);
+  const totalMinutes = dailySeries.reduce((sum, item) => sum + item.minutes, 0);
+  const uniqueUsers = new Set(snapshot.records.filter((r) => {
+    const ended = new Date(r.endedAt).getTime();
+    return Number.isFinite(ended) && ended >= start && ended <= now;
+  }).map((r) => r.userId)).size;
+  const uniqueGroups = new Set(snapshot.records.filter((r) => {
+    const ended = new Date(r.endedAt).getTime();
+    return Number.isFinite(ended) && ended >= start && ended <= now;
+  }).map((r) => r.chatId)).size;
+  res.setHeader("Cache-Control", "no-store");
+  res.json({
+    periodDays: days,
+    summary: { totalActivities, totalMinutes, uniqueUsers, uniqueGroups, activeNow: activeActivities.length },
+    daily: dailySeries,
+    kinds: kindTotals,
+  });
+});
+
 adminApiRouter.get("/audit-logs", async (req, res) => {
   const auth = requireAdmin(req, res);
   if (!auth) return;
