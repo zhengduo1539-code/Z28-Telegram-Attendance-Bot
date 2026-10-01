@@ -23,7 +23,7 @@ const requireAdmin = (req: Request, res: Response) => {
   }
 
   const sessionToken = req.header("x-admin-session")?.trim() || "";
-  const sessionUser = sessionToken ? getAdminSession(sessionToken) : undefined;
+  const sessionUser = sessionToken ? getAdminSession(sessionToken, context.config.token) : undefined;
   if (sessionUser) return { context, user: sessionUser };
 
   const validated = validateTelegramInitData(
@@ -96,7 +96,7 @@ adminApiRouter.post("/session", async (req, res) => {
     sendUnauthorized(res, 403, "Admin access required.");
     return;
   }
-  const session = createAdminSession(validated.user);
+  const session = createAdminSession(validated.user, context.config.token);
   res.setHeader("Cache-Control", "no-store");
   res.json({ session, expiresInSeconds: 30 * 60 });
 });
