@@ -763,16 +763,17 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       border-color: rgba(255,180,45,.24);
     }
 
-    .panel-only-user { display: none; }
+    /* Nothing is visible until the Mini App mode is resolved. */
     .panel-only-private,
-    .panel-only-group {
-      display: none;
+    .panel-only-group,
+    .panel-only-user {
+      display: none !important;
     }
 
     .panel-only-private.visible,
     .panel-only-group.visible,
     .panel-only-user.visible {
-      display: block;
+      display: block !important;
     }
 
     /* Regular users have two distinct screens: verification first, dashboard after verification. */
@@ -1386,69 +1387,29 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       display: none;
     }
 
-    .user-no-group-card {
-      width: min(650px, 100%);
-      padding: 28px 22px;
-      text-align: center;
-      border: 1px solid rgba(255,180,45,.28);
-      border-radius: 24px;
-      background: linear-gradient(145deg, rgba(37,24,5,.92), rgba(52,33,8,.74));
-      box-shadow: 0 20px 44px rgba(0,0,0,.36), inset 0 1px 0 rgba(255,255,255,.05);
-    }
-
-    .user-no-group-icon {
-      width: 64px;
-      height: 64px;
-      margin: 0 auto 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 20px;
-      color: #ffd166;
-      background: linear-gradient(145deg, rgba(255,180,45,.18), rgba(77,46,8,.88));
-      border: 1px solid rgba(255,209,102,.28);
-      box-shadow: 0 0 28px rgba(255,171,44,.16);
-      animation: noGroupPulse 1.8s ease-in-out infinite;
-    }
-
-    .user-no-group-icon svg {
-      width: 31px;
-      height: 31px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 1.8;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    @keyframes noGroupPulse {
-      0%,100% { transform: scale(.96); box-shadow: 0 0 20px rgba(255,171,44,.10); }
-      50% { transform: scale(1); box-shadow: 0 0 34px rgba(255,171,44,.22); }
-    }
-
-    .user-no-group-title {
-      margin: 0;
-      color: #fff3cf;
-      font-size: clamp(21px, 5vw, 28px);
-      font-weight: 850;
-    }
-
+    /* No-group warning is intentionally a blank page: message only, no card, icon, border or controls. */
     .user-no-group-message {
-      margin: 10px auto 0;
-      max-width: 560px;
+      margin: 0 auto;
+      max-width: 640px;
+      padding: 0 18px;
+      text-align: center;
       color: #dfc58e;
-      font-size: 13px;
-      line-height: 1.7;
+      font-size: 14px;
+      line-height: 1.75;
     }
 
     .user-no-group-message strong {
-      color: #ffffff;
+      display: block;
+      margin-bottom: 8px;
+      color: #fff3cf;
+      font-size: clamp(20px, 5vw, 27px);
       font-weight: 850;
     }
 
     .user-no-group-message span {
-      display: block;
-      margin-top: 6px;
+      display: inline;
+      color: #d5b77a;
+      font-size: 13px;
     }
 
     .user-mode.user-no-group-page .top,
@@ -1661,21 +1622,11 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       <button class="user-confirm" id="user-confirm" type="button" disabled>Confirm</button>
     </section>
 
-    <section class="panel-only-user user-no-group-screen" id="user-no-group-screen">
-      <div class="user-no-group-card">
-        <div class="user-no-group-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="9"></circle>
-            <path d="M12 7v6"></path>
-            <path d="M12 16.5h.01"></path>
-          </svg>
-        </div>
-        <h2 class="user-no-group-title" id="user-no-group-title">No eligible group found</h2>
-        <p class="user-no-group-message" id="user-no-group-message">
-          <strong>Add this bot to a group, then make sure your Telegram account is a group owner or administrator.</strong>
-          <span>Groups where the bot is no longer available are not shown.</span>
-        </p>
-      </div>
+    <section class="panel-only-user user-no-group-screen" id="user-no-group-screen" aria-live="polite">
+      <p class="user-no-group-message" id="user-no-group-message">
+        <strong>No eligible group found</strong>
+        <span>Add this bot to a group, then make sure your Telegram account is a group owner or administrator. Groups where the bot is no longer available are not shown.</span>
+      </p>
     </section>
 
     <section class="panel-only-user user-dashboard" id="user-dashboard">
@@ -2052,10 +2003,9 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         document.querySelector("#user-group-options .user-page-title").textContent = tUser("groupOptions");
         document.querySelector("#user-group-options .user-page-sub").textContent = tUser("groupOptionsSub");
         document.getElementById("user-dashboard-sub").textContent = tUser("dashboardSub");
-        document.getElementById("user-no-group-title").textContent = tUser("noGroup");
         document.getElementById("user-no-group-message").innerHTML =
-          '<strong>' + escapeHtml(tUser("noGroupLead")) + '</strong>' +
-          '<span>' + escapeHtml(tUser("noGroupTail")) + '</span>';
+          '<strong>' + escapeHtml(tUser("noGroup")) + '</strong>' +
+          '<span>' + escapeHtml(tUser("noGroupLead")) + ' ' + escapeHtml(tUser("noGroupTail")) + '</span>';
         document.querySelectorAll(".user-language-option").forEach(function(option) {
           option.classList.toggle("active", option.getAttribute("data-user-lang") === userLanguage);
         });
