@@ -44,6 +44,16 @@ export class ActivityReminderScheduler {
         }
       }
 
+      if (now - this.lastCleanupAt >= CLEANUP_INTERVAL_MS) {
+        const protection = await this.attendance.enforceStorageProtection();
+        if (protection.health?.status !== "healthy") {
+          this.logger.warn(
+            { storage: protection.health, cleanup: protection.cleanup },
+            "MongoDB storage protection threshold reached",
+          );
+        }
+      }
+
       const dueActivities = await this.attendance.dueActivityReminders();
       for (const candidate of dueActivities) {
         await this.sendReminder(candidate);
