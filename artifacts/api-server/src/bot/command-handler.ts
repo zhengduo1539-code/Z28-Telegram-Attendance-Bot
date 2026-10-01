@@ -131,6 +131,14 @@ export class CommandHandler {
     const profile = profileFromUser(message, currentLocale);
     if (!profile) return;
 
+    if (message.chat.type === "group" || message.chat.type === "supergroup") {
+      await this.attendance.recordManagedGroup(
+        message.chat.id,
+        message.chat.title || String(message.chat.id),
+        message.chat.username,
+      );
+    }
+
     // Do not block normal update handling on Telegram's command-menu API.
     // A slow/failing setMyCommands call must never make the bot appear frozen.
     void this.ensureAdminCommandMenu(message, profile.userId, profile.locale);
