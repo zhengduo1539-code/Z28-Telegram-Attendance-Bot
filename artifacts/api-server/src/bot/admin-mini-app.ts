@@ -8,90 +8,340 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
   <script src="https://telegram.org/js/telegram-web-app.js?63"></script>
   <style>
     :root {
-      --bg: #f4f6f8;
-      --card: #ffffff;
-      --text: #18212f;
-      --muted: #687386;
-      --line: #dde3ea;
-      --accent: #2481cc;
-      --danger: #d94a4a;
-      --ok: #18875a;
-      --radius: 18px;
+      --bg: #050914;
+      --surface: rgba(9, 17, 31, 0.78);
+      --text: #f7f9fc;
+      --muted: #9ca9bb;
+      --line: rgba(91, 155, 255, 0.22);
+      --accent: #1677ff;
+      --danger: #ff6b6b;
+      --ok: #55d89b;
+      --radius: 20px;
     }
+
     * { box-sizing: border-box; }
+    html, body { min-height: 100%; }
+
     body {
       margin: 0;
       padding: max(14px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right))
         max(22px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
-      background: var(--tg-theme-bg-color, var(--bg));
-      color: var(--tg-theme-text-color, var(--text));
+      background:
+        radial-gradient(circle at 12% 12%, rgba(23, 119, 255, 0.22), transparent 28%),
+        radial-gradient(circle at 86% 8%, rgba(0, 198, 255, 0.14), transparent 24%),
+        linear-gradient(145deg, #02040a 0%, #061126 46%, #02050e 100%);
+      color: var(--text);
       font: 16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      overflow-x: hidden;
     }
-    .wrap { max-width: 760px; margin: 0 auto; }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      z-index: 0;
+      pointer-events: none;
+      border-radius: 42% 58% 60% 40% / 46% 38% 62% 54%;
+      filter: blur(42px);
+      opacity: 0.65;
+      transform: rotate(-18deg);
+    }
+
+    body::before {
+      width: 280px;
+      height: 280px;
+      left: -110px;
+      top: 24%;
+      background: rgba(15, 103, 255, 0.38);
+    }
+
+    body::after {
+      width: 320px;
+      height: 320px;
+      right: -140px;
+      bottom: 8%;
+      background: rgba(0, 166, 255, 0.28);
+    }
+
+    #splash {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      transition: opacity 0.45s ease, visibility 0.45s ease;
+    }
+
+    #splash.hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    #splash-title {
+      margin: 0;
+      padding: 0 24px;
+      text-align: center;
+      font-size: clamp(24px, 7vw, 34px);
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      color: transparent;
+      background: linear-gradient(
+        110deg,
+        #111827 10%,
+        #6b7280 30%,
+        #111827 44%,
+        #a7adb7 54%,
+        #111827 70%
+      );
+      background-size: 250% auto;
+      background-clip: text;
+      -webkit-background-clip: text;
+      animation: welcomeShine 1.55s linear infinite;
+    }
+
+    @keyframes welcomeShine {
+      to { background-position: -250% center; }
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
     .top {
-      display: flex; justify-content: space-between; gap: 12px; align-items: flex-start;
-      margin: 2px 0 16px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      margin: 4px 0 16px;
+      padding: 4px 2px;
     }
-    h1 { margin: 0; font-size: 25px; }
-    .sub { color: var(--tg-theme-hint-color, var(--muted)); margin-top: 4px; }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(25px, 6vw, 31px);
+      font-weight: 850;
+      letter-spacing: -0.02em;
+      color: transparent;
+      background: linear-gradient(
+        90deg,
+        #ff3b30,
+        #ff9f0a,
+        #ffd60a,
+        #34c759,
+        #00c7be,
+        #0a84ff,
+        #5e5ce6,
+        #bf5af2,
+        #ff2d55,
+        #ff3b30
+      );
+      background-size: 220% auto;
+      background-clip: text;
+      -webkit-background-clip: text;
+      animation: rainbowFlow 5s linear infinite;
+    }
+
+    @keyframes rainbowFlow {
+      to { background-position: 220% center; }
+    }
+
+    .sub {
+      color: #93a4ba;
+      margin-top: 5px;
+    }
+
     .refresh {
-      min-height: 44px; border: 0; border-radius: 12px; padding: 0 14px;
-      background: var(--tg-theme-secondary-bg-color, #e9eef3);
-      color: var(--tg-theme-text-color, var(--text)); font-weight: 700;
+      min-height: 44px;
+      border: 1px solid rgba(130, 191, 255, 0.35);
+      border-radius: 13px;
+      padding: 0 15px;
+      background: #1677ff;
+      color: #ffffff;
+      font-weight: 750;
+      box-shadow: 0 8px 22px rgba(22, 119, 255, 0.24);
+      cursor: pointer;
     }
+
+    .refresh:active,
+    button.save:active {
+      transform: translateY(1px);
+    }
+
     .card {
-      background: var(--tg-theme-secondary-bg-color, var(--card));
-      border: 1px solid var(--tg-theme-section-bg-color, var(--line));
-      border-radius: var(--radius); padding: 16px; margin-bottom: 14px;
+      background: linear-gradient(145deg, rgba(8, 16, 30, 0.88), rgba(7, 29, 58, 0.72));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow:
+        0 16px 34px rgba(0, 0, 0, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.035);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
     }
+
     .card h2 { margin: 0 0 12px; font-size: 18px; }
-    .stats { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
-    .stat { background: var(--tg-theme-bg-color,#f7f8fa); border-radius: 14px; padding: 14px; }
-    .stat-label { color: var(--tg-theme-hint-color,var(--muted)); font-size: 13px; }
-    .stat-value { font-size: 28px; font-weight: 800; margin-top: 4px; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .stat {
+      background: linear-gradient(145deg, rgba(16, 39, 72, 0.76), rgba(5, 18, 36, 0.85));
+      border: 1px solid rgba(85, 154, 255, 0.14);
+      border-radius: 15px;
+      padding: 14px;
+    }
+
+    .stat-label,
+    .hint { color: var(--muted); }
+
+    .stat-label { font-size: 13px; }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 800;
+      margin-top: 4px;
+      color: #ffffff;
+    }
+
     .rows { display: grid; gap: 10px; }
+
     .row {
-      display: grid; grid-template-columns: minmax(0,1fr) 120px; gap: 12px; align-items: center;
+      display: grid;
+      grid-template-columns: minmax(0,1fr) 120px;
+      gap: 12px;
+      align-items: center;
       padding: 6px 0;
     }
+
     label { font-weight: 650; }
-    .hint { display: block; color: var(--tg-theme-hint-color,var(--muted)); font-size: 12px; margin-top: 2px; }
-    input[type="number"], input[type="text"] {
-      width: 100%; min-height: 44px; padding: 9px 10px; border-radius: 11px;
-      border: 1px solid var(--line); background: var(--tg-theme-bg-color,#fff); color: inherit;
+
+    .hint {
+      display: block;
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    input[type="number"],
+    input[type="text"] {
+      width: 100%;
+      min-height: 44px;
+      padding: 9px 10px;
+      border-radius: 11px;
+      border: 1px solid rgba(97, 161, 255, 0.24);
+      background: rgba(2, 9, 20, 0.82);
+      color: #ffffff;
       font-size: 16px;
+      outline: none;
     }
-    input:disabled { opacity: .6; }
-    .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+
+    input[type="number"]:focus,
+    input[type="text"]:focus {
+      border-color: rgba(72, 157, 255, 0.72);
+      box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.14);
+    }
+
+    input::placeholder { color: #6f8198; }
+    input:disabled { opacity: .58; }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
     button.save {
-      min-height: 44px; border: 0; border-radius: 12px; padding: 0 16px;
-      background: var(--accent); color: white; font-weight: 750;
+      min-height: 44px;
+      border: 1px solid rgba(130, 191, 255, 0.32);
+      border-radius: 12px;
+      padding: 0 16px;
+      background: linear-gradient(180deg, #2b8cff, #1268e6);
+      color: #ffffff;
+      font-weight: 750;
+      box-shadow: 0 8px 20px rgba(18, 104, 230, 0.25);
+      cursor: pointer;
     }
-    button:disabled { opacity: .55; }
+
+    button:disabled {
+      opacity: .55;
+      cursor: default;
+    }
+
     .toggle {
-      display: flex; align-items: center; justify-content: space-between; gap: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
       min-height: 44px;
     }
+
     .toggle input { width: 22px; height: 22px; }
-    .notice { padding: 11px 13px; border-radius: 12px; margin-bottom: 14px; display: none; }
-    .notice.show { display: block; }
-    .notice.error { background: rgba(217,74,74,.12); color: var(--danger); }
-    .notice.ok { background: rgba(24,135,90,.12); color: var(--ok); }
-    .panel-only-group { display: none; }
-    .panel-only-private { display: none; }
-    .visible { display: block; }
-    .connection {
-      padding: 11px 13px; border-radius: 12px;
-      background: var(--tg-theme-bg-color,#f7f8fa); margin-bottom: 12px;
+
+    .notice {
+      padding: 11px 13px;
+      border-radius: 12px;
+      margin-bottom: 14px;
+      display: none;
+      background: rgba(6, 15, 29, 0.9);
+      border: 1px solid rgba(104, 166, 255, 0.18);
     }
-    .connection strong { display: block; margin-bottom: 3px; }
+
+    .notice.show { display: block; }
+
+    .notice.error {
+      background: rgba(217,74,74,.12);
+      color: #ff8787;
+      border-color: rgba(255,107,107,.2);
+    }
+
+    .notice.ok {
+      background: rgba(24,135,90,.12);
+      color: #6ee7b7;
+      border-color: rgba(85,216,155,.2);
+    }
+
+    .panel-only-group,
+    .panel-only-private { display: none; }
+
+    .visible { display: block; }
+
+    .connection {
+      padding: 11px 13px;
+      border-radius: 12px;
+      background: rgba(2, 11, 24, 0.65);
+      border: 1px solid rgba(92, 156, 255, 0.13);
+      margin-bottom: 12px;
+    }
+
+    .connection strong {
+      display: block;
+      margin-bottom: 3px;
+      color: #ffffff;
+    }
+
     @media (max-width: 480px) {
       .row { grid-template-columns: minmax(0,1fr) 102px; }
       .stats { grid-template-columns: 1fr 1fr; }
+      .top { align-items: center; }
+      .refresh { padding: 0 13px; }
     }
   </style>
 </head>
 <body>
+  <div id="splash" aria-label="Loading">
+    <h1 id="splash-title">Welcome from Zheng Duo</h1>
+  </div>
+
   <main class="wrap" id="app">
     <div class="top">
       <div>
@@ -158,12 +408,23 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
   <script>
     (function () {
       var tg = window.Telegram && window.Telegram.WebApp;
+      var splash = document.getElementById("splash");
+      var splashStartedAt = Date.now();
       var identity = document.getElementById("identity");
       var title = document.getElementById("title");
       var app = document.getElementById("app");
       var notice = document.getElementById("notice");
+      function hideSplash() {
+        var elapsed = Date.now() - splashStartedAt;
+        var remaining = Math.max(0, 850 - elapsed);
+        window.setTimeout(function () {
+          splash.classList.add("hide");
+        }, remaining);
+      }
+
       if (!tg || !tg.initData) {
         identity.textContent = "Open this page inside Telegram.";
+        hideSplash();
         return;
       }
 
@@ -258,6 +519,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           showNotice(error && error.message ? error.message : "Unable to load admin data.", "error");
         } finally {
           setBusy(false);
+          hideSplash();
         }
       }
 
