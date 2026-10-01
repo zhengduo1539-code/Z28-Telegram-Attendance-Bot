@@ -13,6 +13,7 @@ type LocaleText = {
   help: string;
   idInfo: (chatId: number, userId: number) => string;
   botStats: (privateUsers: number, groups: number) => string;
+  botStatsPrivate: string;
   noActive: (displayName: string, userId: number) => string;
   alreadyActive: (
     displayName: string,
@@ -169,6 +170,7 @@ const zh: LocaleText = {
     `活动开始后请在回座时使用 ${inlineCode("/back")}。`,
   ].join("\n"),
   idInfo: (chatId, userId) => `群组标识：${inlineCode(chatId)}\n用户标识：${inlineCode(userId)}`,
+  botStatsPrivate: "请在私聊中使用 /stats。",
   botStats: (privateUsers, groups) => [
     "📊 Bot Statistics",
     "",
@@ -387,6 +389,7 @@ const en: LocaleText = {
     `Use ${inlineCode("/back")} when you return.`,
   ].join("\n"),
   idInfo: (chatId, userId) => `Chat ID: ${inlineCode(chatId)}\nUser ID: ${inlineCode(userId)}`,
+  botStatsPrivate: "Please use /stats in a private chat.",
   botStats: (privateUsers, groups) => [
     "📊 Bot Statistics",
     "",
