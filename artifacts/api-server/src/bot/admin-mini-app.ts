@@ -1100,7 +1100,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       <div id="user-group-list" class="user-group-list"></div>
     </section>
 
-    <section class="card" id="limits-card" data-section="activity">
+    <section class="card panel-only-private panel-only-group" id="limits-card" data-section="activity">
       <h2>
         <span class="section-icon activity-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24">
@@ -1132,7 +1132,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       </div>
     </section>
 
-    <section class="card" id="counts-card" data-section="counts">
+    <section class="card panel-only-private panel-only-group" id="counts-card" data-section="counts">
       <h2>
         <span class="section-icon counts-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24">
