@@ -121,8 +121,8 @@ groupAdminApiRouter.get("/summary", async (req, res) => {
 
   const [group, limits, rawCountLimits, connection] = await Promise.all([
     auth.context.telegram.getChat(auth.groupId),
-    auth.context.attendance.getActivityLimits(),
-    auth.context.attendance.getActivityCountLimits(),
+    auth.context.attendance.getActivityLimits(auth.groupId),
+    auth.context.attendance.getActivityCountLimits(auth.groupId),
     auth.context.attendance.getConnectedGroup(auth.groupId),
   ]);
 
@@ -161,6 +161,7 @@ groupAdminApiRouter.put("/activity-limits", async (req, res) => {
   const activityLimits = await auth.context.attendance.setActivityLimit(
     kind as ActivityKind,
     minutes,
+    auth.groupId,
   );
   res.setHeader("Cache-Control", "no-store");
   res.json({ activityLimits });
@@ -184,6 +185,7 @@ groupAdminApiRouter.put("/count-limits", async (req, res) => {
   const countLimits = await auth.context.attendance.setActivityCountLimit(
     kind as ActivityKind,
     count,
+    auth.groupId,
   );
   res.setHeader("Cache-Control", "no-store");
   res.json({ countLimits: serializeCountLimits(countLimits) });
