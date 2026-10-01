@@ -372,6 +372,70 @@ adminApiRouter.get("/users", async (req, res) => {
   });
 });
 
+adminApiRouter.get("/group-health", async (req, res) => {
+  const auth = requireAdmin(req, res);
+  if (!auth) return;
+  const chatId = Number(req.query.chatId);
+  if (!Number.isSafeInteger(chatId) || chatId >= 0) {
+    res.status(400).json({ error: "A valid group chat ID is required." });
+    return;
+  }
+
+  const snapshot = await auth.context.attendance.snapshot();
+  const group = snapshot.managedGroups?.[String(chatId)];
+  if (!group) {
+    res.status(404).json({ error: "Managed group not found." });
+    return;
+  }
+
+  const checkedAt = new Date().toISOString();
+  const startedAt = Date.now();
+  const checks: Array<{ name: string; status: "ok" | "error"; latencyMs: number; detail: string }> = [];
+
+  const runCheck = async (name: string, task: () => Promise<string>) => {
+    const started = Date.now();
+    try {
+      const detail = await task();
+      checks.push({ name, status: "ok", latencyMs: Date.now() - started, detail });
+    } catch (error: unknown) {
+      checks.push({
+        name,
+        status: "error",
+        latencyMs: Date.now() - started,
+        detail: error instanceof Error ? error.message.slice(0, 240) : "Telegram check failed",
+      });
+    }
+  };
+
+  await runCheck("Telegram access", async () => {
+    const chat = await auth.context.telegram.getChat(chatId);
+    return chat.type + (chat.title ? " · " + chat.title : "");
+  });
+  await runCheck("Member count", async () => {
+    const count = await auth.context.telegram.getChatMemberCount(chatId);
+    return String(count) + " members";
+  });
+
+  const connection = snapshot.connectedGroups?.[String(chatId)];
+  if (connection) {
+    await runCheck("Connected destination", async () => {
+      const chat = await auth.context.telegram.getChat(connection.targetChatId);
+      return chat.type + (chat.title ? " · " + chat.title : "");
+    });
+  }
+
+  const healthy = checks.every((check) => check.status === "ok");
+  res.setHeader("Cache-Control", "no-store");
+  res.json({
+    chatId,
+    group: { title: group.title, username: group.username || null },
+    healthy,
+    checks,
+    totalLatencyMs: Date.now() - startedAt,
+    checkedAt,
+  });
+});
+
 adminApiRouter.get("/groups", async (req, res) => {
   const auth = requireAdmin(req, res);
   if (!auth) return;
