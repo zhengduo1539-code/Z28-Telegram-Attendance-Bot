@@ -766,8 +766,13 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     /* Nothing is visible until the Mini App mode is resolved. */
     .panel-only-private,
     .panel-only-group,
-    .panel-only-user {
+    .panel-only-user,
+    .panel-only-admin-verify {
       display: none !important;
+    }
+
+    .panel-only-admin-verify.visible {
+      display: block !important;
     }
 
     .panel-only-private.visible,
@@ -797,12 +802,31 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     }
 
     .user-mode.user-verification-page .top { display:none !important; }
+    .admin-verification-page .top { display:none !important; }
     .user-mode.user-dashboard-page .top { display:flex; }
     .user-dashboard-page .top .sub { display:none; }
     .user-mode.user-dashboard-page .top .credit-marquee { display:block; }
 
     .user-mode.user-dashboard-page .user-card#user-verify-card {
       display: none !important;
+    }
+
+    .admin-verification-page .panel-only-admin-verify {
+      display: block !important;
+    }
+
+    .admin-verification-page .user-card#user-verify-card {
+      display: block !important;
+    }
+
+    .admin-verification-page .wrap {
+      min-height: calc(100vh - max(36px, env(safe-area-inset-top) + env(safe-area-inset-bottom)));
+      display: flex;
+      align-items: center;
+    }
+
+    .admin-verification-page .panel-only-admin-verify {
+      width: 100%;
     }
 
     .user-mode.user-dashboard-page .panel-only-user#user-dashboard,
@@ -2584,7 +2608,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       </div>
     </section>
 
-    <section class="card user-card panel-only-user" id="user-verify-card">
+    <section class="card user-card panel-only-admin-verify panel-only-user" id="user-verify-card">
       <div class="user-language-switcher">
         <button class="user-language-button" id="user-language-button" type="button" aria-label="Change language" aria-expanded="false">
           <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -2834,7 +2858,9 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         "";
       var groupMode = /^group_-\d+$/.test(startParam);
       var userMode = false;
+      var userMode = false;
       var adminMode = false;
+      var adminVerificationMode = false;
       var apiBase = groupMode ? "/api/group-admin" : "/api/admin";
       var telegramUserId =
         tg.initDataUnsafe && tg.initDataUnsafe.user
@@ -2855,6 +2881,12 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           idLabel: "Telegram User ID",
           idPlaceholder: "Enter your Telegram ID",
           idHint: "Your ID must match the Telegram account currently opening this Mini App.",
+          adminVerifyTitle: "Admin Access Verification",
+          adminVerifySubtitle: "Bot Owner / Administrator",
+          adminVerifyLead: "Bot owner or admin_ids ID ထည့်ပါ",
+          adminIdLabel: "Bot owner or admin_ids ID",
+          adminIdPlaceholder: "Bot owner or admin_ids ID ထည့်ပါ",
+          adminIdHint: "The entered ID must match the Telegram account currently opening this Mini App.",
           confirm: "Confirm",
           confirmed: "Confirmed",
           settings: "Admin Settings",
@@ -2898,6 +2930,12 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           idLabel: "Telegram User ID",
           idPlaceholder: "Telegram ID ထည့်ပါ",
           idHint: "ထည့်ထားသော ID သည် ယခု Mini App ဖွင့်ထားသော Telegram account နှင့် ကိုက်ညီရမည်။",
+          adminVerifyTitle: "Admin Access Verification",
+          adminVerifySubtitle: "Bot Owner / Administrator",
+          adminVerifyLead: "Bot owner or admin_ids ID ထည့်ပါ",
+          adminIdLabel: "Bot owner or admin_ids ID",
+          adminIdPlaceholder: "Bot owner or admin_ids ID ထည့်ပါ",
+          adminIdHint: "ထည့်ထားသော ID သည် ယခု Mini App ဖွင့်ထားသော Telegram account နှင့် ကိုက်ညီရမည်။",
           confirm: "အတည်ပြုမည်",
           confirmed: "အတည်ပြုပြီး",
           settings: "Admin Settings",
@@ -2941,6 +2979,12 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           idLabel: "Telegram 用户 ID",
           idPlaceholder: "请输入 Telegram ID",
           idHint: "输入的 ID 必须与当前打开此 Mini App 的 Telegram 账号一致。",
+          adminVerifyTitle: "管理员访问验证",
+          adminVerifySubtitle: "Bot Owner / Administrator",
+          adminVerifyLead: "Bot owner or admin_ids ID ထည့်ပါ",
+          adminIdLabel: "Bot owner or admin_ids ID",
+          adminIdPlaceholder: "Bot owner or admin_ids ID ထည့်ပါ",
+          adminIdHint: "输入的 ID 必须与当前打开此 Mini App 的 Telegram 账号一致。",
           confirm: "确认",
           confirmed: "已确认",
           settings: "管理设置",
@@ -3034,6 +3078,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       function setPanelVisibility(mode) {
         userMode = mode === "user";
         adminMode = mode === "admin";
+        adminVerificationMode = mode === "admin-verify";
         document.body.classList.toggle("user-mode", userMode);
         document.body.classList.toggle("admin-mode", adminMode);
 
@@ -3042,6 +3087,9 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         });
         document.querySelectorAll(".panel-only-private").forEach(function (element) {
           element.classList.toggle("visible", mode === "admin");
+        });
+        document.querySelectorAll(".panel-only-admin-verify").forEach(function (element) {
+          element.classList.toggle("visible", mode === "admin-verify");
         });
         document.querySelectorAll(".panel-only-user").forEach(function (element) {
           element.classList.toggle("visible", mode === "user");
@@ -3232,6 +3280,13 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       }
 
       function clearUserDashboard() {
+        document.body.classList.remove("admin-verification-page");
+        document.getElementById("user-verify-title").textContent = tUser("verifyTitle");
+        document.getElementById("user-verify-subtitle").textContent = tUser("verifySubtitle");
+        document.getElementById("user-verify-lead").textContent = tUser("verifyLead");
+        document.getElementById("user-id-label").textContent = tUser("idLabel");
+        document.getElementById("user-id-input").placeholder = tUser("idPlaceholder");
+        document.getElementById("user-id-hint").textContent = tUser("idHint");
         document.getElementById("user-dashboard").classList.remove("visible");
         document.getElementById("user-group-options-list").innerHTML = "";
         document.getElementById("user-dashboard-sub").textContent = tUser("dashboardSub");
@@ -3241,7 +3296,26 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         document.body.classList.remove("user-dashboard-page");
       }
 
+      function showAdminVerificationPage() {
+        adminVerificationMode = true;
+        document.body.classList.remove("user-verification-page", "user-dashboard-page", "user-no-group-page");
+        document.body.classList.add("admin-verification-page");
+        document.getElementById("user-id-input").value = "";
+        document.getElementById("user-confirm").disabled = true;
+        document.getElementById("user-confirm").classList.remove("ready");
+        document.getElementById("user-confirm").textContent = tUser("confirm");
+        document.getElementById("user-verify-title").textContent = tUser("adminVerifyTitle");
+        document.getElementById("user-verify-subtitle").textContent = tUser("adminVerifySubtitle");
+        document.getElementById("user-verify-lead").textContent = tUser("adminVerifyLead");
+        document.getElementById("user-id-label").textContent = tUser("adminIdLabel");
+        document.getElementById("user-id-input").placeholder = tUser("adminIdPlaceholder");
+        document.getElementById("user-id-hint").textContent = tUser("adminIdHint");
+        document.getElementById("user-verify-card").classList.add("visible");
+        title.textContent = tUser("adminVerifySubtitle");
+      }
+
       function showUserVerificationPage() {
+        adminVerificationMode = false;
         window.clearTimeout(showUserNoGroupScreen.timer);
         document.getElementById("user-no-group-screen").classList.remove("visible");
         clearUserDashboard();
@@ -3446,6 +3520,26 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         });
       }
 
+      async function apiUserMode() {
+        var headers = new Headers();
+        headers.set("X-Telegram-Init-Data", initData);
+        headers.set("Accept", "application/json");
+
+        var response = await fetch("/api/user/mode", {
+          method: "GET",
+          headers: headers
+        });
+        var data = await response.json().catch(function () { return {}; });
+        if (!response.ok) {
+          throw new Error(
+            typeof data.error === "string"
+              ? data.error
+              : "Unable to determine access mode."
+          );
+        }
+        return data;
+      }
+
       async function apiUserDashboard(userId, groupId) {
         var headers = new Headers();
         headers.set("X-Telegram-Init-Data", initData);
@@ -3601,8 +3695,18 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           userConfirm.disabled = true;
           userConfirm.classList.remove("ready");
           try {
-            var opened = await loadUserDashboard();
-            if (opened) userConfirm.innerHTML = "Confirmed";
+            if (adminVerificationMode) {
+              setPanelVisibility("admin");
+              document.body.classList.remove("admin-verification-page");
+              title.textContent = "Administration";
+              await load();
+              hideSplash();
+              startAdminDashboardRefresh();
+              userConfirm.innerHTML = "Confirmed";
+            } else {
+              var opened = await loadUserDashboard();
+              if (opened) userConfirm.innerHTML = "Confirmed";
+            }
           } catch (error) {
             showNotice(error && error.message ? error.message : "Verification failed.", "error");
             userConfirm.disabled = false;
@@ -3622,17 +3726,9 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         try {
           var modeData = await apiUserMode();
           if (modeData.isConfiguredAdmin) {
-            setPanelVisibility("admin");
-            title.textContent = "Administration";
-            try {
-              await load();
-            } catch (error) {
-              hideSplash();
-              showNotice(error && error.message ? error.message : "Unable to load the admin dashboard.", "error");
-              return;
-            }
+            setPanelVisibility("admin-verify");
+            showAdminVerificationPage();
             hideSplash();
-            startAdminDashboardRefresh();
           } else {
             setPanelVisibility("user");
             title.textContent = telegramUserId ? String(telegramUserId) + " " + tUser("title") : tUser("title");
