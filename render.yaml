@@ -13,5 +13,7 @@ services:
         sync: false
       - key: ADMIN_IDS
         sync: false
+      - key: ADMIN_MINI_APP_URL
+        sync: false
       - key: BOT_DATA_PATH
         value: data/m58-bot-state.json

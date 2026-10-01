@@ -33,6 +33,30 @@ export type BotConfig = {
   timeZone: string;
   botOwnerId?: number;
   adminIds: number[];
+  adminMiniAppUrl?: string;
+};
+
+const resolveAdminMiniAppUrl = (): string | undefined => {
+  const explicit = process.env["ADMIN_MINI_APP_URL"]?.trim();
+  const renderBase = process.env["RENDER_EXTERNAL_URL"]?.trim();
+  const base = explicit || renderBase;
+  if (!base) return undefined;
+
+  try {
+    const url = new URL(base);
+    if (url.protocol !== "https:") return undefined;
+
+    const normalizedPath = url.pathname.replace(/\/+$/, "");
+    if (!normalizedPath.endsWith("/admin")) {
+      url.pathname = normalizedPath + "/admin";
+    } else {
+      url.pathname = normalizedPath;
+    }
+
+    return url.toString().replace(/\/$/, "");
+  } catch {
+    return undefined;
+  }
 };
 
 export const getBotConfig = (): BotConfig => ({
@@ -49,4 +73,5 @@ export const getBotConfig = (): BotConfig => ({
   timeZone: "Asia/Rangoon",
   botOwnerId: parseUserId(process.env["BOT_OWNER_ID"]),
   adminIds: parseAdminIds(process.env["ADMIN_IDS"]),
+  adminMiniAppUrl: resolveAdminMiniAppUrl(),
 });
