@@ -1221,8 +1221,16 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       padding:0 15px; background:linear-gradient(180deg,#2b8cff,#1268e6); color:#fff; font-weight:750; cursor:pointer;
     }
     .user-warning-feed {
-      min-height:220px; max-height:430px; overflow:auto; padding:12px;
+      min-height:220px; max-height:none; overflow:auto; padding:12px;
       border:1px solid rgba(255,180,45,.22); border-radius:18px; background:rgba(26,18,6,.45);
+    }
+
+    .user-warning-tab-panel {
+      min-height: calc(100vh - 150px);
+    }
+
+    .user-warning-tab-panel .user-warning-feed {
+      min-height: calc(100vh - 190px);
     }
     .user-warning-item { padding:12px; margin-bottom:9px; border-radius:14px; border:1px solid rgba(255,180,45,.17); background:rgba(77,46,8,.22); }
     .user-warning-item:last-child { margin-bottom:0; }
@@ -1936,6 +1944,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         document.getElementById("user-settings-tab-button").classList.toggle("active", settings);
         document.getElementById("user-warning-tab-button").classList.toggle("active", !settings);
       }
+
+      activateUserTab("settings");
 
       document.getElementById("user-settings-tab-button").addEventListener("click", function () {
         activateUserTab("settings");
