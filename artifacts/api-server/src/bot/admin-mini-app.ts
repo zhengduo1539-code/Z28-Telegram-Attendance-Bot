@@ -757,6 +757,12 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       border-color: rgba(85,216,155,.2);
     }
 
+    .notice.warning {
+      background: rgba(77,46,8,.22);
+      color: #ffd98a;
+      border-color: rgba(255,180,45,.24);
+    }
+
     .panel-only-user { display: none; }
     .panel-only-private,
     .panel-only-group {
@@ -848,6 +854,102 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     }
 
     .user-card::before { display: none; }
+
+    .user-mode.user-verification-page .wrap {
+      min-height: calc(100vh - max(36px, env(safe-area-inset-top) + env(safe-area-inset-bottom)));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px 0;
+    }
+
+    .user-mode.user-verification-page .user-card#user-verify-card {
+      position: relative;
+      width: min(520px, 100%);
+      margin: 0;
+    }
+
+    .user-language-switcher {
+      position: absolute;
+      top: 13px;
+      right: 13px;
+      z-index: 4;
+    }
+
+    .user-language-button {
+      width: 42px;
+      height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      border: 1px solid rgba(111, 196, 255, 0.38);
+      background: linear-gradient(145deg, rgba(25, 126, 255, 0.26), rgba(8, 34, 66, 0.92));
+      color: #9fd4ff;
+      cursor: pointer;
+      box-shadow: 0 0 0 0 rgba(53, 166, 255, 0.32), 0 8px 22px rgba(0, 86, 190, 0.22);
+      animation: globePulse 2.1s ease-in-out infinite;
+    }
+
+    .user-language-button svg {
+      width: 23px;
+      height: 23px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      animation: globeSpin 6s linear infinite;
+    }
+
+    @keyframes globePulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(53,166,255,0), 0 8px 22px rgba(0,86,190,.22); }
+      50% { box-shadow: 0 0 0 7px rgba(53,166,255,.08), 0 10px 26px rgba(0,126,255,.30); }
+    }
+
+    @keyframes globeSpin {
+      to { transform: rotate(360deg); }
+    }
+
+    .user-language-menu {
+      position: absolute;
+      top: 49px;
+      right: 0;
+      width: 178px;
+      padding: 6px;
+      border: 1px solid rgba(91,155,255,.25);
+      border-radius: 15px;
+      background: rgba(4,12,25,.96);
+      box-shadow: 0 18px 38px rgba(0,0,0,.38);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .user-language-menu[hidden] { display: none; }
+
+    .user-language-option {
+      width: 100%;
+      min-height: 40px;
+      border: 0;
+      border-radius: 10px;
+      background: transparent;
+      color: #dbeafe;
+      text-align: left;
+      padding: 0 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .user-language-option:hover,
+    .user-language-option.active {
+      background: rgba(36,127,255,.18);
+      color: #fff;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .user-language-button,
+      .user-language-button svg { animation: none !important; }
+    }
 
     .user-lead {
       margin: 0 0 15px;
@@ -1350,6 +1452,20 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     </section>
 
     <section class="card user-card panel-only-user" id="user-verify-card">
+      <div class="user-language-switcher">
+        <button class="user-language-button" id="user-language-button" type="button" aria-label="Change language" aria-expanded="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="9"></circle>
+            <path d="M3 12h18"></path>
+            <path d="M12 3c2.4 2.5 3.6 5.5 3.6 9s-1.2 6.5-3.6 9c-2.4-2.5-3.6-5.5-3.6-9S9.6 5.5 12 3z"></path>
+          </svg>
+        </button>
+        <div class="user-language-menu" id="user-language-menu" hidden>
+          <button class="user-language-option active" type="button" data-user-lang="en">English</button>
+          <button class="user-language-option" type="button" data-user-lang="my">Burmese</button>
+          <button class="user-language-option" type="button" data-user-lang="zh">Chinese (Simplified)</button>
+        </div>
+      </div>
       <h2>
         <span class="section-icon stats-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24">
@@ -1357,13 +1473,13 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             <path d="M9.5 12l1.7 1.7 3.6-4"></path>
           </svg>
         </span>
-        <span class="section-title"><span>Verify Your Telegram ID</span><small>User Access</small></span>
+        <span class="section-title"><span id="user-verify-title">Verify Your Telegram ID</span><small id="user-verify-subtitle">User Access</small></span>
       </h2>
-      <p class="user-lead">Enter your Telegram user ID to open your group dashboard.</p>
+      <p class="user-lead" id="user-verify-lead">Enter your Telegram user ID to open your group dashboard.</p>
       <div class="user-id-wrap">
-        <label for="user-id-input">Telegram User ID</label>
+        <label for="user-id-input" id="user-id-label">Telegram User ID</label>
         <input class="user-id-input" id="user-id-input" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="Enter your Telegram ID">
-        <span class="user-id-hint">Your ID must match the Telegram account currently opening this Mini App.</span>
+        <span class="user-id-hint" id="user-id-hint">Your ID must match the Telegram account currently opening this Mini App.</span>
       </div>
       <button class="user-confirm" id="user-confirm" type="button" disabled>Confirm</button>
     </section>
@@ -1385,19 +1501,19 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
         <div class="user-tab-shell">
           <div class="user-tab-panel active" id="user-settings-tab">
-            <div class="user-group-box compact">
-              <div class="user-group-box-title">Group Activities</div>
-              <div class="user-group-name" id="user-warning-group-name"></div>
-              <div class="user-group-metrics">
-                <div class="user-live-metric"><div class="user-live-label">Group member</div><div class="user-live-value" id="user-member-count">—</div></div>
-                <div class="user-live-metric"><div class="user-live-label">Member active</div><div class="user-live-value active" id="user-active-count">—</div></div>
-              </div>
-            </div>
             <div class="user-setting-card" id="user-settings-limits-card"></div>
             <div class="user-setting-card counts" id="user-settings-counts-card"></div>
           </div>
 
           <div class="user-tab-panel user-warning-tab-panel" id="user-warning-tab">
+            <div class="user-group-box compact">
+              <div class="user-group-box-title" id="user-group-activities-title">Group Activities</div>
+              <div class="user-group-name" id="user-warning-group-name"></div>
+              <div class="user-group-metrics">
+                <div class="user-live-metric"><div class="user-live-label" id="user-group-member-label">Group member</div><div class="user-live-value" id="user-member-count">—</div></div>
+                <div class="user-live-metric"><div class="user-live-label" id="user-member-active-label">Member active</div><div class="user-live-value active" id="user-active-count">—</div></div>
+              </div>
+            </div>
             <div class="user-warning-feed" id="user-warning-feed"><div class="user-warning-empty">No warning messages yet.</div></div>
           </div>
         </div>
@@ -1560,7 +1676,162 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           : undefined;
       var userLoading = document.getElementById("user-loading");
       var userVerifiedKey = "z28_verified_user_id";
+      var userLanguageKey = "z28_user_language";
+      var userLanguage = "en";
       var userDashboardRefreshTimer = null;
+
+      var userUiText = {
+        en: {
+          title: "User Dashboard",
+          verifyTitle: "Verify Your Telegram ID",
+          verifySubtitle: "User Access",
+          verifyLead: "Enter your Telegram user ID to open your group dashboard.",
+          idLabel: "Telegram User ID",
+          idPlaceholder: "Enter your Telegram ID",
+          idHint: "Your ID must match the Telegram account currently opening this Mini App.",
+          confirm: "Confirm",
+          confirmed: "Confirmed",
+          settings: "Admin Settings",
+          warning: "Warning",
+          groupOptions: "Group Options",
+          groupOptionsSub: "Select a group to open its dashboard.",
+          dashboardSub: "Live activity overview",
+          groupActivities: "Group Activities",
+          groupMember: "Group member",
+          memberActive: "Member active",
+          noWarnings: "No warning messages yet.",
+          saveLimits: "Save Limits",
+          saveCountLimits: "Save Count Limits",
+          activityLimits: "Activity Limits",
+          durationControl: "Duration Control",
+          dailyCountLimits: "Daily Count Limits",
+          dailyUsageControl: "Daily Usage Control",
+          warningTitle: "⚠ Activity Warning",
+          warningStatus: "Single activity exceeded time limit",
+          status: "Status",
+          overtime: "Overtime",
+          user: "User",
+          activity: "Activity",
+          group: "Group",
+          switch: "Switch",
+          noGroup: "No eligible group found",
+          noGroupMessage: "Add this bot to a group, then make sure your Telegram account is a group owner or administrator. Groups where the bot is no longer available are not shown.",
+          idMismatch: "The entered ID does not match your Telegram account."
+        },
+        my: {
+          title: "User Dashboard",
+          verifyTitle: "Telegram ID အတည်ပြုရန်",
+          verifySubtitle: "User Access",
+          verifyLead: "သင့် Group Dashboard ကိုဖွင့်ရန် Telegram User ID ကိုထည့်ပါ။",
+          idLabel: "Telegram User ID",
+          idPlaceholder: "Telegram ID ထည့်ပါ",
+          idHint: "ထည့်ထားသော ID သည် ယခု Mini App ဖွင့်ထားသော Telegram account နှင့် ကိုက်ညီရမည်။",
+          confirm: "အတည်ပြုမည်",
+          confirmed: "အတည်ပြုပြီး",
+          settings: "Admin Settings",
+          warning: "Warning",
+          groupOptions: "Group Options",
+          groupOptionsSub: "Dashboard ဖွင့်ရန် Group တစ်ခုကိုရွေးပါ။",
+          dashboardSub: "Live activity overview",
+          groupActivities: "Group Activities",
+          groupMember: "Group member",
+          memberActive: "Member active",
+          noWarnings: "Warning message မရှိသေးပါ။",
+          saveLimits: "Limits သိမ်းမည်",
+          saveCountLimits: "Count Limits သိမ်းမည်",
+          activityLimits: "Activity Limits",
+          durationControl: "Duration Control",
+          dailyCountLimits: "Daily Count Limits",
+          dailyUsageControl: "Daily Usage Control",
+          warningTitle: "⚠ Activity Warning",
+          warningStatus: "Activity တစ်ခု၏ သတ်မှတ်ချိန် ကျော်လွန်ခဲ့သည်",
+          status: "အခြေအနေ",
+          overtime: "Overtime",
+          user: "User",
+          activity: "Activity",
+          group: "Group",
+          switch: "ပြောင်းမည်",
+          noGroup: "သင့်အတွက် အသုံးပြုနိုင်သော Group မရှိပါ",
+          noGroupMessage: "Bot ကို Group တစ်ခုထဲသို့ ထည့်ပြီး သင့် Telegram account ကို Group owner သို့မဟုတ် administrator ဖြစ်ကြောင်း သေချာပါစေ။ Bot မရှိတော့သော Group များကို မပြပါ။",
+          idMismatch: "ထည့်ထားသော ID သည် သင့် Telegram account နှင့် မကိုက်ညီပါ။"
+        },
+        zh: {
+          title: "用户仪表板",
+          verifyTitle: "验证您的 Telegram ID",
+          verifySubtitle: "用户访问",
+          verifyLead: "输入您的 Telegram 用户 ID 以打开群组仪表板。",
+          idLabel: "Telegram 用户 ID",
+          idPlaceholder: "请输入 Telegram ID",
+          idHint: "输入的 ID 必须与当前打开此 Mini App 的 Telegram 账号一致。",
+          confirm: "确认",
+          confirmed: "已确认",
+          settings: "管理设置",
+          warning: "警告",
+          groupOptions: "群组选择",
+          groupOptionsSub: "选择一个群组以打开其仪表板。",
+          dashboardSub: "实时活动概览",
+          groupActivities: "群组活动",
+          groupMember: "群组成员",
+          memberActive: "活跃成员",
+          noWarnings: "暂无警告消息。",
+          saveLimits: "保存时间限制",
+          saveCountLimits: "保存次数限制",
+          activityLimits: "活动时间限制",
+          durationControl: "时长控制",
+          dailyCountLimits: "每日次数限制",
+          dailyUsageControl: "每日使用控制",
+          warningTitle: "⚠ 活动警告",
+          warningStatus: "单次活动超过时间限制",
+          status: "状态",
+          overtime: "超时时长",
+          user: "用户",
+          activity: "活动",
+          group: "群组",
+          switch: "切换",
+          noGroup: "没有找到可用的群组",
+          noGroupMessage: "请将 Bot 添加到群组，并确保您的 Telegram 账号是群主或管理员。Bot 已不在的群组不会显示。",
+          idMismatch: "输入的 ID 与您的 Telegram 账号不匹配。"
+        }
+      };
+
+      function loadUserLanguage() {
+        try {
+          var saved = localStorage.getItem(userLanguageKey);
+          if (saved === "en" || saved === "my" || saved === "zh") userLanguage = saved;
+        } catch {}
+      }
+
+      function tUser(key) {
+        return userUiText[userLanguage][key] || userUiText.en[key] || key;
+      }
+
+      function applyUserLanguage() {
+        document.documentElement.lang = userLanguage === "my" ? "my" : userLanguage;
+        document.getElementById("user-verify-title").textContent = tUser("verifyTitle");
+        document.getElementById("user-verify-subtitle").textContent = tUser("verifySubtitle");
+        document.getElementById("user-verify-lead").textContent = tUser("verifyLead");
+        document.getElementById("user-id-label").textContent = tUser("idLabel");
+        document.getElementById("user-id-input").placeholder = tUser("idPlaceholder");
+        document.getElementById("user-id-hint").textContent = tUser("idHint");
+        if (!document.getElementById("user-confirm").classList.contains("confirmed")) {
+          document.getElementById("user-confirm").textContent = tUser("confirm");
+        }
+        document.getElementById("user-settings-tab-button").textContent = tUser("settings");
+        document.getElementById("user-warning-tab-button").textContent = tUser("warning");
+        document.getElementById("user-group-activities-title").textContent = tUser("groupActivities");
+        document.getElementById("user-group-member-label").textContent = tUser("groupMember");
+        document.getElementById("user-member-active-label").textContent = tUser("memberActive");
+        var warningEmpty = document.getElementById("user-warning-feed").querySelector(".user-warning-empty");
+        if (warningEmpty) warningEmpty.textContent = tUser("noWarnings");
+        document.querySelector("#user-group-options .user-page-title").textContent = tUser("groupOptions");
+        document.querySelector("#user-group-options .user-page-sub").textContent = tUser("groupOptionsSub");
+        document.getElementById("user-dashboard-sub").textContent = tUser("dashboardSub");
+        document.querySelectorAll(".user-language-option").forEach(function(option) {
+          option.classList.toggle("active", option.getAttribute("data-user-lang") === userLanguage);
+        });
+      }
+
+      loadUserLanguage();
 
       function startUserDashboardRefresh() {
         if (userDashboardRefreshTimer) return;
@@ -1721,15 +1992,15 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           return '<div class="editor-row"><label>' + item[1] + '</label><input data-kind="' + item[0] +
             '" type="number" min="1" step="1" value="' + escapeHtml(String(item[2])) + '"></div>';
         }).join("");
-        var titleText = isCount ? "Daily Count Limits" : "Activity Limits";
-        var subText = isCount ? "Daily Usage Control" : "Duration Control";
+        var titleText = isCount ? tUser("dailyCountLimits") : tUser("activityLimits");
+        var subText = isCount ? tUser("dailyUsageControl") : tUser("durationControl");
         var icon = isCount
           ? '<svg viewBox="0 0 24 24"><path d="M4 21h16"></path><rect class="count-bar count-bar-1" x="5" y="13" width="3" height="5" rx="1.5" fill="currentColor" stroke="none"></rect><rect class="count-bar count-bar-2" x="10.5" y="9" width="3" height="9" rx="1.5" fill="currentColor" stroke="none"></rect><rect class="count-bar count-bar-3" x="16" y="5" width="3" height="13" rx="1.5" fill="currentColor" stroke="none"></rect></svg>'
           : '<svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7.5"></circle><path d="M9 3h6"></path><path d="M12 5.5v2"></path><g class="clock-hand"><path d="M12 13l3-2"></path></g></svg>';
         return '<div class="user-setting-head"><span class="user-setting-icon">' + icon + '</span><div><div class="user-setting-title">' +
           titleText + '</div><div class="user-setting-sub">' + subText + '</div></div></div>' +
           '<div class="user-setting-editor">' + inputs + '<button class="user-setting-save" data-setting-type="' + type +
-          '" data-group-id="' + groupId + '" type="button">Save ' + (isCount ? "Count Limits" : "Limits") + '</button></div>';
+          '" data-group-id="' + groupId + '" type="button">' + (isCount ? escapeHtml(tUser("saveCountLimits")) : escapeHtml(tUser("saveLimits"))) + '</button></div>';
       }
 
       function renderGroupOptions(groups) {
@@ -1755,7 +2026,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       function renderWarnings(warnings) {
         var feed = document.getElementById("user-warning-feed");
         if (!warnings || !warnings.length) {
-          feed.innerHTML = '<div class="user-warning-empty">No warning messages yet.</div>';
+          feed.innerHTML = '<div class="user-warning-empty">' + escapeHtml(tUser("noWarnings")) + '</div>';
           return;
         }
         feed.innerHTML = warnings.map(function(warning) {
@@ -1766,14 +2037,14 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             if (legacy) timeout = Number(legacy[1]) * 60 + Number(legacy[2]);
           }
           return '<article class="user-warning-item">' +
-            '<div class="user-warning-item-head"><strong>⚠ Activity Warning</strong><span>' +
+            '<div class="user-warning-item-head"><strong>' + escapeHtml(tUser("warningTitle")) + '</strong><span>' +
             escapeHtml(formatWarningTime(warning.createdAt)) + '</span></div>' +
             '<div class="user-warning-details">' +
-              '<div><span>Group</span><strong>' + escapeHtml(document.getElementById("user-warning-group-name").textContent || "Group") + '</strong></div>' +
-              '<div><span>User</span><strong>' + escapeHtml(warning.displayName || "Member") + '</strong></div>' +
-              '<div><span>Activity</span><strong>' + escapeHtml(activity) + '</strong></div>' +
-              '<div><span>Status</span><strong>Single activity exceeded time limit</strong></div>' +
-              '<div><span>Overtime</span><strong>' + escapeHtml(formatWarningDuration(timeout)) + '</strong></div>' +
+              '<div><span>' + escapeHtml(tUser("group")) + '</span><strong>' + escapeHtml(document.getElementById("user-warning-group-name").textContent || tUser("group")) + '</strong></div>' +
+              '<div><span>' + escapeHtml(tUser("user")) + '</span><strong>' + escapeHtml(warning.displayName || "Member") + '</strong></div>' +
+              '<div><span>' + escapeHtml(tUser("activity")) + '</span><strong>' + escapeHtml(activity) + '</strong></div>' +
+              '<div><span>' + escapeHtml(tUser("status")) + '</span><strong>' + escapeHtml(tUser("warningStatus")) + '</strong></div>' +
+              '<div><span>' + escapeHtml(tUser("overtime")) + '</span><strong>' + escapeHtml(formatWarningDuration(timeout)) + '</strong></div>' +
             '</div>' +
           '</article>';
         }).join("");
@@ -1785,9 +2056,10 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         window.__z28SelectedGroupId = group.id;
         document.getElementById("user-group-options").hidden = true;
         document.getElementById("user-selected-dashboard").hidden = false;
-        title.textContent = group.title + " Dashboard";
+        title.textContent = group.title + " " + tUser("title");
         document.getElementById("switch-group").hidden = false;
-        document.getElementById("user-selected-group-title").textContent = group.title + " Dashboard";
+        document.getElementById("switch-group").textContent = tUser("switch");
+        document.getElementById("user-selected-group-title").textContent = group.title + " " + tUser("title");
         document.getElementById("user-warning-group-name").textContent = group.title;
         document.getElementById("user-member-count").textContent = String(group.memberCount);
         document.getElementById("user-active-count").textContent = String(group.activeCount);
@@ -1805,7 +2077,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           document.getElementById("user-group-options").hidden = false;
           document.getElementById("user-selected-dashboard").hidden = true;
           document.getElementById("switch-group").hidden = true;
-          title.textContent = "Group Options";
+          title.textContent = tUser("groupOptions");
           renderGroupOptions(data.groups);
           return;
         }
@@ -1882,10 +2154,10 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             clearUserDashboard();
             document.getElementById("user-id-input").value="";
             document.getElementById("user-confirm").disabled=true;
-            showNotice(data.message || "No eligible group found.","error");
+            showNotice(tUser("noGroupMessage"),"warning");
             window.setTimeout(function() {
               document.getElementById("user-verify-card").classList.add("visible");
-              title.textContent = "User Access";
+              title.textContent = tUser("verifySubtitle");
             }, 2850);
             return false;
           }
@@ -1930,7 +2202,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           document.getElementById("user-group-options").hidden=false;
           document.getElementById("user-selected-dashboard").hidden=true;
           button.hidden=true;
-          title.textContent = "Group Options";
+          title.textContent = tUser("groupOptions");
           renderGroupOptions(data.groups || []);
         }).catch(function(error){
           showNotice(error && error.message ? error.message : "Unable to load groups.","error");
@@ -1955,6 +2227,28 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         activateUserTab("warning");
       });
 
+      document.getElementById("user-language-button").addEventListener("click", function () {
+        var menu = document.getElementById("user-language-menu");
+        var open = menu.hidden;
+        menu.hidden = !open;
+        this.setAttribute("aria-expanded", String(open));
+      });
+
+      document.querySelectorAll(".user-language-option").forEach(function (option) {
+        option.addEventListener("click", function () {
+          var selected = option.getAttribute("data-user-lang");
+          if (selected !== "en" && selected !== "my" && selected !== "zh") return;
+          userLanguage = selected;
+          try { localStorage.setItem(userLanguageKey, userLanguage); } catch {}
+          document.getElementById("user-language-menu").hidden = true;
+          document.getElementById("user-language-button").setAttribute("aria-expanded", "false");
+          applyUserLanguage();
+          if (userMode && document.body.classList.contains("user-dashboard-page") && window.__z28SelectedGroupId) {
+            loadUserDashboard(false, window.__z28SelectedGroupId).catch(function () {});
+          }
+        });
+      });
+
       var userIdInput = document.getElementById("user-id-input");
       var userConfirm = document.getElementById("user-confirm");
 
@@ -1972,7 +2266,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           if (!entered || !/^\d+$/.test(entered) || !telegramUserId) return;
 
           if (Number(entered) !== Number(telegramUserId)) {
-            showNotice("The entered ID does not match your Telegram account.", "error");
+            showNotice(tUser("idMismatch"), "error");
             return;
           }
 
@@ -2005,7 +2299,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             await load();
           } else {
             setPanelVisibility("user");
-            title.textContent = "User Dashboard";
+            title.textContent = tUser("title");
             var stored = getVerifiedUserId();
             var current = telegramUserId ? String(telegramUserId) : "";
             if (stored && current && stored === current) {
@@ -2143,6 +2437,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         });
       }
 
+      loadUserLanguage();
+      applyUserLanguage();
       initializeMode();
     })();
   </script>
