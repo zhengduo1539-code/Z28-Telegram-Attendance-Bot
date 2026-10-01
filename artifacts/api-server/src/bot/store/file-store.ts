@@ -1,6 +1,6 @@
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
-import type { BotState, MiniAppGroupAccess } from "../types";
+import type { ActiveActivity, BotState, MiniAppGroupAccess } from "../types";
 import type { BotStore } from "./types";
 
 export const emptyState = (): BotState => ({
@@ -45,6 +45,10 @@ export const isBotState = (value: unknown): value is BotState => {
 };
 
 const MINI_APP_ACCESS_TTL_MS = 5 * 60 * 1000;
+
+const activeActivityKey = (chatId: number, userId: number) =>
+  `${chatId}:${userId}`;
+
 
 const miniAppAccessKey = (userId: number, groupId: number) =>
   `${userId}:${groupId}`;
@@ -119,6 +123,88 @@ export class FileBotStore implements BotStore {
     this.updateQueue = update.catch(() => undefined);
     await update;
     return updatedState as BotState;
+  }
+
+  async getActiveActivity(chatId: number, userId: number): Promise<ActiveActivity | undefined> {
+    const state = await this.load();
+    return state.activeActivities[activeActivityKey(chatId, userId)];
+  }
+
+  async listActiveActivities(): Promise<ActiveActivity[]> {
+    const state = await this.load();
+    return Object.values(state.activeActivities).map((activity) => ({ ...activity }));
+  }
+
+  async createActiveActivity(activity: ActiveActivity): Promise<boolean> {
+    let created = false;
+    await this.update((state) => {
+      const key = activeActivityKey(activity.chatId, activity.userId);
+      if (state.activeActivities[key]) return;
+      state.activeActivities[key] = { ...activity };
+      created = true;
+    });
+    return created;
+  }
+
+  async deleteActiveActivity(chatId: number, userId: number, activityId: string): Promise<void> {
+    await this.update((state) => {
+      const key = activeActivityKey(chatId, userId);
+      if (state.activeActivities[key]?.id === activityId) delete state.activeActivities[key];
+    });
+  }
+
+  async listDueActiveActivities(now: Date, graceMs: number): Promise<ActiveActivity[]> {
+    const nowMs = now.getTime();
+    return (await this.listActiveActivities()).filter((activity) => {
+      if (activity.reminderSentAt) return false;
+      const dueAt = new Date(activity.startedAt).getTime() + activity.limitMinutes * 60_000 + graceMs;
+      return Number.isFinite(dueAt) && dueAt <= nowMs;
+    });
+  }
+
+  async claimActiveActivityReminder(
+    candidate: Pick<ActiveActivity, "chatId" | "userId" | "startedAt">,
+    now: Date,
+    graceMs: number,
+    leaseMs: number,
+  ): Promise<{ activity: ActiveActivity; claimedAt: string } | undefined> {
+    const key = activeActivityKey(candidate.chatId, candidate.userId);
+    const claimedAt = now.toISOString();
+    let claim: { activity: ActiveActivity; claimedAt: string } | undefined;
+    await this.update((state) => {
+      const activity = state.activeActivities[key];
+      if (!activity || activity.startedAt !== candidate.startedAt || activity.reminderSentAt) return;
+      const dueAt = new Date(activity.startedAt).getTime() + activity.limitMinutes * 60_000 + graceMs;
+      if (!Number.isFinite(dueAt) || dueAt > now.getTime()) return;
+      const existingClaim = activity.reminderClaimedAt ? new Date(activity.reminderClaimedAt).getTime() : Number.NaN;
+      if (Number.isFinite(existingClaim) && now.getTime() - existingClaim < leaseMs) return;
+      activity.reminderClaimedAt = claimedAt;
+      claim = { activity: { ...activity }, claimedAt };
+    });
+    return claim;
+  }
+
+  async markActiveActivityReminderSent(
+    claim: { activity: ActiveActivity; claimedAt: string },
+    sentAt: Date,
+  ): Promise<void> {
+    await this.update((state) => {
+      const activity = state.activeActivities[activeActivityKey(claim.activity.chatId, claim.activity.userId)];
+      if (!activity || activity.id !== claim.activity.id || activity.startedAt !== claim.activity.startedAt || activity.reminderClaimedAt !== claim.claimedAt) return;
+      activity.reminderSentAt = sentAt.toISOString();
+      delete activity.reminderClaimedAt;
+    });
+  }
+
+  async releaseActiveActivityReminderClaim(
+    claim: { activity: ActiveActivity; claimedAt: string },
+  ): Promise<void> {
+    await this.update((state) => {
+      const activity = state.activeActivities[activeActivityKey(claim.activity.chatId, claim.activity.userId)];
+      if (activity?.id === claim.activity.id && activity.startedAt === claim.activity.startedAt && activity.reminderClaimedAt === claim.claimedAt) {
+        delete activity.reminderClaimedAt;
+      }
+    });
   }
 
   async getMiniAppGroupAccess(
