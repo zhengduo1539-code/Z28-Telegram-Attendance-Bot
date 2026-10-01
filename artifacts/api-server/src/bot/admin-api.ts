@@ -275,7 +275,8 @@ adminApiRouter.get("/health", async (req, res) => {
   const rssMb = memoryUsage.rss / 1024 / 1024;
   const heapUsedMb = memoryUsage.heapUsed / 1024 / 1024;
   const heapTotalMb = memoryUsage.heapTotal / 1024 / 1024;
-  const heapUsagePercent = heapTotalMb > 0 ? (heapUsedMb / heapTotalMb) * 100 : 0;
+  const heapLimitMb = getHeapStatistics().heap_size_limit / 1024 / 1024;
+  const heapUsagePercent = heapLimitMb > 0 ? (heapUsedMb / heapLimitMb) * 100 : 0;
   const rssUsagePercent = (rssMb / auth.context.config.memoryRssLimitMb) * 100;
   const heapStatus =
     heapUsagePercent >= auth.context.config.memoryHeapCriticalPercent
@@ -309,6 +310,7 @@ adminApiRouter.get("/health", async (req, res) => {
       rssMb: Math.round(rssMb * 10) / 10,
       heapUsedMb: Math.round(heapUsedMb * 10) / 10,
       heapTotalMb: Math.round(heapTotalMb * 10) / 10,
+      heapLimitMb: Math.round(heapLimitMb * 10) / 10,
       heapUsagePercent: Math.round(heapUsagePercent * 10) / 10,
       rssUsagePercent: Math.round(rssUsagePercent * 10) / 10,
       heapWarnPercent: auth.context.config.memoryHeapWarnPercent,
