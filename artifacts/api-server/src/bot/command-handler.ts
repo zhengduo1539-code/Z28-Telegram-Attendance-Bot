@@ -116,7 +116,7 @@ export class CommandHandler {
 
     // Do not block normal update handling on Telegram's command-menu API.
     // A slow/failing setMyCommands call must never make the bot appear frozen.
-    void this.ensureAdminCommandMenu(message, profile.userId);
+    void this.ensureAdminCommandMenu(message, profile.userId, profile.locale);
 
     const pendingConnect = await this.attendance.getPendingConnect(
       message.chat.id,
@@ -373,9 +373,15 @@ export class CommandHandler {
   private async ensureAdminCommandMenu(
     message: TelegramMessage,
     userId: number,
+    locale: Locale,
   ): Promise<void> {
     if (message.chat.type === "private") {
-      await this.ensurePrivateMenuButton(message.chat.id, userId, this.config.adminMiniAppUrl);
+      await this.ensurePrivateMenuButton(
+        message.chat.id,
+        userId,
+        locale,
+        this.config.adminMiniAppUrl,
+      );
     }
 
     const isConfiguredAdmin =
@@ -413,6 +419,7 @@ export class CommandHandler {
   private async ensurePrivateMenuButton(
     chatId: number,
     userId: number,
+    locale: Locale,
     miniAppUrl: string | undefined,
   ): Promise<void> {
     const isConfiguredAdmin =
@@ -424,7 +431,7 @@ export class CommandHandler {
       if (isConfiguredAdmin && miniAppUrl) {
         await this.telegram.setChatMenuButton(chatId, {
           type: "web_app",
-          text: "⚙️ Admin Panel",
+          text: locale === "en" ? "⚙️ Admin Panel" : "⚙️ 打开管理面板",
           web_app: { url: miniAppUrl },
         });
       } else {
