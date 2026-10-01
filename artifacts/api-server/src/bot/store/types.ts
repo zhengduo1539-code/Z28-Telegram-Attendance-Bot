@@ -1,4 +1,4 @@
-import type { ActiveActivity, BotState, MiniAppGroupAccess } from "../types";
+import type { ActiveActivity, AuditLogEntry, BotState, MiniAppGroupAccess } from "../types";
 
 export interface BotStore {
   load(): Promise<BotState>;
@@ -11,6 +11,8 @@ export interface BotStore {
     role: MiniAppGroupAccess["role"],
   ): Promise<MiniAppGroupAccess>;
   clearMiniAppGroupAccess(userId: number, groupId: number): Promise<void>;
+  createAuditLog(entry: AuditLogEntry): Promise<void>;
+  listAuditLogs(options: { search?: string; action?: string; page: number; pageSize: number }): Promise<{ logs: AuditLogEntry[]; total: number; totalPages: number; page: number; pageSize: number }>;
   getActiveActivity(chatId: number, userId: number): Promise<ActiveActivity | undefined>;
   listActiveActivities(): Promise<ActiveActivity[]>;
   createActiveActivity(activity: ActiveActivity): Promise<boolean>;

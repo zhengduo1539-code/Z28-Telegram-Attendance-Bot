@@ -2426,6 +2426,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             <span class="admin-nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="3" width="7" height="7" rx="2"></rect><rect x="3" y="14" width="7" height="7" rx="2"></rect><rect x="14" y="14" width="7" height="7" rx="2"></rect></svg></span>
             <span>Overview</span>
           </button>
+          <button class="admin-nav-item" type="button" data-admin-nav="audit"><span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5z"></path><path d="M8 8h8M8 12h8M8 16h5"></path></svg></span><span>Audit Log</span></button>
           <button class="admin-nav-item" type="button" data-admin-nav="groups">
             <span class="admin-nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"></rect><path d="M8 9h8M8 13h5"></path></svg></span>
             <span>Group Management</span>
@@ -2505,6 +2506,31 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
               <div class="admin-kpi-value" id="admin-reminder-status">—</div>
               <div class="admin-kpi-note" id="admin-reminder-note">Automation status</div>
             </article>
+          </div>
+        </section>
+
+        <section class="admin-section" id="admin-audit">
+          <div class="admin-panel">
+            <div class="admin-panel-head"><div>
+              <h2 class="admin-panel-title">Audit Log</h2>
+              <div class="admin-panel-sub">Review administrative changes made through the protected dashboard.</div>
+            </div><div class="admin-status-pill">Protected history</div></div>
+            <div class="admin-panel-body">
+              <div class="admin-users-toolbar">
+                <input class="admin-users-search" id="admin-audit-search" type="search" autocomplete="off" placeholder="Search admin, action, target, or details">
+                <select class="admin-users-filter" id="admin-audit-filter" aria-label="Filter audit actions">
+                  <option value="">All actions</option><option value="activity_limit.updated">Activity limits</option><option value="daily_limit.updated">Daily limits</option><option value="automation.updated">Automation</option>
+                </select>
+                <span class="admin-users-meta" id="admin-audit-meta">Loading audit history…</span>
+              </div>
+              <div class="admin-users-table-wrap"><table class="admin-users-table">
+                <thead><tr><th>Time</th><th>Administrator</th><th>Action</th><th>Target</th><th>Details</th></tr></thead>
+                <tbody id="admin-audit-table-body"><tr><td colspan="5"><div class="admin-users-empty">Loading audit history…</div></td></tr></tbody>
+              </table></div>
+              <div class="admin-users-footer"><span class="admin-users-meta" id="admin-audit-page-meta">—</span><div class="admin-users-pagination">
+                <button class="admin-users-page" id="admin-audit-prev" type="button">Previous</button><button class="admin-users-page" id="admin-audit-next" type="button">Next</button>
+              </div></div>
+            </div>
           </div>
         </section>
 
@@ -3347,6 +3373,30 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         return data;
       }
 
+      var adminAuditState = { search:"", action:"", page:1, pageSize:20, totalPages:1 };
+
+      function renderAdminAudit(data) {
+        var logs=data.logs||[], pagination=data||{};
+        var body=document.getElementById("admin-audit-table-body"), meta=document.getElementById("admin-audit-meta"), pageMeta=document.getElementById("admin-audit-page-meta"), prev=document.getElementById("admin-audit-prev"), next=document.getElementById("admin-audit-next");
+        if(!body||!meta||!pageMeta||!prev||!next)return;
+        adminAuditState.page=pagination.page||1; adminAuditState.totalPages=pagination.totalPages||1;
+        if(!logs.length) body.innerHTML='<tr><td colspan="5"><div class="admin-users-empty">No audit entries match the current filter.</div></td></tr>';
+        else body.innerHTML=logs.map(function(log){
+          var role=log.role==="owner"?"Owner":"Administrator";
+          return '<tr><td class="admin-user-muted">'+escapeHtml(formatAdminDate(log.createdAt))+'</td><td><div class="admin-user-primary"><div class="admin-user-avatar">'+escapeHtml(adminInitials(log.actorName))+'</div><div><div class="admin-user-name">'+escapeHtml(log.actorName||"Administrator")+'</div><div class="admin-user-sub">'+escapeHtml(role)+" • "+escapeHtml(String(log.actorUserId))+'</div></div></div></td><td><span class="admin-user-status active">'+escapeHtml(log.action)+'</span></td><td>'+escapeHtml(log.target||"—")+'</td><td class="admin-user-muted">'+escapeHtml(log.details||"—")+'</td></tr>';
+        }).join("");
+        meta.textContent=String(pagination.total||0)+(Number(pagination.total||0)===1?" entry":" entries");
+        pageMeta.textContent="Page "+String(adminAuditState.page)+" of "+String(adminAuditState.totalPages);
+        prev.disabled=adminAuditState.page<=1; next.disabled=adminAuditState.page>=adminAuditState.totalPages;
+      }
+
+      async function loadAdminAudit(resetPage) {
+        if(resetPage) adminAuditState.page=1;
+        var query=new URLSearchParams(); query.set("page",String(adminAuditState.page)); query.set("pageSize",String(adminAuditState.pageSize));
+        if(adminAuditState.search) query.set("search",adminAuditState.search); if(adminAuditState.action) query.set("action",adminAuditState.action);
+        var data=await api("/audit-logs?"+query.toString()); renderAdminAudit(data); return data;
+      }
+
       var adminGroupsState = { search:"", page:1, pageSize:20, totalPages:1 };
 
       function renderAdminGroups(data) {
@@ -4058,6 +4108,21 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       document.getElementById("admin-groups-next").addEventListener("click", function(){
         if(adminGroupsState.page>=adminGroupsState.totalPages)return; adminGroupsState.page+=1;
         loadAdminGroups(false).catch(function(error){showNotice(error&&error.message?error.message:"Unable to load groups.","error");});
+      });
+
+      var adminAuditSearchTimer = null;
+      document.getElementById("admin-audit-search").addEventListener("input", function(){
+        adminAuditState.search=this.value.trim(); window.clearTimeout(adminAuditSearchTimer);
+        adminAuditSearchTimer=window.setTimeout(function(){loadAdminAudit(true).catch(function(error){showNotice(error&&error.message?error.message:"Unable to load audit history.","error");});},250);
+      });
+      document.getElementById("admin-audit-filter").addEventListener("change", function(){
+        adminAuditState.action=this.value; loadAdminAudit(true).catch(function(error){showNotice(error&&error.message?error.message:"Unable to load audit history.","error");});
+      });
+      document.getElementById("admin-audit-prev").addEventListener("click", function(){
+        if(adminAuditState.page<=1)return; adminAuditState.page-=1; loadAdminAudit(false).catch(function(error){showNotice(error&&error.message?error.message:"Unable to load audit history.","error");});
+      });
+      document.getElementById("admin-audit-next").addEventListener("click", function(){
+        if(adminAuditState.page>=adminAuditState.totalPages)return; adminAuditState.page+=1; loadAdminAudit(false).catch(function(error){showNotice(error&&error.message?error.message:"Unable to load audit history.","error");});
       });
 
       var adminUsersSearchTimer = null;
