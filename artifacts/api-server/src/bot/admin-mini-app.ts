@@ -1467,6 +1467,18 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           : undefined;
       var userLoading = document.getElementById("user-loading");
       var userVerifiedKey = "z28_verified_user_id";
+      var userDashboardRefreshTimer = null;
+
+      function startUserDashboardRefresh() {
+        if (userDashboardRefreshTimer) return;
+        userDashboardRefreshTimer = window.setInterval(function () {
+          if (!userMode || !getVerifiedUserId()) return;
+          loadUserDashboard().catch(function () {
+            // Keep the current dashboard visible if a background refresh temporarily fails.
+          });
+        }, 10000);
+      }
+
 
       function setPanelVisibility(mode) {
         userMode = mode === "user";
@@ -1904,6 +1916,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
               clearUserDashboard();
             }
             hideSplash();
+            startUserDashboardRefresh();
           }
         } catch (error) {
           setPanelVisibility("user");
