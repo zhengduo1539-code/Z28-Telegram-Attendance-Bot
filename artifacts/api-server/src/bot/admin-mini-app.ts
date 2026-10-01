@@ -1374,7 +1374,13 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         }
       }
 
+      var emptyDashboardTimer = null;
+
       function clearUserDashboard() {
+        if (emptyDashboardTimer) {
+          window.clearTimeout(emptyDashboardTimer);
+          emptyDashboardTimer = null;
+        }
         document.getElementById("user-dashboard").classList.remove("visible");
         document.getElementById("user-group-list").innerHTML = "";
         document.getElementById("user-group-count").textContent = "0 Groups";
@@ -1382,9 +1388,17 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
       function renderUserDashboard(data) {
         var dashboard = document.getElementById("user-dashboard");
+        var verifyCard = document.getElementById("user-verify-card");
+        var input = document.getElementById("user-id-input");
+        var confirm = document.getElementById("user-confirm");
         var list = document.getElementById("user-group-list");
         var count = document.getElementById("user-group-count");
         var groups = Array.isArray(data.groups) ? data.groups : [];
+
+        if (emptyDashboardTimer) {
+          window.clearTimeout(emptyDashboardTimer);
+          emptyDashboardTimer = null;
+        }
 
         dashboard.classList.add("visible");
         count.textContent = groups.length + (groups.length === 1 ? " Group" : " Groups");
@@ -1398,9 +1412,25 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
               '<strong>No eligible group found</strong>' +
               '<p>Add this bot to a group, then make sure your Telegram account is a group owner or administrator. Groups where the bot is no longer available are not shown.</p>' +
             '</div>';
+
+          emptyDashboardTimer = window.setTimeout(function () {
+            emptyDashboardTimer = null;
+            dashboard.classList.remove("visible");
+            verifyCard.classList.add("visible");
+            if (input) {
+              input.value = "";
+              input.focus();
+            }
+            if (confirm) {
+              confirm.disabled = true;
+              confirm.classList.remove("ready");
+              confirm.textContent = "Confirm";
+            }
+          }, 2800);
           return;
         }
 
+        verifyCard.classList.remove("visible");
         list.innerHTML = groups.map(function (group) {
           var role = group.memberStatus === "creator" ? "Owner" : "Admin";
           var target = group.connectedTarget
