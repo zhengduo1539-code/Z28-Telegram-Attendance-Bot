@@ -175,6 +175,51 @@ export class AttendanceService {
     return this.store.listAuditLogs(options);
   }
 
+  getHistoryRetentionDays(): number {
+    return this.config.historyRetentionDays;
+  }
+
+  async pruneHistoryBefore(cutoff: Date): Promise<{ records: number; warnings: number; pendingConnects: number }> {
+    let removedRecords = 0;
+    let removedWarnings = 0;
+    let removedPendingConnects = 0;
+
+    await this.store.update((state) => {
+      const beforeRecords = state.records.length;
+      state.records = state.records.filter((record) => {
+        const endedAt = new Date(record.endedAt).getTime();
+        return !Number.isFinite(endedAt) || endedAt >= cutoff.getTime();
+      });
+      removedRecords = beforeRecords - state.records.length;
+
+      if (state.groupWarnings) {
+        for (const [chatId, warnings] of Object.entries(state.groupWarnings)) {
+          const kept = warnings.filter((warning) => {
+            const createdAt = new Date(warning.createdAt).getTime();
+            return !Number.isFinite(createdAt) || createdAt >= cutoff.getTime();
+          });
+          removedWarnings += warnings.length - kept.length;
+          if (kept.length) state.groupWarnings[chatId] = kept;
+          else delete state.groupWarnings[chatId];
+        }
+      }
+
+      if (state.pendingConnects) {
+        const pendingCutoff = Date.now() - 24 * 60 * 60 * 1000;
+        for (const [key, pending] of Object.entries(state.pendingConnects)) {
+          const requestedAt = new Date(pending.requestedAt).getTime();
+          if (Number.isFinite(requestedAt) && requestedAt < pendingCutoff) {
+            delete state.pendingConnects[key];
+            removedPendingConnects += 1;
+          }
+        }
+      }
+    });
+
+    return { records: removedRecords, warnings: removedWarnings, pendingConnects: removedPendingConnects };
+  }
+
+
   async getMiniAppGroupAccess(userId: number, groupId: number) {
     return this.store.getMiniAppGroupAccess(userId, groupId);
   }
