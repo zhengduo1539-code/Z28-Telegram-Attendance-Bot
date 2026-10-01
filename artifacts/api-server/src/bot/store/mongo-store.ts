@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { MongoClient } from "mongodb";
-import { FileBotStore } from "./file-store";
+import { emptyState, FileBotStore, isBotState } from "./file-store";
 import type { BotState } from "../types";
 import type { BotStore } from "./types";
 
@@ -10,7 +10,6 @@ type MongoStateDocument = {
   updatedAt: Date;
 };
 
-const DATABASE_NAME = "z28_attendance_bot";
 const COLLECTION_NAME = "bot_state";
 const STATE_ID = "bot-state";
 
@@ -38,7 +37,7 @@ export class MongoBotStore implements BotStore {
     }
 
     return this.client
-      .db(DATABASE_NAME)
+      .db()
       .collection<MongoStateDocument>(COLLECTION_NAME);
   }
 
@@ -49,6 +48,9 @@ export class MongoBotStore implements BotStore {
     const document = await collection.findOne({ _id: STATE_ID });
 
     if (document) {
+      if (!isBotState(document.state)) {
+        throw new Error("MongoDB bot state document is invalid.");
+      }
       this.state = document.state;
       return this.state;
     }
@@ -112,11 +114,3 @@ export class MongoBotStore implements BotStore {
   }
 }
 
-const emptyState = (): BotState => ({
-  users: {},
-  activeActivities: {},
-  records: [],
-  activityLimits: {},
-  connectedGroups: {},
-  pendingConnects: {},
-});
