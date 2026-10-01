@@ -9,6 +9,7 @@ import type {
   Locale,
   UserProfile,
   MiniAppGroupAccess,
+  GroupWarning,
 } from "./types";
 import type { BotStore } from "./store/types";
 
@@ -315,11 +316,7 @@ export class AttendanceService {
         nextState.records.push(activityRecord);
       }
 
-      let warning: BotState["groupWarnings"] extends Record<string, infer T>
-        ? T extends Array<infer W>
-          ? W
-          : never
-        : never;
+      let warning: GroupWarning | undefined;
 
       if (isTimeout) {
         const warningKey = String(profile.chatId);
