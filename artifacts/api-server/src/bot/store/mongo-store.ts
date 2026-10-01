@@ -405,6 +405,11 @@ export class MongoBotStore implements BotStore {
     await collection.insertOne({ _id: entry.id, id: entry.id, actorUserId: entry.actorUserId, actorName: entry.actorName, role: entry.role, action: entry.action, target: entry.target, details: entry.details, createdAt: new Date(entry.createdAt) });
   }
 
+  async deleteAuditLogsBefore(cutoff: Date): Promise<number> {
+    const result = await (await this.database()).collection<MongoAuditLogDocument>(AUDIT_LOG_COLLECTION).deleteMany({ createdAt: { $lt: cutoff } });
+    return result.deletedCount;
+  }
+
   async listAuditLogs(options: { search?: string; action?: string; page: number; pageSize: number }): Promise<{ logs: AuditLogEntry[]; total: number; totalPages: number; page: number; pageSize: number }> {
     const collection = (await this.database()).collection<MongoAuditLogDocument>(AUDIT_LOG_COLLECTION);
     const filter: Record<string, unknown> = {};
