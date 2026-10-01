@@ -630,14 +630,23 @@ adminApiRouter.get("/analytics", async (req, res) => {
   for (const record of snapshot.records) {
     const ended = new Date(record.endedAt).getTime();
     if (!Number.isFinite(ended) || ended < start || ended > now) continue;
-    const day = record.endedAt.slice(0, 10);
+
+    const endedDate = new Date(ended);
+    const day = endedDate.toISOString().slice(0, 10);
     const bucket = daily.get(day) || { activities: 0, seconds: 0, users: new Set<number>() };
+    const elapsedSeconds = Number(record.elapsedSeconds);
+    const safeElapsedSeconds = Number.isFinite(elapsedSeconds) ? Math.max(0, elapsedSeconds) : 0;
+
     bucket.activities += 1;
-    bucket.seconds += Math.max(0, record.elapsedSeconds || 0);
+    bucket.seconds += safeElapsedSeconds;
     bucket.users.add(record.userId);
     daily.set(day, bucket);
-    kindTotals[record.kind].count += 1;
-    kindTotals[record.kind].seconds += Math.max(0, record.elapsedSeconds || 0);
+
+    if (record.kind in kindTotals) {
+      const kind = record.kind as ActivityKind;
+      kindTotals[kind].count += 1;
+      kindTotals[kind].seconds += safeElapsedSeconds;
+    }
   }
   const dailySeries = Array.from({ length: days }, (_, index) => {
     const date = new Date(now - (days - 1 - index) * 24 * 60 * 60 * 1000);
