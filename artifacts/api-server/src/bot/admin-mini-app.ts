@@ -2451,6 +2451,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             <span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 21h16"></path><rect x="5" y="13" width="3" height="5" rx="1.5"></rect><rect x="10.5" y="9" width="3" height="9" rx="1.5"></rect><rect x="16" y="5" width="3" height="13" rx="1.5"></rect></svg></span>
             <span>Daily Limits</span>
           </button>
+          <button class="admin-nav-item" type="button" data-admin-nav="health"><span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 12h3l2-6 4 12 2-6h5"></path><path d="M4 19h16"></path></svg></span><span>System Health</span></button>
           <button class="admin-nav-item" type="button" data-admin-nav="automation">
             <span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg></span>
             <span>Automation</span>
@@ -2616,6 +2617,28 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
                   <button class="admin-users-page" id="admin-users-next" type="button">Next</button>
                 </div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="admin-section" id="admin-health">
+          <div class="admin-panel">
+            <div class="admin-panel-head"><div>
+              <h2 class="admin-panel-title">System Health</h2>
+              <div class="admin-panel-sub">Live diagnostics for the admin API, persistent storage, and Telegram connection.</div>
+            </div><button class="admin-save" id="admin-health-refresh" type="button">Check now</button></div>
+            <div class="admin-panel-body">
+              <div class="admin-health-grid">
+                <div class="admin-health-card"><div class="admin-health-head"><div class="admin-health-name">Admin API</div><span class="admin-health-dot" id="health-api-dot"></span></div><div class="admin-health-value" id="health-api-value">Checking…</div></div>
+                <div class="admin-health-card"><div class="admin-health-head"><div class="admin-health-name">Persistent Storage</div><span class="admin-health-dot" id="health-storage-dot"></span></div><div class="admin-health-value" id="health-storage-value">Checking…</div></div>
+                <div class="admin-health-card"><div class="admin-health-head"><div class="admin-health-name">Telegram API</div><span class="admin-health-dot" id="health-telegram-dot"></span></div><div class="admin-health-value" id="health-telegram-value">Checking…</div></div>
+              </div>
+              <div class="admin-health-meta">
+                <div class="admin-health-meta-card"><div class="admin-health-meta-label">Overall status</div><div class="admin-health-meta-value" id="health-overall">Checking…</div></div>
+                <div class="admin-health-meta-card"><div class="admin-health-meta-label">Uptime</div><div class="admin-health-meta-value" id="health-uptime">—</div></div>
+                <div class="admin-health-meta-card"><div class="admin-health-meta-label">Memory</div><div class="admin-health-meta-value" id="health-memory">—</div></div>
+              </div>
+              <div class="admin-panel-sub" id="health-checked-at" style="margin-top:14px">Last checked: —</div>
             </div>
           </div>
         </section>
@@ -3400,6 +3423,41 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         return data;
       }
 
+      function formatHealthUptime(seconds) {
+        var total = Math.max(0, Number(seconds) || 0);
+        var days = Math.floor(total / 86400);
+        var hours = Math.floor((total % 86400) / 3600);
+        var minutes = Math.floor((total % 3600) / 60);
+        return days ? days + "d " + hours + "h" : hours ? hours + "h " + minutes + "m" : minutes + "m";
+      }
+
+      function renderAdminHealth(data) {
+        var services = data.services || {};
+        ["api","storage","telegram"].forEach(function(key) {
+          var service = services[key] || {};
+          var dot = document.getElementById("health-" + key + "-dot");
+          var value = document.getElementById("health-" + key + "-value");
+          if (!dot || !value) return;
+          var healthy = service.status === "healthy";
+          dot.className = "admin-health-dot " + (healthy ? "healthy" : "error");
+          value.textContent = (healthy ? "Operational" : "Unavailable") + " · " + String(service.latencyMs || 0) + " ms";
+        });
+        var overall = document.getElementById("health-overall");
+        var uptime = document.getElementById("health-uptime");
+        var memory = document.getElementById("health-memory");
+        var checked = document.getElementById("health-checked-at");
+        if (overall) overall.innerHTML = '<span class="admin-health-status ' + (data.status === "healthy" ? "healthy" : "degraded") + '">' + escapeHtml(data.status === "healthy" ? "Healthy" : "Degraded") + '</span>';
+        if (uptime) uptime.textContent = formatHealthUptime(data.uptimeSeconds);
+        if (memory) memory.textContent = String(data.memory && data.memory.heapUsedMb || 0) + " MB heap";
+        if (checked) checked.textContent = "Last checked: " + (data.checkedAt ? formatAdminDate(data.checkedAt) : "—");
+      }
+
+      async function loadAdminHealth() {
+        var data = await api("/health");
+        renderAdminHealth(data);
+        return data;
+      }
+
       var adminAnalyticsDays = 30;
 
       function renderAdminAnalytics(data) {
@@ -4138,6 +4196,9 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           document.querySelectorAll("[data-admin-nav]").forEach(function(item) {
             item.classList.toggle("active", item === button);
           });
+          if (button.getAttribute("data-admin-nav") === "health") {
+            loadAdminHealth().catch(function(error){showNotice(error && error.message ? error.message : "Unable to load system health.","error");});
+          }
           if (button.getAttribute("data-admin-nav") === "users") {
             loadAdminUsers(true).catch(function(error){showNotice(error && error.message ? error.message : "Unable to load users.","error");});
           }
@@ -4161,6 +4222,14 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
       document.getElementById("admin-analytics-period").addEventListener("change", function(){
         adminAnalyticsDays=Number(this.value)||30; loadAdminAnalytics().catch(function(error){showNotice(error&&error.message?error.message:"Unable to load analytics.","error");});
+      });
+
+      document.getElementById("admin-health-refresh").addEventListener("click", function() {
+        runAction(document.getElementById("admin-health-refresh"), "Checking…", loadAdminHealth, "Check now").then(function() {
+          showNotice("System health check completed.", "ok");
+        }).catch(function(error) {
+          showNotice(error && error.message ? error.message : "Unable to check system health.", "error");
+        });
       });
 
       var adminAuditSearchTimer = null;

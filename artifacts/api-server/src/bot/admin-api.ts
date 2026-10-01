@@ -76,6 +76,55 @@ const serializeCountLimits = (
 
 export const adminApiRouter: IRouter = Router();
 
+adminApiRouter.get("/health", async (req, res) => {
+  const auth = requireAdmin(req, res);
+  if (!auth) return;
+
+  const startedAt = Date.now();
+  let storageStatus = "healthy";
+  let storageLatencyMs = 0;
+  let telegramStatus = "healthy";
+  let telegramLatencyMs = 0;
+
+  const storageStarted = Date.now();
+  try {
+    await auth.context.attendance.snapshot();
+    storageLatencyMs = Date.now() - storageStarted;
+  } catch {
+    storageStatus = "error";
+    storageLatencyMs = Date.now() - storageStarted;
+  }
+
+  const telegramStarted = Date.now();
+  try {
+    await auth.context.telegram.call<{ id: number; username?: string }>("getMe");
+    telegramLatencyMs = Date.now() - telegramStarted;
+  } catch {
+    telegramStatus = "error";
+    telegramLatencyMs = Date.now() - telegramStarted;
+  }
+
+  const services = {
+    api: { status: "healthy", latencyMs: Date.now() - startedAt },
+    storage: { status: storageStatus, latencyMs: storageLatencyMs },
+    telegram: { status: telegramStatus, latencyMs: telegramLatencyMs },
+  };
+  const healthy = Object.values(services).every((service) => service.status === "healthy");
+
+  res.setHeader("Cache-Control", "no-store");
+  res.json({
+    status: healthy ? "healthy" : "degraded",
+    checkedAt: new Date().toISOString(),
+    uptimeSeconds: Math.floor(process.uptime()),
+    memory: {
+      rssMb: Math.round(process.memoryUsage().rss / 1024 / 1024),
+      heapUsedMb: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
+      heapTotalMb: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
+    },
+    services,
+  });
+});
+
 adminApiRouter.get("/summary", async (req, res) => {
   const auth = requireAdmin(req, res);
   if (!auth) return;
