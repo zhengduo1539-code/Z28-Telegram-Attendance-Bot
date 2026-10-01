@@ -1286,8 +1286,9 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         });
       }
 
-      setPanelVisibility(groupMode ? "group" : "admin");
-      title.textContent = groupMode ? "⚙️ Group Admin Panel" : "⚙️ Admin Panel";
+      // Default non-group launches to user mode so admin controls never flash for regular users.
+      setPanelVisibility(groupMode ? "group" : "user");
+      title.textContent = groupMode ? "⚙️ Group Admin Panel" : "User Dashboard";
       document.getElementById("limits-scope").textContent =
         groupMode ? "These settings use the same bot activity limits as the group commands." : "";
 
