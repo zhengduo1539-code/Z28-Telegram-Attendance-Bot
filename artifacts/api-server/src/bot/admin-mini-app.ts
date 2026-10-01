@@ -1702,6 +1702,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           dailyUsageControl: "Daily Usage Control",
           warningTitle: "⚠ Activity Warning",
           warningStatus: "Single activity exceeded time limit",
+          status: "Status",
           overtime: "Overtime",
           user: "User",
           activity: "Activity",
@@ -1738,6 +1739,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           dailyUsageControl: "Daily Usage Control",
           warningTitle: "⚠ Activity Warning",
           warningStatus: "Activity တစ်ခု၏ သတ်မှတ်ချိန် ကျော်လွန်ခဲ့သည်",
+          status: "အခြေအနေ",
           overtime: "Overtime",
           user: "User",
           activity: "Activity",
@@ -1774,6 +1776,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           dailyUsageControl: "每日使用控制",
           warningTitle: "⚠ 活动警告",
           warningStatus: "单次活动超过时间限制",
+          status: "状态",
           overtime: "超时时长",
           user: "用户",
           activity: "活动",
@@ -1812,7 +1815,11 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         document.getElementById("user-group-activities-title").textContent = tUser("groupActivities");
         document.getElementById("user-group-member-label").textContent = tUser("groupMember");
         document.getElementById("user-member-active-label").textContent = tUser("memberActive");
-        document.getElementById("user-warning-feed").querySelector(".user-warning-empty")?.replaceChildren(document.createTextNode(tUser("noWarnings")));
+        var warningEmpty = document.getElementById("user-warning-feed").querySelector(".user-warning-empty");
+        if (warningEmpty) warningEmpty.textContent = tUser("noWarnings");
+        document.querySelector("#user-group-options .user-page-title").textContent = tUser("groupOptions");
+        document.querySelector("#user-group-options .user-page-sub").textContent = tUser("groupOptionsSub");
+        document.getElementById("user-dashboard-sub").textContent = tUser("dashboardSub");
         document.querySelectorAll(".user-language-option").forEach(function(option) {
           option.classList.toggle("active", option.getAttribute("data-user-lang") === userLanguage);
         });
@@ -1987,7 +1994,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         return '<div class="user-setting-head"><span class="user-setting-icon">' + icon + '</span><div><div class="user-setting-title">' +
           titleText + '</div><div class="user-setting-sub">' + subText + '</div></div></div>' +
           '<div class="user-setting-editor">' + inputs + '<button class="user-setting-save" data-setting-type="' + type +
-          '" data-group-id="' + groupId + '" type="button">Save ' + (isCount ? "Count Limits" : "Limits") + '</button></div>';
+          '" data-group-id="' + groupId + '" type="button">' + (isCount ? escapeHtml(tUser("saveCountLimits")) : escapeHtml(tUser("saveLimits"))) + '</button></div>';
       }
 
       function renderGroupOptions(groups) {
@@ -2030,7 +2037,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
               '<div><span>' + escapeHtml(tUser("group")) + '</span><strong>' + escapeHtml(document.getElementById("user-warning-group-name").textContent || tUser("group")) + '</strong></div>' +
               '<div><span>' + escapeHtml(tUser("user")) + '</span><strong>' + escapeHtml(warning.displayName || "Member") + '</strong></div>' +
               '<div><span>' + escapeHtml(tUser("activity")) + '</span><strong>' + escapeHtml(activity) + '</strong></div>' +
-              '<div><span>Status</span><strong>' + escapeHtml(tUser("warningStatus")) + '</strong></div>' +
+              '<div><span>' + escapeHtml(tUser("status")) + '</span><strong>' + escapeHtml(tUser("warningStatus")) + '</strong></div>' +
               '<div><span>' + escapeHtml(tUser("overtime")) + '</span><strong>' + escapeHtml(formatWarningDuration(timeout)) + '</strong></div>' +
             '</div>' +
           '</article>';
