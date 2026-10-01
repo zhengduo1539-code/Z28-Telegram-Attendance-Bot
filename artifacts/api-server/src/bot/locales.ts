@@ -13,6 +13,8 @@ type LocaleText = {
   idInfo: (chatId: number, userId: number) => string;
   botStats: (privateUsers: number, groups: number) => string;
   botStatsPrivate: string;
+  adminPanelPrompt: string;
+  adminMiniAppUnavailable: string;
   noActive: (displayName: string, userId: number) => string;
   alreadyActive: (
     displayName: string,
@@ -387,6 +389,8 @@ const en: LocaleText = {
   ].join("\n"),
   idInfo: (chatId, userId) => `Chat ID: ${inlineCode(chatId)}\nUser ID: ${inlineCode(userId)}`,
   botStatsPrivate: "Please use /stats in a private chat.",
+  adminPanelPrompt: "Tap the button below to open the Admin Panel.",
+  adminMiniAppUnavailable: "The Admin Panel is currently unavailable. Please try again later.",
   botStats: (privateUsers, groups) => [
     "📊 Bot Statistics",
     "",
