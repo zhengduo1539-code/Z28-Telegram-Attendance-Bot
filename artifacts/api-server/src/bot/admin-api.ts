@@ -194,6 +194,13 @@ adminApiRouter.post("/broadcast", async (req, res) => {
   });
 });
 
+adminApiRouter.get("/telegram-metrics", (req, res) => {
+  const auth = requireAdmin(req, res);
+  if (!auth) return;
+  res.setHeader("Cache-Control", "no-store");
+  res.json(auth.context.telegram.getApiMetrics());
+});
+
 adminApiRouter.get("/health", async (req, res) => {
   const auth = requireAdmin(req, res);
   if (!auth) return;
