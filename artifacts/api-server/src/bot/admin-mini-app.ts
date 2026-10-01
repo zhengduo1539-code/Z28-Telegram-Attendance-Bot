@@ -778,9 +778,9 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       min-height: 100vh;
     }
 
-    .user-mode.user-dashboard-page .top {
-      display: none;
-    }
+    .user-mode.user-dashboard-page .top { display:flex; }
+    .user-dashboard-page .top .credit-marquee,
+    .user-dashboard-page .top .sub { display:none; }
 
     .user-mode.user-dashboard-page .user-card#user-verify-card {
       display: none !important;
@@ -1188,6 +1188,40 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       line-height:1.65;
     }
 
+    .user-group-options {
+      padding-bottom: 78px;
+    }
+    .user-group-option {
+      width: 100%; min-height: 64px; display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; margin-bottom: 10px; padding: 14px 16px; border: 1px solid rgba(91,155,255,.24);
+      border-radius: 17px; background: linear-gradient(145deg,rgba(8,16,30,.90),rgba(7,29,58,.72));
+      color:#fff; text-align:left; font-weight:800; cursor:pointer; box-shadow:0 12px 26px rgba(0,0,0,.22);
+    }
+    .user-group-option span:last-child { color:#72b8ff; font-size:22px; }
+    .user-setting-editor { display:grid; gap:9px; }
+    .user-setting-editor .editor-row {
+      display:grid; grid-template-columns:minmax(0,1fr) 110px; align-items:center; gap:10px;
+      padding:9px; border-radius:13px; background:rgba(2,9,20,.34); border:1px solid rgba(91,155,255,.11);
+    }
+    .user-setting-editor label { color:#dce8f8; font-size:12px; font-weight:750; }
+    .user-setting-editor input { min-height:40px; text-align:center; }
+    .user-setting-save {
+      min-height:42px; margin-top:3px; border:1px solid rgba(130,191,255,.32); border-radius:12px;
+      padding:0 15px; background:linear-gradient(180deg,#2b8cff,#1268e6); color:#fff; font-weight:750; cursor:pointer;
+    }
+    .user-warning-feed {
+      min-height:220px; max-height:430px; overflow:auto; padding:12px;
+      border:1px solid rgba(255,180,45,.22); border-radius:18px; background:rgba(26,18,6,.45);
+    }
+    .user-warning-item { padding:12px; margin-bottom:9px; border-radius:14px; border:1px solid rgba(255,180,45,.17); background:rgba(77,46,8,.22); }
+    .user-warning-item:last-child { margin-bottom:0; }
+    .user-warning-item-head { display:flex; justify-content:space-between; gap:8px; color:#ffd98a; font-size:11px; font-weight:800; }
+    .user-warning-item-message { margin-top:6px; color:#fff0c4; font-size:12px; line-height:1.55; }
+    .user-warning-empty { min-height:190px; display:flex; align-items:center; justify-content:center; text-align:center; color:#d5b77a; font-size:12px; }
+    .switch-group {
+      min-height:44px; border:1px solid rgba(130,191,255,.35); border-radius:13px; padding:0 15px;
+      background:rgba(12,38,72,.86); color:#fff; font-weight:750; box-shadow:0 8px 22px rgba(22,119,255,.16); cursor:pointer;
+    }
     .user-loading {
       position:fixed;
       inset:0;
@@ -1268,9 +1302,10 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         </div>
         <div class="sub" id="identity">Checking access…</div>
       </div>
-      <button class="refresh action-button" id="refresh" type="button">
-        <span class="button-content"><span>Refresh</span></span>
-      </button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+        <button class="switch-group" id="switch-group" type="button" hidden>Switch</button>
+        <button class="refresh action-button" id="refresh" type="button"><span class="button-content"><span>Refresh</span></span></button>
+      </div>
     </div>
 
     <div id="notice" class="notice" role="status" aria-live="polite"></div>
@@ -1315,30 +1350,44 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     </section>
 
     <section class="panel-only-user user-dashboard" id="user-dashboard">
-      <div class="user-page-head">
-        <div>
-          <h2 class="user-page-title">Group Activities</h2>
+      <div class="user-group-options" id="user-group-options">
+        <div class="user-page-head"><div>
+          <h2 class="user-page-title">Group Options</h2>
+          <div class="user-page-sub">Select a group to open its dashboard.</div>
+        </div></div>
+        <div id="user-group-options-list"></div>
+      </div>
+
+      <div id="user-selected-dashboard" hidden>
+        <div class="user-page-head"><div>
+          <h2 class="user-page-title" id="user-selected-group-title">Group Dashboard</h2>
           <div class="user-page-sub" id="user-dashboard-sub">Live activity overview</div>
+        </div></div>
+
+        <div class="user-tab-shell">
+          <div class="user-tab-panel active" id="user-warning-tab">
+            <div class="user-group-box compact">
+              <div class="user-group-box-title">Group Activities</div>
+              <div class="user-group-name" id="user-warning-group-name"></div>
+              <div class="user-group-metrics">
+                <div class="user-live-metric"><div class="user-live-label">Group member</div><div class="user-live-value" id="user-member-count">—</div></div>
+                <div class="user-live-metric"><div class="user-live-label">Member active</div><div class="user-live-value active" id="user-active-count">—</div></div>
+              </div>
+            </div>
+            <div class="user-warning-feed" id="user-warning-feed"><div class="user-warning-empty">No warning messages yet.</div></div>
+          </div>
+
+          <div class="user-tab-panel" id="user-settings-tab">
+            <div class="user-setting-card" id="user-settings-limits-card"></div>
+            <div class="user-setting-card counts" id="user-settings-counts-card"></div>
+          </div>
         </div>
+
+        <nav class="user-tabbar" aria-label="Dashboard sections">
+          <button class="user-tab active" id="user-settings-tab-button" type="button">Admin Settings</button>
+          <button class="user-tab" id="user-warning-tab-button" type="button">Warning</button>
+        </nav>
       </div>
-
-      <div class="user-tab-shell">
-        <div class="user-tab-panel active" id="user-warning-tab">
-          <div id="user-group-list"></div>
-          <div class="user-setting-card" id="user-warning-limits-card"></div>
-          <div class="user-setting-card counts" id="user-warning-counts-card"></div>
-        </div>
-
-        <div class="user-tab-panel" id="user-settings-tab">
-          <div class="user-setting-card" id="user-settings-limits-card"></div>
-          <div class="user-setting-card counts" id="user-settings-counts-card"></div>
-        </div>
-      </div>
-
-      <nav class="user-tabbar" aria-label="Dashboard sections">
-        <button class="user-tab" id="user-settings-tab-button" type="button">Admin Settings</button>
-        <button class="user-tab active" id="user-warning-tab-button" type="button">Warning</button>
-      </nav>
     </section>
 
     <section class="card panel-only-private panel-only-group" id="limits-card" data-section="activity">
@@ -1634,145 +1683,166 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         document.getElementById("user-dashboard").classList.remove("visible");
         document.getElementById("user-group-list").innerHTML = "";
         document.getElementById("user-dashboard-sub").textContent = "Live activity overview";
+        document.getElementById("user-group-options").hidden = false;
+        document.getElementById("user-selected-dashboard").hidden = true;
+        document.getElementById("switch-group").hidden = true;
         document.body.classList.remove("user-dashboard-page");
       }
 
-      function settingCardMarkup(kind, titleText, subtitle, values) {
-        var icon = kind === "activity"
-          ? '<svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7.5"></circle><path d="M9 3h6"></path><path d="M12 5.5v2"></path><g class="clock-hand"><path d="M12 13l3-2"></path></g></svg>'
-          : '<svg viewBox="0 0 24 24"><path d="M4 21h16"></path><rect class="count-bar count-bar-1" x="5" y="13" width="3" height="5" rx="1.5" fill="currentColor" stroke="none"></rect><rect class="count-bar count-bar-2" x="10.5" y="9" width="3" height="9" rx="1.5" fill="currentColor" stroke="none"></rect><rect class="count-bar count-bar-3" x="16" y="5" width="3" height="13" rx="1.5" fill="currentColor" stroke="none"></rect><path d="M4.5 10l3.5-3 4 2 4-4 4.5 1"></path></svg>';
+      function formatWarningTime(value) {
+        try { return new Intl.DateTimeFormat("en-GB",{month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"}).format(new Date(value)); }
+        catch { return ""; }
+      }
 
-        var items = values.map(function (item) {
-          return '<div class="user-setting-value"><div class="user-setting-value-label">' +
-            escapeHtml(item.label) +
-            '</div><div class="user-setting-value-number">' +
-            escapeHtml(item.value) +
-            '</div></div>';
+      function settingEditorMarkup(type, values, groupId) {
+        var isCount = type === "count";
+        var rows = isCount ? [["wc","WC",values.wc],["smoke","Smoke",values.smoke],["wcd","WCD",values.wcd]]
+          : [["eat","Eat",values.eat],["wc","WC",values.wc],["smoke","Smoke",values.smoke],["wcd","WCD",values.wcd]];
+        var inputs = rows.map(function(item) {
+          return '<div class="editor-row"><label>' + item[1] + '</label><input data-kind="' + item[0] +
+            '" type="number" min="1" step="1" value="' + escapeHtml(String(item[2])) + '"></div>';
         }).join("");
+        var titleText = isCount ? "Daily Count Limits" : "Activity Limits";
+        var subText = isCount ? "Daily Usage Control" : "Duration Control";
+        var icon = isCount
+          ? '<svg viewBox="0 0 24 24"><path d="M4 21h16"></path><rect class="count-bar count-bar-1" x="5" y="13" width="3" height="5" rx="1.5" fill="currentColor" stroke="none"></rect><rect class="count-bar count-bar-2" x="10.5" y="9" width="3" height="9" rx="1.5" fill="currentColor" stroke="none"></rect><rect class="count-bar count-bar-3" x="16" y="5" width="3" height="13" rx="1.5" fill="currentColor" stroke="none"></rect></svg>'
+          : '<svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7.5"></circle><path d="M9 3h6"></path><path d="M12 5.5v2"></path><g class="clock-hand"><path d="M12 13l3-2"></path></g></svg>';
+        return '<div class="user-setting-head"><span class="user-setting-icon">' + icon + '</span><div><div class="user-setting-title">' +
+          titleText + '</div><div class="user-setting-sub">' + subText + '</div></div></div>' +
+          '<div class="user-setting-editor">' + inputs + '<button class="user-setting-save" data-setting-type="' + type +
+          '" data-group-id="' + groupId + '" type="button">Save ' + (isCount ? "Count Limits" : "Limits") + '</button></div>';
+      }
 
-        return '<div class="user-setting-head">' +
-          '<span class="user-setting-icon">' + icon + '</span>' +
-          '<div><div class="user-setting-title">' + escapeHtml(titleText) + '</div>' +
-          '<div class="user-setting-sub">' + escapeHtml(subtitle) + '</div></div>' +
-          '</div><div class="user-setting-grid">' + items + '</div>';
+      function renderGroupOptions(groups) {
+        var list = document.getElementById("user-group-options-list");
+        list.innerHTML = (groups || []).map(function(group) {
+          return '<button class="user-group-option" type="button" data-group-id="' + group.id + '"><span>' +
+            escapeHtml(group.title) + '</span><span>›</span></button>';
+        }).join("");
+        list.querySelectorAll(".user-group-option").forEach(function(button) {
+          button.addEventListener("click", function() { selectUserGroup(Number(button.getAttribute("data-group-id"))); });
+        });
+      }
+
+      function renderWarnings(warnings) {
+        var feed = document.getElementById("user-warning-feed");
+        if (!warnings || !warnings.length) {
+          feed.innerHTML = '<div class="user-warning-empty">No warning messages yet.</div>';
+          return;
+        }
+        feed.innerHTML = warnings.map(function(warning) {
+          return '<div class="user-warning-item"><div class="user-warning-item-head"><span>' +
+            escapeHtml(warning.displayName || "Member") + ' · ' + escapeHtml(String(warning.kind || "").toUpperCase()) +
+            '</span><span>' + escapeHtml(formatWarningTime(warning.createdAt)) + '</span></div><div class="user-warning-item-message">' +
+            escapeHtml(warning.message) + '</div></div>';
+        }).join("");
+      }
+
+      function renderSelectedDashboard(data) {
+        var group = data.selectedGroup;
+        if (!group) return;
+        window.__z28SelectedGroupId = group.id;
+        document.getElementById("user-group-options").hidden = true;
+        document.getElementById("user-selected-dashboard").hidden = false;
+        document.getElementById("switch-group").hidden = false;
+        document.getElementById("user-selected-group-title").textContent = group.title + " Dashboard";
+        document.getElementById("user-warning-group-name").textContent = group.title;
+        document.getElementById("user-member-count").textContent = String(group.memberCount);
+        document.getElementById("user-active-count").textContent = String(group.activeCount);
+        document.getElementById("user-settings-limits-card").innerHTML = settingEditorMarkup("duration", data.activityLimits || {}, group.id);
+        document.getElementById("user-settings-counts-card").innerHTML = settingEditorMarkup("count", data.countLimits || {}, group.id);
+        renderWarnings(data.warnings || []);
+        bindUserSettingButtons();
       }
 
       function renderUserDashboard(data) {
         var dashboard = document.getElementById("user-dashboard");
-        var list = document.getElementById("user-group-list");
-        var groups = Array.isArray(data.groups) ? data.groups : [];
-        var activity = data.activityLimits || {};
-        var counts = data.countLimits || {};
-
         dashboard.classList.add("visible");
-
-        var activityValues = [
-          { label: "Eat", value: String(activity.eat ?? "—") + " min" },
-          { label: "WC", value: String(activity.wc ?? "—") + " min" },
-          { label: "Smoke", value: String(activity.smoke ?? "—") + " min" },
-          { label: "WCD", value: String(activity.wcd ?? "—") + " min" }
-        ];
-        var countValues = [
-          { label: "Eat", value: Number.isFinite(counts.eat) ? String(counts.eat) : "Unlimited" },
-          { label: "WC", value: String(counts.wc ?? "—") + " / day" },
-          { label: "Smoke", value: String(counts.smoke ?? "—") + " / day" },
-          { label: "WCD", value: String(counts.wcd ?? "—") + " / day" }
-        ];
-
-        document.getElementById("user-warning-limits-card").innerHTML =
-          settingCardMarkup("activity", "Activity Limits", "Duration Control", activityValues);
-        document.getElementById("user-warning-counts-card").innerHTML =
-          settingCardMarkup("counts", "Daily Count Limits", "Daily Usage Control", countValues);
-        document.getElementById("user-settings-limits-card").innerHTML =
-          settingCardMarkup("activity", "Activity Limits", "Duration Control", activityValues);
-        document.getElementById("user-settings-counts-card").innerHTML =
-          settingCardMarkup("counts", "Daily Count Limits", "Daily Usage Control", countValues);
-
-        if (!groups.length) {
-          list.innerHTML =
-            '<div class="user-empty">' +
-              '<strong>No eligible group found</strong>' +
-              '<p>Add this bot to a group, then make sure your Telegram account is a group owner or administrator. Groups where the bot is no longer available are not shown.</p>' +
-            '</div>';
+        if (!data.groups || !data.groups.length) return;
+        if (data.selectionRequired) {
+          document.getElementById("user-group-options").hidden = false;
+          document.getElementById("user-selected-dashboard").hidden = true;
+          document.getElementById("switch-group").hidden = true;
+          renderGroupOptions(data.groups);
           return;
         }
-
-        list.innerHTML = groups.map(function (group) {
-          var active = Number(group.activeCount || 0);
-          var members = Number(group.memberCount || 0);
-          return '<div class="user-group-box">' +
-            '<div class="user-group-box-title">Group Activities</div>' +
-            '<div class="user-group-name">' + escapeHtml(group.title) + '</div>' +
-            '<div class="user-group-metrics">' +
-              '<div class="user-live-metric"><div class="user-live-label">Group member</div><div class="user-live-value">' + String(members) + '</div></div>' +
-              '<div class="user-live-metric"><div class="user-live-label">Member active</div><div class="user-live-value active">' + String(active) + '</div></div>' +
-            '</div>' +
-          '</div>';
-        }).join("");
-
-        document.getElementById("user-dashboard-sub").textContent =
-          groups.length === 1 ? "1 managed group · Live activity overview" :
-          String(groups.length) + " managed groups · Live activity overview";
+        renderSelectedDashboard(data);
       }
 
-      async function apiUserMode() {
-        var headers = new Headers();
-        headers.set("X-Telegram-Init-Data", initData);
-        headers.set("Accept", "application/json");
-        var response = await fetch("/api/user/mode", { headers: headers });
-        var data = await response.json().catch(function () { return {}; });
-        if (!response.ok) {
-          throw new Error(typeof data.error === "string" ? data.error : "Unable to identify access mode.");
-        }
-        return data;
+      async function selectUserGroup(groupId) {
+        await loadUserDashboard(true, groupId);
       }
 
-      async function apiUserDashboard(userId) {
+      function bindUserSettingButtons() {
+        document.querySelectorAll(".user-setting-save").forEach(function(button) {
+          button.onclick = async function() {
+            var type = button.getAttribute("data-setting-type");
+            var groupId = Number(button.getAttribute("data-group-id"));
+            var card = button.closest(".user-setting-card");
+            var inputs = card.querySelectorAll("input");
+            var original = button.textContent;
+            button.disabled = true;
+            button.innerHTML = '<span class="button-spinner" aria-hidden="true"></span> Saving…';
+            try {
+              for (var i=0;i<inputs.length;i+=1) {
+                var value = Number(inputs[i].value);
+                var kind = inputs[i].getAttribute("data-kind");
+                if (!Number.isSafeInteger(value) || value <= 0) throw new Error("Enter positive integers for all settings.");
+                await apiUserSettings(groupId, type, kind, value);
+              }
+              button.innerHTML = "✓ Successfully";
+              window.setTimeout(function(){ button.textContent = original; button.disabled=false; },1500);
+              await loadUserDashboard(false, groupId);
+            } catch(error) {
+              button.disabled=false; button.textContent=original;
+              showNotice(error && error.message ? error.message : "Save failed.","error");
+            }
+          };
+        });
+      }
+
+      async function apiUserDashboard(userId, groupId) {
         var headers = new Headers();
         headers.set("X-Telegram-Init-Data", initData);
         headers.set("Accept", "application/json");
         headers.set("Content-Type", "application/json");
-        var response = await fetch("/api/user/dashboard", {
-          method: "POST",
-          headers: headers,
-          body: JSON.stringify({ userId: Number(userId) })
-        });
-        var data = await response.json().catch(function () { return {}; });
-        if (!response.ok) {
-          throw new Error(typeof data.error === "string" ? data.error : "Unable to load your dashboard.");
-        }
+        var body = { userId: Number(userId) };
+        if (groupId !== undefined) body.groupId = Number(groupId);
+        var response = await fetch("/api/user/dashboard",{method:"POST",headers:headers,body:JSON.stringify(body)});
+        var data = await response.json().catch(function(){return {};});
+        if (!response.ok) throw new Error(typeof data.error === "string" ? data.error : "Unable to load your dashboard.");
         return data;
       }
 
-      async function loadUserDashboard(withLoading) {
-        if (!telegramUserId) {
-          throw new Error("Unable to identify your Telegram account.");
-        }
+      async function apiUserSettings(groupId,type,kind,value) {
+        var headers = new Headers();
+        headers.set("X-Telegram-Init-Data", initData);
+        headers.set("Accept", "application/json");
+        headers.set("Content-Type", "application/json");
+        var response = await fetch("/api/user/settings",{method:"PUT",headers:headers,
+          body:JSON.stringify({groupId:Number(groupId),type:type,kind:kind,value:Number(value)})});
+        var data = await response.json().catch(function(){return {};});
+        if (!response.ok) throw new Error(typeof data.error === "string" ? data.error : "Unable to save group settings.");
+        return data;
+      }
+
+      async function loadUserDashboard(withLoading, groupId) {
+        if (!telegramUserId) throw new Error("Unable to identify your Telegram account.");
         var showLoader = withLoading !== false;
         if (showLoader) showUserLoading(true);
         try {
-          var data = await apiUserDashboard(telegramUserId);
+          var data = await apiUserDashboard(telegramUserId,groupId);
           if (!data.hasGroups) {
             try { localStorage.removeItem(userVerifiedKey); } catch {}
             document.body.classList.remove("user-dashboard-page");
             document.body.classList.add("user-verification-page");
             clearUserDashboard();
             document.getElementById("user-verify-card").classList.add("visible");
-            showNotice(
-              "No eligible group found. Add this bot to a group, then make sure your Telegram account is a group owner or administrator. Groups where the bot is no longer available are not shown.",
-              "error"
-            );
-            var input = document.getElementById("user-id-input");
-            var confirm = document.getElementById("user-confirm");
-            if (input) input.value = "";
-            if (confirm) {
-              confirm.disabled = true;
-              confirm.classList.remove("ready");
-              confirm.textContent = "Confirm";
-            }
+            showNotice(data.message || "No eligible group found.","error");
+            document.getElementById("user-id-input").value="";
+            document.getElementById("user-confirm").disabled=true;
             return false;
           }
-
           rememberVerifiedUserId(telegramUserId);
           document.body.classList.remove("user-verification-page");
           document.body.classList.add("user-dashboard-page");
@@ -1784,61 +1854,6 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         }
       }
 
-      async function load() {
-        if (userMode) {
-          var storedUserId = getVerifiedUserId();
-          var currentUserId = telegramUserId ? String(telegramUserId) : "";
-          if (storedUserId && currentUserId && storedUserId === currentUserId) {
-            try {
-              await loadUserDashboard();
-            } catch (error) {
-              document.getElementById("user-verify-card").classList.add("visible");
-              showNotice(error && error.message ? error.message : "Unable to load your dashboard.", "error");
-            }
-          } else {
-            document.getElementById("user-verify-card").classList.add("visible");
-            clearUserDashboard();
-          }
-          hideSplash();
-          return;
-        }
-
-        setBusy(true);
-        try {
-          var data = await api("/summary");
-          if (groupMode) {
-            identity.textContent =
-              (data.group.title || "Group") + " · Telegram ID " + data.group.id;
-            document.getElementById("connection").innerHTML = data.connection
-              ? "<strong>Connected target</strong>" + escapeHtml(data.connection.targetGroupName) + " (" + escapeHtml(String(data.connection.targetChatId)) + ")"
-              : "<strong>No target connected</strong>Timeout notifications are not connected to a target group.";
-            document.getElementById("target").value = data.connection
-              ? String(data.connection.targetChatId)
-              : "";
-          } else {
-            identity.textContent =
-              (data.user.first_name || "Admin") + " · Telegram ID " + data.user.id;
-            document.getElementById("users").textContent = String(data.stats.privateUsers);
-            document.getElementById("groups").textContent = String(data.stats.groups);
-            document.getElementById("reminder").checked = data.reminderEnabled;
-          }
-
-          document.getElementById("limit-eat").value = data.activityLimits.eat;
-          document.getElementById("limit-wc").value = data.activityLimits.wc;
-          document.getElementById("limit-smoke").value = data.activityLimits.smoke;
-          document.getElementById("limit-wcd").value = data.activityLimits.wcd;
-
-          document.getElementById("count-wc").value = data.countLimits.wc;
-          document.getElementById("count-smoke").value = data.countLimits.smoke;
-          document.getElementById("count-wcd").value = data.countLimits.wcd;
-        } catch (error) {
-          showNotice(error && error.message ? error.message : "Unable to load admin data.", "error");
-        } finally {
-          setBusy(false);
-          hideSplash();
-        }
-      }
-
       function escapeHtml(value) {
         var text = String(value);
         return text.replace(/[&<>"']/g, function (char) {
@@ -1846,28 +1861,28 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         });
       }
 
-      document.getElementById("refresh").addEventListener("click", function () {
-        var button = document.getElementById("refresh");
-        runAction(
-          button,
-          "Refreshing…",
-          async function () {
-            if (userMode) {
-              var verified = getVerifiedUserId();
-              if (verified) {
-                await loadUserDashboard();
-              } else {
-                clearUserDashboard();
-                document.getElementById("user-verify-card").classList.add("visible");
-              }
-            } else {
-              await load();
-            }
-          },
-          "Refresh"
-        ).catch(function (error) {
-          showNotice(error && error.message ? error.message : "Refresh failed.", "error");
-        });
+      document.getElementById("refresh").addEventListener("click", function() {
+        var button=document.getElementById("refresh");
+        runAction(button,"Refreshing…",async function(){
+          if(userMode){
+            var verified=getVerifiedUserId();
+            if(verified) await loadUserDashboard(false,window.__z28SelectedGroupId);
+            else { clearUserDashboard(); document.getElementById("user-verify-card").classList.add("visible"); }
+          } else await load();
+        },"Refresh").catch(function(error){showNotice(error && error.message ? error.message : "Refresh failed.","error");});
+      });
+
+      document.getElementById("switch-group").addEventListener("click", function() {
+        var button=document.getElementById("switch-group");
+        button.disabled=true;
+        apiUserDashboard(telegramUserId).then(function(data){
+          document.getElementById("user-group-options").hidden=false;
+          document.getElementById("user-selected-dashboard").hidden=true;
+          button.hidden=true;
+          renderGroupOptions(data.groups || []);
+        }).catch(function(error){
+          showNotice(error && error.message ? error.message : "Unable to load groups.","error");
+        }).finally(function(){button.disabled=false;});
       });
 
       function activateUserTab(tab) {
