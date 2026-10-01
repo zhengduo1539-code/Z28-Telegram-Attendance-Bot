@@ -10,6 +10,7 @@ import type {
   UserProfile,
   MiniAppGroupAccess,
   GroupWarning,
+  AuditLogEntry,
 } from "./types";
 import type { BotStore } from "./store/types";
 
@@ -161,6 +162,14 @@ export class AttendanceService {
     private readonly store: BotStore,
     private readonly config: BotConfig,
   ) {}
+
+  async createAuditLog(entry: AuditLogEntry): Promise<void> {
+    await this.store.createAuditLog(entry);
+  }
+
+  async listAuditLogs(options: { search?: string; action?: string; page: number; pageSize: number }) {
+    return this.store.listAuditLogs(options);
+  }
 
   async getMiniAppGroupAccess(userId: number, groupId: number) {
     return this.store.getMiniAppGroupAccess(userId, groupId);
