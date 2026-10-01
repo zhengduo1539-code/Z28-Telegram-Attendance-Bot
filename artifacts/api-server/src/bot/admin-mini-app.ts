@@ -1551,7 +1551,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           loadUserDashboard(false).catch(function () {
             // Keep the current dashboard visible if a background refresh temporarily fails.
           });
-        }, 10000);
+        }, 5000);
       }
 
 
