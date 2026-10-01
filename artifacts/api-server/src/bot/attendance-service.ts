@@ -521,42 +521,19 @@ export class AttendanceService {
     });
   }
 
-  async getDailyStats(
-    profile: Omit<UserProfile, "createdAt" | "updatedAt">,
-  ) {
-    const now = new Date();
+  async getBotStats() {
     const state = await this.store.load();
-    const dayKey = localDateKey(now, this.config.timeZone);
-    const key = userKey(profile.chatId, profile.userId);
-    const records = state.records.filter(
-      (record) =>
-        record.chatId === profile.chatId &&
-        record.userId === profile.userId &&
-        localDateKey(new Date(record.endedAt), this.config.timeZone) === dayKey,
-    );
-    const active = state.activeActivities[key];
-    const stats = trackedActivities.reduce(
-      (result, kind) => {
-        const completed = records.filter((record) => record.kind === kind);
-        const activeSeconds =
-          active?.kind === kind
-            ? Math.max(0, Math.floor((now.getTime() - new Date(active.startedAt).getTime()) / 1000))
-            : 0;
-        result[kind] = {
-          count: completed.length + (active?.kind === kind ? 1 : 0),
-          seconds:
-            completed.reduce((total, record) => total + record.elapsedSeconds, 0) +
-            activeSeconds,
-        };
-        return result;
-      },
-      {} as Record<ActivityKind, ActivitySummary>,
-    );
+    const privateUserIds = new Set<number>();
+    const groupIds = new Set<number>();
+
+    for (const profile of Object.values(state.users)) {
+      if (profile.chatId > 0) privateUserIds.add(profile.userId);
+      if (profile.chatId < 0) groupIds.add(profile.chatId);
+    }
+
     return {
-      date: dayKey,
-      stats,
-      totalSeconds: Object.values(stats).reduce((total, item) => total + item.seconds, 0),
-      activeKind: active?.kind,
+      privateUsers: privateUserIds.size,
+      groups: groupIds.size,
     };
   }
 

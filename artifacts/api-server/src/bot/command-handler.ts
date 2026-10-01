@@ -83,6 +83,7 @@ export const ADMIN_MENU_COMMANDS = [
   { command: "countlimits", description: "View daily activity count limits" },
   { command: "reminder", description: "Turn overdue reminders on/off" },
   { command: "reminders", description: "View overdue reminder status" },
+  { command: "stats", description: "View bot statistics" },
 ];
 
 export class CommandHandler {
@@ -250,13 +251,19 @@ export class CommandHandler {
         break;
       }
       case "stats": {
-        const dailyStats = await this.attendance.getDailyStats(profile);
-        response = text.stats(
-          dailyStats.date,
-          dailyStats.stats,
-          dailyStats.totalSeconds,
-          dailyStats.activeKind,
-        );
+        const isAdmin =
+          this.config.botOwnerId === profile.userId ||
+          this.config.adminIds.includes(profile.userId);
+        if (!isAdmin) {
+          response = text.adminOnly;
+          break;
+        }
+        if (message.chat.type !== "private") {
+          response = text.botStatsPrivate;
+          break;
+        }
+        const stats = await this.attendance.getBotStats();
+        response = text.botStats(stats.privateUsers, stats.groups);
         break;
       }
       case "work":
