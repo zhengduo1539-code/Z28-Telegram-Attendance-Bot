@@ -3,6 +3,7 @@ import { MongoClient } from "mongodb";
 import { emptyState, FileBotStore, isBotState } from "./file-store";
 import type {
   ActiveActivity,
+  AuditLogEntry,
   BotState,
   MiniAppGroupAccess,
 } from "../types";
@@ -28,6 +29,18 @@ type MongoActiveActivityDocument = {
   reminderSentAt?: Date;
 };
 
+type MongoAuditLogDocument = {
+  _id: string;
+  id: string;
+  actorUserId: number;
+  actorName: string;
+  role: AuditLogEntry["role"];
+  action: string;
+  target: string;
+  details: string;
+  createdAt: Date;
+};
+
 type MongoMiniAppAccessDocument = {
   _id: string;
   userId: number;
@@ -40,6 +53,7 @@ const COLLECTION_NAME = "bot_state";
 const STATE_ID = "bot-state";
 const ACTIVE_ACTIVITY_COLLECTION = "active_activities";
 const MINI_APP_ACCESS_COLLECTION = "mini_app_access";
+const AUDIT_LOG_COLLECTION = "audit_logs";
 const MINI_APP_ACCESS_TTL_MS = 5 * 60 * 1000;
 
 const activeActivityKey = (chatId: number, userId: number) =>
@@ -101,6 +115,7 @@ export class MongoBotStore implements BotStore {
   private state?: BotState;
   private updateQueue: Promise<void> = Promise.resolve();
   private miniAppAccessIndexPromise?: Promise<void>;
+  private auditLogIndexPromise?: Promise<void>;
 
   constructor(
     private readonly uri: string,
@@ -376,6 +391,36 @@ export class MongoBotStore implements BotStore {
       },
       { $unset: { reminderClaimedAt: "" } },
     );
+  }
+
+  async createAuditLog(entry: AuditLogEntry): Promise<void> {
+    const collection = (await this.database()).collection<MongoAuditLogDocument>(AUDIT_LOG_COLLECTION);
+    if (!this.auditLogIndexPromise) {
+      this.auditLogIndexPromise = collection.createIndex({ createdAt: -1 }, { name: "audit_logs_created_at" }).then(() => undefined).catch((error: unknown) => {
+        this.auditLogIndexPromise = undefined;
+        throw error;
+      });
+    }
+    await this.auditLogIndexPromise;
+    await collection.insertOne({ _id: entry.id, id: entry.id, actorUserId: entry.actorUserId, actorName: entry.actorName, role: entry.role, action: entry.action, target: entry.target, details: entry.details, createdAt: new Date(entry.createdAt) });
+  }
+
+  async listAuditLogs(options: { search?: string; action?: string; page: number; pageSize: number }): Promise<{ logs: AuditLogEntry[]; total: number; totalPages: number; page: number; pageSize: number }> {
+    const collection = (await this.database()).collection<MongoAuditLogDocument>(AUDIT_LOG_COLLECTION);
+    const filter: Record<string, unknown> = {};
+    if (options.action) filter.action = options.action;
+    if (options.search) {
+      const expression = new RegExp(options.search.replace(/[.*+?^\${}()|[\]\\]/g, "\\  async getMiniAppGroupAccess("), "i");
+      filter.$or = [{ actorName: expression }, { action: expression }, { target: expression }, { details: expression }];
+      const numericSearch = Number(options.search);
+      if (Number.isSafeInteger(numericSearch)) (filter.$or as unknown[]).push({ actorUserId: numericSearch });
+    }
+    const total = await collection.countDocuments(filter);
+    const pageSize = Math.min(Math.max(options.pageSize, 1), 50);
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+    const page = Math.min(Math.max(options.page, 1), totalPages);
+    const documents = await collection.find(filter).sort({ createdAt: -1 }).skip((page - 1) * pageSize).limit(pageSize).toArray();
+    return { logs: documents.map((document) => ({ id: document.id, actorUserId: document.actorUserId, actorName: document.actorName, role: document.role, action: document.action, target: document.target, details: document.details, createdAt: document.createdAt.toISOString() })), total, totalPages, page, pageSize };
   }
 
   async getMiniAppGroupAccess(
