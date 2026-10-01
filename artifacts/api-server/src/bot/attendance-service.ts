@@ -167,6 +167,10 @@ export class AttendanceService {
     await this.store.createAuditLog(entry);
   }
 
+  async deleteAuditLogsBefore(cutoff: Date): Promise<number> {
+    return this.store.deleteAuditLogsBefore(cutoff);
+  }
+
   async listAuditLogs(options: { search?: string; action?: string; page: number; pageSize: number }) {
     return this.store.listAuditLogs(options);
   }
