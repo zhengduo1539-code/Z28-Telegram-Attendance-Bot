@@ -5829,7 +5829,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       }
 
       async function selectUserGroup(groupId) {
-        if (!Number.isSafeInteger(groupId) || groupId <= 0) return;
+        if (!Number.isSafeInteger(groupId) || groupId >= 0) return;
         try {
           var loaded = await loadUserDashboard(true, groupId);
           if (loaded) {
