@@ -307,11 +307,13 @@ userApiRouter.post("/dashboard", async (req, res) => {
     },
   });
   } catch (error) {
-    sendError(
-      res,
-      500,
-      error instanceof Error ? error.message : "Unable to load dashboard data.",
-    );
+    const message =
+      error instanceof Error ? error.message : "Unable to load dashboard data.";
+    console.error("[user-dashboard] failed to load dashboard", {
+      message,
+      stack: error instanceof Error ? error.stack : undefined,
+    });
+    sendError(res, 500, message);
   }
 });
 
