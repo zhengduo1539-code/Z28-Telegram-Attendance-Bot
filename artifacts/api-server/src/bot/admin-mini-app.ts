@@ -1416,10 +1416,12 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     }
 
     .user-tabbar {
-      position:relative;
+      position:fixed;
       z-index:20;
+      left:50%;
+      bottom:max(10px,env(safe-area-inset-bottom));
+      transform:translateX(-50%);
       width:min(730px,calc(100% - 28px));
-      margin:16px auto max(0px,env(safe-area-inset-bottom));
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:7px;
