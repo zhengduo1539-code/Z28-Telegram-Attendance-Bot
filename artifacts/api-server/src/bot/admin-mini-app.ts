@@ -3634,16 +3634,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             <div class="user-setting-card counts" id="user-settings-counts-card"></div>
           </div>
 
-          <div class="user-tab-panel user-warning-tab-panel" id="user-warning-tab">
-            <div class="user-dashboard-section-label warning">Warning</div>
-            <div class="user-warning-feed" id="user-warning-feed"></div>
-          </div>
         </div>
-
-        <nav class="user-tabbar" aria-label="Dashboard sections">
-          <button class="user-tab active" id="user-settings-tab-button" type="button">Admin Settings</button>
-          <button class="user-tab" id="user-warning-tab-button" type="button">Warning</button>
-        </nav>
       </div>
     </section>
 
@@ -3977,13 +3968,9 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         if (!document.getElementById("user-confirm").classList.contains("confirmed")) {
           document.getElementById("user-confirm").textContent = tUser("confirm");
         }
-        document.getElementById("user-settings-tab-button").textContent = tUser("settings");
-        document.getElementById("user-warning-tab-button").textContent = tUser("warning");
         document.getElementById("user-group-activities-title").textContent = tUser("groupActivities");
         document.getElementById("user-group-member-label").textContent = tUser("groupMember");
         document.getElementById("user-member-active-label").textContent = tUser("memberActive");
-        var warningEmpty = document.getElementById("user-warning-feed").querySelector(".user-warning-empty");
-        if (warningEmpty) warningEmpty.textContent = tUser("noWarnings");
         document.querySelector("#user-group-options .user-page-title").textContent = tUser("groupOptions");
         document.querySelector("#user-group-options .user-page-sub").textContent = tUser("groupOptionsSub");
         document.getElementById("user-dashboard-sub").textContent = tUser("dashboardSub");
@@ -4871,7 +4858,6 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         document.getElementById("user-settings-counts-card").innerHTML =
           settingEditorMarkup("count", countLimits, group.id);
 
-        renderWarnings(data.warnings || [], group);
         bindUserSettingButtons();
       }
 
@@ -5037,23 +5023,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         }).finally(function(){button.disabled=false;});
       });
 
-      function activateUserTab(tab) {
-        var settings = tab === "settings";
-        document.getElementById("user-settings-tab").classList.toggle("active", settings);
-        document.getElementById("user-warning-tab").classList.toggle("active", !settings);
-        document.getElementById("user-settings-tab-button").classList.toggle("active", settings);
-        document.getElementById("user-warning-tab-button").classList.toggle("active", !settings);
-      }
 
-      activateUserTab("settings");
-
-      document.getElementById("user-settings-tab-button").addEventListener("click", function () {
-        activateUserTab("settings");
-      });
-
-      document.getElementById("user-warning-tab-button").addEventListener("click", function () {
-        activateUserTab("warning");
-      });
 
       function bindUserLanguageControl(buttonId, menuId) {
         var button = document.getElementById(buttonId);
