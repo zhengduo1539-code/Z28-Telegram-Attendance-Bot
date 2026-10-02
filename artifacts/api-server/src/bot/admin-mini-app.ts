@@ -5565,10 +5565,20 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       }
 
       async function selectUserGroup(groupId) {
+        if (!Number.isSafeInteger(groupId) || groupId <= 0) return;
         try {
           var loaded = await loadUserDashboard(true, groupId);
-          if (loaded) window.__z28GroupSelectionOpen = false;
+          if (loaded) {
+            window.__z28GroupSelectionOpen = false;
+          }
         } catch (error) {
+          // Keep Group Options visible until a valid group is selected successfully.
+          window.__z28GroupSelectionOpen = true;
+          document.getElementById("user-group-options").hidden = false;
+          document.getElementById("user-selected-dashboard").hidden = true;
+          document.getElementById("switch-group").hidden = true;
+          document.getElementById("user-greeting").classList.remove("visible");
+          title.textContent = tUser("groupOptions");
           showNotice(error && error.message ? error.message : "Unable to open the selected group.","error");
         }
       }
@@ -5706,19 +5716,36 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
       document.getElementById("switch-group").addEventListener("click", function() {
         var button=document.getElementById("switch-group");
-        button.disabled=true;
+        var groupOptions=document.getElementById("user-group-options");
+        var selectedDashboard=document.getElementById("user-selected-dashboard");
+        var greeting=document.getElementById("user-greeting");
+        if (window.__z28GroupSelectionOpen) return;
+
         window.__z28GroupSelectionOpen = true;
+        button.disabled = true;
+
+        // Enter a dedicated selection state immediately.
+        groupOptions.hidden = false;
+        selectedDashboard.hidden = true;
+        button.hidden = true;
+        greeting.classList.remove("visible");
+        title.textContent = tUser("groupOptions");
+
         apiUserDashboard(telegramUserId).then(function(data){
-          document.getElementById("user-group-options").hidden=false;
-          document.getElementById("user-selected-dashboard").hidden=true;
-          button.hidden=true;
-          document.getElementById("user-greeting").classList.remove("visible");
-          title.textContent = tUser("groupOptions");
           renderGroupOptions(data.groups || []);
         }).catch(function(error){
+          // Restore the previous dashboard only when loading the group list fails.
           window.__z28GroupSelectionOpen = false;
+          groupOptions.hidden = true;
+          selectedDashboard.hidden = false;
+          button.hidden = false;
+          title.textContent = tUser("title");
+          greeting.classList.add("visible");
+          renderUserGreeting();
           showNotice(error && error.message ? error.message : "Unable to load groups.","error");
-        }).finally(function(){button.disabled=false;});
+        }).finally(function(){
+          button.disabled = false;
+        });
       });
 
 
