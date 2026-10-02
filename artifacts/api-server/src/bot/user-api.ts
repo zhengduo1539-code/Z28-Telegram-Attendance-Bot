@@ -233,6 +233,7 @@ userApiRouter.post("/dashboard", async (req, res) => {
     return;
   }
 
+  try {
   const snapshot = await auth.context.attendance.snapshot();
   const groups: DashboardGroup[] = [];
   for (const groupId of discoverGroupIds(snapshot)) {
@@ -305,6 +306,13 @@ userApiRouter.post("/dashboard", async (req, res) => {
       wcd: countLimits.wcd ?? defaultCountLimits.wcd,
     },
   });
+  } catch (error) {
+    sendError(
+      res,
+      500,
+      error instanceof Error ? error.message : "Unable to load dashboard data.",
+    );
+  }
 });
 
 userApiRouter.put("/settings", async (req, res) => {
