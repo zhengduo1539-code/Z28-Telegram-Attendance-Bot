@@ -3687,7 +3687,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     body.user-mode.user-dashboard-page .user-about-page {
       position:relative;
       overflow:hidden;
-      padding:18px;
+      padding:18px 18px 118px;
       margin-bottom:0;
       border-radius:20px;
       border:1px solid rgba(202,237,255,.13);
@@ -3751,7 +3751,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       .user-about-grid { grid-template-columns:1fr; }
       .user-about-card.user-about-credit-card { grid-column:auto; }
       .user-about-copy { margin-left:0; }
-      body.user-mode.user-dashboard-page .user-about-page { margin-bottom:0;padding:15px; }
+      body.user-mode.user-dashboard-page .user-about-page { margin-bottom:0;padding:15px 15px 108px; }
       body.user-mode.user-dashboard-page .user-tab { min-height:44px;gap:6px; }
       body.user-mode.user-dashboard-page .user-tab-icon,
       body.user-mode.user-dashboard-page .user-tab-icon svg { width:16px;height:16px; }
