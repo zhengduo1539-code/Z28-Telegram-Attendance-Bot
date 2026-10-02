@@ -70,8 +70,49 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #ffffff;
+      overflow: hidden;
+      isolation: isolate;
+      background:
+        radial-gradient(circle at 50% 44%, rgba(34, 211, 238, 0.14), transparent 19%),
+        radial-gradient(circle at 24% 28%, rgba(59, 130, 246, 0.15), transparent 27%),
+        radial-gradient(circle at 78% 72%, rgba(168, 85, 247, 0.14), transparent 29%),
+        linear-gradient(145deg, #02040b 0%, #061125 48%, #03050e 100%);
       transition: opacity 0.45s ease, visibility 0.45s ease;
+    }
+
+    #splash::before {
+      content: "";
+      position: absolute;
+      inset: -20%;
+      z-index: -2;
+      opacity: 0.42;
+      background:
+        linear-gradient(rgba(56, 189, 248, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56, 189, 248, 0.08) 1px, transparent 1px);
+      background-size: 34px 34px;
+      transform: perspective(700px) rotateX(62deg) scale(1.7) translateY(12%);
+      transform-origin: center bottom;
+      mask-image: linear-gradient(to top, rgba(0,0,0,.95), transparent 76%);
+      -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,.95), transparent 76%);
+      animation: splashGridDrift 8s linear infinite;
+    }
+
+    #splash::after {
+      content: "";
+      position: absolute;
+      width: min(62vw, 430px);
+      height: min(62vw, 430px);
+      z-index: -1;
+      border-radius: 50%;
+      background: radial-gradient(
+        circle,
+        rgba(34, 211, 238, 0.15) 0%,
+        rgba(59, 130, 246, 0.08) 28%,
+        rgba(168, 85, 247, 0.04) 48%,
+        transparent 72%
+      );
+      filter: blur(8px);
+      animation: splashOrbPulse 3.2s ease-in-out infinite;
     }
 
     #splash.hide {
@@ -81,29 +122,92 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     }
 
     #splash-title {
+      position: relative;
       margin: 0;
       padding: 0 24px;
       text-align: center;
-      font-size: clamp(24px, 7vw, 34px);
-      font-weight: 800;
-      letter-spacing: 0.02em;
+      font-size: clamp(25px, 7vw, 38px);
+      line-height: 1.08;
+      font-weight: 900;
+      letter-spacing: 0.025em;
       color: transparent;
       background: linear-gradient(
-        110deg,
-        #111827 10%,
-        #6b7280 30%,
-        #111827 44%,
-        #a7adb7 54%,
-        #111827 70%
+        100deg,
+        #67e8f9 0%,
+        #38bdf8 24%,
+        #60a5fa 46%,
+        #a78bfa 68%,
+        #e879f9 84%,
+        #67e8f9 100%
       );
-      background-size: 250% auto;
+      background-size: 240% auto;
       background-clip: text;
       -webkit-background-clip: text;
-      animation: welcomeShine 1.55s linear infinite;
+      -webkit-text-fill-color: transparent;
+      text-shadow:
+        0 0 14px rgba(34, 211, 238, 0.35),
+        0 0 34px rgba(59, 130, 246, 0.22),
+        0 0 58px rgba(168, 85, 247, 0.13);
+      animation: welcomeShine 2.8s linear infinite, welcomeGlow 2.3s ease-in-out infinite;
+    }
+
+    #splash-title::before {
+      content: "";
+      display: block;
+      width: 46px;
+      height: 3px;
+      margin: 0 auto 18px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #22d3ee, #60a5fa, #a78bfa);
+      box-shadow:
+        0 0 9px rgba(34, 211, 238, 0.8),
+        0 0 22px rgba(96, 165, 250, 0.45);
+    }
+
+    #splash-title::after {
+      content: "Z28 • TELEGRAM ATTENDANCE";
+      display: block;
+      margin: 15px auto 0;
+      font-size: 9px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: 0.28em;
+      color: rgba(186, 230, 253, 0.68);
+      text-shadow: 0 0 10px rgba(34, 211, 238, 0.22);
     }
 
     @keyframes welcomeShine {
-      to { background-position: -250% center; }
+      0% { background-position: 120% center; }
+      100% { background-position: -120% center; }
+    }
+
+    @keyframes welcomeGlow {
+      0%, 100% {
+        filter: brightness(0.96);
+        transform: translateY(0);
+      }
+      50% {
+        filter: brightness(1.12);
+        transform: translateY(-1px);
+      }
+    }
+
+    @keyframes splashOrbPulse {
+      0%, 100% { opacity: 0.65; transform: scale(0.92); }
+      50% { opacity: 1; transform: scale(1.08); }
+    }
+
+    @keyframes splashGridDrift {
+      0% { transform: perspective(700px) rotateX(62deg) scale(1.7) translateY(12%); }
+      100% { transform: perspective(700px) rotateX(62deg) scale(1.7) translateY(16%); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #splash::before,
+      #splash::after,
+      #splash-title {
+        animation: none !important;
+      }
     }
 
     .wrap {
@@ -2620,7 +2724,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
   <div id="user-loading" class="user-loading" aria-live="polite" aria-label="Loading"><div class="user-loader"></div></div>
 
   <div id="splash" aria-label="Loading">
-    <h1 id="splash-title">Welcome from Zheng Duo</h1>
+    <h1 id="splash-title">Welcome from Zhen Duo</h1>
   </div>
 
   <main class="wrap" id="app">
