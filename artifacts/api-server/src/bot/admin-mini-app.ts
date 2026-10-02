@@ -6743,20 +6743,17 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         try {
           var modeData = await apiUserMode();
           if (modeData.isConfiguredAdmin) {
-            var storedAdminId = getVerifiedAdminId();
-            var currentAdminId = telegramUserId ? String(telegramUserId) : "";
-            if (storedAdminId && currentAdminId && storedAdminId === currentAdminId) {
-              setPanelVisibility("admin");
-              title.textContent = "Administration";
-              await createAdminSession();
+            setPanelVisibility("admin");
+            title.textContent = "Administration";
+            try {
               await load();
+            } catch (error) {
               hideSplash();
-              startAdminDashboardRefresh();
-            } else {
-              setPanelVisibility("admin-verify");
-              showAdminVerificationPage();
-              hideSplash();
+              showNotice(error && error.message ? error.message : "Unable to load the admin dashboard.", "error");
+              return;
             }
+            hideSplash();
+            startAdminDashboardRefresh();
           } else {
             setPanelVisibility("user");
             title.textContent = telegramUserId ? String(telegramUserId) + " " + tUser("title") : tUser("title");
