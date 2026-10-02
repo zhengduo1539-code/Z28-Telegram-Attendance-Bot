@@ -3675,6 +3675,158 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       }
     }
 
+    /* User Dashboard About section. */
+    body.user-mode.user-dashboard-page #user-about-button {
+      min-height:40px;
+      min-width:112px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:0 13px;
+      border:1px solid rgba(202,237,255,.18);
+      border-radius:14px;
+      color:#dff8ff;
+      background:
+        linear-gradient(145deg,rgba(255,255,255,.105),rgba(255,255,255,.022)),
+        rgba(7,19,34,.42);
+      box-shadow:
+        0 14px 32px rgba(0,0,0,.34),
+        0 1px 0 rgba(255,255,255,.10) inset,
+        0 -1px 0 rgba(0,0,0,.18) inset;
+      backdrop-filter:blur(22px) saturate(165%);
+      -webkit-backdrop-filter:blur(22px) saturate(165%);
+      font-size:12px;
+      font-weight:780;
+      line-height:1;
+      cursor:pointer;
+      align-self:flex-end;
+      position:relative;
+      overflow:hidden;
+      transition:transform .20s ease,border-color .22s ease,background .24s ease,box-shadow .24s ease,color .22s ease;
+    }
+    body.user-mode.user-dashboard-page #user-about-button::after {
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:linear-gradient(110deg,rgba(255,255,255,.12),transparent 35%,transparent 72%,rgba(88,214,255,.07));
+      opacity:.72;
+      transform:translateX(-22%);
+      transition:transform .45s ease,opacity .25s ease;
+    }
+    body.user-mode.user-dashboard-page #user-about-button:hover {
+      transform:translateY(-1px);
+      border-color:rgba(137,224,255,.34);
+      color:#f3fdff;
+      background:
+        linear-gradient(145deg,rgba(255,255,255,.13),rgba(255,255,255,.03)),
+        rgba(8,25,45,.50);
+      box-shadow:0 18px 38px rgba(0,0,0,.40),0 0 24px rgba(56,190,255,.075),0 1px 0 rgba(255,255,255,.13) inset;
+    }
+    body.user-mode.user-dashboard-page #user-about-button:hover::after { transform:translateX(22%);opacity:.95; }
+    body.user-mode.user-dashboard-page #user-about-button:active { transform:translateY(0) scale(.965); }
+    body.user-mode.user-dashboard-page #user-about-button:focus-visible { outline:2px solid rgba(112,220,255,.42);outline-offset:2px; }
+    body.user-mode.user-dashboard-page #user-about-button svg {
+      position:relative;
+      z-index:1;
+      width:17px;
+      height:17px;
+      flex:0 0 17px;
+      stroke:currentColor;
+      fill:none;
+      stroke-width:1.8;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+      filter:drop-shadow(0 0 7px rgba(92,214,255,.18));
+    }
+    body.user-mode.user-dashboard-page #user-about-button-label { position:relative;z-index:1;display:inline-flex;align-items:center; }
+
+    body.user-mode.user-dashboard-page .user-about-panel {
+      position:relative;
+      overflow:hidden;
+      padding:18px;
+      border-radius:20px;
+      border:1px solid rgba(202,237,255,.13);
+      background:
+        radial-gradient(circle at 8% 0%,rgba(57,213,255,.10),transparent 30%),
+        linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.018)),
+        rgba(7,17,31,.54);
+      box-shadow:0 20px 46px rgba(0,0,0,.42),0 1px 0 rgba(255,255,255,.09) inset,0 -1px 0 rgba(0,0,0,.18) inset;
+      backdrop-filter:blur(28px) saturate(165%);
+      -webkit-backdrop-filter:blur(28px) saturate(165%);
+      animation:userAboutIn .34s cubic-bezier(.22,1,.36,1) both;
+    }
+    body.user-mode.user-dashboard-page .user-about-panel[hidden] { display:none !important; }
+    @keyframes userAboutIn {
+      from { opacity:0;transform:translateY(10px) scale(.985);filter:blur(2px); }
+      to { opacity:1;transform:translateY(0) scale(1);filter:blur(0); }
+    }
+    .user-about-head { display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:16px; }
+    .user-about-head .user-dashboard-section-label { margin:0; }
+    .user-about-back {
+      min-height:38px;
+      min-width:78px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      padding:0 11px;
+      border:1px solid rgba(202,237,255,.14);
+      border-radius:12px;
+      color:#d7f5ff;
+      background:rgba(255,255,255,.045);
+      cursor:pointer;
+      font-size:12px;
+      font-weight:760;
+      box-shadow:0 8px 18px rgba(0,0,0,.24),0 1px 0 rgba(255,255,255,.07) inset;
+      transition:transform .18s ease,border-color .2s ease,background .2s ease;
+    }
+    .user-about-back:hover { transform:translateY(-1px);border-color:rgba(137,224,255,.28);background:rgba(56,190,255,.075); }
+    .user-about-back:active { transform:translateY(0) scale(.97); }
+    .user-about-back svg { width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round; }
+    .user-about-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px; }
+    .user-about-card {
+      min-width:0;
+      padding:14px;
+      border-radius:16px;
+      border:1px solid rgba(202,237,255,.10);
+      background:linear-gradient(145deg,rgba(255,255,255,.05),rgba(255,255,255,.012)),rgba(3,11,22,.40);
+      box-shadow:0 12px 28px rgba(0,0,0,.24),0 1px 0 rgba(255,255,255,.055) inset;
+    }
+    .user-about-card.user-about-credit-card { grid-column:1 / -1; }
+    .user-about-card[open] { border-color:rgba(124,218,255,.19); }
+    .user-about-icon {
+      width:38px;height:38px;flex:0 0 38px;display:inline-flex;align-items:center;justify-content:center;
+      border-radius:13px;color:#94dcff;background:linear-gradient(145deg,rgba(48,181,255,.16),rgba(37,69,120,.34));
+      border:1px solid rgba(127,220,255,.14);box-shadow:0 10px 20px rgba(0,116,220,.13),0 1px 0 rgba(255,255,255,.07) inset;
+    }
+    .user-about-icon svg { width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round; }
+    article.user-about-card:not(.user-about-details) { display:flex;align-items:center;gap:12px; }
+    .user-about-label { color:#8198b3;font-size:11px;font-weight:730;letter-spacing:.025em; }
+    .user-about-value { margin-top:3px;color:#f0fbff;font-size:16px;font-weight:790;letter-spacing:-.01em; }
+    .user-about-credit-sub { margin-top:1px;color:#6f849f;font-size:10px;font-weight:650; }
+    .user-about-details { overflow:hidden; }
+    .user-about-details summary { display:flex;align-items:center;gap:12px;cursor:pointer;list-style:none;user-select:none; }
+    .user-about-details summary::-webkit-details-marker { display:none; }
+    .user-about-summary-copy { min-width:0;flex:1;display:flex;align-items:center;justify-content:space-between;gap:10px; }
+    .user-about-summary-arrow { color:#80d9ff;font-size:20px;line-height:1;transition:transform .22s ease; }
+    .user-about-details[open] .user-about-summary-arrow { transform:rotate(90deg); }
+    .user-about-copy { margin:12px 0 2px 50px;color:#8ea3bc;font-size:12px;line-height:1.6; }
+    @media (max-width:620px) {
+      .user-about-grid { grid-template-columns:1fr; }
+      .user-about-card.user-about-credit-card { grid-column:auto; }
+      .user-about-copy { margin-left:0; }
+      body.user-mode.user-dashboard-page #user-about-button { min-width:98px;min-height:38px;padding:0 11px;border-radius:13px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      body.user-mode.user-dashboard-page #user-about-button,
+      body.user-mode.user-dashboard-page #user-about-button::after,
+      body.user-mode.user-dashboard-page .user-about-panel,
+      .user-about-back,
+      .user-about-summary-arrow { transition:none !important;animation:none !important; }
+    }
+
     /* Refined User Dashboard Refresh control. */
     body.user-mode.user-dashboard-page #refresh {
       min-height:40px;
@@ -3857,6 +4009,14 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             <path d="M7 17l2.5-2.5"></path>
           </svg>
           <span id="switch-group-label">Switch</span>
+        </button>
+        <button class="about-button" id="user-about-button" type="button" hidden aria-label="About">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="8.5"></circle>
+            <path d="M12 10.5v5"></path>
+            <path d="M12 7.25h.01"></path>
+          </svg>
+          <span id="user-about-button-label">About</span>
         </button>
       </div>
     </div>
@@ -4383,6 +4543,98 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           </div>
 
         </div>
+
+        <div class="user-about-panel" id="user-about-panel" hidden>
+          <div class="user-about-head">
+            <div>
+              <div class="user-dashboard-section-label" id="user-about-title">About</div>
+              <div class="user-page-sub" id="user-about-sub">App information and credits</div>
+            </div>
+            <button class="user-about-back" id="user-about-back" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M14.5 6.5 9 12l5.5 5.5"></path>
+              </svg>
+              <span id="user-about-back-label">Back</span>
+            </button>
+          </div>
+
+          <div class="user-about-grid">
+            <article class="user-about-card">
+              <div class="user-about-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M7 4.5h10"></path>
+                  <path d="M6 8.5h12"></path>
+                  <path d="M8 4.5v15"></path>
+                  <path d="M16 4.5v15"></path>
+                  <path d="M8 19.5h8"></path>
+                </svg>
+              </div>
+              <div>
+                <div class="user-about-label" id="user-about-bot-version-label">Bot Version</div>
+                <div class="user-about-value">M58</div>
+              </div>
+            </article>
+
+            <article class="user-about-card">
+              <div class="user-about-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="5" y="4" width="14" height="16" rx="3"></rect>
+                  <path d="M8.5 8h7"></path>
+                  <path d="M8.5 12h4.5"></path>
+                  <path d="M8.5 16h6"></path>
+                </svg>
+              </div>
+              <div>
+                <div class="user-about-label" id="user-about-mini-version-label">Mini App Version</div>
+                <div class="user-about-value">1.0.0</div>
+              </div>
+            </article>
+
+            <details class="user-about-card user-about-details">
+              <summary>
+                <span class="user-about-icon">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M7 4h10a2 2 0 0 1 2 2v12l-3-1.5L12 18l-3-1.5L6 18V6a2 2 0 0 1 2-2Z"></path>
+                  </svg>
+                </span>
+                <span class="user-about-summary-copy">
+                  <span class="user-about-label" id="user-about-terms-label">Terms of Use</span>
+                  <span class="user-about-summary-arrow">›</span>
+                </span>
+              </summary>
+              <div class="user-about-copy" id="user-about-terms-copy">Use this Mini App only for the attendance and group-management functions provided by the bot. Keep your Telegram account secure and use the service according to your group rules.</div>
+            </details>
+
+            <details class="user-about-card user-about-details">
+              <summary>
+                <span class="user-about-icon">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 3 19 6v5c0 4.8-2.9 7.9-7 10-4.1-2.1-7-5.2-7-10V6l7-3Z"></path>
+                    <path d="m9.5 12 1.7 1.7 3.5-3.5"></path>
+                  </svg>
+                </span>
+                <span class="user-about-summary-copy">
+                  <span class="user-about-label" id="user-about-privacy-label">Privacy</span>
+                  <span class="user-about-summary-arrow">›</span>
+                </span>
+              </summary>
+              <div class="user-about-copy" id="user-about-privacy-copy">The Mini App uses Telegram WebApp account information to verify access and show the groups available to you. Information shown in this dashboard is used only for the bot features provided to your account and groups.</div>
+            </details>
+
+            <article class="user-about-card user-about-credit-card">
+              <div class="user-about-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 3.5 14.6 9l5.9.8-4.3 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8-4.3-4.1L9.4 9 12 3.5Z"></path>
+                </svg>
+              </div>
+              <div>
+                <div class="user-about-label" id="user-about-credits-label">Credits</div>
+                <div class="user-about-value">Zhen Duo</div>
+                <div class="user-about-credit-sub" id="user-about-creator-label">Creator</div>
+              </div>
+            </article>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -4543,6 +4795,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       var userLanguageKey = "z28_user_language";
       var userLanguage = "en";
       var userDashboardRefreshTimer = null;
+      window.__z28GroupSelectionOpen = false;
+      window.__z28AboutOpen = false;
 
       var userUiText = {
         en: {
@@ -4580,6 +4834,17 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           activitySmoke: "Smoke",
           activityWcd: "WCD",
           switch: "Switch",
+          about: "About",
+          aboutSub: "App information and credits",
+          aboutBack: "Back",
+          botVersion: "Bot Version",
+          miniAppVersion: "Mini App Version",
+          terms: "Terms of Use",
+          termsCopy: "Use this Mini App only for the attendance and group-management functions provided by the bot. Keep your Telegram account secure and use the service according to your group rules.",
+          privacy: "Privacy",
+          privacyCopy: "The Mini App uses Telegram WebApp account information to verify access and show the groups available to you. Information shown in this dashboard is used only for the bot features provided to your account and groups.",
+          credits: "Credits",
+          creator: "Creator",
           noGroup: "No eligible group found",
           noGroupLead: "Add this bot to a group, then make sure your Telegram account is a group owner or administrator.",
           noGroupTail: "Groups where the bot is no longer available are not shown.",
@@ -4621,6 +4886,17 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           activitySmoke: "ဆေးလိပ်",
           activityWcd: "WCD",
           switch: "ပြောင်းမည်",
+          about: "About",
+          aboutSub: "App အချက်အလက်နှင့် Credits",
+          aboutBack: "နောက်သို့",
+          botVersion: "Bot Version",
+          miniAppVersion: "Mini App Version",
+          terms: "အသုံးပြုမှုစည်းမျဉ်း",
+          termsCopy: "ဤ Mini App ကို Bot မှပေးထားသော attendance နှင့် group management လုပ်ဆောင်ချက်များအတွက်သာ အသုံးပြုပါ။ သင့် Telegram account ကို လုံခြုံစွာထိန်းသိမ်းပြီး သင့် Group ၏ စည်းမျဉ်းများအတိုင်း ဝန်ဆောင်မှုကို အသုံးပြုပါ။",
+          privacy: "Privacy",
+          privacyCopy: "Mini App သည် access အတည်ပြုရန်နှင့် သင့်အတွက်ရရှိနိုင်သော Group များကို ပြသရန် Telegram WebApp account information ကို အသုံးပြုပါသည်။ Dashboard တွင်ပြသသောအချက်အလက်များကို သင့် account နှင့် Group များအတွက် Bot မှပေးသော feature များအတွက်သာ အသုံးပြုပါသည်။",
+          credits: "Credits",
+          creator: "ဖန်တီးသူ",
           noGroup: "သင့်အတွက် အသုံးပြုနိုင်သော Group မရှိပါ",
           noGroupLead: "Bot ကို Group တစ်ခုထဲသို့ ထည့်ပြီး သင့် Telegram account ကို Group owner သို့မဟုတ် administrator ဖြစ်ကြောင်း သေချာပါစေ။",
           noGroupTail: "Bot မရှိတော့သော Group များကို မပြပါ။",
@@ -4662,6 +4938,17 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           activitySmoke: "抽烟",
           activityWcd: "大号",
           switch: "切换",
+          about: "关于",
+          aboutSub: "应用信息与创作者",
+          aboutBack: "返回",
+          botVersion: "机器人版本",
+          miniAppVersion: "Mini App 版本",
+          terms: "使用条款",
+          termsCopy: "此 Mini App 仅用于机器人提供的打卡和群组管理功能。请妥善保护您的 Telegram 账号，并遵守您所在群组的使用规则。",
+          privacy: "隐私",
+          privacyCopy: "Mini App 使用 Telegram WebApp 账号信息验证访问权限，并显示您可以使用的群组。Dashboard 中显示的信息仅用于机器人向您的账号和群组提供的功能。",
+          credits: "鸣谢",
+          creator: "创作者",
           noGroup: "没有找到可用的群组",
           noGroupLead: "请将 Bot 添加到群组，并确保您的 Telegram 账号是群主或管理员。",
           noGroupTail: "Bot 已不在的群组不会显示。",
@@ -4714,6 +5001,18 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         document.querySelector("#user-group-options .user-page-title").textContent = tUser("groupOptions");
         document.querySelector("#user-group-options .user-page-sub").textContent = tUser("groupOptionsSub");
         document.getElementById("user-dashboard-sub").textContent = tUser("dashboardSub");
+        document.getElementById("user-about-button-label").textContent = tUser("about");
+        document.getElementById("user-about-title").textContent = tUser("about");
+        document.getElementById("user-about-sub").textContent = tUser("aboutSub");
+        document.getElementById("user-about-back-label").textContent = tUser("aboutBack");
+        document.getElementById("user-about-bot-version-label").textContent = tUser("botVersion");
+        document.getElementById("user-about-mini-version-label").textContent = tUser("miniAppVersion");
+        document.getElementById("user-about-terms-label").textContent = tUser("terms");
+        document.getElementById("user-about-terms-copy").textContent = tUser("termsCopy");
+        document.getElementById("user-about-privacy-label").textContent = tUser("privacy");
+        document.getElementById("user-about-privacy-copy").textContent = tUser("privacyCopy");
+        document.getElementById("user-about-credits-label").textContent = tUser("credits");
+        document.getElementById("user-about-creator-label").textContent = tUser("creator");
         renderUserGreeting();
         document.getElementById("user-no-group-message").innerHTML =
           '<strong>' + escapeHtml(tUser("noGroup")) + '</strong>' +
@@ -4730,7 +5029,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         userDashboardRefreshTimer = window.setInterval(function () {
           if (!userMode || !getVerifiedUserId()) return;
           var groupOptions = document.getElementById("user-group-options");
-          if ((groupOptions && !groupOptions.hidden) || window.__z28GroupSelectionOpen) return;
+          if ((groupOptions && !groupOptions.hidden) || window.__z28GroupSelectionOpen || window.__z28AboutOpen) return;
           loadUserDashboard(false, window.__z28SelectedGroupId).catch(function () {
             // Keep the current dashboard visible if a background refresh temporarily fails.
           });
@@ -5519,6 +5818,10 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         title.textContent = tUser("title");
         document.getElementById("user-greeting").classList.add("visible");
         renderUserGreeting();
+        window.__z28AboutOpen = false;
+        document.getElementById("user-about-panel").hidden = true;
+        document.getElementById("refresh").hidden = false;
+        document.getElementById("user-about-button").hidden = false;
         document.getElementById("switch-group").hidden = false;
         document.getElementById("switch-group-label").textContent = tUser("switch");
         document.getElementById("user-selected-group-title").textContent = group.title + " " + tUser("title");
@@ -5556,6 +5859,9 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           document.getElementById("user-group-options").hidden = false;
           document.getElementById("user-selected-dashboard").hidden = true;
           document.getElementById("switch-group").hidden = true;
+          document.getElementById("user-about-button").hidden = true;
+          document.getElementById("user-about-panel").hidden = true;
+          window.__z28AboutOpen = false;
           document.getElementById("user-greeting").classList.remove("visible");
           title.textContent = tUser("groupOptions");
           renderGroupOptions(data.groups);
@@ -5702,7 +6008,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       document.getElementById("refresh").addEventListener("click", function() {
         var button=document.getElementById("refresh");
         var groupOptions = document.getElementById("user-group-options");
-        if (userMode && groupOptions && !groupOptions.hidden) return;
+        if (userMode && (window.__z28AboutOpen || (groupOptions && !groupOptions.hidden))) return;
         runAction(button,"Refreshing…",async function(){
           if(userMode){
             var verified=getVerifiedUserId();
@@ -5712,6 +6018,31 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             }
           } else await load();
         },"Refresh").catch(function(error){showNotice(error && error.message ? error.message : "Refresh failed.","error");});
+      });
+
+      document.getElementById("user-about-button").addEventListener("click", function() {
+        if (!document.body.classList.contains("user-dashboard-page") || window.__z28GroupSelectionOpen) return;
+        window.__z28AboutOpen = true;
+        document.getElementById("user-about-panel").hidden = false;
+        document.getElementById("user-selected-dashboard").hidden = true;
+        document.getElementById("user-about-panel").hidden = false;
+        document.getElementById("refresh").hidden = true;
+        document.getElementById("switch-group").hidden = true;
+        document.getElementById("user-about-button").hidden = true;
+        document.getElementById("user-greeting").classList.remove("visible");
+        title.textContent = tUser("about");
+      });
+
+      document.getElementById("user-about-back").addEventListener("click", function() {
+        window.__z28AboutOpen = false;
+        document.getElementById("user-about-panel").hidden = true;
+        document.getElementById("user-selected-dashboard").hidden = false;
+        document.getElementById("refresh").hidden = false;
+        document.getElementById("switch-group").hidden = false;
+        document.getElementById("user-about-button").hidden = false;
+        title.textContent = tUser("title");
+        document.getElementById("user-greeting").classList.add("visible");
+        renderUserGreeting();
       });
 
       document.getElementById("switch-group").addEventListener("click", function() {
