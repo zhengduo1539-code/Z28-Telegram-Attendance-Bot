@@ -64,6 +64,11 @@ const resolveAdminMiniAppUrl = (): string | undefined => {
       url.pathname = normalizedPath;
     }
 
+    const deployVersion = process.env["RENDER_GIT_COMMIT"]?.trim();
+    if (deployVersion) {
+      url.searchParams.set("v", deployVersion.slice(0, 12));
+    }
+
     return url.toString().replace(/\/$/, "");
   } catch {
     return undefined;
