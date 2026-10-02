@@ -227,11 +227,10 @@ export class CommandHandler {
         let userMiniAppUrl = this.config.adminMiniAppUrl;
         try {
           const url = new URL(userMiniAppUrl);
-          url.pathname = url.pathname.replace(/\\/+$/, "") + "/../user";
-          url.pathname = new URL(url.toString()).pathname;
+          url.pathname = "/user";
           userMiniAppUrl = url.toString();
         } catch {
-          userMiniAppUrl = this.config.adminMiniAppUrl.replace(/\\/admin\\/?$/, "/user");
+          userMiniAppUrl = this.config.adminMiniAppUrl.replace(/\/admin\/?$/, "/user");
         }
 
         await this.telegram.sendMessage(
