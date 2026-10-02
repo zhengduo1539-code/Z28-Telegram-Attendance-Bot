@@ -5987,7 +5987,12 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           var data = await apiUserDashboard(telegramUserId,groupId);
           var groupSelectionRequestBlocked =
             window.__z28GroupSelectionOpen && groupId === undefined;
-          if (requestId !== userDashboardRequestId || groupSelectionRequestBlocked || window.__z28AboutOpen) {
+          if (
+            requestId !== userDashboardRequestId ||
+            groupSelectionRequestBlocked ||
+            window.__z28AboutOpen ||
+            isUserSettingsEditing()
+          ) {
             return false;
           }
           if (!data.hasGroups) {
