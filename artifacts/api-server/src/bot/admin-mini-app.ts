@@ -4848,14 +4848,26 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       var tg = window.Telegram && window.Telegram.WebApp;
       var splash = document.getElementById("splash");
       var splashStartedAt = Date.now();
+      var splashHideTimer = null;
+      var splashHidden = false;
       var identity = document.getElementById("identity");
       var title = document.getElementById("title");
       var app = document.getElementById("app");
       var notice = document.getElementById("notice");
+
+      // Keep the first-launch Welcome screen readable while allowing dashboard data
+      // to load in the background. The fade-out then hands off to the dashboard or
+      // the existing loading/empty/error state without blocking the app indefinitely.
+      var splashMinimumDuration = 3000;
+
       function hideSplash() {
+        if (!splash || splashHidden) return;
         var elapsed = Date.now() - splashStartedAt;
-        var remaining = Math.max(0, 1800 - elapsed);
-        window.setTimeout(function () {
+        var remaining = Math.max(0, splashMinimumDuration - elapsed);
+        window.clearTimeout(splashHideTimer);
+        splashHideTimer = window.setTimeout(function () {
+          if (splashHidden) return;
+          splashHidden = true;
           splash.classList.add("hide");
         }, remaining);
       }
@@ -6637,7 +6649,13 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         if (groupMode) {
           setPanelVisibility("group");
           title.textContent = "⚙️ Group Admin Panel";
-          await load();
+          try {
+            await load();
+          } catch (error) {
+            showNotice(error && error.message ? error.message : "Unable to load the group admin panel.", "error");
+          } finally {
+            hideSplash();
+          }
           return;
         }
 
