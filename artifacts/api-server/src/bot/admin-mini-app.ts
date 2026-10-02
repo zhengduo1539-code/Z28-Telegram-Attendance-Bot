@@ -6752,6 +6752,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       async function initializeMode() {
         if (userPageMode) {
           setPanelVisibility("user");
+          document.body.classList.remove("user-verification-page", "admin-verification-page");
           title.textContent = telegramUserId ? String(telegramUserId) + " " + tUser("title") : tUser("title");
           var storedUserId = getVerifiedUserId();
           var currentUserId = telegramUserId ? String(telegramUserId) : "";
@@ -6766,6 +6767,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
         if (groupMode) {
           setPanelVisibility("group");
+          document.body.classList.remove("user-verification-page", "admin-verification-page", "user-dashboard-page");
           title.textContent = "⚙️ Group Admin Panel";
           try {
             await load();
@@ -6778,6 +6780,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         }
 
         setPanelVisibility("admin");
+        document.body.classList.remove("user-verification-page", "admin-verification-page", "user-dashboard-page");
         title.textContent = "Administration";
         await createAdminSession();
         await load();
