@@ -121,6 +121,23 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       pointer-events: none;
     }
 
+    .splash-subtitle {
+      margin-top: 14px;
+      text-align: center;
+      color: rgba(148, 197, 255, 0.78);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      text-shadow: 0 0 14px rgba(96, 165, 250, 0.16);
+      animation: subtitleAppear 1s 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    @keyframes subtitleAppear {
+      from { opacity: 0; transform: translateY(5px); filter: blur(3px); }
+      to { opacity: 1; transform: translateY(0); filter: blur(0); }
+    }
+
     #splash-title {
       position: relative;
       margin: 0;
@@ -175,7 +192,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     @media (prefers-reduced-motion: reduce) {
       #splash::before,
       #splash::after,
-      #splash-title {
+      #splash-title,
+      .splash-subtitle {
         animation: none !important;
       }
     }
@@ -2694,7 +2712,10 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
   <div id="user-loading" class="user-loading" aria-live="polite" aria-label="Loading"><div class="user-loader"></div></div>
 
   <div id="splash" aria-label="Loading">
-    <h1 id="splash-title">Welcome</h1>
+    <div>
+      <h1 id="splash-title">Welcome</h1>
+      <div class="splash-subtitle">Z28 • TELEGRAM ATTENDANCE</div>
+    </div>
   </div>
 
   <main class="wrap" id="app">
