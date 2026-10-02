@@ -1559,6 +1559,10 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       font-weight:750;
     }
     .user-setting-editor-status[hidden] { display:none !important; }
+    .user-setting-change-summary { display:flex; align-items:flex-start; gap:7px; min-height:30px; padding:7px 10px; border-radius:10px; background:rgba(72,157,255,.07); border:1px solid rgba(104,178,255,.14); color:#b9dcff; font-size:11px; font-weight:700; line-height:1.45; }
+    .user-setting-change-summary[hidden] { display:none !important; }
+    .user-setting-change-summary.is-error { background:rgba(255,107,107,.07); border-color:rgba(255,107,107,.18); color:#ffb8b8; }
+    .user-setting-change-summary strong { color:#e9f6ff; }
     .user-setting-unsaved-dot {
       width:6px;
       height:6px;
@@ -4940,6 +4944,9 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           unsavedSwitchWarning: "Save or cancel your unsaved changes before switching groups.",
           unsavedRefreshWarning: "Save or cancel your unsaved changes before refreshing.",
           unsavedLanguageWarning: "Save or cancel your unsaved changes before changing language.",
+          changesToSave: "Changes to save",
+          savePartialFailure: "Some changes were saved, but one or more settings could not be saved. Review the unsaved values and try again.",
+          saveFailed: "Nothing was saved. Your changes are still here; please try again.",
           invalidSettingValue: "Enter a positive whole number.",
           saving: "Saving…",
           saved: "Saved",
@@ -5000,6 +5007,11 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           cancel: "မလုပ်တော့ပါ",
           unsavedChanges: "မသိမ်းရသေးသော ပြင်ဆင်ချက်များ",
           unsavedSwitchWarning: "Group ပြောင်းမီ မသိမ်းရသေးသော ပြင်ဆင်ချက်များကို Save သို့မဟုတ် Cancel လုပ်ပါ။",
+          unsavedRefreshWarning: "Refresh မလုပ်မီ မသိမ်းရသေးသော ပြင်ဆင်ချက်များကို Save သို့မဟုတ် Cancel လုပ်ပါ။",
+          unsavedLanguageWarning: "Language ပြောင်းမီ မသိမ်းရသေးသော ပြင်ဆင်ချက်များကို Save သို့မဟုတ် Cancel လုပ်ပါ။",
+          changesToSave: "သိမ်းဆည်းမည့် ပြင်ဆင်ချက်များ",
+          savePartialFailure: "ပြင်ဆင်ချက်အချို့ သိမ်းပြီးဖြစ်သော်လည်း setting တစ်ခု သို့မဟုတ် တစ်ခုထက်ပို၍ မသိမ်းနိုင်ပါ။ မသိမ်းရသေးသော တန်ဖိုးများကို စစ်ပြီး ထပ်ကြိုးစားပါ။",
+          saveFailed: "ဘာ setting မှ မသိမ်းရသေးပါ။ သင့်ပြင်ဆင်ချက်များကို ထိန်းသိမ်းထားပြီး ထပ်ကြိုးစားနိုင်ပါသည်။",
           invalidSettingValue: "အပေါင်းကိန်းပြည့်တစ်ခု ထည့်ပါ။",
           saving: "သိမ်းနေသည်…",
           saved: "သိမ်းပြီးပါပြီ",
@@ -5060,6 +5072,11 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           cancel: "取消",
           unsavedChanges: "未保存的更改",
           unsavedSwitchWarning: "切换群组前，请先保存或取消未保存的更改。",
+          unsavedRefreshWarning: "刷新前，请先保存或取消未保存的更改。",
+          unsavedLanguageWarning: "更改语言前，请先保存或取消未保存的更改。",
+          changesToSave: "待保存的更改",
+          savePartialFailure: "部分更改已保存，但一个或多个设置无法保存。请检查未保存的数值后重试。",
+          saveFailed: "没有任何设置被保存。您的更改仍然保留，请重试。",
           invalidSettingValue: "请输入正整数。",
           saving: "保存中…",
           saved: "已保存",
@@ -5968,6 +5985,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           '<div class="user-setting-editor" data-setting-editor="' + type + '" hidden>' + inputs +
           '<div class="user-setting-editor-status" hidden>' +
           '<span class="user-setting-unsaved-dot" aria-hidden="true"></span><span class="user-setting-unsaved">' + escapeHtml(tUser("unsavedChanges")) + '</span></div>' +
+          '<div class="user-setting-change-summary" hidden aria-live="polite"></div>' +
           '<div class="user-setting-editor-error" hidden role="alert">' + escapeHtml(tUser("invalidSettingValue")) + '</div>' +
           '<div class="user-setting-editor-actions"><button class="user-setting-cancel" data-setting-cancel="' + type +
           '" type="button">' + escapeHtml(tUser("cancel")) + '</button><button class="user-setting-save" data-setting-type="' + type +
@@ -6115,6 +6133,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         if (error) error.hidden = !(showError && invalid);
         var status = editor.querySelector(".user-setting-editor-status");
         if (status) status.hidden = !hasUnsavedChanges;
+        updateUserSettingChangeSummary(editor);
         var saveButton = editor.querySelector(".user-setting-save");
         if (saveButton && !saveButton.dataset.saving) {
           var disabled = invalid || !hasUnsavedChanges;
@@ -6122,6 +6141,23 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           saveButton.setAttribute("aria-disabled", disabled ? "true" : "false");
         }
         return !invalid;
+      }
+
+      function updateUserSettingChangeSummary(editor, errorMessage) {
+        if (!editor) return;
+        var summary = editor.querySelector(".user-setting-change-summary");
+        if (!summary) return;
+        var changes = [];
+        var labels = { eat: tUser("activityEat"), wc: tUser("activityWc"), smoke: tUser("activitySmoke"), wcd: tUser("activityWcd") };
+        editor.querySelectorAll("input[data-original-value]").forEach(function(input) {
+          if (input.value === input.getAttribute("data-original-value")) return;
+          var kind = input.getAttribute("data-kind") || "";
+          changes.push("<strong>" + escapeHtml(labels[kind] || kind.toUpperCase()) + "</strong> " + escapeHtml(input.getAttribute("data-original-value")) + " → " + escapeHtml(input.value));
+        });
+        if (!changes.length && !errorMessage) { summary.hidden = true; summary.classList.remove("is-error"); summary.textContent = ""; return; }
+        summary.hidden = false;
+        summary.classList.toggle("is-error", Boolean(errorMessage));
+        summary.innerHTML = errorMessage ? escapeHtml(errorMessage) : "<span>" + escapeHtml(tUser("changesToSave")) + ":</span> " + changes.join(", ");
       }
 
       function bindUserSettingButtons() {
@@ -6151,6 +6187,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
               return field.value !== field.getAttribute("data-original-value");
             });
             status.hidden = !hasUnsavedChanges;
+            updateUserSettingChangeSummary(editor);
           };
         });
 
@@ -6198,38 +6235,47 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             var type = button.getAttribute("data-setting-type");
             var groupId = Number(button.getAttribute("data-group-id"));
             var card = button.closest(".user-setting-card");
-            var inputs = card.querySelectorAll(".user-setting-editor input");
+            var editor = card.querySelector(".user-setting-editor");
+            var inputs = Array.from(editor.querySelectorAll("input"));
             var original = button.textContent;
+            var successfulInputs = [];
             button.disabled = true;
             button.dataset.saving = "true";
             button.setAttribute("aria-disabled", "true");
             button.innerHTML = '<span class="button-spinner" aria-hidden="true"></span> ' + escapeHtml(tUser("saving")) + '…';
             try {
-              if (!validateUserSettingEditor(card.querySelector(".user-setting-editor"), true)) {
-                throw new Error(tUser("invalidSettingValue"));
+              if (!validateUserSettingEditor(editor, true)) throw new Error(tUser("invalidSettingValue"));
+              for (var i = 0; i < inputs.length; i += 1) {
+                var input = inputs[i];
+                if (input.value === input.getAttribute("data-original-value")) continue;
+                var value = Number(input.value);
+                var kind = input.getAttribute("data-kind");
+                if (!Number.isSafeInteger(value) || value <= 0) throw new Error(tUser("invalidSettingValue"));
+                try {
+                  await apiUserSettings(groupId, type, kind, value);
+                  input.setAttribute("data-original-value", input.value);
+                  successfulInputs.push(input);
+                } catch (error) {
+                  throw error;
+                }
               }
-              for (var i=0;i<inputs.length;i+=1) {
-                var value = Number(inputs[i].value);
-                var kind = inputs[i].getAttribute("data-kind");
-                if (!Number.isSafeInteger(value) || value <= 0) throw new Error("Enter positive integers for all settings.");
-                await apiUserSettings(groupId, type, kind, value);
-              }
-              inputs.forEach(function(input) {
-                input.setAttribute("data-original-value", input.value);
-              });
+              inputs.forEach(function(input) { input.classList.remove("is-invalid"); input.setAttribute("aria-invalid", "false"); });
+              updateUserSettingChangeSummary(editor);
               button.innerHTML = "✓ " + escapeHtml(tUser("saved"));
               window.setTimeout(function(){ button.textContent = original; delete button.dataset.saving; button.disabled=false; button.setAttribute("aria-disabled", "false"); },1500);
-              if (document.activeElement && typeof document.activeElement.blur === "function") {
-                document.activeElement.blur();
-              }
+              if (document.activeElement && typeof document.activeElement.blur === "function") document.activeElement.blur();
               await loadUserDashboard(false, groupId);
             } catch(error) {
               delete button.dataset.saving;
               button.disabled=false;
               button.setAttribute("aria-disabled", "false");
               button.textContent=original;
-              validateUserSettingEditor(card.querySelector(".user-setting-editor"), true);
-              showNotice(error && error.message ? error.message : "Save failed.","error");
+              validateUserSettingEditor(editor, true);
+              var remainingDirty = inputs.some(function(input) { return input.value !== input.getAttribute("data-original-value"); });
+              var message = error && error.message ? error.message : tUser("saveFailed");
+              var recoveryMessage = successfulInputs.length && remainingDirty ? tUser("savePartialFailure") : message;
+              updateUserSettingChangeSummary(editor, recoveryMessage);
+              showNotice(recoveryMessage, "error");
             }
           };
         });
