@@ -4904,6 +4904,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           edit: "Edit",
           cancel: "Cancel",
           unsavedChanges: "Unsaved changes",
+          unsavedSwitchWarning: "Save or cancel your unsaved changes before switching groups.",
           invalidSettingValue: "Enter a positive whole number.",
           saving: "Saving…",
           saved: "Saved",
@@ -4963,6 +4964,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           edit: "ပြင်မည်",
           cancel: "မလုပ်တော့ပါ",
           unsavedChanges: "မသိမ်းရသေးသော ပြင်ဆင်ချက်များ",
+          unsavedSwitchWarning: "Group ပြောင်းမီ မသိမ်းရသေးသော ပြင်ဆင်ချက်များကို Save သို့မဟုတ် Cancel လုပ်ပါ။",
           invalidSettingValue: "အပေါင်းကိန်းပြည့်တစ်ခု ထည့်ပါ။",
           saving: "သိမ်းနေသည်…",
           saved: "သိမ်းပြီးပါပြီ",
@@ -5022,6 +5024,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           edit: "编辑",
           cancel: "取消",
           unsavedChanges: "未保存的更改",
+          unsavedSwitchWarning: "切换群组前，请先保存或取消未保存的更改。",
           invalidSettingValue: "请输入正整数。",
           saving: "保存中…",
           saved: "已保存",
@@ -5144,6 +5147,14 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       }
 
       loadUserLanguage();
+
+      function hasUserSettingUnsavedChanges() {
+        var unsaved = false;
+        document.querySelectorAll(".user-setting-editor input[data-original-value]").forEach(function(input) {
+          if (input.value !== input.getAttribute("data-original-value")) unsaved = true;
+        });
+        return unsaved;
+      }
 
       function isUserSettingsEditing() {
         var activeElement = document.activeElement;
@@ -6311,6 +6322,10 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         var selectedDashboard=document.getElementById("user-selected-dashboard");
         var greeting=document.getElementById("user-greeting");
         if (window.__z28GroupSelectionOpen) return;
+        if (hasUserSettingUnsavedChanges()) {
+          showNotice(tUser("unsavedSwitchWarning"), "error");
+          return;
+        }
 
         ++userDashboardRequestId;
         window.__z28GroupSelectionOpen = true;
