@@ -1260,7 +1260,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
     .user-tab-shell {
       position:relative;
-      padding-bottom:82px;
+      padding-bottom:14px;
     }
 
     #user-selected-dashboard #user-dashboard-page-shell[hidden] {
@@ -1416,12 +1416,10 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     }
 
     .user-tabbar {
-      position:fixed;
+      position:relative;
       z-index:20;
-      left:50%;
-      bottom:max(10px,env(safe-area-inset-bottom));
-      transform:translateX(-50%);
       width:min(730px,calc(100% - 28px));
+      margin:16px auto max(0px,env(safe-area-inset-bottom));
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:7px;
@@ -3688,7 +3686,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       position:relative;
       overflow:hidden;
       padding:18px;
-      margin-bottom:122px;
+      margin-bottom:0;
       border-radius:20px;
       border:1px solid rgba(202,237,255,.13);
       background:
@@ -3751,7 +3749,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       .user-about-grid { grid-template-columns:1fr; }
       .user-about-card.user-about-credit-card { grid-column:auto; }
       .user-about-copy { margin-left:0; }
-      body.user-mode.user-dashboard-page .user-about-page { margin-bottom:114px;padding:15px; }
+      body.user-mode.user-dashboard-page .user-about-page { margin-bottom:0;padding:15px; }
       body.user-mode.user-dashboard-page .user-tab { min-height:44px;gap:6px; }
       body.user-mode.user-dashboard-page .user-tab-icon,
       body.user-mode.user-dashboard-page .user-tab-icon svg { width:16px;height:16px; }
