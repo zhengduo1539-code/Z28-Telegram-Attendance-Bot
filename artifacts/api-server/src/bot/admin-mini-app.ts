@@ -4994,12 +4994,23 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
       loadUserLanguage();
 
+      function isUserSettingsEditing() {
+        var activeElement = document.activeElement;
+        if (!activeElement || typeof activeElement.matches !== "function") return false;
+        return activeElement.matches("#user-settings-limits-card input, #user-settings-counts-card input");
+      }
+
       function startUserDashboardRefresh() {
         if (userDashboardRefreshTimer) return;
         userDashboardRefreshTimer = window.setInterval(function () {
           if (!userMode || !getVerifiedUserId()) return;
           var groupOptions = document.getElementById("user-group-options");
-          if ((groupOptions && !groupOptions.hidden) || window.__z28GroupSelectionOpen || window.__z28AboutOpen) return;
+          if (
+            (groupOptions && !groupOptions.hidden) ||
+            window.__z28GroupSelectionOpen ||
+            window.__z28AboutOpen ||
+            isUserSettingsEditing()
+          ) return;
           loadUserDashboard(false, window.__z28SelectedGroupId).catch(function () {
             // Keep the current dashboard visible if a background refresh temporarily fails.
           });
