@@ -1592,6 +1592,11 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       background:linear-gradient(180deg,#2b8cff,#1268e6);
       color:#fff;
     }
+    .user-setting-save:disabled {
+      opacity:.48;
+      cursor:not-allowed;
+      filter:saturate(.55);
+    }
 
     .user-no-group-screen {
       display: none;
@@ -6037,6 +6042,11 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         });
         var error = editor.querySelector(".user-setting-editor-error");
         if (error) error.hidden = !(showError && invalid);
+        var saveButton = editor.querySelector(".user-setting-save");
+        if (saveButton && !saveButton.dataset.saving) {
+          saveButton.disabled = invalid;
+          saveButton.setAttribute("aria-disabled", invalid ? "true" : "false");
+        }
         return !invalid;
       }
 
@@ -6050,6 +6060,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             if (!view || !editor) return;
             view.hidden = true;
             editor.hidden = false;
+            validateUserSettingEditor(editor, false);
             var firstInput = editor.querySelector("input");
             if (firstInput) firstInput.focus();
           };
@@ -6098,6 +6109,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             var inputs = card.querySelectorAll(".user-setting-editor input");
             var original = button.textContent;
             button.disabled = true;
+            button.dataset.saving = "true";
+            button.setAttribute("aria-disabled", "true");
             button.innerHTML = '<span class="button-spinner" aria-hidden="true"></span> Saving…';
             try {
               if (!validateUserSettingEditor(card.querySelector(".user-setting-editor"), true)) {
@@ -6110,10 +6123,14 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
                 await apiUserSettings(groupId, type, kind, value);
               }
               button.innerHTML = "✓ Successfully";
-              window.setTimeout(function(){ button.textContent = original; button.disabled=false; },1500);
+              window.setTimeout(function(){ button.textContent = original; delete button.dataset.saving; button.disabled=false; button.setAttribute("aria-disabled", "false"); },1500);
               await loadUserDashboard(false, groupId);
             } catch(error) {
-              button.disabled=false; button.textContent=original;
+              delete button.dataset.saving;
+              button.disabled=false;
+              button.setAttribute("aria-disabled", "false");
+              button.textContent=original;
+              validateUserSettingEditor(card.querySelector(".user-setting-editor"), true);
               showNotice(error && error.message ? error.message : "Save failed.","error");
             }
           };
