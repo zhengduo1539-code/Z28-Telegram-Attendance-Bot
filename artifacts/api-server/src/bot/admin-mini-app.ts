@@ -4570,8 +4570,10 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
                 </svg>
               </div>
               <div>
+                <div class="user-about-label" id="user-about-bot-name-label">Bot</div>
+                <div class="user-about-value">Z28</div>
                 <div class="user-about-label" id="user-about-bot-version-label">Bot Version</div>
-                <div class="user-about-value">M58</div>
+                <div class="user-about-value">1.0.0</div>
               </div>
             </article>
 
@@ -4629,7 +4631,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
               </div>
               <div>
                 <div class="user-about-label" id="user-about-credits-label">Credits</div>
-                <div class="user-about-value">Zhen Duo</div>
+                <div class="user-about-value">Chan Myae</div>
                 <div class="user-about-credit-sub" id="user-about-creator-label">Creator</div>
               </div>
             </article>
@@ -4837,6 +4839,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           about: "About",
           aboutSub: "App information and credits",
           aboutBack: "Back",
+          botName: "Bot",
           botVersion: "Bot Version",
           miniAppVersion: "Mini App Version",
           terms: "Terms of Use",
@@ -4889,6 +4892,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           about: "About",
           aboutSub: "App အချက်အလက်နှင့် Credits",
           aboutBack: "နောက်သို့",
+          botName: "Bot",
           botVersion: "Bot Version",
           miniAppVersion: "Mini App Version",
           terms: "အသုံးပြုမှုစည်းမျဉ်း",
@@ -4941,6 +4945,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           about: "关于",
           aboutSub: "应用信息与创作者",
           aboutBack: "返回",
+          botName: "机器人",
           botVersion: "机器人版本",
           miniAppVersion: "Mini App 版本",
           terms: "使用条款",
@@ -5005,6 +5010,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         document.getElementById("user-about-title").textContent = tUser("about");
         document.getElementById("user-about-sub").textContent = tUser("aboutSub");
         document.getElementById("user-about-back-label").textContent = tUser("aboutBack");
+        document.getElementById("user-about-bot-name-label").textContent = tUser("botName");
         document.getElementById("user-about-bot-version-label").textContent = tUser("botVersion");
         document.getElementById("user-about-mini-version-label").textContent = tUser("miniAppVersion");
         document.getElementById("user-about-terms-label").textContent = tUser("terms");
