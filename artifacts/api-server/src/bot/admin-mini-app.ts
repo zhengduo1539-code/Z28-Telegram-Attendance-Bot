@@ -4946,6 +4946,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         new URLSearchParams(window.location.search).get("tgWebAppStartParam") ||
         "";
       var groupMode = /^group_-\d+$/.test(startParam);
+      var userPageMode = window.location.pathname === "/user";
       var userMode = false;
       var adminMode = false;
       var adminVerificationMode = false;
@@ -6749,6 +6750,20 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       }
 
       async function initializeMode() {
+        if (userPageMode) {
+          setPanelVisibility("user");
+          title.textContent = telegramUserId ? String(telegramUserId) + " " + tUser("title") : tUser("title");
+          var storedUserId = getVerifiedUserId();
+          var currentUserId = telegramUserId ? String(telegramUserId) : "";
+          if (storedUserId && currentUserId && storedUserId === currentUserId) {
+            await loadUserDashboard();
+          } else {
+            showUserVerificationPage();
+          }
+          hideSplash();
+          return;
+        }
+
         if (groupMode) {
           setPanelVisibility("group");
           title.textContent = "⚙️ Group Admin Panel";
