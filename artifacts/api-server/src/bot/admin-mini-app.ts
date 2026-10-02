@@ -1535,6 +1535,28 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     }
     .user-setting-editor label { color:#dce8f8; font-size:12px; font-weight:750; }
     .user-setting-editor input { min-height:40px; text-align:center; }
+    .user-setting-editor-status {
+      display:flex;
+      align-items:center;
+      gap:7px;
+      min-height:30px;
+      padding:7px 10px;
+      border-radius:10px;
+      background:rgba(255,185,72,.08);
+      border:1px solid rgba(255,193,92,.14);
+      color:#ffd78b;
+      font-size:11px;
+      font-weight:750;
+    }
+    .user-setting-editor-status[hidden] { display:none !important; }
+    .user-setting-unsaved-dot {
+      width:6px;
+      height:6px;
+      flex:0 0 6px;
+      border-radius:50%;
+      background:#ffc45f;
+      box-shadow:0 0 9px rgba(255,196,95,.62);
+    }
     .user-setting-editor-actions {
       display:grid;
       grid-template-columns:1fr 1fr;
@@ -4832,6 +4854,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           saveCountLimits: "Save Count Limits",
           edit: "Edit",
           cancel: "Cancel",
+          unsavedChanges: "Unsaved changes",
           activityLimits: "Activity Limits",
           durationControl: "Duration Control",
           dailyCountLimits: "Daily Count Limits",
@@ -4887,6 +4910,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           saveCountLimits: "Count Limits သိမ်းမည်",
           edit: "ပြင်မည်",
           cancel: "မလုပ်တော့ပါ",
+          unsavedChanges: "မသိမ်းရသေးသော ပြင်ဆင်ချက်များ",
           activityLimits: "Activity Limits",
           durationControl: "Duration Control",
           dailyCountLimits: "Daily Count Limits",
@@ -4942,6 +4966,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           saveCountLimits: "保存次数限制",
           edit: "编辑",
           cancel: "取消",
+          unsavedChanges: "未保存的更改",
           activityLimits: "活动时间限制",
           durationControl: "时长控制",
           dailyCountLimits: "每日次数限制",
@@ -5836,6 +5861,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           '<div class="user-setting-view"><div class="user-setting-grid">' + values + '</div><button class="user-setting-edit" data-setting-edit="' + type +
           '" type="button">' + escapeHtml(tUser("edit")) + '</button></div>' +
           '<div class="user-setting-editor" data-setting-editor="' + type + '" hidden>' + inputs +
+          '<div class="user-setting-editor-status" hidden>' +
+          '<span class="user-setting-unsaved-dot" aria-hidden="true"></span><span class="user-setting-unsaved">' + escapeHtml(tUser("unsavedChanges")) + '</span></div>' +
           '<div class="user-setting-editor-actions"><button class="user-setting-cancel" data-setting-cancel="' + type +
           '" type="button">' + escapeHtml(tUser("cancel")) + '</button><button class="user-setting-save" data-setting-type="' + type +
           '" data-group-id="' + groupId + '" type="button">' + (isCount ? escapeHtml(tUser("saveCountLimits")) : escapeHtml(tUser("saveLimits"))) + '</button></div></div>';
@@ -5963,6 +5990,19 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           };
         });
 
+        document.querySelectorAll(".user-setting-editor input").forEach(function(input) {
+          input.oninput = function() {
+            var editor = input.closest(".user-setting-editor");
+            if (!editor) return;
+            var status = editor.querySelector(".user-setting-editor-status");
+            if (!status) return;
+            var hasUnsavedChanges = Array.from(editor.querySelectorAll("input[data-original-value]")).some(function(field) {
+              return field.value !== field.getAttribute("data-original-value");
+            });
+            status.hidden = !hasUnsavedChanges;
+          };
+        });
+
         document.querySelectorAll(".user-setting-cancel").forEach(function(button) {
           button.onclick = function() {
             var card = button.closest(".user-setting-card");
@@ -5973,6 +6013,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             editor.querySelectorAll("input[data-original-value]").forEach(function(input) {
               input.value = input.getAttribute("data-original-value");
             });
+            var status = editor.querySelector(".user-setting-editor-status");
+            if (status) status.hidden = true;
             editor.hidden = true;
             view.hidden = false;
           };
