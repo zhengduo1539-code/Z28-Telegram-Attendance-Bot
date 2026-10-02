@@ -5691,10 +5691,10 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
       document.getElementById("refresh").addEventListener("click", function() {
         var button=document.getElementById("refresh");
+        var groupOptions = document.getElementById("user-group-options");
+        if (userMode && groupOptions && !groupOptions.hidden) return;
         runAction(button,"Refreshing…",async function(){
           if(userMode){
-            var groupOptions = document.getElementById("user-group-options");
-            if (groupOptions && !groupOptions.hidden) return;
             var verified=getVerifiedUserId();
             if(verified) await loadUserDashboard(false,window.__z28SelectedGroupId);
             else {
@@ -5707,8 +5707,6 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       document.getElementById("switch-group").addEventListener("click", function() {
         var button=document.getElementById("switch-group");
         button.disabled=true;
-        document.getElementById("user-group-options").hidden=true;
-        document.getElementById("user-selected-dashboard").hidden=true;
         window.__z28GroupSelectionOpen = true;
         apiUserDashboard(telegramUserId).then(function(data){
           document.getElementById("user-group-options").hidden=false;
