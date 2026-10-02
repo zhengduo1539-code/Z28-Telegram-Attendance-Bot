@@ -22,11 +22,11 @@ type MongoActiveActivityDocument = {
   userId: number;
   displayName: string;
   kind: ActiveActivity["kind"];
-  startedAt: Date;
+  startedAt: Date | string | number;
   limitMinutes: number;
-  dueAt: Date;
-  reminderClaimedAt?: Date;
-  reminderSentAt?: Date;
+  dueAt: Date | string | number;
+  reminderClaimedAt?: Date | string | number;
+  reminderSentAt?: Date | string | number;
 };
 
 type MongoAuditLogDocument = {
@@ -70,6 +70,14 @@ const isDuplicateKeyError = (error: unknown): boolean =>
   "code" in error &&
   (error as { code?: unknown }).code === 11000;
 
+const toIsoString = (value: Date | string | number, field: string): string => {
+  const date = value instanceof Date ? value : new Date(value);
+  if (!Number.isFinite(date.getTime())) {
+    throw new Error("Invalid active activity " + field + " date.");
+  }
+  return date.toISOString();
+};
+
 const toActiveActivity = (
   document: MongoActiveActivityDocument,
 ): ActiveActivity => ({
@@ -78,13 +86,13 @@ const toActiveActivity = (
   userId: document.userId,
   displayName: document.displayName,
   kind: document.kind,
-  startedAt: document.startedAt.toISOString(),
+  startedAt: toIsoString(document.startedAt, "startedAt"),
   limitMinutes: document.limitMinutes,
   ...(document.reminderClaimedAt
-    ? { reminderClaimedAt: document.reminderClaimedAt.toISOString() }
+    ? { reminderClaimedAt: toIsoString(document.reminderClaimedAt, "reminderClaimedAt") }
     : {}),
   ...(document.reminderSentAt
-    ? { reminderSentAt: document.reminderSentAt.toISOString() }
+    ? { reminderSentAt: toIsoString(document.reminderSentAt, "reminderSentAt") }
     : {}),
 });
 
@@ -291,12 +299,29 @@ export class MongoBotStore implements BotStore {
     const document = await (
       await this.activeActivityCollection()
     ).findOne({ _id: activeActivityKey(chatId, userId) });
-    return document ? toActiveActivity(document) : undefined;
+    if (!document) return undefined;
+    try {
+      return toActiveActivity(document);
+    } catch {
+      return undefined;
+    }
   }
 
   async listActiveActivities(): Promise<ActiveActivity[]> {
     const documents = await (await this.activeActivityCollection()).find({}).toArray();
-    return documents.map(toActiveActivity);
+    const activities: ActiveActivity[] = [];
+    for (const document of documents) {
+      try {
+        const activity = toActiveActivity(document);
+        if (Number.isFinite(activity.limitMinutes) && activity.limitMinutes > 0) {
+          activities.push(activity);
+        }
+      } catch {
+        // Ignore malformed temporary activity documents so admin pages and
+        // other read paths remain available while the bad record is isolated.
+      }
+    }
+    return activities;
   }
 
   async createActiveActivity(activity: ActiveActivity): Promise<boolean> {
@@ -337,7 +362,15 @@ export class MongoBotStore implements BotStore {
         reminderSentAt: { $exists: false },
       })
       .toArray();
-    return documents.map(toActiveActivity);
+    const activities: ActiveActivity[] = [];
+    for (const document of documents) {
+      try {
+        activities.push(toActiveActivity(document));
+      } catch {
+        // Ignore malformed temporary activity documents.
+      }
+    }
+    return activities;
   }
 
   async claimActiveActivityReminder(
