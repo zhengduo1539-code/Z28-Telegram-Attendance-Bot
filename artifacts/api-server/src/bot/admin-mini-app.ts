@@ -6085,7 +6085,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         document.body.classList.remove("user-verification-page","user-dashboard-page","user-no-group-page");
         document.body.classList.add("user-dashboard-error-page");
         document.getElementById("user-dashboard-error-title").textContent=tUser("dashboardLoadError");
-        document.getElementById("user-dashboard-error-lead").textContent=tUser("dashboardLoadErrorLead");
+        document.getElementById("user-dashboard-error-lead").textContent = error && error.message ? error.message : tUser("dashboardLoadErrorLead");
         var retry=document.getElementById("user-dashboard-error-retry");
         retry.textContent=tUser("retry");retry.disabled=false;screen.hidden=false;title.textContent=tUser("dashboardLoadError");
       }
