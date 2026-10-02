@@ -289,13 +289,13 @@ const zh: LocaleText = {
     const seconds = timeoutSeconds % 60;
     const pad = (value: number) => String(value).padStart(2, "0");
     return [
-      `<b>⚠ Activity Warning · ${escapeHtml(warningTime || "Unknown time")}</b>`,
-      "",
-      `Group: ${inlineCode(groupId)}`,
-      `User: ${userLink(displayName, userId)}`,
-      `Activity: ${inlineCode(activity.toUpperCase())}`,
-      `Status: ${inlineCode("Single activity exceeded time limit")}`,
-      `Overtime: ${inlineCode(pad(minutes) + "m " + pad(seconds) + "s")}`,
+      `群组：${inlineCode("打开群【" + groupName + "】")}`,
+      `群组标识：${inlineCode(groupId)}`,
+      `用户：${inlineCode(displayName)}`,
+      `用户标识：${inlineCode(userId)}`,
+      `打卡活动：${inlineCode(activity.toUpperCase())}`,
+      `状态：${inlineCode("单次活动超过时间限制")}`,
+      `超时时长：${inlineCode(pad(minutes) + "分钟 " + pad(seconds) + "秒")}`,
     ].join("\n");
   },
   workCheckIn: (displayName, userId, checkedAt) => [
@@ -505,13 +505,13 @@ const en: LocaleText = {
     const seconds = timeoutSeconds % 60;
     const pad = (value: number) => String(value).padStart(2, "0");
     return [
-      `<b>⚠ Activity Warning · ${escapeHtml(warningTime || "Unknown time")}</b>`,
-      "",
-      `Group: ${inlineCode(groupId)}`,
-      `User: ${userLink(displayName, userId)}`,
+      `Group: ${inlineCode("Open Group [" + groupName + "]")}`,
+      `Group ID: ${inlineCode(groupId)}`,
+      `User: ${inlineCode(displayName)}`,
+      `User ID: ${inlineCode(userId)}`,
       `Activity: ${inlineCode(activity.toUpperCase())}`,
       `Status: ${inlineCode("Single activity exceeded time limit")}`,
-      `Overtime: ${inlineCode(pad(minutes) + "m " + pad(seconds) + "s")}`,
+      `Overtime: ${inlineCode(pad(minutes) + " min " + pad(seconds) + " sec")}`,
     ].join("\n");
   },
   workCheckIn: (displayName, userId, checkedAt) => [
