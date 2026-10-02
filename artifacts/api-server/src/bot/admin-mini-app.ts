@@ -6093,8 +6093,9 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       function showUserNoGroupScreen() {
         window.clearTimeout(showUserNoGroupScreen.timer);
         document.getElementById("user-verify-card").classList.remove("visible");
+        document.getElementById("user-dashboard-error-screen").hidden = true;
         clearUserDashboard();
-        document.body.classList.remove("user-verification-page", "user-dashboard-page");
+        document.body.classList.remove("user-verification-page", "user-dashboard-page", "user-dashboard-error-page");
         document.body.classList.add("user-no-group-page");
         document.getElementById("user-no-group-screen").classList.add("visible");
         window.clearTimeout(showUserNoGroupScreen.timer);
@@ -6527,7 +6528,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             return false;
           }
           rememberVerifiedUserId(telegramUserId);
-          document.body.classList.remove("user-verification-page");
+          document.getElementById("user-dashboard-error-screen").hidden = true;
+          document.body.classList.remove("user-verification-page", "user-dashboard-error-page", "user-no-group-page");
           document.body.classList.add("user-dashboard-page");
           document.getElementById("user-verify-card").classList.remove("visible");
           renderUserDashboard(data);
