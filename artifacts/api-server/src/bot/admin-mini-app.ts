@@ -3718,7 +3718,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         var data = await response.json().catch(function () { return {}; });
         if (!response.ok) {
           var message = typeof data.error === "string" ? data.error : "Request failed.";
-          if (path.indexOf("/notifications") !== 0) {
+          if (response.status < 500 && path.indexOf("/notifications") !== 0) {
             void reportClientNotification(
               "Dashboard Request Failed",
               message,
@@ -4160,6 +4160,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       }
 
       var adminRefreshTimer = null;
+      var adminNotificationRefreshTimer = null;
       function startAdminDashboardRefresh() {
         if (adminRefreshTimer) return;
         adminRefreshTimer = window.setInterval(function () {
@@ -4168,6 +4169,11 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             void reportClientNotification("Background Refresh Failed", error && error.message ? error.message : "Dashboard refresh failed.", 0, "Background refresh");
           });
         }, 15000);
+        loadAdminNotifications().catch(function () {});
+        adminNotificationRefreshTimer = window.setInterval(function () {
+          if (!adminMode || adminNotificationOpen) return;
+          loadAdminNotifications().catch(function () {});
+        }, 8000);
       }
 
       function showUserLoading(show) {
