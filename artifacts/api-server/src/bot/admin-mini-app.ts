@@ -5129,7 +5129,10 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           noGroupLead: "Bot ကို Group တစ်ခုထဲသို့ ထည့်ပြီး သင့် Telegram account ကို Group owner သို့မဟုတ် administrator ဖြစ်ကြောင်း သေချာပါစေ။",
           noGroupTail: "Bot မရှိတော့သော Group များကို မပြပါ။",
           noGroupMessage: "Bot ကို Group တစ်ခုထဲသို့ ထည့်ပြီး သင့် Telegram account ကို Group owner သို့မဟုတ် administrator ဖြစ်ကြောင်း သေချာပါစေ။ Bot မရှိတော့သော Group များကို မပြပါ။",
-          idMismatch: "ထည့်ထားသော ID သည် သင့် Telegram account နှင့် မကိုက်ညီပါ။"
+          idMismatch: "ထည့်ထားသော ID သည် သင့် Telegram account နှင့် မကိုက်ညီပါ။",
+          dashboardLoadError: "Dashboard ကို ယခုဖွင့်၍ မရသေးပါ။",
+          dashboardLoadErrorLead: "Dashboard ကိုဖွင့်နေစဉ် ပြဿနာတစ်ခု ဖြစ်ပေါ်ခဲ့ပါသည်။ သင့်သိမ်းထားပြီးသော setting များကို မပြောင်းလဲထားပါ။",
+          retry: "ထပ်ကြိုးစားမည်"
         },
         zh: {
           title: "用户仪表板",
