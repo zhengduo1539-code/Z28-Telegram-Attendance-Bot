@@ -1535,6 +1535,16 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     }
     .user-setting-editor label { color:#dce8f8; font-size:12px; font-weight:750; }
     .user-setting-editor input { min-height:40px; text-align:center; }
+    .user-setting-editor input.is-invalid {
+      border-color:rgba(255,107,107,.72);
+      box-shadow:0 0 0 2px rgba(255,107,107,.10);
+    }
+    .user-setting-editor-error {
+      display:flex; align-items:center; gap:7px; min-height:30px; padding:7px 10px;
+      border-radius:10px; background:rgba(255,107,107,.08); border:1px solid rgba(255,107,107,.16);
+      color:#ffb3b3; font-size:11px; font-weight:750;
+    }
+    .user-setting-editor-error[hidden] { display:none !important; }
     .user-setting-editor-status {
       display:flex;
       align-items:center;
@@ -4889,6 +4899,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           edit: "Edit",
           cancel: "Cancel",
           unsavedChanges: "Unsaved changes",
+          invalidSettingValue: "Enter a positive whole number.",
           activityLimits: "Activity Limits",
           durationControl: "Duration Control",
           dailyCountLimits: "Daily Count Limits",
@@ -4945,6 +4956,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           edit: "ပြင်မည်",
           cancel: "မလုပ်တော့ပါ",
           unsavedChanges: "မသိမ်းရသေးသော ပြင်ဆင်ချက်များ",
+          invalidSettingValue: "အပေါင်းကိန်းပြည့်တစ်ခု ထည့်ပါ။",
           activityLimits: "Activity Limits",
           durationControl: "Duration Control",
           dailyCountLimits: "Daily Count Limits",
@@ -5001,6 +5013,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           edit: "编辑",
           cancel: "取消",
           unsavedChanges: "未保存的更改",
+          invalidSettingValue: "请输入正整数。",
           activityLimits: "活动时间限制",
           durationControl: "时长控制",
           dailyCountLimits: "每日次数限制",
@@ -5897,6 +5910,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           '<div class="user-setting-editor" data-setting-editor="' + type + '" hidden>' + inputs +
           '<div class="user-setting-editor-status" hidden>' +
           '<span class="user-setting-unsaved-dot" aria-hidden="true"></span><span class="user-setting-unsaved">' + escapeHtml(tUser("unsavedChanges")) + '</span></div>' +
+          '<div class="user-setting-editor-error" hidden role="alert">' + escapeHtml(tUser("invalidSettingValue")) + '</div>' +
           '<div class="user-setting-editor-actions"><button class="user-setting-cancel" data-setting-cancel="' + type +
           '" type="button">' + escapeHtml(tUser("cancel")) + '</button><button class="user-setting-save" data-setting-type="' + type +
           '" data-group-id="' + groupId + '" type="button">' + (isCount ? escapeHtml(tUser("saveCountLimits")) : escapeHtml(tUser("saveLimits"))) + '</button></div></div>';
@@ -6011,6 +6025,21 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         }
       }
 
+      function validateUserSettingEditor(editor, showError) {
+        if (!editor) return false;
+        var invalid = false;
+        editor.querySelectorAll("input[data-original-value]").forEach(function(input) {
+          var value = Number(input.value);
+          var fieldInvalid = !Number.isSafeInteger(value) || value <= 0;
+          input.classList.toggle("is-invalid", fieldInvalid);
+          input.setAttribute("aria-invalid", fieldInvalid ? "true" : "false");
+          if (fieldInvalid) invalid = true;
+        });
+        var error = editor.querySelector(".user-setting-editor-error");
+        if (error) error.hidden = !(showError && invalid);
+        return !invalid;
+      }
+
       function bindUserSettingButtons() {
         document.querySelectorAll(".user-setting-edit").forEach(function(button) {
           button.onclick = function() {
@@ -6032,6 +6061,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             if (!editor) return;
             var status = editor.querySelector(".user-setting-editor-status");
             if (!status) return;
+            validateUserSettingEditor(editor, true);
             var hasUnsavedChanges = Array.from(editor.querySelectorAll("input[data-original-value]")).some(function(field) {
               return field.value !== field.getAttribute("data-original-value");
             });
@@ -6048,7 +6078,11 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             if (!view || !editor) return;
             editor.querySelectorAll("input[data-original-value]").forEach(function(input) {
               input.value = input.getAttribute("data-original-value");
+              input.classList.remove("is-invalid");
+              input.setAttribute("aria-invalid", "false");
             });
+            var error = editor.querySelector(".user-setting-editor-error");
+            if (error) error.hidden = true;
             var status = editor.querySelector(".user-setting-editor-status");
             if (status) status.hidden = true;
             editor.hidden = true;
@@ -6066,6 +6100,9 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             button.disabled = true;
             button.innerHTML = '<span class="button-spinner" aria-hidden="true"></span> Saving…';
             try {
+              if (!validateUserSettingEditor(card.querySelector(".user-setting-editor"), true)) {
+                throw new Error(tUser("invalidSettingValue"));
+              }
               for (var i=0;i<inputs.length;i+=1) {
                 var value = Number(inputs[i].value);
                 var kind = inputs[i].getAttribute("data-kind");
