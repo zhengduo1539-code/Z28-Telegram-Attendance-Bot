@@ -4735,7 +4735,6 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       var adminVerifiedKey = "z28_verified_admin_id";
       var userLanguageKey = "z28_user_language";
       var userLanguage = "en";
-      var userDashboardRefreshTimer = null;
       var userDashboardRequestId = 0;
       var userDashboardData = null;
       window.__z28GroupSelectionOpen = false;
@@ -4999,24 +4998,6 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         if (!activeElement || typeof activeElement.matches !== "function") return false;
         return activeElement.matches("#user-settings-limits-card input, #user-settings-counts-card input");
       }
-
-      function startUserDashboardRefresh() {
-        if (userDashboardRefreshTimer) return;
-        userDashboardRefreshTimer = window.setInterval(function () {
-          if (!userMode || !getVerifiedUserId()) return;
-          var groupOptions = document.getElementById("user-group-options");
-          if (
-            (groupOptions && !groupOptions.hidden) ||
-            window.__z28GroupSelectionOpen ||
-            window.__z28AboutOpen ||
-            isUserSettingsEditing()
-          ) return;
-          loadUserDashboard(false, window.__z28SelectedGroupId).catch(function () {
-            // Keep the current dashboard visible if a background refresh temporarily fails.
-          });
-        }, 2000);
-      }
-
 
       function setPanelVisibility(mode) {
         userMode = mode === "user";
@@ -6235,7 +6216,6 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
               showUserVerificationPage();
             }
             hideSplash();
-            startUserDashboardRefresh();
           }
         } catch (error) {
           setPanelVisibility("user");
