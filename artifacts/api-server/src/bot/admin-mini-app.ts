@@ -3718,7 +3718,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         var data = await response.json().catch(function () { return {}; });
         if (!response.ok) {
           var message = typeof data.error === "string" ? data.error : "Request failed.";
-          if (response.status < 500 && path.indexOf("/notifications") !== 0) {
+          if (path.indexOf("/notifications") !== 0) {
             void reportClientNotification(
               "Dashboard Request Failed",
               message,
