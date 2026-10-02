@@ -2774,8 +2774,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     }
 
     @keyframes userDashboardGlassIn {
-      from { opacity: 0; transform: translateY(9px) scale(.995); filter: blur(2px); }
-      to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
     body.user-mode.user-dashboard-page .user-group-box,
