@@ -78,6 +78,12 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         radial-gradient(circle at 78% 72%, rgba(168, 85, 247, 0.14), transparent 29%),
         linear-gradient(145deg, #02040b 0%, #061125 48%, #03050e 100%);
       transition: opacity 0.45s ease, visibility 0.45s ease;
+      animation: splashAutoHide 0.45s ease 3.35s forwards;
+    }
+
+    @keyframes splashAutoHide {
+      from { opacity: 1; visibility: visible; pointer-events: auto; }
+      to { opacity: 0; visibility: hidden; pointer-events: none; }
     }
 
     #splash::before {
