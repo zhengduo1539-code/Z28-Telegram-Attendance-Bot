@@ -6050,19 +6050,25 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       function validateUserSettingEditor(editor, showError) {
         if (!editor) return false;
         var invalid = false;
+        var hasUnsavedChanges = false;
         editor.querySelectorAll("input[data-original-value]").forEach(function(input) {
           var value = Number(input.value);
+          var originalValue = input.getAttribute("data-original-value");
           var fieldInvalid = !Number.isSafeInteger(value) || value <= 0;
           input.classList.toggle("is-invalid", fieldInvalid);
           input.setAttribute("aria-invalid", fieldInvalid ? "true" : "false");
           if (fieldInvalid) invalid = true;
+          if (input.value !== originalValue) hasUnsavedChanges = true;
         });
         var error = editor.querySelector(".user-setting-editor-error");
         if (error) error.hidden = !(showError && invalid);
+        var status = editor.querySelector(".user-setting-editor-status");
+        if (status) status.hidden = !hasUnsavedChanges;
         var saveButton = editor.querySelector(".user-setting-save");
         if (saveButton && !saveButton.dataset.saving) {
-          saveButton.disabled = invalid;
-          saveButton.setAttribute("aria-disabled", invalid ? "true" : "false");
+          var disabled = invalid || !hasUnsavedChanges;
+          saveButton.disabled = disabled;
+          saveButton.setAttribute("aria-disabled", disabled ? "true" : "false");
         }
         return !invalid;
       }
