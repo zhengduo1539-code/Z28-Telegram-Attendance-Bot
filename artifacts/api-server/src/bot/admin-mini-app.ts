@@ -3578,6 +3578,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       letter-spacing:.01em;
       line-height:1;
       cursor:pointer;
+      align-self:flex-end;
       position:relative;
       overflow:hidden;
       transition:
