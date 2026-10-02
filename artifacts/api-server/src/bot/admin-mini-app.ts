@@ -4576,6 +4576,37 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       showUserNoGroupScreen.timer = null;
 
 
+      function settingEditorMarkup(type, values, groupId) {
+        var isCount = type === "count";
+        var rows = isCount ? [["wc","WC",values.wc],["smoke","Smoke",values.smoke],["wcd","WCD",values.wcd]]
+          : [["eat","Eat",values.eat],["wc","WC",values.wc],["smoke","Smoke",values.smoke],["wcd","WCD",values.wcd]];
+        var inputs = rows.map(function(item) {
+          return '<div class="editor-row"><label>' + item[1] + '</label><input data-kind="' + item[0] +
+            '" type="number" min="1" step="1" value="' + escapeHtml(String(item[2])) + '"></div>';
+        }).join("");
+        var titleText = isCount ? tUser("dailyCountLimits") : tUser("activityLimits");
+        var subText = isCount ? tUser("dailyUsageControl") : tUser("durationControl");
+        var icon = isCount
+          ? '<svg viewBox="0 0 24 24"><path d="M4 21h16"></path><rect class="count-bar count-bar-1" x="5" y="13" width="3" height="5" rx="1.5" fill="currentColor" stroke="none"></rect><rect class="count-bar count-bar-2" x="10.5" y="9" width="3" height="9" rx="1.5" fill="currentColor" stroke="none"></rect><rect class="count-bar count-bar-3" x="16" y="5" width="3" height="13" rx="1.5" fill="currentColor" stroke="none"></rect></svg>'
+          : '<svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7.5"></circle><path d="M9 3h6"></path><path d="M12 5.5v2"></path><g class="clock-hand"><path d="M12 13l3-2"></path></g></svg>';
+        return '<div class="user-setting-head"><span class="user-setting-icon">' + icon + '</span><div><div class="user-setting-title">' +
+          titleText + '</div><div class="user-setting-sub">' + subText + '</div></div></div>' +
+          '<div class="user-setting-editor">' + inputs + '<button class="user-setting-save" data-setting-type="' + type +
+          '" data-group-id="' + groupId + '" type="button">' + (isCount ? escapeHtml(tUser("saveCountLimits")) : escapeHtml(tUser("saveLimits"))) + '</button></div>';
+      }
+
+      function renderGroupOptions(groups) {
+        var list = document.getElementById("user-group-options-list");
+        list.innerHTML = (groups || []).map(function(group) {
+          return '<button class="user-group-option" type="button" data-group-id="' + group.id + '"><span>' +
+            escapeHtml(group.title) + '</span><span>›</span></button>';
+        }).join("");
+        list.querySelectorAll(".user-group-option").forEach(function(button) {
+          button.addEventListener("click", function() { selectUserGroup(Number(button.getAttribute("data-group-id"))); });
+        });
+      }
+
+
       function renderSelectedDashboard(data) {
         var group = data.selectedGroup;
         if (!group) return;
