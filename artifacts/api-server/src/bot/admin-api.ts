@@ -838,5 +838,5 @@ export const userPageHandler = (_req: Request, res: Response) => {
   res.setHeader("Cache-Control", "no-store");
   res
     .type("html")
-    .send(adminMiniAppHtml.replace("<script>", "<script>window.__z28MiniAppMode = \"user\";"));
+    .send(adminMiniAppHtml.replace("<head>", "<head><script>window.__z28MiniAppMode = \"user\";</script>"));
 };
