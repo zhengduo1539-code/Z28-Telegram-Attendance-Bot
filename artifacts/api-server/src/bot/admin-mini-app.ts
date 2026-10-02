@@ -914,6 +914,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
     .user-header-tools { position:relative; display:flex; align-items:center; gap:7px; flex:0 0 auto; }
     .user-appearance-switcher { position:relative; z-index:11; }
+    .user-header-tools .dashboard-language-switcher { position:relative; top:auto; right:auto; }
     .user-appearance-button {
       width:42px;height:42px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;
       border:1px solid rgba(111,196,255,.34);background:linear-gradient(145deg,rgba(25,126,255,.22),rgba(8,34,66,.92));
