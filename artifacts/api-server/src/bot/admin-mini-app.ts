@@ -4893,6 +4893,31 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         }, remaining);
       }
 
+      // Fail-safe: a startup exception must never leave the Welcome screen blocking
+      // the Mini App forever. Normal startup still uses the 3-second readable splash.
+      window.setTimeout(function () {
+        if (!splash || splashHidden) return;
+        splashHidden = true;
+        window.clearTimeout(splashHideTimer);
+        splash.classList.add("hide");
+      }, 5500);
+
+      window.addEventListener("error", function () {
+        if (splash && !splashHidden) {
+          splashHidden = true;
+          window.clearTimeout(splashHideTimer);
+          splash.classList.add("hide");
+        }
+      });
+
+      window.addEventListener("unhandledrejection", function () {
+        if (splash && !splashHidden) {
+          splashHidden = true;
+          window.clearTimeout(splashHideTimer);
+          splash.classList.add("hide");
+        }
+      });
+
       if (!tg || !tg.initData) {
         identity.textContent = "Open this page inside Telegram.";
         hideSplash();
