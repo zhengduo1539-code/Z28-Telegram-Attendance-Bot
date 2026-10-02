@@ -1602,6 +1602,18 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       filter:saturate(.55);
     }
 
+    .user-dashboard-error-screen { display:none; }
+    .user-dashboard-error-message { margin:0 auto; width:min(620px,calc(100% - 36px)); padding:30px 22px; text-align:center; border-radius:22px; border:1px solid rgba(255,107,107,.18); background:linear-gradient(145deg,rgba(45,13,20,.70),rgba(22,10,19,.56)); box-shadow:0 18px 42px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.03); }
+    .user-dashboard-error-icon { width:48px;height:48px;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:1px solid rgba(255,107,107,.32);background:rgba(255,107,107,.10);color:#ffb3b3;font-size:24px;font-weight:900; }
+    .user-dashboard-error-message strong { display:block;color:#fff1f1;font-size:clamp(19px,5vw,25px);font-weight:850; }
+    .user-dashboard-error-message span { display:block;margin:9px auto 0;max-width:500px;color:#d8aeb4;font-size:13px;line-height:1.7; }
+    .user-dashboard-error-retry { min-height:44px;margin-top:19px;padding:0 20px;border:1px solid rgba(130,191,255,.34);border-radius:13px;background:linear-gradient(180deg,#2b8cff,#1268e6);color:#fff;font-weight:800;box-shadow:0 9px 22px rgba(18,104,230,.24);cursor:pointer; }
+    .user-dashboard-error-retry:disabled { opacity:.55;cursor:default; }
+    .user-mode.user-dashboard-error-page .top,.user-mode.user-dashboard-error-page #notice,.user-mode.user-dashboard-error-page .user-card#user-verify-card,.user-mode.user-dashboard-error-page .user-dashboard,.user-mode.user-dashboard-error-page .user-no-group-screen { display:none !important; }
+    .user-mode.user-dashboard-error-page .wrap { min-height:calc(100vh - max(36px,env(safe-area-inset-top) + env(safe-area-inset-bottom)));display:flex;align-items:center;justify-content:center;padding:18px 0; }
+    .user-mode.user-dashboard-error-page .user-dashboard-error-screen { display:flex !important;min-height:calc(100vh - max(36px,env(safe-area-inset-top) + env(safe-area-inset-bottom)));align-items:center;justify-content:center;width:100%;padding:18px 0; }
+    .user-mode.user-dashboard-error-page #user-dashboard-error-screen[hidden] { display:flex !important; }
+
     .user-no-group-screen {
       display: none;
     }
@@ -4571,6 +4583,15 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       </p>
     </section>
 
+    <section class="panel-only-user user-dashboard-error-screen" id="user-dashboard-error-screen" aria-live="assertive" hidden>
+      <div class="user-dashboard-error-message">
+        <div class="user-dashboard-error-icon" aria-hidden="true">!</div>
+        <strong id="user-dashboard-error-title">Unable to load your dashboard right now.</strong>
+        <span id="user-dashboard-error-lead">Something went wrong while loading your dashboard. Your saved settings were not changed.</span>
+        <button class="user-dashboard-error-retry" id="user-dashboard-error-retry" type="button">Try Again</button>
+      </div>
+    </section>
+
     <section class="panel-only-user user-dashboard" id="user-dashboard">
       <div class="user-group-options" id="user-group-options">
         <div class="user-page-head"><div>
@@ -5038,6 +5059,12 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           noGroupTail: "Groups where the bot is no longer available are not shown.",
           noGroupMessage: "Add this bot to a group, then make sure your Telegram account is a group owner or administrator. Groups where the bot is no longer available are not shown.",
           idMismatch: "The entered ID does not match your Telegram account."
+          dashboardLoadError: "暂时无法加载您的控制面板。",
+          dashboardLoadErrorLead: "加载控制面板时出现问题。您已保存的设置没有被更改。",
+          retry: "再试一次"
+          dashboardLoadError: "Unable to load your dashboard right now.",
+          dashboardLoadErrorLead: "Something went wrong while loading your dashboard. Your saved settings were not changed.",
+          retry: "Try Again"
         },
         my: {
           title: "User Dashboard",
@@ -5991,6 +6018,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
       function showUserVerificationPage() {
         adminVerificationMode = false;
+        document.getElementById("user-dashboard-error-screen").hidden=true;
+        document.body.classList.remove("user-dashboard-error-page");
         window.clearTimeout(showUserNoGroupScreen.timer);
         document.getElementById("user-no-group-screen").classList.remove("visible");
         clearUserDashboard();
@@ -6003,6 +6032,20 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         document.getElementById("user-confirm").textContent = tUser("confirm");
         document.getElementById("user-verify-card").classList.add("visible");
         title.textContent = tUser("verifySubtitle");
+      }
+
+      function showUserDashboardError(error, groupId) {
+        var screen=document.getElementById("user-dashboard-error-screen");
+        if(!screen)return;
+        window.__z28DashboardErrorGroupId=groupId!==undefined&&Number.isSafeInteger(Number(groupId))?Number(groupId):undefined;
+        document.getElementById("user-verify-card").classList.remove("visible");
+        clearUserDashboard();
+        document.body.classList.remove("user-verification-page","user-dashboard-page","user-no-group-page");
+        document.body.classList.add("user-dashboard-error-page");
+        document.getElementById("user-dashboard-error-title").textContent=tUser("dashboardLoadError");
+        document.getElementById("user-dashboard-error-lead").textContent=tUser("dashboardLoadErrorLead");
+        var retry=document.getElementById("user-dashboard-error-retry");
+        retry.textContent=tUser("retry");retry.disabled=false;screen.hidden=false;title.textContent=tUser("dashboardLoadError");
       }
 
       function showUserNoGroupScreen() {
@@ -6166,6 +6209,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             window.__z28GroupSelectionOpen = false;
           }
         } catch (error) {
+          if (document.body.classList.contains("user-dashboard-error-page")) return;
           // Keep Group Options visible until a valid group is selected successfully.
           window.__z28GroupSelectionOpen = true;
           document.getElementById("user-group-options").hidden = false;
@@ -6431,6 +6475,9 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           document.getElementById("user-verify-card").classList.remove("visible");
           renderUserDashboard(data);
           return true;
+        } catch (error) {
+          if (requestId === userDashboardRequestId && !window.__z28AboutOpen && !isUserSettingsEditing()) showUserDashboardError(error, groupId);
+          throw error;
         } finally {
           if (showLoader) showUserLoading(false);
         }
@@ -6690,10 +6737,12 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           }
         } catch (error) {
           setPanelVisibility("user");
-          showUserVerificationPage();
-          title.textContent = "User Access";
+          if (!document.body.classList.contains("user-dashboard-error-page")) {
+            showUserVerificationPage();
+            title.textContent = "User Access";
+            showNotice(error && error.message ? error.message : "Unable to open the user dashboard.", "error");
+          }
           hideSplash();
-          showNotice(error && error.message ? error.message : "Unable to open the user dashboard.", "error");
         }
       }
 
@@ -7061,6 +7110,18 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           });
         });
       }
+
+      document.getElementById("user-dashboard-error-retry").addEventListener("click", function() {
+        var button=document.getElementById("user-dashboard-error-retry");
+        if(button.disabled)return;
+        var groupId=window.__z28DashboardErrorGroupId;
+        button.disabled=true;button.textContent=tUser("saving");
+        loadUserDashboard(true,groupId).then(function(opened){
+          if(opened){document.getElementById("user-dashboard-error-screen").hidden=true;document.body.classList.remove("user-dashboard-error-page");}
+        }).catch(function(error){showNotice(error&&error.message?error.message:tUser("dashboardLoadError"),"error");}).finally(function(){
+          if(document.body.classList.contains("user-dashboard-error-page")){button.disabled=false;button.textContent=tUser("retry");}
+        });
+      });
 
       loadUserLanguage();
       applyUserLanguage();
