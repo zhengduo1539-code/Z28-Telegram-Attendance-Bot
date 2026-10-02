@@ -5949,7 +5949,9 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         if (showLoader) showUserLoading(true);
         try {
           var data = await apiUserDashboard(telegramUserId,groupId);
-          if (requestId !== userDashboardRequestId || window.__z28GroupSelectionOpen || window.__z28AboutOpen) {
+          var groupSelectionRequestBlocked =
+            window.__z28GroupSelectionOpen && groupId === undefined;
+          if (requestId !== userDashboardRequestId || groupSelectionRequestBlocked || window.__z28AboutOpen) {
             return false;
           }
           if (!data.hasGroups) {
