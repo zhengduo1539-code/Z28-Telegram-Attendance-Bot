@@ -213,14 +213,50 @@ export class CommandHandler {
 
     if (!command) return;
     if (command.name === "lang" || command.name === "language") {
+      if (!command.argument) {
+        if (message.chat.type !== "private" || !this.config.adminMiniAppUrl) {
+          await this.telegram.sendMessage(
+            message.chat.id,
+            getLocale(currentLocale).languageUsage,
+            undefined,
+            message.message_id,
+          );
+          return;
+        }
+
+        let userMiniAppUrl = this.config.adminMiniAppUrl;
+        try {
+          const url = new URL(userMiniAppUrl);
+          url.pathname = url.pathname.replace(/\\/+$/, "") + "/../user";
+          url.pathname = new URL(url.toString()).pathname;
+          userMiniAppUrl = url.toString();
+        } catch {
+          userMiniAppUrl = this.config.adminMiniAppUrl.replace(/\\/admin\\/?$/, "/user");
+        }
+
+        await this.telegram.sendMessage(
+          message.chat.id,
+          "Request your language settings in the User Mini App.",
+          {
+            inline_keyboard: [[
+              {
+                text: "Request language",
+                style: "primary",
+                web_app: { url: userMiniAppUrl },
+              },
+            ]],
+          },
+          message.message_id,
+        );
+        return;
+      }
+
       const requestedLocale =
         command.argument === "eng" ? "en" : command.argument;
       if (requestedLocale !== "zh" && requestedLocale !== "en") {
         await this.telegram.sendMessage(
           message.chat.id,
-          command.argument
-            ? getLocale(currentLocale).unknownLanguage
-            : getLocale(currentLocale).languageUsage,
+          getLocale(currentLocale).unknownLanguage,
           undefined,
           message.message_id,
         );
