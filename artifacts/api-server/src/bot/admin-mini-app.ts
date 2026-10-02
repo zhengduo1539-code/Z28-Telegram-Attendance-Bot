@@ -66,7 +66,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     #splash {
       position: fixed;
       inset: 0;
-      z-index: 9999;
+      z-index: 10001;
       display: flex;
       align-items: center;
       justify-content: center;
