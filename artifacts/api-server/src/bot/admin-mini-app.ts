@@ -126,80 +126,50 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       margin: 0;
       padding: 0 24px;
       text-align: center;
-      font-size: clamp(25px, 7vw, 38px);
-      line-height: 1.08;
-      font-weight: 900;
-      letter-spacing: 0.025em;
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: clamp(42px, 12vw, 68px);
+      line-height: 1;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-indent: 0.12em;
       color: transparent;
       background: linear-gradient(
-        100deg,
-        #67e8f9 0%,
-        #38bdf8 24%,
-        #60a5fa 46%,
-        #a78bfa 68%,
-        #e879f9 84%,
-        #67e8f9 100%
+        110deg,
+        #f8fafc 0%,
+        #dbeafe 28%,
+        #93c5fd 52%,
+        #c4b5fd 76%,
+        #f8fafc 100%
       );
-      background-size: 240% auto;
+      background-size: 220% auto;
       background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       text-shadow:
-        0 0 14px rgba(34, 211, 238, 0.35),
-        0 0 34px rgba(59, 130, 246, 0.22),
-        0 0 58px rgba(168, 85, 247, 0.13);
-      animation: welcomeShine 2.8s linear infinite, welcomeGlow 2.3s ease-in-out infinite;
-    }
-
-    #splash-title::before {
-      content: "";
-      display: block;
-      width: 46px;
-      height: 3px;
-      margin: 0 auto 18px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, #22d3ee, #60a5fa, #a78bfa);
-      box-shadow:
-        0 0 9px rgba(34, 211, 238, 0.8),
-        0 0 22px rgba(96, 165, 250, 0.45);
-    }
-
-    #splash-title::after {
-      content: "Z28 • TELEGRAM ATTENDANCE";
-      display: block;
-      margin: 15px auto 0;
-      font-size: 9px;
-      font-weight: 800;
-      line-height: 1;
-      letter-spacing: 0.28em;
-      color: rgba(186, 230, 253, 0.68);
-      text-shadow: 0 0 10px rgba(34, 211, 238, 0.22);
+        0 0 18px rgba(147, 197, 253, 0.22),
+        0 0 42px rgba(99, 102, 241, 0.12);
+      animation: welcomeShine 4.2s ease-in-out infinite,
+        welcomeAppear 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
     }
 
     @keyframes welcomeShine {
-      0% { background-position: 120% center; }
-      100% { background-position: -120% center; }
+      0%, 100% { background-position: 100% center; }
+      50% { background-position: 0% center; }
     }
 
-    @keyframes welcomeGlow {
-      0%, 100% {
-        filter: brightness(0.96);
-        transform: translateY(0);
+    @keyframes welcomeAppear {
+      from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.97);
+        letter-spacing: 0.18em;
+        filter: blur(4px);
       }
-      50% {
-        filter: brightness(1.12);
-        transform: translateY(-1px);
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        letter-spacing: 0.12em;
+        filter: blur(0);
       }
-    }
-
-    @keyframes splashOrbPulse {
-      0%, 100% { opacity: 0.65; transform: scale(0.92); }
-      50% { opacity: 1; transform: scale(1.08); }
-    }
-
-    @keyframes splashGridDrift {
-      0% { transform: perspective(700px) rotateX(62deg) scale(1.7) translateY(12%); }
-      100% { transform: perspective(700px) rotateX(62deg) scale(1.7) translateY(16%); }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -2724,7 +2694,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
   <div id="user-loading" class="user-loading" aria-live="polite" aria-label="Loading"><div class="user-loader"></div></div>
 
   <div id="splash" aria-label="Loading">
-    <h1 id="splash-title">Welcome from Zhen Duo</h1>
+    <h1 id="splash-title">Welcome</h1>
   </div>
 
   <main class="wrap" id="app">
@@ -3403,7 +3373,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       var notice = document.getElementById("notice");
       function hideSplash() {
         var elapsed = Date.now() - splashStartedAt;
-        var remaining = Math.max(0, 850 - elapsed);
+        var remaining = Math.max(0, 1800 - elapsed);
         window.setTimeout(function () {
           splash.classList.add("hide");
         }, remaining);
