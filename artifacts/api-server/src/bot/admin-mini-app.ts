@@ -3675,7 +3675,146 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       }
     }
 
+    /* Refined User Dashboard Refresh control. */
+    body.user-mode.user-dashboard-page #refresh {
+      min-height:40px;
+      min-width:112px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:0 13px;
+      border:1px solid rgba(202,237,255,.18);
+      border-radius:14px;
+      color:#dff8ff;
+      background:
+        linear-gradient(145deg,rgba(255,255,255,.105),rgba(255,255,255,.022)),
+        rgba(7,19,34,.42);
+      box-shadow:
+        0 14px 32px rgba(0,0,0,.34),
+        0 1px 0 rgba(255,255,255,.10) inset,
+        0 -1px 0 rgba(0,0,0,.18) inset;
+      backdrop-filter:blur(22px) saturate(165%);
+      -webkit-backdrop-filter:blur(22px) saturate(165%);
+      font-size:12px;
+      font-weight:780;
+      letter-spacing:.01em;
+      line-height:1;
+      cursor:pointer;
+      align-self:flex-end;
+      position:relative;
+      overflow:hidden;
+      transition:
+        transform .20s ease,
+        border-color .22s ease,
+        background .24s ease,
+        box-shadow .24s ease,
+        color .22s ease;
+    }
+
+    body.user-mode.user-dashboard-page #refresh::before {
+      content:"↻";
+      position:relative;
+      z-index:1;
+      width:17px;
+      height:17px;
+      flex:0 0 17px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      color:currentColor;
+      font-size:18px;
+      font-weight:520;
+      line-height:1;
+      transform:translateY(-0.5px);
+      filter:drop-shadow(0 0 7px rgba(92,214,255,.18));
+      transition:transform .34s cubic-bezier(.22,1,.36,1),opacity .2s ease;
+    }
+
+    body.user-mode.user-dashboard-page #refresh::after {
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:linear-gradient(110deg,rgba(255,255,255,.12),transparent 35%,transparent 72%,rgba(88,214,255,.07));
+      opacity:.72;
+      transform:translateX(-22%);
+      transition:transform .45s ease,opacity .25s ease;
+    }
+
+    body.user-mode.user-dashboard-page #refresh:hover {
+      transform:translateY(-1px);
+      border-color:rgba(137,224,255,.34);
+      color:#f3fdff;
+      background:
+        linear-gradient(145deg,rgba(255,255,255,.13),rgba(255,255,255,.03)),
+        rgba(8,25,45,.50);
+      box-shadow:
+        0 18px 38px rgba(0,0,0,.40),
+        0 0 24px rgba(56,190,255,.075),
+        0 1px 0 rgba(255,255,255,.13) inset;
+    }
+
+    body.user-mode.user-dashboard-page #refresh:hover::before {
+      transform:rotate(180deg) scale(1.04);
+    }
+
+    body.user-mode.user-dashboard-page #refresh:hover::after {
+      transform:translateX(22%);
+      opacity:.95;
+    }
+
+    body.user-mode.user-dashboard-page #refresh:active {
+      transform:translateY(0) scale(.965);
+    }
+
+    body.user-mode.user-dashboard-page #refresh:focus-visible {
+      outline:2px solid rgba(112,220,255,.42);
+      outline-offset:2px;
+    }
+
+    body.user-mode.user-dashboard-page #refresh .button-content {
+      position:relative;
+      z-index:1;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      min-width:0;
+    }
+
+    body.user-mode.user-dashboard-page #refresh.is-loading::before {
+      opacity:0;
+      transform:none;
+    }
+
+    body.user-mode.user-dashboard-page #refresh:disabled {
+      opacity:.58;
+      cursor:default;
+      transform:none;
+    }
+
+    @media (max-width:620px) {
+      body.user-mode.user-dashboard-page #refresh {
+        min-width:98px;
+        min-height:38px;
+        padding:0 11px;
+        border-radius:13px;
+        gap:7px;
+      }
+
+      body.user-mode.user-dashboard-page #refresh::before {
+        width:16px;
+        height:16px;
+        flex-basis:16px;
+        font-size:17px;
+      }
+    }
+
     @media (prefers-reduced-motion: reduce) {
+      body.user-mode.user-dashboard-page #refresh,
+      body.user-mode.user-dashboard-page #refresh::before,
+      body.user-mode.user-dashboard-page #refresh::after,
       body.user-mode.user-dashboard-page #switch-group,
       body.user-mode.user-dashboard-page #switch-group::before,
       body.user-mode.user-dashboard-page #switch-group svg {
@@ -4590,6 +4729,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         if (userDashboardRefreshTimer) return;
         userDashboardRefreshTimer = window.setInterval(function () {
           if (!userMode || !getVerifiedUserId()) return;
+          var groupOptions = document.getElementById("user-group-options");
+          if ((groupOptions && !groupOptions.hidden) || window.__z28GroupSelectionOpen) return;
           loadUserDashboard(false, window.__z28SelectedGroupId).catch(function () {
             // Keep the current dashboard visible if a background refresh temporarily fails.
           });
@@ -5424,7 +5565,12 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       }
 
       async function selectUserGroup(groupId) {
-        await loadUserDashboard(true, groupId);
+        try {
+          var loaded = await loadUserDashboard(true, groupId);
+          if (loaded) window.__z28GroupSelectionOpen = false;
+        } catch (error) {
+          showNotice(error && error.message ? error.message : "Unable to open the selected group.","error");
+        }
       }
 
       function bindUserSettingButtons() {
@@ -5547,6 +5693,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         var button=document.getElementById("refresh");
         runAction(button,"Refreshing…",async function(){
           if(userMode){
+            var groupOptions = document.getElementById("user-group-options");
+            if (groupOptions && !groupOptions.hidden) return;
             var verified=getVerifiedUserId();
             if(verified) await loadUserDashboard(false,window.__z28SelectedGroupId);
             else {
@@ -5559,6 +5707,9 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       document.getElementById("switch-group").addEventListener("click", function() {
         var button=document.getElementById("switch-group");
         button.disabled=true;
+        document.getElementById("user-group-options").hidden=true;
+        document.getElementById("user-selected-dashboard").hidden=true;
+        window.__z28GroupSelectionOpen = true;
         apiUserDashboard(telegramUserId).then(function(data){
           document.getElementById("user-group-options").hidden=false;
           document.getElementById("user-selected-dashboard").hidden=true;
@@ -5567,6 +5718,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           title.textContent = tUser("groupOptions");
           renderGroupOptions(data.groups || []);
         }).catch(function(error){
+          window.__z28GroupSelectionOpen = false;
           showNotice(error && error.message ? error.message : "Unable to load groups.","error");
         }).finally(function(){button.disabled=false;});
       });
