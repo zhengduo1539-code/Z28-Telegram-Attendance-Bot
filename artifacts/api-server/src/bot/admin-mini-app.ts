@@ -1486,6 +1486,48 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       color:#fff; text-align:left; font-weight:800; cursor:pointer; box-shadow:0 12px 26px rgba(0,0,0,.22);
     }
     .user-group-option span:last-child { color:#72b8ff; font-size:22px; }
+    .user-setting-view { display:grid; gap:9px; }
+    .user-setting-grid {
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:9px;
+    }
+    .user-setting-value {
+      min-height:56px;
+      padding:11px 12px;
+      border-radius:13px;
+      background:linear-gradient(145deg,rgba(255,255,255,.050),rgba(255,255,255,.012)),rgba(2,10,21,.32);
+      border:1px solid rgba(213,239,255,.085);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .user-setting-value-label {
+      color:#aebfd2;
+      font-size:12px;
+      font-weight:700;
+    }
+    .user-setting-value-number {
+      color:#f4f8ff;
+      font-size:15px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+    .user-setting-edit {
+      width:100%;
+      min-height:42px;
+      margin-top:3px;
+      border:1px solid rgba(130,191,255,.24);
+      border-radius:12px;
+      padding:0 15px;
+      background:linear-gradient(145deg,rgba(38,134,255,.12),rgba(18,79,150,.18));
+      color:#a8d7ff;
+      font-weight:750;
+      cursor:pointer;
+    }
+    .user-setting-editor[hidden],
+    .user-setting-view[hidden] { display:none !important; }
     .user-setting-editor { display:grid; gap:9px; }
     .user-setting-editor .editor-row {
       display:grid; grid-template-columns:minmax(0,1fr) 110px; align-items:center; gap:10px;
@@ -4767,6 +4809,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           memberActive: "Member active",
           saveLimits: "Save Limits",
           saveCountLimits: "Save Count Limits",
+          edit: "Edit",
           activityLimits: "Activity Limits",
           durationControl: "Duration Control",
           dailyCountLimits: "Daily Count Limits",
@@ -4820,6 +4863,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           memberActive: "Member active",
           saveLimits: "Limits သိမ်းမည်",
           saveCountLimits: "Count Limits သိမ်းမည်",
+          edit: "ပြင်မည်",
           activityLimits: "Activity Limits",
           durationControl: "Duration Control",
           dailyCountLimits: "Daily Count Limits",
@@ -4873,6 +4917,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           memberActive: "活跃成员",
           saveLimits: "保存时间限制",
           saveCountLimits: "保存次数限制",
+          edit: "编辑",
           activityLimits: "活动时间限制",
           durationControl: "时长控制",
           dailyCountLimits: "每日次数限制",
@@ -5752,6 +5797,11 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           return '<div class="editor-row"><label>' + item[1] + '</label><input data-kind="' + item[0] +
             '" type="number" min="1" step="1" value="' + escapeHtml(String(item[2])) + '"></div>';
         }).join("");
+        var values = rows.map(function(item) {
+          var displayValue = isCount ? String(item[2]) : String(item[2]) + " min";
+          return '<div class="user-setting-value"><span class="user-setting-value-label">' + item[1] +
+            '</span><strong class="user-setting-value-number">' + escapeHtml(displayValue) + '</strong></div>';
+        }).join("");
         var titleText = isCount ? tUser("dailyCountLimits") : tUser("activityLimits");
         var subText = isCount ? tUser("dailyUsageControl") : tUser("durationControl");
         var icon = isCount
@@ -5759,7 +5809,9 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           : '<svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7.5"></circle><path d="M9 3h6"></path><path d="M12 5.5v2"></path><g class="clock-hand"><path d="M12 13l3-2"></path></g></svg>';
         return '<div class="user-setting-head"><span class="user-setting-icon">' + icon + '</span><div><div class="user-setting-title">' +
           titleText + '</div><div class="user-setting-sub">' + subText + '</div></div></div>' +
-          '<div class="user-setting-editor">' + inputs + '<button class="user-setting-save" data-setting-type="' + type +
+          '<div class="user-setting-view"><div class="user-setting-grid">' + values + '</div><button class="user-setting-edit" data-setting-edit="' + type +
+          '" type="button">' + escapeHtml(tUser("edit")) + '</button></div>' +
+          '<div class="user-setting-editor" data-setting-editor="' + type + '" hidden>' + inputs + '<button class="user-setting-save" data-setting-type="' + type +
           '" data-group-id="' + groupId + '" type="button">' + (isCount ? escapeHtml(tUser("saveCountLimits")) : escapeHtml(tUser("saveLimits"))) + '</button></div>';
       }
 
@@ -5871,12 +5923,26 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       }
 
       function bindUserSettingButtons() {
+        document.querySelectorAll(".user-setting-edit").forEach(function(button) {
+          button.onclick = function() {
+            var card = button.closest(".user-setting-card");
+            if (!card) return;
+            var view = card.querySelector(".user-setting-view");
+            var editor = card.querySelector(".user-setting-editor");
+            if (!view || !editor) return;
+            view.hidden = true;
+            editor.hidden = false;
+            var firstInput = editor.querySelector("input");
+            if (firstInput) firstInput.focus();
+          };
+        });
+
         document.querySelectorAll(".user-setting-save").forEach(function(button) {
           button.onclick = async function() {
             var type = button.getAttribute("data-setting-type");
             var groupId = Number(button.getAttribute("data-group-id"));
             var card = button.closest(".user-setting-card");
-            var inputs = card.querySelectorAll("input");
+            var inputs = card.querySelectorAll(".user-setting-editor input");
             var original = button.textContent;
             button.disabled = true;
             button.innerHTML = '<span class="button-spinner" aria-hidden="true"></span> Saving…';
