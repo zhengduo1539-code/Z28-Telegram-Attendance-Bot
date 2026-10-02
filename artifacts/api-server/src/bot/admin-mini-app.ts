@@ -1293,9 +1293,6 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       text-transform: uppercase;
     }
 
-    .user-dashboard-section-label.warning {
-      color: #ffd98a;
-    }
 
     .user-setting-card {
       position:relative;
@@ -1446,18 +1443,6 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       box-shadow:0 8px 20px rgba(22,119,255,.25);
     }
 
-    .user-warning {
-      padding:14px;
-      margin-bottom:14px;
-      border:1px solid rgba(255,180,45,.20);
-      border-radius:16px;
-      background:rgba(77,46,8,.20);
-      color:#ffd98a;
-      font-size:11px;
-      line-height:1.55;
-    }
-
-    .user-warning strong { color:#fff0c4; }
 
     .user-empty {
       padding:26px 18px;
@@ -1503,63 +1488,6 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     .user-setting-save {
       min-height:42px; margin-top:3px; border:1px solid rgba(130,191,255,.32); border-radius:12px;
       padding:0 15px; background:linear-gradient(180deg,#2b8cff,#1268e6); color:#fff; font-weight:750; cursor:pointer;
-    }
-    .user-warning-feed {
-      min-height:220px; max-height:none; overflow:auto; padding:12px;
-      border:1px solid rgba(255,180,45,.22); border-radius:18px; background:rgba(26,18,6,.45);
-    }
-
-    .user-warning-tab-panel {
-      min-height: calc(100vh - 150px);
-      padding: 8px 2px 96px;
-    }
-
-    .user-warning-tab-panel .user-warning-feed {
-      min-height: calc(100vh - 210px);
-      padding: 6px 0;
-      background: transparent;
-      border: 0;
-      overflow: visible;
-    }
-
-    .user-warning-tab-panel .user-warning-item {
-      padding: 4px 2px 20px;
-      margin: 0 0 20px;
-      border: 0;
-      border-bottom: 1px solid rgba(255,180,45,.12);
-      border-radius: 0;
-      background: transparent;
-    }
-
-    .user-warning-tab-panel .user-warning-item:last-child {
-      margin-bottom: 0;
-      border-bottom: 0;
-    }
-
-    .user-warning-tab-panel .user-warning-item-message {
-      margin: 0;
-      color: #fff0c4;
-      font-size: 13px;
-      line-height: 1.75;
-    }
-
-    .user-warning-tab-panel .user-warning-item-message b {
-      color: #fff3cf;
-      font-weight: 850;
-    }
-
-    .user-warning-tab-panel .user-warning-item-message code {
-      padding: 2px 5px;
-      border-radius: 6px;
-      background: rgba(255,255,255,.07);
-      color: #ffd98a;
-      font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
-      font-size: .92em;
-    }
-
-    .user-warning-tab-panel .user-warning-item-message a {
-      color: #82baff;
-      text-decoration: none;
     }
 
     .user-no-group-screen {
@@ -1618,44 +1546,6 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     @media (prefers-reduced-motion: reduce) {
       .user-no-group-icon { animation: none !important; }
     }
-    .user-warning-item { padding:12px; margin-bottom:9px; border-radius:14px; border:1px solid rgba(255,180,45,.17); background:rgba(77,46,8,.22); }
-    .user-warning-item:last-child { margin-bottom:0; }
-    .user-warning-item-head {
-      display:flex;
-      align-items:baseline;
-      justify-content:space-between;
-      gap:10px;
-      color:#ffd98a;
-      font-size:12px;
-      font-weight:850;
-    }
-    .user-warning-item-head strong { color:#fff3cf; }
-    .user-warning-item-head span { color:#b99a5e; font-size:10px; white-space:nowrap; }
-    .user-warning-details {
-      display:grid;
-      gap:6px;
-      margin-top:10px;
-      padding-top:9px;
-      border-top:1px solid rgba(255,180,45,.12);
-    }
-    .user-warning-details > div {
-      display:grid;
-      grid-template-columns:86px minmax(0,1fr);
-      gap:8px;
-      align-items:baseline;
-      font-size:11px;
-    }
-    .user-warning-details > div span {
-      color:#9e8352;
-      font-weight:700;
-    }
-    .user-warning-details > div strong {
-      color:#fff0c4;
-      font-weight:800;
-      overflow-wrap:anywhere;
-    }
-    .user-warning-item-message { margin-top:6px; color:#fff0c4; font-size:12px; line-height:1.55; }
-    .user-warning-empty { min-height:190px; display:flex; align-items:center; justify-content:center; text-align:center; color:#d5b77a; font-size:12px; }
     .switch-group {
       min-height:44px; border:1px solid rgba(130,191,255,.35); border-radius:13px; padding:0 15px;
       background:rgba(12,38,72,.86); color:#fff; font-weight:750; box-shadow:0 8px 22px rgba(22,119,255,.16); cursor:pointer;
@@ -1694,24 +1584,6 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       }
     }
 
-    /* Structured warning cards */
-    .user-warning-feed { display:grid; gap:12px; min-height:220px; max-height:none; overflow:visible; padding:0; border:0; background:transparent; }
-    .user-warning-tab-panel .user-warning-feed { min-height:calc(100vh - 210px); padding:2px 0 96px; }
-    .user-warning-item { position:relative; padding:14px 14px 15px 16px; margin:0; border:1px solid rgba(255,180,45,.22); border-radius:18px; background:linear-gradient(145deg,rgba(42,27,8,.82),rgba(17,17,20,.88)); box-shadow:0 14px 30px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.035); overflow:hidden; }
-    .user-warning-item::before { content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:linear-gradient(180deg,#ffd166,#ff9f0a); box-shadow:0 0 18px rgba(255,180,45,.16); }
-    .user-warning-item-head { display:flex; align-items:center; justify-content:space-between; gap:12px; min-width:0; padding-bottom:11px; border-bottom:1px solid rgba(255,180,45,.12); }
-    .user-warning-item-title { display:inline-flex; align-items:center; gap:8px; min-width:0; color:#fff3cf; font-size:14px; font-weight:850; }
-    .user-warning-item-title .warning-symbol { display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; flex:0 0 24px; border-radius:8px; background:rgba(255,180,45,.13); border:1px solid rgba(255,209,102,.18); color:#ffd166; font-size:13px; box-shadow:0 0 14px rgba(255,180,45,.10); }
-    .user-warning-item-time { flex:0 0 auto; color:#b99a5e; font-size:10px; font-weight:750; white-space:nowrap; }
-    .user-warning-details { display:grid; gap:0; margin:10px 0 0; }
-    .user-warning-detail { display:grid; grid-template-columns:86px minmax(0,1fr); gap:10px; align-items:baseline; min-width:0; padding:8px 0; }
-    .user-warning-detail + .user-warning-detail { border-top:1px solid rgba(255,180,45,.08); }
-    .user-warning-detail-label { color:#9e8352; font-size:10px; font-weight:800; letter-spacing:.035em; text-transform:uppercase; }
-    .user-warning-detail-value { min-width:0; color:#fff0c4; font-size:12px; font-weight:750; line-height:1.45; overflow-wrap:anywhere; }
-    .user-warning-detail-value .warning-meta { display:block; margin-top:2px; color:#9f8759; font-size:10px; font-weight:650; }
-    .user-warning-detail.overtime .user-warning-detail-value { color:#ffd166; font-weight:850; text-shadow:0 0 12px rgba(255,180,45,.12); }
-    .user-warning-item-message { display:none !important; }
-    @media (max-width:480px) { .user-warning-item { padding:13px 12px 14px 14px; } .user-warning-item-head { align-items:flex-start; } .user-warning-item-title { font-size:13px; } .user-warning-detail { grid-template-columns:72px minmax(0,1fr); gap:8px; } }
 
     .panel-only-group,
     .panel-only-private { display: none; }
@@ -3036,10 +2908,6 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       box-shadow: 0 7px 18px rgba(37,99,235,.20),inset 0 1px 0 rgba(255,255,255,.10);
     }
 
-    body.user-mode.user-dashboard-page .user-warning-feed {
-      border-color: rgba(255,180,45,.13);
-      background: rgba(26,18,6,.25);
-    }
 
     @media (max-width: 620px) {
       body.user-mode.user-dashboard-page .wrap {
@@ -3617,7 +3485,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
             <div class="user-group-box compact" id="user-group-activities-card">
               <div class="user-group-box-title" id="user-group-activities-title">Group Activities</div>
-              <div class="user-group-name" id="user-warning-group-name"></div>
+              <div class="user-group-name" id="user-group-name"></div>
               <div class="user-group-metrics">
                 <div class="user-live-metric">
                   <div class="user-live-label" id="user-group-member-label">Group member</div>
@@ -3814,27 +3682,18 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           confirm: "Confirm",
           confirmed: "Confirmed",
           settings: "Admin Settings",
-          warning: "Warning",
           groupOptions: "Group Options",
           groupOptionsSub: "Select a group to open its dashboard.",
           dashboardSub: "Live activity overview",
           groupActivities: "Group Activities",
           groupMember: "Group member",
           memberActive: "Member active",
-          noWarnings: "No warning messages yet.",
           saveLimits: "Save Limits",
           saveCountLimits: "Save Count Limits",
           activityLimits: "Activity Limits",
           durationControl: "Duration Control",
           dailyCountLimits: "Daily Count Limits",
           dailyUsageControl: "Daily Usage Control",
-          warningTitle: "⚠ Activity Warning",
-          warningStatus: "Single activity exceeded time limit",
-          status: "Status",
-          overtime: "Overtime",
-          user: "User",
-          activity: "Activity",
-          group: "Group",
           activityEat: "Eat",
           activityWc: "WC",
           activitySmoke: "Smoke",
@@ -3863,27 +3722,18 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           confirm: "အတည်ပြုမည်",
           confirmed: "အတည်ပြုပြီး",
           settings: "Admin Settings",
-          warning: "Warning",
           groupOptions: "Group Options",
           groupOptionsSub: "Dashboard ဖွင့်ရန် Group တစ်ခုကိုရွေးပါ။",
           dashboardSub: "Live activity overview",
           groupActivities: "Group Activities",
           groupMember: "Group member",
           memberActive: "Member active",
-          noWarnings: "Warning message မရှိသေးပါ။",
           saveLimits: "Limits သိမ်းမည်",
           saveCountLimits: "Count Limits သိမ်းမည်",
           activityLimits: "Activity Limits",
           durationControl: "Duration Control",
           dailyCountLimits: "Daily Count Limits",
           dailyUsageControl: "Daily Usage Control",
-          warningTitle: "⚠ Activity Warning",
-          warningStatus: "Activity တစ်ခု၏ သတ်မှတ်ချိန် ကျော်လွန်ခဲ့သည်",
-          status: "အခြေအနေ",
-          overtime: "Overtime",
-          user: "User",
-          activity: "Activity",
-          group: "Group",
           activityEat: "ထမင်းစား",
           activityWc: "အိမ်သာ",
           activitySmoke: "ဆေးလိပ်",
@@ -3912,27 +3762,18 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           confirm: "确认",
           confirmed: "已确认",
           settings: "管理设置",
-          warning: "警告",
           groupOptions: "群组选择",
           groupOptionsSub: "选择一个群组以打开其仪表板。",
           dashboardSub: "实时活动概览",
           groupActivities: "群组活动",
           groupMember: "群组成员",
           memberActive: "活跃成员",
-          noWarnings: "暂无警告消息。",
           saveLimits: "保存时间限制",
           saveCountLimits: "保存次数限制",
           activityLimits: "活动时间限制",
           durationControl: "时长控制",
           dailyCountLimits: "每日次数限制",
           dailyUsageControl: "每日使用控制",
-          warningTitle: "⚠ 活动警告",
-          warningStatus: "单次活动超过时间限制",
-          status: "状态",
-          overtime: "超时时长",
-          user: "用户",
-          activity: "活动",
-          group: "群组",
           activityEat: "吃饭",
           activityWc: "上厕所",
           activitySmoke: "抽烟",
@@ -4734,96 +4575,6 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       }
       showUserNoGroupScreen.timer = null;
 
-      function formatWarningTime(value) {
-        try { return new Intl.DateTimeFormat("en-GB",{month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"}).format(new Date(value)); }
-        catch { return ""; }
-      }
-
-      function settingEditorMarkup(type, values, groupId) {
-        var isCount = type === "count";
-        var rows = isCount ? [["wc","WC",values.wc],["smoke","Smoke",values.smoke],["wcd","WCD",values.wcd]]
-          : [["eat","Eat",values.eat],["wc","WC",values.wc],["smoke","Smoke",values.smoke],["wcd","WCD",values.wcd]];
-        var inputs = rows.map(function(item) {
-          return '<div class="editor-row"><label>' + item[1] + '</label><input data-kind="' + item[0] +
-            '" type="number" min="1" step="1" value="' + escapeHtml(String(item[2])) + '"></div>';
-        }).join("");
-        var titleText = isCount ? tUser("dailyCountLimits") : tUser("activityLimits");
-        var subText = isCount ? tUser("dailyUsageControl") : tUser("durationControl");
-        var icon = isCount
-          ? '<svg viewBox="0 0 24 24"><path d="M4 21h16"></path><rect class="count-bar count-bar-1" x="5" y="13" width="3" height="5" rx="1.5" fill="currentColor" stroke="none"></rect><rect class="count-bar count-bar-2" x="10.5" y="9" width="3" height="9" rx="1.5" fill="currentColor" stroke="none"></rect><rect class="count-bar count-bar-3" x="16" y="5" width="3" height="13" rx="1.5" fill="currentColor" stroke="none"></rect></svg>'
-          : '<svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7.5"></circle><path d="M9 3h6"></path><path d="M12 5.5v2"></path><g class="clock-hand"><path d="M12 13l3-2"></path></g></svg>';
-        return '<div class="user-setting-head"><span class="user-setting-icon">' + icon + '</span><div><div class="user-setting-title">' +
-          titleText + '</div><div class="user-setting-sub">' + subText + '</div></div></div>' +
-          '<div class="user-setting-editor">' + inputs + '<button class="user-setting-save" data-setting-type="' + type +
-          '" data-group-id="' + groupId + '" type="button">' + (isCount ? escapeHtml(tUser("saveCountLimits")) : escapeHtml(tUser("saveLimits"))) + '</button></div>';
-      }
-
-      function renderGroupOptions(groups) {
-        var list = document.getElementById("user-group-options-list");
-        list.innerHTML = (groups || []).map(function(group) {
-          return '<button class="user-group-option" type="button" data-group-id="' + group.id + '"><span>' +
-            escapeHtml(group.title) + '</span><span>›</span></button>';
-        }).join("");
-        list.querySelectorAll(".user-group-option").forEach(function(button) {
-          button.addEventListener("click", function() { selectUserGroup(Number(button.getAttribute("data-group-id"))); });
-        });
-      }
-
-      function formatWarningDuration(seconds) {
-        var total = Number(seconds);
-        if (!Number.isFinite(total) || total < 0) return "—";
-        total = Math.floor(total);
-        var minutes = Math.floor(total / 60);
-        var remainder = total % 60;
-        return String(minutes).padStart(2, "0") + "m " + String(remainder).padStart(2, "0") + "s";
-      }
-
-      function getUserActivityLabel(kind) {
-        var labels = {
-          eat: tUser("activityEat"),
-          wc: tUser("activityWc"),
-          smoke: tUser("activitySmoke"),
-          wcd: tUser("activityWcd")
-        };
-        return labels[kind] || String(kind || "—");
-      }
-
-      function renderWarnings(warnings, group) {
-        var feed = document.getElementById("user-warning-feed");
-        if (!feed) return;
-        if (!warnings || !warnings.length) {
-          feed.innerHTML = '<div class="user-warning-empty">' + escapeHtml(tUser("noWarnings")) + '</div>';
-          return;
-        }
-        var groupName = group && group.title ? String(group.title) : "—";
-        var groupId = group && group.id !== undefined ? String(group.id) : "";
-        feed.innerHTML = warnings.map(function(warning) {
-          var displayName = String(warning.displayName || "—");
-          var userId = warning.userId !== undefined ? String(warning.userId) : "";
-          var activity = getUserActivityLabel(warning.kind);
-          var createdAt = formatWarningTime(warning.createdAt);
-          var overtime = formatWarningDuration(warning.timeoutSeconds);
-          return '<article class="user-warning-item">' +
-            '<div class="user-warning-item-head">' +
-              '<div class="user-warning-item-title"><span class="warning-symbol" aria-hidden="true">⚠</span><span>' +
-                escapeHtml(tUser("warningTitle").replace(/^⚠\\s*/, "")) + '</span></div>' +
-              '<span class="user-warning-item-time">' + escapeHtml(createdAt) + '</span>' +
-            '</div>' +
-            '<div class="user-warning-details">' +
-              '<div class="user-warning-detail"><span class="user-warning-detail-label">' + escapeHtml(tUser("group")) + '</span><strong class="user-warning-detail-value">' +
-                escapeHtml(groupName) + (groupId ? '<span class="warning-meta">ID: ' + escapeHtml(groupId) + '</span>' : '') + '</strong></div>' +
-              '<div class="user-warning-detail"><span class="user-warning-detail-label">' + escapeHtml(tUser("user")) + '</span><strong class="user-warning-detail-value">' +
-                escapeHtml(displayName) + (userId ? '<span class="warning-meta">ID: ' + escapeHtml(userId) + '</span>' : '') + '</strong></div>' +
-              '<div class="user-warning-detail"><span class="user-warning-detail-label">' + escapeHtml(tUser("activity")) + '</span><strong class="user-warning-detail-value">' +
-                escapeHtml(activity) + '</strong></div>' +
-              '<div class="user-warning-detail"><span class="user-warning-detail-label">' + escapeHtml(tUser("status")) + '</span><strong class="user-warning-detail-value">' +
-                escapeHtml(tUser("warningStatus")) + '</strong></div>' +
-              '<div class="user-warning-detail overtime"><span class="user-warning-detail-label">' + escapeHtml(tUser("overtime")) + '</span><strong class="user-warning-detail-value">' +
-                escapeHtml(overtime) + '</strong></div>' +
-            '</div>' +
-          '</article>';
-        }).join("");
-      }
 
       function renderSelectedDashboard(data) {
         var group = data.selectedGroup;
@@ -4835,7 +4586,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         document.getElementById("switch-group").hidden = false;
         document.getElementById("switch-group").textContent = tUser("switch");
         document.getElementById("user-selected-group-title").textContent = group.title + " " + tUser("title");
-        document.getElementById("user-warning-group-name").textContent = group.title;
+        document.getElementById("user-group-name").textContent = group.title;
         function updateLiveMetric(id, value) {
           var element = document.getElementById(id);
           if (!element) return;

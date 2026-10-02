@@ -284,8 +284,6 @@ userApiRouter.post("/dashboard", async (req, res) => {
 
   const activityLimits = await auth.context.attendance.getActivityLimits(selected.id);
   const countLimits = await auth.context.attendance.getActivityCountLimits(selected.id);
-  const warnings = await auth.context.attendance.getGroupWarnings(selected.id, 30);
-
   res.setHeader("Cache-Control", "no-store");
   res.json({
     user: auth.user,
@@ -306,7 +304,6 @@ userApiRouter.post("/dashboard", async (req, res) => {
       smoke: countLimits.smoke ?? defaultCountLimits.smoke,
       wcd: countLimits.wcd ?? defaultCountLimits.wcd,
     },
-    warnings,
   });
 });
 
