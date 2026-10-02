@@ -24,6 +24,36 @@ const localDateKey = (date: Date, timeZone: string): string => {
   return `${values["year"]}-${values["month"]}-${values["day"]}`;
 };
 
+const escapeTelegramHtml = (value: string) =>
+  value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+const notifyConfiguredAdminsOfDashboardFailure = async (
+  context: NonNullable<ReturnType<typeof getAdminApiContext>>,
+  userId: number,
+  error: unknown,
+) => {
+  const adminIds = [
+    context.config.botOwnerId,
+    ...context.config.adminIds,
+  ].filter((id): id is number => id !== undefined);
+  const recipients = [...new Set(adminIds)];
+  if (!recipients.length) return;
+
+  const message = error instanceof Error ? error.message : String(error);
+  const stack = error instanceof Error ? error.stack : undefined;
+  const details = stack && stack !== message ? `\n<pre>${escapeTelegramHtml(stack).slice(0, 3000)}</pre>` : "";
+  const text = [
+    "⚠️ <b>User Dashboard Error</b>",
+    `User ID: <code>${userId}</code>`,
+    `Error: <code>${escapeTelegramHtml(message).slice(0, 1000)}</code>`,
+    details,
+  ].join("\n");
+
+  await Promise.allSettled(
+    recipients.map((adminId) => context.telegram.sendMessage(adminId, text)),
+  );
+};
+
 const sendError = (res: Response, status: number, error: string) => {
   res.status(status).json({ error });
 };
@@ -313,6 +343,11 @@ userApiRouter.post("/dashboard", async (req, res) => {
       message,
       stack: error instanceof Error ? error.stack : undefined,
     });
+    await notifyConfiguredAdminsOfDashboardFailure(
+      auth.context,
+      requestedUserId,
+      error,
+    );
     sendError(res, 500, message);
   }
 });
