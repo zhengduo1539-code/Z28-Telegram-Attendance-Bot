@@ -1535,9 +1535,30 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     }
     .user-setting-editor label { color:#dce8f8; font-size:12px; font-weight:750; }
     .user-setting-editor input { min-height:40px; text-align:center; }
+    .user-setting-editor-actions {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+      margin-top:3px;
+    }
+    .user-setting-cancel,
     .user-setting-save {
-      min-height:42px; margin-top:3px; border:1px solid rgba(130,191,255,.32); border-radius:12px;
-      padding:0 15px; background:linear-gradient(180deg,#2b8cff,#1268e6); color:#fff; font-weight:750; cursor:pointer;
+      min-height:42px;
+      border:1px solid rgba(130,191,255,.32);
+      border-radius:12px;
+      padding:0 15px;
+      font-weight:750;
+      cursor:pointer;
+    }
+    .user-setting-cancel {
+      color:#b7c8da;
+      background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.012));
+      border-color:rgba(180,205,230,.16);
+    }
+    .user-setting-save {
+      margin-top:0;
+      background:linear-gradient(180deg,#2b8cff,#1268e6);
+      color:#fff;
     }
 
     .user-no-group-screen {
@@ -4810,6 +4831,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           saveLimits: "Save Limits",
           saveCountLimits: "Save Count Limits",
           edit: "Edit",
+          cancel: "Cancel",
           activityLimits: "Activity Limits",
           durationControl: "Duration Control",
           dailyCountLimits: "Daily Count Limits",
@@ -4864,6 +4886,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           saveLimits: "Limits သိမ်းမည်",
           saveCountLimits: "Count Limits သိမ်းမည်",
           edit: "ပြင်မည်",
+          cancel: "မလုပ်တော့ပါ",
           activityLimits: "Activity Limits",
           durationControl: "Duration Control",
           dailyCountLimits: "Daily Count Limits",
@@ -4918,6 +4941,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           saveLimits: "保存时间限制",
           saveCountLimits: "保存次数限制",
           edit: "编辑",
+          cancel: "取消",
           activityLimits: "活动时间限制",
           durationControl: "时长控制",
           dailyCountLimits: "每日次数限制",
@@ -5795,7 +5819,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           : [["eat","Eat",values.eat],["wc","WC",values.wc],["smoke","Smoke",values.smoke],["wcd","WCD",values.wcd]];
         var inputs = rows.map(function(item) {
           return '<div class="editor-row"><label>' + item[1] + '</label><input data-kind="' + item[0] +
-            '" type="number" min="1" step="1" value="' + escapeHtml(String(item[2])) + '"></div>';
+            '" type="number" min="1" step="1" value="' + escapeHtml(String(item[2])) + '" data-original-value="' + escapeHtml(String(item[2])) + '"></div>';
         }).join("");
         var values = rows.map(function(item) {
           var displayValue = isCount ? String(item[2]) : String(item[2]) + " min";
@@ -5811,8 +5835,10 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           titleText + '</div><div class="user-setting-sub">' + subText + '</div></div></div>' +
           '<div class="user-setting-view"><div class="user-setting-grid">' + values + '</div><button class="user-setting-edit" data-setting-edit="' + type +
           '" type="button">' + escapeHtml(tUser("edit")) + '</button></div>' +
-          '<div class="user-setting-editor" data-setting-editor="' + type + '" hidden>' + inputs + '<button class="user-setting-save" data-setting-type="' + type +
-          '" data-group-id="' + groupId + '" type="button">' + (isCount ? escapeHtml(tUser("saveCountLimits")) : escapeHtml(tUser("saveLimits"))) + '</button></div>';
+          '<div class="user-setting-editor" data-setting-editor="' + type + '" hidden>' + inputs +
+          '<div class="user-setting-editor-actions"><button class="user-setting-cancel" data-setting-cancel="' + type +
+          '" type="button">' + escapeHtml(tUser("cancel")) + '</button><button class="user-setting-save" data-setting-type="' + type +
+          '" data-group-id="' + groupId + '" type="button">' + (isCount ? escapeHtml(tUser("saveCountLimits")) : escapeHtml(tUser("saveLimits"))) + '</button></div></div>';
       }
 
       function renderGroupOptions(groups) {
@@ -5934,6 +5960,21 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             editor.hidden = false;
             var firstInput = editor.querySelector("input");
             if (firstInput) firstInput.focus();
+          };
+        });
+
+        document.querySelectorAll(".user-setting-cancel").forEach(function(button) {
+          button.onclick = function() {
+            var card = button.closest(".user-setting-card");
+            if (!card) return;
+            var view = card.querySelector(".user-setting-view");
+            var editor = card.querySelector(".user-setting-editor");
+            if (!view || !editor) return;
+            editor.querySelectorAll("input[data-original-value]").forEach(function(input) {
+              input.value = input.getAttribute("data-original-value");
+            });
+            editor.hidden = true;
+            view.hidden = false;
           };
         });
 
