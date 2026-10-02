@@ -3216,6 +3216,341 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       }
     }
 
+
+    /* Final User Dashboard Liquid Glass surface.
+       This block intentionally sits last so earlier generic dashboard rules cannot flatten the material. */
+    body.user-mode.user-dashboard-page {
+      --glass-bg: rgba(8, 19, 34, .43);
+      --glass-bg-strong: rgba(10, 24, 42, .56);
+      --glass-border: rgba(210, 241, 255, .18);
+      --glass-highlight: rgba(255, 255, 255, .095);
+      --glass-shadow: rgba(0, 0, 0, .48);
+      background:
+        radial-gradient(560px 420px at 4% -4%, rgba(50, 207, 255, .17), transparent 68%),
+        radial-gradient(520px 420px at 104% 8%, rgba(102, 91, 255, .18), transparent 66%),
+        radial-gradient(420px 360px at 54% 112%, rgba(0, 153, 255, .11), transparent 70%),
+        linear-gradient(145deg, #02050b 0%, #06111f 46%, #02060e 100%);
+      color:#f4f9ff;
+    }
+
+    body.user-mode.user-dashboard-page::before,
+    body.user-mode.user-dashboard-page::after {
+      z-index:0;
+      filter:blur(70px);
+      opacity:.48;
+      pointer-events:none;
+      will-change:transform;
+      animation:userGlassAmbient 12s ease-in-out infinite alternate;
+    }
+
+    body.user-mode.user-dashboard-page::before {
+      width:420px;
+      height:420px;
+      left:-170px;
+      top:4%;
+      background:rgba(44,205,255,.22);
+    }
+
+    body.user-mode.user-dashboard-page::after {
+      width:460px;
+      height:460px;
+      right:-190px;
+      bottom:0;
+      background:rgba(108,86,255,.20);
+      animation-delay:-5s;
+    }
+
+    @keyframes userGlassAmbient {
+      from { transform:translate3d(0,0,0) scale(1); }
+      to { transform:translate3d(22px,-16px,0) scale(1.08); }
+    }
+
+    body.user-mode.user-dashboard-page .wrap {
+      max-width:780px;
+      position:relative;
+      z-index:2;
+    }
+
+    body.user-mode.user-dashboard-page .top {
+      position:relative;
+      isolation:isolate;
+      margin:0 0 18px;
+      padding:15px 15px 15px 14px;
+      border:1px solid var(--glass-border);
+      border-radius:24px;
+      background:
+        linear-gradient(120deg, rgba(255,255,255,.105), rgba(255,255,255,.028) 35%, rgba(10,26,45,.30) 100%),
+        rgba(7,17,30,.36);
+      box-shadow:
+        0 24px 58px var(--glass-shadow),
+        0 1px 0 rgba(255,255,255,.11) inset,
+        0 -1px 0 rgba(0,0,0,.20) inset;
+      backdrop-filter:blur(30px) saturate(175%);
+      -webkit-backdrop-filter:blur(30px) saturate(175%);
+      overflow:visible;
+    }
+
+    body.user-mode.user-dashboard-page .top::after {
+      content:"";
+      position:absolute;
+      inset:1px;
+      z-index:-1;
+      border-radius:23px;
+      pointer-events:none;
+      background:
+        linear-gradient(112deg, rgba(255,255,255,.11) 0%, rgba(255,255,255,.03) 20%, transparent 42%, transparent 66%, rgba(139,220,255,.045) 100%);
+      opacity:.92;
+      mix-blend-mode:screen;
+    }
+
+    body.user-mode.user-dashboard-page .top::before {
+      content:"";
+      position:absolute;
+      left:12px;
+      top:11px;
+      width:4px;
+      height:34px;
+      border-radius:999px;
+      background:linear-gradient(180deg,#73eaff,#3f9cff 48%,#9b83ff);
+      box-shadow:0 0 20px rgba(76,205,255,.42),0 0 38px rgba(108,91,255,.18);
+    }
+
+    body.user-mode.user-dashboard-page .top h1 {
+      position:relative;
+      z-index:2;
+      margin-left:13px;
+      font-size:clamp(23px,5.8vw,31px);
+      line-height:1.08;
+      letter-spacing:-.038em;
+      font-weight:850;
+      background:
+        linear-gradient(108deg,#f9fcff 0%,#dffbff 22%,#7de9ff 46%,#c1b7ff 66%,#ffffff 85%,#aeeaff 100%);
+      background-size:260% auto;
+      color:transparent;
+      background-clip:text;
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      filter:drop-shadow(0 0 16px rgba(93,220,255,.18));
+      animation:userDashboardTitleShine 6s ease-in-out infinite,userDashboardTitleIn .65s cubic-bezier(.22,1,.36,1) both;
+    }
+
+    body.user-mode.user-dashboard-page .user-greeting {
+      position:relative;
+      z-index:2;
+      display:block;
+      margin:6px 0 0 13px;
+      color:rgba(190,220,240,.76);
+      font-size:12px;
+      font-weight:650;
+      letter-spacing:.005em;
+      opacity:0;
+      transform:translateY(6px);
+      animation:userGreetingIn .72s .12s cubic-bezier(.22,1,.36,1) both;
+    }
+
+    body.user-mode.user-dashboard-page .user-language-button {
+      position:relative;
+      z-index:2;
+      width:42px;
+      height:42px;
+      border:1px solid rgba(219,243,255,.20);
+      border-radius:15px;
+      background:
+        linear-gradient(145deg,rgba(255,255,255,.12),rgba(255,255,255,.025)),
+        rgba(9,22,38,.34);
+      box-shadow:
+        0 16px 34px rgba(0,0,0,.30),
+        0 1px 0 rgba(255,255,255,.10) inset;
+      backdrop-filter:blur(24px) saturate(165%);
+      -webkit-backdrop-filter:blur(24px) saturate(165%);
+    }
+
+    body.user-mode.user-dashboard-page .user-language-button:hover {
+      border-color:rgba(132,225,255,.38);
+      box-shadow:0 18px 38px rgba(0,0,0,.34),0 0 24px rgba(64,193,255,.09),0 1px 0 rgba(255,255,255,.13) inset;
+    }
+
+    body.user-mode.user-dashboard-page .user-language-menu {
+      margin-top:8px;
+      border:1px solid rgba(218,241,255,.17);
+      border-radius:19px;
+      background:
+        linear-gradient(145deg,rgba(255,255,255,.10),rgba(255,255,255,.022)),
+        rgba(4,12,23,.48);
+      box-shadow:
+        0 28px 58px rgba(0,0,0,.48),
+        0 1px 0 rgba(255,255,255,.09) inset;
+      backdrop-filter:blur(32px) saturate(180%);
+      -webkit-backdrop-filter:blur(32px) saturate(180%);
+    }
+
+    body.user-mode.user-dashboard-page .user-group-box,
+    body.user-mode.user-dashboard-page .user-setting-card,
+    body.user-mode.user-dashboard-page .user-group-option {
+      isolation:isolate;
+      position:relative;
+      overflow:hidden;
+      border:1px solid var(--glass-border);
+      border-radius:22px;
+      background:
+        linear-gradient(135deg,rgba(255,255,255,.105) 0%,rgba(255,255,255,.028) 31%,rgba(7,22,39,.18) 100%),
+        var(--glass-bg);
+      box-shadow:
+        0 24px 54px var(--glass-shadow),
+        0 1px 0 rgba(255,255,255,.095) inset,
+        0 -1px 0 rgba(0,0,0,.18) inset;
+      backdrop-filter:blur(30px) saturate(170%);
+      -webkit-backdrop-filter:blur(30px) saturate(170%);
+      transform:translateZ(0);
+      transition:transform .26s ease,border-color .26s ease,box-shadow .32s ease,background .32s ease;
+    }
+
+    body.user-mode.user-dashboard-page .user-group-box::after,
+    body.user-mode.user-dashboard-page .user-setting-card::after,
+    body.user-mode.user-dashboard-page .user-group-option::after {
+      content:"";
+      position:absolute;
+      inset:0;
+      z-index:-1;
+      border-radius:inherit;
+      pointer-events:none;
+      background:
+        linear-gradient(116deg,rgba(255,255,255,.13) 0%,rgba(255,255,255,.035) 17%,transparent 34%,transparent 72%,rgba(109,215,255,.05) 100%);
+      opacity:.9;
+      transform:translateX(-28%);
+      animation:userGlassSheen 9s ease-in-out infinite;
+    }
+
+    @keyframes userGlassSheen {
+      0%,62% { transform:translateX(-28%); opacity:.30; }
+      78% { transform:translateX(18%); opacity:.78; }
+      100% { transform:translateX(28%); opacity:.30; }
+    }
+
+    body.user-mode.user-dashboard-page .user-group-box:hover,
+    body.user-mode.user-dashboard-page .user-setting-card:hover,
+    body.user-mode.user-dashboard-page .user-group-option:hover {
+      transform:translateY(-2px);
+      border-color:rgba(154,229,255,.28);
+      box-shadow:
+        0 30px 66px rgba(0,0,0,.52),
+        0 0 0 1px rgba(112,213,255,.045),
+        0 1px 0 rgba(255,255,255,.12) inset;
+    }
+
+    body.user-mode.user-dashboard-page .user-group-box-title,
+    body.user-mode.user-dashboard-page .user-live-label,
+    body.user-mode.user-dashboard-page .user-live-value,
+    body.user-mode.user-dashboard-page .user-group-name,
+    body.user-mode.user-dashboard-page .user-setting-head,
+    body.user-mode.user-dashboard-page .user-setting-value,
+    body.user-mode.user-dashboard-page .user-setting-editor,
+    body.user-mode.user-dashboard-page .user-setting-title,
+    body.user-mode.user-dashboard-page .user-setting-sub {
+      position:relative;
+      z-index:2;
+    }
+
+    body.user-mode.user-dashboard-page .user-live-metric,
+    body.user-mode.user-dashboard-page .user-setting-value,
+    body.user-mode.user-dashboard-page .user-setting-editor .editor-row {
+      border:1px solid rgba(211,241,255,.105);
+      border-radius:16px;
+      background:
+        linear-gradient(145deg,rgba(255,255,255,.065),rgba(255,255,255,.015)),
+        rgba(1,9,18,.22);
+      box-shadow:
+        0 12px 28px rgba(0,0,0,.22),
+        0 1px 0 rgba(255,255,255,.055) inset;
+      backdrop-filter:blur(20px) saturate(160%);
+      -webkit-backdrop-filter:blur(20px) saturate(160%);
+    }
+
+    body.user-mode.user-dashboard-page .user-setting-icon {
+      background:
+        linear-gradient(145deg,rgba(255,255,255,.11),rgba(255,255,255,.025)),
+        rgba(11,39,65,.30);
+      border-color:rgba(181,231,255,.24);
+      box-shadow:0 14px 30px rgba(0,0,0,.25),0 1px 0 rgba(255,255,255,.09) inset,0 0 20px rgba(58,174,255,.08);
+      backdrop-filter:blur(22px) saturate(170%);
+      -webkit-backdrop-filter:blur(22px) saturate(170%);
+    }
+
+    body.user-mode.user-dashboard-page .user-dashboard-section-label {
+      color:rgba(192,225,242,.72);
+      letter-spacing:.17em;
+      font-size:9px;
+    }
+
+    body.user-mode.user-dashboard-page .user-live-label {
+      color:rgba(151,184,207,.74);
+    }
+
+    body.user-mode.user-dashboard-page .user-live-value {
+      color:#f7fbff;
+      text-shadow:0 0 24px rgba(101,215,255,.11);
+    }
+
+    body.user-mode.user-dashboard-page .user-page-title {
+      color:#f5faff;
+      text-shadow:0 0 26px rgba(91,218,255,.08);
+    }
+
+    body.user-mode.user-dashboard-page .user-page-sub {
+      color:rgba(150,180,205,.66);
+    }
+
+    body.user-mode.user-dashboard-page .user-setting-save {
+      border:1px solid rgba(174,229,255,.28);
+      border-radius:14px;
+      background:
+        linear-gradient(135deg,rgba(91,202,255,.92),rgba(66,116,235,.88) 58%,rgba(120,99,238,.84));
+      box-shadow:0 16px 34px rgba(27,101,205,.25),0 1px 0 rgba(255,255,255,.20) inset;
+      backdrop-filter:blur(15px);
+      -webkit-backdrop-filter:blur(15px);
+    }
+
+    body.user-mode.user-dashboard-page .user-tabbar {
+      border:1px solid rgba(214,240,255,.17);
+      border-radius:20px;
+      background:
+        linear-gradient(145deg,rgba(255,255,255,.095),rgba(255,255,255,.018)),
+        rgba(3,10,20,.48);
+      box-shadow:
+        0 24px 54px rgba(0,0,0,.48),
+        0 1px 0 rgba(255,255,255,.09) inset;
+      backdrop-filter:blur(30px) saturate(175%);
+      -webkit-backdrop-filter:blur(30px) saturate(175%);
+    }
+
+    body.user-mode.user-dashboard-page .user-tab.active {
+      background:
+        linear-gradient(135deg,rgba(104,211,255,.38),rgba(58,119,236,.52) 58%,rgba(122,102,240,.42)),
+        rgba(26,91,165,.40);
+      border:1px solid rgba(195,238,255,.20);
+      box-shadow:0 12px 28px rgba(24,93,196,.25),0 1px 0 rgba(255,255,255,.17) inset;
+      backdrop-filter:blur(18px) saturate(170%);
+      -webkit-backdrop-filter:blur(18px) saturate(170%);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      body.user-mode.user-dashboard-page::before,
+      body.user-mode.user-dashboard-page::after,
+      body.user-mode.user-dashboard-page .top h1,
+      body.user-mode.user-dashboard-page .user-greeting,
+      body.user-mode.user-dashboard-page .user-group-box::after,
+      body.user-mode.user-dashboard-page .user-setting-card::after,
+      body.user-mode.user-dashboard-page .user-group-option::after {
+        animation:none !important;
+      }
+
+      body.user-mode.user-dashboard-page .user-group-box,
+      body.user-mode.user-dashboard-page .user-setting-card,
+      body.user-mode.user-dashboard-page .user-group-option {
+        transition:none !important;
+      }
+    }
+
   </style>
 </head>
 <body>
