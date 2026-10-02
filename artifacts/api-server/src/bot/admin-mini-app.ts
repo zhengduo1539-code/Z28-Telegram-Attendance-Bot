@@ -4468,6 +4468,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             <div class="user-setting-card counts" id="user-settings-counts-card"></div>
           </div>
         </div>
+      </div>
 
         <div class="user-about-page" id="user-about-page" hidden>
           <div class="user-page-head user-about-page-head">
@@ -4576,7 +4577,6 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           </button>
         </nav>
 
-      </div>
     </section>
 
     <section class="card panel-only-private panel-only-group" id="limits-card" data-section="activity">
@@ -5763,6 +5763,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         var group = data.selectedGroup;
         if (!group) return;
         window.__z28SelectedGroupId = group.id;
+        window.__z28GroupSelectionOpen = false;
+        window.__z28AboutOpen = false;
         document.getElementById("user-group-options").hidden = true;
         document.getElementById("user-selected-dashboard").hidden = false;
         title.textContent = tUser("title");
@@ -5830,6 +5832,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
       async function selectUserGroup(groupId) {
         if (!Number.isSafeInteger(groupId) || groupId >= 0) return;
+        window.__z28AboutOpen = false;
         try {
           var loaded = await loadUserDashboard(true, groupId);
           if (loaded) {
@@ -6039,6 +6042,9 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         groupOptions.hidden = false;
         document.getElementById("user-dashboard-page-shell").hidden = true;
         selectedDashboard.hidden = true;
+        document.getElementById("user-about-page").hidden = true;
+        document.getElementById("user-tabbar").hidden = true;
+        window.__z28AboutOpen = false;
         button.hidden = true;
         greeting.classList.remove("visible");
         title.textContent = tUser("groupOptions");
@@ -6050,6 +6056,9 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           window.__z28GroupSelectionOpen = false;
           groupOptions.hidden = true;
           selectedDashboard.hidden = false;
+          document.getElementById("user-about-page").hidden = true;
+          document.getElementById("user-tabbar").hidden = false;
+          window.__z28AboutOpen = false;
           button.hidden = false;
           title.textContent = tUser("title");
           greeting.classList.add("visible");
