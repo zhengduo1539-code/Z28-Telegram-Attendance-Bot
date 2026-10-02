@@ -2758,8 +2758,10 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       font-size: clamp(22px,5.5vw,29px);
       letter-spacing: -.025em;
       animation: none;
-      background: linear-gradient(100deg,#f8fbff 0%,#a9dfff 45%,#c5b8ff 100%);
-      background-size: 100% auto;
+      color: #f4f9ff;
+      background: none;
+      -webkit-background-clip: initial;
+      background-clip: initial;
       text-shadow: 0 0 22px rgba(79,220,255,.10);
     }
 
