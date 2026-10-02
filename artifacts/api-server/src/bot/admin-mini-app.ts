@@ -4905,6 +4905,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           cancel: "Cancel",
           unsavedChanges: "Unsaved changes",
           invalidSettingValue: "Enter a positive whole number.",
+          saving: "Saving…",
+          saved: "Saved",
           activityLimits: "Activity Limits",
           durationControl: "Duration Control",
           dailyCountLimits: "Daily Count Limits",
@@ -4962,6 +4964,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           cancel: "မလုပ်တော့ပါ",
           unsavedChanges: "မသိမ်းရသေးသော ပြင်ဆင်ချက်များ",
           invalidSettingValue: "အပေါင်းကိန်းပြည့်တစ်ခု ထည့်ပါ။",
+          saving: "သိမ်းနေသည်…",
+          saved: "သိမ်းပြီးပါပြီ",
           activityLimits: "Activity Limits",
           durationControl: "Duration Control",
           dailyCountLimits: "Daily Count Limits",
@@ -5019,6 +5023,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           cancel: "取消",
           unsavedChanges: "未保存的更改",
           invalidSettingValue: "请输入正整数。",
+          saving: "保存中…",
+          saved: "已保存",
           activityLimits: "活动时间限制",
           durationControl: "时长控制",
           dailyCountLimits: "每日次数限制",
@@ -6111,7 +6117,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             button.disabled = true;
             button.dataset.saving = "true";
             button.setAttribute("aria-disabled", "true");
-            button.innerHTML = '<span class="button-spinner" aria-hidden="true"></span> Saving…';
+            button.innerHTML = '<span class="button-spinner" aria-hidden="true"></span> ' + escapeHtml(tUser("saving")) + '…';
             try {
               if (!validateUserSettingEditor(card.querySelector(".user-setting-editor"), true)) {
                 throw new Error(tUser("invalidSettingValue"));
@@ -6122,7 +6128,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
                 if (!Number.isSafeInteger(value) || value <= 0) throw new Error("Enter positive integers for all settings.");
                 await apiUserSettings(groupId, type, kind, value);
               }
-              button.innerHTML = "✓ Successfully";
+              button.innerHTML = "✓ " + escapeHtml(tUser("saved"));
               window.setTimeout(function(){ button.textContent = original; delete button.dataset.saving; button.disabled=false; button.setAttribute("aria-disabled", "false"); },1500);
               await loadUserDashboard(false, groupId);
             } catch(error) {
