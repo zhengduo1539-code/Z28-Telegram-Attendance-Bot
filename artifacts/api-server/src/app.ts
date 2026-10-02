@@ -2,7 +2,7 @@ import express, { type Express } from "express";
 import cors from "cors";
 import pinoHttp from "pino-http";
 import router from "./routes";
-import { adminApiRouter, adminPageHandler } from "./bot/admin-api";
+import { adminApiRouter, adminPageHandler, userPageHandler } from "./bot/admin-api";
 import { groupAdminApiRouter } from "./bot/group-admin-api";
 import { userApiRouter } from "./bot/user-api";
 import { logger } from "./lib/logger";
@@ -34,6 +34,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/admin", adminPageHandler);
+app.get("/user", userPageHandler);
 app.use("/api/admin", adminApiRouter);
 app.use("/api/group-admin", groupAdminApiRouter);
 app.use("/api/user", userApiRouter);
