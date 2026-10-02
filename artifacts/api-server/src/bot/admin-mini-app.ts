@@ -6151,6 +6151,24 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           };
         });
 
+        document.querySelectorAll(".user-setting-editor input").forEach(function(input) {
+          input.onkeydown = function(event) {
+            var editor = input.closest(".user-setting-editor");
+            if (!editor) return;
+            if (event.key === "Escape") {
+              event.preventDefault();
+              var cancelButton = editor.querySelector(".user-setting-cancel");
+              if (cancelButton) cancelButton.click();
+              return;
+            }
+            if (event.key === "Enter") {
+              event.preventDefault();
+              var saveButton = editor.querySelector(".user-setting-save");
+              if (saveButton && !saveButton.disabled) saveButton.click();
+            }
+          };
+        });
+
         document.querySelectorAll(".user-setting-cancel").forEach(function(button) {
           button.onclick = function() {
             var card = button.closest(".user-setting-card");
