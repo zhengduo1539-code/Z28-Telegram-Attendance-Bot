@@ -3675,77 +3675,12 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       }
     }
 
-    /* User Dashboard About section. */
-    body.user-mode.user-dashboard-page #user-about-button {
-      min-height:40px;
-      min-width:112px;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      padding:0 13px;
-      border:1px solid rgba(202,237,255,.18);
-      border-radius:14px;
-      color:#dff8ff;
-      background:
-        linear-gradient(145deg,rgba(255,255,255,.105),rgba(255,255,255,.022)),
-        rgba(7,19,34,.42);
-      box-shadow:
-        0 14px 32px rgba(0,0,0,.34),
-        0 1px 0 rgba(255,255,255,.10) inset,
-        0 -1px 0 rgba(0,0,0,.18) inset;
-      backdrop-filter:blur(22px) saturate(165%);
-      -webkit-backdrop-filter:blur(22px) saturate(165%);
-      font-size:12px;
-      font-weight:780;
-      line-height:1;
-      cursor:pointer;
-      align-self:flex-end;
-      position:relative;
-      overflow:hidden;
-      transition:transform .20s ease,border-color .22s ease,background .24s ease,box-shadow .24s ease,color .22s ease;
-    }
-    body.user-mode.user-dashboard-page #user-about-button::after {
-      content:"";
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      background:linear-gradient(110deg,rgba(255,255,255,.12),transparent 35%,transparent 72%,rgba(88,214,255,.07));
-      opacity:.72;
-      transform:translateX(-22%);
-      transition:transform .45s ease,opacity .25s ease;
-    }
-    body.user-mode.user-dashboard-page #user-about-button:hover {
-      transform:translateY(-1px);
-      border-color:rgba(137,224,255,.34);
-      color:#f3fdff;
-      background:
-        linear-gradient(145deg,rgba(255,255,255,.13),rgba(255,255,255,.03)),
-        rgba(8,25,45,.50);
-      box-shadow:0 18px 38px rgba(0,0,0,.40),0 0 24px rgba(56,190,255,.075),0 1px 0 rgba(255,255,255,.13) inset;
-    }
-    body.user-mode.user-dashboard-page #user-about-button:hover::after { transform:translateX(22%);opacity:.95; }
-    body.user-mode.user-dashboard-page #user-about-button:active { transform:translateY(0) scale(.965); }
-    body.user-mode.user-dashboard-page #user-about-button:focus-visible { outline:2px solid rgba(112,220,255,.42);outline-offset:2px; }
-    body.user-mode.user-dashboard-page #user-about-button svg {
-      position:relative;
-      z-index:1;
-      width:17px;
-      height:17px;
-      flex:0 0 17px;
-      stroke:currentColor;
-      fill:none;
-      stroke-width:1.8;
-      stroke-linecap:round;
-      stroke-linejoin:round;
-      filter:drop-shadow(0 0 7px rgba(92,214,255,.18));
-    }
-    body.user-mode.user-dashboard-page #user-about-button-label { position:relative;z-index:1;display:inline-flex;align-items:center; }
-
-    body.user-mode.user-dashboard-page .user-about-panel {
+    /* User Dashboard About page + bottom folder tabs. */
+    body.user-mode.user-dashboard-page .user-about-page {
       position:relative;
       overflow:hidden;
       padding:18px;
+      margin-bottom:86px;
       border-radius:20px;
       border:1px solid rgba(202,237,255,.13);
       background:
@@ -3757,40 +3692,15 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       -webkit-backdrop-filter:blur(28px) saturate(165%);
       animation:userAboutIn .34s cubic-bezier(.22,1,.36,1) both;
     }
-    body.user-mode.user-dashboard-page .user-about-panel[hidden] { display:none !important; }
+    body.user-mode.user-dashboard-page .user-about-page[hidden] { display:none !important; }
+    body.user-mode.user-dashboard-page .user-about-page-head { margin-bottom:18px;padding-right:0; }
     @keyframes userAboutIn {
       from { opacity:0;transform:translateY(10px) scale(.985);filter:blur(2px); }
       to { opacity:1;transform:translateY(0) scale(1);filter:blur(0); }
     }
-    .user-about-head { display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:16px; }
-    .user-about-head .user-dashboard-section-label { margin:0; }
-    .user-about-back {
-      min-height:38px;
-      min-width:78px;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:6px;
-      padding:0 11px;
-      border:1px solid rgba(202,237,255,.14);
-      border-radius:12px;
-      color:#d7f5ff;
-      background:rgba(255,255,255,.045);
-      cursor:pointer;
-      font-size:12px;
-      font-weight:760;
-      box-shadow:0 8px 18px rgba(0,0,0,.24),0 1px 0 rgba(255,255,255,.07) inset;
-      transition:transform .18s ease,border-color .2s ease,background .2s ease;
-    }
-    .user-about-back:hover { transform:translateY(-1px);border-color:rgba(137,224,255,.28);background:rgba(56,190,255,.075); }
-    .user-about-back:active { transform:translateY(0) scale(.97); }
-    .user-about-back svg { width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round; }
     .user-about-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px; }
     .user-about-card {
-      min-width:0;
-      padding:14px;
-      border-radius:16px;
-      border:1px solid rgba(202,237,255,.10);
+      min-width:0;padding:14px;border-radius:16px;border:1px solid rgba(202,237,255,.10);
       background:linear-gradient(145deg,rgba(255,255,255,.05),rgba(255,255,255,.012)),rgba(3,11,22,.40);
       box-shadow:0 12px 28px rgba(0,0,0,.24),0 1px 0 rgba(255,255,255,.055) inset;
     }
@@ -3803,6 +3713,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     }
     .user-about-icon svg { width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round; }
     article.user-about-card:not(.user-about-details) { display:flex;align-items:center;gap:12px; }
+    .user-about-copy-block { min-width:0; }
     .user-about-label { color:#8198b3;font-size:11px;font-weight:730;letter-spacing:.025em; }
     .user-about-value { margin-top:3px;color:#f0fbff;font-size:16px;font-weight:790;letter-spacing:-.01em; }
     .user-about-credit-sub { margin-top:1px;color:#6f849f;font-size:10px;font-weight:650; }
@@ -3813,18 +3724,33 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     .user-about-summary-arrow { color:#80d9ff;font-size:20px;line-height:1;transition:transform .22s ease; }
     .user-about-details[open] .user-about-summary-arrow { transform:rotate(90deg); }
     .user-about-copy { margin:12px 0 2px 50px;color:#8ea3bc;font-size:12px;line-height:1.6; }
+
+    body.user-mode.user-dashboard-page .user-tabbar[hidden] { display:none !important; }
+    body.user-mode.user-dashboard-page .user-tab {
+      position:relative;display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:48px;border:1px solid transparent;
+    }
+    body.user-mode.user-dashboard-page .user-tab-icon {
+      position:relative;z-index:1;width:17px;height:17px;display:inline-flex;align-items:center;justify-content:center;
+    }
+    body.user-mode.user-dashboard-page .user-tab-icon svg {
+      width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;
+      transition:transform .3s cubic-bezier(.22,1,.36,1);
+    }
+    body.user-mode.user-dashboard-page .user-tab:hover .user-tab-icon svg { transform:translateY(-1px) scale(1.05); }
+    body.user-mode.user-dashboard-page .user-tab.active .user-tab-icon svg { filter:drop-shadow(0 0 8px rgba(123,220,255,.26)); }
+
     @media (max-width:620px) {
       .user-about-grid { grid-template-columns:1fr; }
       .user-about-card.user-about-credit-card { grid-column:auto; }
       .user-about-copy { margin-left:0; }
-      body.user-mode.user-dashboard-page #user-about-button { min-width:98px;min-height:38px;padding:0 11px;border-radius:13px; }
+      body.user-mode.user-dashboard-page .user-about-page { margin-bottom:82px;padding:15px; }
+      body.user-mode.user-dashboard-page .user-tab { min-height:44px;gap:6px; }
+      body.user-mode.user-dashboard-page .user-tab-icon,
+      body.user-mode.user-dashboard-page .user-tab-icon svg { width:16px;height:16px; }
     }
     @media (prefers-reduced-motion: reduce) {
-      body.user-mode.user-dashboard-page #user-about-button,
-      body.user-mode.user-dashboard-page #user-about-button::after,
-      body.user-mode.user-dashboard-page .user-about-panel,
-      .user-about-back,
-      .user-about-summary-arrow { transition:none !important;animation:none !important; }
+      body.user-mode.user-dashboard-page .user-about-page,
+      body.user-mode.user-dashboard-page .user-tab-icon svg { animation:none !important;transition:none !important; }
     }
 
     /* Refined User Dashboard Refresh control. */
@@ -4009,14 +3935,6 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             <path d="M7 17l2.5-2.5"></path>
           </svg>
           <span id="switch-group-label">Switch</span>
-        </button>
-        <button class="about-button" id="user-about-button" type="button" hidden aria-label="About">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="12" cy="12" r="8.5"></circle>
-            <path d="M12 10.5v5"></path>
-            <path d="M12 7.25h.01"></path>
-          </svg>
-          <span id="user-about-button-label">About</span>
         </button>
       </div>
     </div>
@@ -4544,34 +4462,36 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
         </div>
 
-        <div class="user-about-panel" id="user-about-panel" hidden>
-          <div class="user-about-head">
+        <div class="user-about-page" id="user-about-page" hidden>
+          <div class="user-page-head user-about-page-head">
             <div>
-              <div class="user-dashboard-section-label" id="user-about-title">About</div>
+              <h2 class="user-page-title" id="user-about-title">About</h2>
               <div class="user-page-sub" id="user-about-sub">App information and credits</div>
             </div>
-            <button class="user-about-back" id="user-about-back" type="button">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M14.5 6.5 9 12l5.5 5.5"></path>
-              </svg>
-              <span id="user-about-back-label">Back</span>
-            </button>
           </div>
 
           <div class="user-about-grid">
             <article class="user-about-card">
               <div class="user-about-icon">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M7 4.5h10"></path>
-                  <path d="M6 8.5h12"></path>
-                  <path d="M8 4.5v15"></path>
-                  <path d="M16 4.5v15"></path>
-                  <path d="M8 19.5h8"></path>
+                  <path d="M7 4.5h10"></path><path d="M6 8.5h12"></path>
+                  <path d="M8 4.5v15"></path><path d="M16 4.5v15"></path><path d="M8 19.5h8"></path>
                 </svg>
               </div>
-              <div>
+              <div class="user-about-copy-block">
                 <div class="user-about-label" id="user-about-bot-name-label">Bot</div>
                 <div class="user-about-value">Z28</div>
+              </div>
+            </article>
+
+            <article class="user-about-card">
+              <div class="user-about-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="5" y="4" width="14" height="16" rx="3"></rect>
+                  <path d="M8.5 8h7"></path><path d="M8.5 12h4.5"></path><path d="M8.5 16h6"></path>
+                </svg>
+              </div>
+              <div class="user-about-copy-block">
                 <div class="user-about-label" id="user-about-bot-version-label">Bot Version</div>
                 <div class="user-about-value">1.0.0</div>
               </div>
@@ -4581,12 +4501,10 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
               <div class="user-about-icon">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <rect x="5" y="4" width="14" height="16" rx="3"></rect>
-                  <path d="M8.5 8h7"></path>
-                  <path d="M8.5 12h4.5"></path>
-                  <path d="M8.5 16h6"></path>
+                  <path d="M8.5 8h7"></path><path d="M8.5 12h4.5"></path><path d="M8.5 16h6"></path>
                 </svg>
               </div>
-              <div>
+              <div class="user-about-copy-block">
                 <div class="user-about-label" id="user-about-mini-version-label">Mini App Version</div>
                 <div class="user-about-value">1.0.0</div>
               </div>
@@ -4595,9 +4513,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             <details class="user-about-card user-about-details">
               <summary>
                 <span class="user-about-icon">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M7 4h10a2 2 0 0 1 2 2v12l-3-1.5L12 18l-3-1.5L6 18V6a2 2 0 0 1 2-2Z"></path>
-                  </svg>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10a2 2 0 0 1 2 2v12l-3-1.5L12 18l-3-1.5L6 18V6a2 2 0 0 1 2-2Z"></path></svg>
                 </span>
                 <span class="user-about-summary-copy">
                   <span class="user-about-label" id="user-about-terms-label">Terms of Use</span>
@@ -4610,10 +4526,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             <details class="user-about-card user-about-details">
               <summary>
                 <span class="user-about-icon">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M12 3 19 6v5c0 4.8-2.9 7.9-7 10-4.1-2.1-7-5.2-7-10V6l7-3Z"></path>
-                    <path d="m9.5 12 1.7 1.7 3.5-3.5"></path>
-                  </svg>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 19 6v5c0 4.8-2.9 7.9-7 10-4.1-2.1-7-5.2-7-10V6l7-3Z"></path><path d="m9.5 12 1.7 1.7 3.5-3.5"></path></svg>
                 </span>
                 <span class="user-about-summary-copy">
                   <span class="user-about-label" id="user-about-privacy-label">Privacy</span>
@@ -4625,11 +4538,9 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
             <article class="user-about-card user-about-credit-card">
               <div class="user-about-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M12 3.5 14.6 9l5.9.8-4.3 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8-4.3-4.1L9.4 9 12 3.5Z"></path>
-                </svg>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 14.6 9l5.9.8-4.3 4.1 1 5.8-5.2-2.8 1-5.8-4.3-4.1L9.4 9 12 3.5Z"></path></svg>
               </div>
-              <div>
+              <div class="user-about-copy-block">
                 <div class="user-about-label" id="user-about-credits-label">Credits</div>
                 <div class="user-about-value">Chan Myae</div>
                 <div class="user-about-credit-sub" id="user-about-creator-label">Creator</div>
@@ -4637,6 +4548,27 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             </article>
           </div>
         </div>
+
+        <nav class="user-tabbar" id="user-tabbar" hidden aria-label="User dashboard sections">
+          <button class="user-tab active" type="button" data-user-tab="dashboard" aria-selected="true">
+            <span class="user-tab-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <rect x="4" y="4" width="6" height="6" rx="1.5"></rect><rect x="14" y="4" width="6" height="6" rx="1.5"></rect>
+                <rect x="4" y="14" width="6" height="6" rx="1.5"></rect><rect x="14" y="14" width="6" height="6" rx="1.5"></rect>
+              </svg>
+            </span>
+            <span id="user-dashboard-tab-label">Dashboard</span>
+          </button>
+          <button class="user-tab" type="button" data-user-tab="about" aria-selected="false">
+            <span class="user-tab-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="8.5"></circle><path d="M12 10.5v5"></path><path d="M12 7.25h.01"></path>
+              </svg>
+            </span>
+            <span id="user-about-tab-label">About</span>
+          </button>
+        </nav>
+
       </div>
     </section>
 
@@ -4836,9 +4768,9 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           activitySmoke: "Smoke",
           activityWcd: "WCD",
           switch: "Switch",
+          dashboardTab: "Dashboard",
           about: "About",
           aboutSub: "App information and credits",
-          aboutBack: "Back",
           botName: "Bot",
           botVersion: "Bot Version",
           miniAppVersion: "Mini App Version",
@@ -4889,9 +4821,9 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           activitySmoke: "ဆေးလိပ်",
           activityWcd: "WCD",
           switch: "ပြောင်းမည်",
+          dashboardTab: "Dashboard",
           about: "About",
           aboutSub: "App အချက်အလက်နှင့် Credits",
-          aboutBack: "နောက်သို့",
           botName: "Bot",
           botVersion: "Bot Version",
           miniAppVersion: "Mini App Version",
@@ -4942,9 +4874,9 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           activitySmoke: "抽烟",
           activityWcd: "大号",
           switch: "切换",
+          dashboardTab: "仪表板",
           about: "关于",
           aboutSub: "应用信息与创作者",
-          aboutBack: "返回",
           botName: "机器人",
           botVersion: "机器人版本",
           miniAppVersion: "Mini App 版本",
@@ -5006,10 +4938,10 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         document.querySelector("#user-group-options .user-page-title").textContent = tUser("groupOptions");
         document.querySelector("#user-group-options .user-page-sub").textContent = tUser("groupOptionsSub");
         document.getElementById("user-dashboard-sub").textContent = tUser("dashboardSub");
-        document.getElementById("user-about-button-label").textContent = tUser("about");
+        document.getElementById("user-dashboard-tab-label").textContent = tUser("dashboardTab");
+        document.getElementById("user-about-tab-label").textContent = tUser("about");
         document.getElementById("user-about-title").textContent = tUser("about");
         document.getElementById("user-about-sub").textContent = tUser("aboutSub");
-        document.getElementById("user-about-back-label").textContent = tUser("aboutBack");
         document.getElementById("user-about-bot-name-label").textContent = tUser("botName");
         document.getElementById("user-about-bot-version-label").textContent = tUser("botVersion");
         document.getElementById("user-about-mini-version-label").textContent = tUser("miniAppVersion");
@@ -5729,7 +5661,10 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         document.getElementById("user-dashboard-sub").textContent = tUser("dashboardSub");
         document.getElementById("user-group-options").hidden = false;
         document.getElementById("user-selected-dashboard").hidden = true;
+        document.getElementById("user-about-page").hidden = true;
+        document.getElementById("user-tabbar").hidden = true;
         document.getElementById("switch-group").hidden = true;
+        window.__z28AboutOpen = false;
         document.body.classList.remove("user-dashboard-page");
       }
 
@@ -5825,10 +5760,16 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         document.getElementById("user-greeting").classList.add("visible");
         renderUserGreeting();
         window.__z28AboutOpen = false;
-        document.getElementById("user-about-panel").hidden = true;
+        document.getElementById("user-about-page").hidden = true;
+        document.getElementById("user-selected-dashboard").hidden = false;
+        document.getElementById("user-tabbar").hidden = false;
         document.getElementById("refresh").hidden = false;
-        document.getElementById("user-about-button").hidden = false;
         document.getElementById("switch-group").hidden = false;
+        document.querySelectorAll("[data-user-tab]").forEach(function(button) {
+          var active = button.getAttribute("data-user-tab") === "dashboard";
+          button.classList.toggle("active", active);
+          button.setAttribute("aria-selected", String(active));
+        });
         document.getElementById("switch-group-label").textContent = tUser("switch");
         document.getElementById("user-selected-group-title").textContent = group.title + " " + tUser("title");
         document.getElementById("user-group-name").textContent = group.title;
@@ -5865,8 +5806,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           document.getElementById("user-group-options").hidden = false;
           document.getElementById("user-selected-dashboard").hidden = true;
           document.getElementById("switch-group").hidden = true;
-          document.getElementById("user-about-button").hidden = true;
-          document.getElementById("user-about-panel").hidden = true;
+          document.getElementById("user-about-page").hidden = true;
+          document.getElementById("user-tabbar").hidden = true;
           window.__z28AboutOpen = false;
           document.getElementById("user-greeting").classList.remove("visible");
           title.textContent = tUser("groupOptions");
@@ -6026,29 +5967,45 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         },"Refresh").catch(function(error){showNotice(error && error.message ? error.message : "Refresh failed.","error");});
       });
 
-      document.getElementById("user-about-button").addEventListener("click", function() {
-        if (!document.body.classList.contains("user-dashboard-page") || window.__z28GroupSelectionOpen) return;
-        window.__z28AboutOpen = true;
-        document.getElementById("user-about-panel").hidden = false;
-        document.getElementById("user-selected-dashboard").hidden = true;
-        document.getElementById("user-about-panel").hidden = false;
-        document.getElementById("refresh").hidden = true;
-        document.getElementById("switch-group").hidden = true;
-        document.getElementById("user-about-button").hidden = true;
-        document.getElementById("user-greeting").classList.remove("visible");
-        title.textContent = tUser("about");
-      });
+      function setUserDashboardTab(tab) {
+        if (!document.body.classList.contains("user-dashboard-page")) return;
+        if (window.__z28GroupSelectionOpen) return;
 
-      document.getElementById("user-about-back").addEventListener("click", function() {
-        window.__z28AboutOpen = false;
-        document.getElementById("user-about-panel").hidden = true;
-        document.getElementById("user-selected-dashboard").hidden = false;
-        document.getElementById("refresh").hidden = false;
-        document.getElementById("switch-group").hidden = false;
-        document.getElementById("user-about-button").hidden = false;
-        title.textContent = tUser("title");
-        document.getElementById("user-greeting").classList.add("visible");
-        renderUserGreeting();
+        var dashboardPage = document.getElementById("user-selected-dashboard");
+        var aboutPage = document.getElementById("user-about-page");
+        var tabbar = document.getElementById("user-tabbar");
+        var refreshButton = document.getElementById("refresh");
+        var switchButton = document.getElementById("switch-group");
+        var greeting = document.getElementById("user-greeting");
+        var isAbout = tab === "about";
+
+        window.__z28AboutOpen = isAbout;
+        dashboardPage.hidden = isAbout;
+        aboutPage.hidden = !isAbout;
+        tabbar.hidden = false;
+        refreshButton.hidden = isAbout;
+        switchButton.hidden = isAbout;
+
+        document.querySelectorAll("[data-user-tab]").forEach(function(button) {
+          var active = button.getAttribute("data-user-tab") === tab;
+          button.classList.toggle("active", active);
+          button.setAttribute("aria-selected", String(active));
+        });
+
+        if (isAbout) {
+          greeting.classList.remove("visible");
+          title.textContent = tUser("about");
+        } else {
+          greeting.classList.add("visible");
+          title.textContent = tUser("title");
+          renderUserGreeting();
+        }
+      }
+
+      document.querySelectorAll("[data-user-tab]").forEach(function(button) {
+        button.addEventListener("click", function() {
+          setUserDashboardTab(button.getAttribute("data-user-tab"));
+        });
       });
 
       document.getElementById("switch-group").addEventListener("click", function() {
