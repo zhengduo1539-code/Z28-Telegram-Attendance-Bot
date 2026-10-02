@@ -3551,6 +3551,137 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       }
     }
 
+
+    /* Refined User Dashboard Switch control. */
+    body.user-mode.user-dashboard-page #switch-group {
+      min-height:40px;
+      min-width:112px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:0 13px;
+      border:1px solid rgba(202,237,255,.18);
+      border-radius:14px;
+      color:#dff8ff;
+      background:
+        linear-gradient(145deg,rgba(255,255,255,.105),rgba(255,255,255,.022)),
+        rgba(7,19,34,.42);
+      box-shadow:
+        0 14px 32px rgba(0,0,0,.34),
+        0 1px 0 rgba(255,255,255,.10) inset,
+        0 -1px 0 rgba(0,0,0,.18) inset;
+      backdrop-filter:blur(22px) saturate(165%);
+      -webkit-backdrop-filter:blur(22px) saturate(165%);
+      font-size:12px;
+      font-weight:780;
+      letter-spacing:.01em;
+      line-height:1;
+      cursor:pointer;
+      position:relative;
+      overflow:hidden;
+      transition:
+        transform .20s ease,
+        border-color .22s ease,
+        background .24s ease,
+        box-shadow .24s ease,
+        color .22s ease;
+    }
+
+    body.user-mode.user-dashboard-page #switch-group::before {
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:linear-gradient(110deg,rgba(255,255,255,.12),transparent 35%,transparent 72%,rgba(88,214,255,.07));
+      opacity:.72;
+      transform:translateX(-22%);
+      transition:transform .45s ease,opacity .25s ease;
+    }
+
+    body.user-mode.user-dashboard-page #switch-group:hover {
+      transform:translateY(-1px);
+      border-color:rgba(137,224,255,.34);
+      color:#f3fdff;
+      background:
+        linear-gradient(145deg,rgba(255,255,255,.13),rgba(255,255,255,.03)),
+        rgba(8,25,45,.50);
+      box-shadow:
+        0 18px 38px rgba(0,0,0,.40),
+        0 0 24px rgba(56,190,255,.075),
+        0 1px 0 rgba(255,255,255,.13) inset;
+    }
+
+    body.user-mode.user-dashboard-page #switch-group:hover::before {
+      transform:translateX(22%);
+      opacity:.95;
+    }
+
+    body.user-mode.user-dashboard-page #switch-group:active {
+      transform:translateY(0) scale(.965);
+    }
+
+    body.user-mode.user-dashboard-page #switch-group:focus-visible {
+      outline:2px solid rgba(112,220,255,.42);
+      outline-offset:2px;
+    }
+
+    body.user-mode.user-dashboard-page #switch-group svg {
+      position:relative;
+      z-index:1;
+      width:17px;
+      height:17px;
+      flex:0 0 17px;
+      stroke:currentColor;
+      fill:none;
+      stroke-width:1.8;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+      filter:drop-shadow(0 0 7px rgba(92,214,255,.18));
+      transition:transform .34s cubic-bezier(.22,1,.36,1);
+    }
+
+    body.user-mode.user-dashboard-page #switch-group:hover svg {
+      transform:rotate(180deg) scale(1.04);
+    }
+
+    body.user-mode.user-dashboard-page #switch-group-label {
+      position:relative;
+      z-index:1;
+      display:inline-flex;
+      align-items:center;
+      min-width:0;
+    }
+
+    body.user-mode.user-dashboard-page #switch-group:disabled {
+      opacity:.58;
+      cursor:default;
+      transform:none;
+    }
+
+    @media (max-width:620px) {
+      body.user-mode.user-dashboard-page #switch-group {
+        min-width:98px;
+        min-height:38px;
+        padding:0 11px;
+        border-radius:13px;
+        gap:7px;
+      }
+      body.user-mode.user-dashboard-page #switch-group svg {
+        width:16px;
+        height:16px;
+        flex-basis:16px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      body.user-mode.user-dashboard-page #switch-group,
+      body.user-mode.user-dashboard-page #switch-group::before,
+      body.user-mode.user-dashboard-page #switch-group svg {
+        transition:none !important;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -3578,7 +3709,15 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       </div>
       <div style="display:flex;flex-direction:column;gap:8px;align-items:stretch;justify-content:flex-start">
         <button class="refresh action-button" id="refresh" type="button"><span class="button-content"><span>Refresh</span></span></button>
-        <button class="switch-group" id="switch-group" type="button" hidden>Switch</button>
+        <button class="switch-group" id="switch-group" type="button" hidden aria-label="Switch group">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 7h10l-2.5-2.5"></path>
+            <path d="M17 7l-2.5 2.5"></path>
+            <path d="M17 17H7l2.5 2.5"></path>
+            <path d="M7 17l2.5-2.5"></path>
+          </svg>
+          <span id="switch-group-label">Switch</span>
+        </button>
       </div>
     </div>
 
@@ -5239,7 +5378,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         document.getElementById("user-greeting").classList.add("visible");
         renderUserGreeting();
         document.getElementById("switch-group").hidden = false;
-        document.getElementById("switch-group").textContent = tUser("switch");
+        document.getElementById("switch-group-label").textContent = tUser("switch");
         document.getElementById("user-selected-group-title").textContent = group.title + " " + tUser("title");
         document.getElementById("user-group-name").textContent = group.title;
         function updateLiveMetric(id, value) {
