@@ -6779,13 +6779,38 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           return;
         }
 
-        setPanelVisibility("admin");
-        document.body.classList.remove("user-verification-page", "admin-verification-page", "user-dashboard-page");
-        title.textContent = "Administration";
-        await createAdminSession();
-        await load();
-        hideSplash();
-        startAdminDashboardRefresh();
+        try {
+          var modeData = await apiUserMode();
+          if (modeData.isConfiguredAdmin) {
+            setPanelVisibility("admin");
+            document.body.classList.remove("user-verification-page", "admin-verification-page", "user-dashboard-page");
+            title.textContent = "Administration";
+            await createAdminSession();
+            await load();
+            hideSplash();
+            startAdminDashboardRefresh();
+          } else {
+            setPanelVisibility("user");
+            document.body.classList.remove("user-verification-page", "admin-verification-page");
+            title.textContent = telegramUserId ? String(telegramUserId) + " " + tUser("title") : tUser("title");
+            var storedUserId = getVerifiedUserId();
+            var currentUserId = telegramUserId ? String(telegramUserId) : "";
+            if (storedUserId && currentUserId && storedUserId === currentUserId) {
+              await loadUserDashboard();
+            } else {
+              showUserVerificationPage();
+            }
+            hideSplash();
+          }
+        } catch (error) {
+          setPanelVisibility("user");
+          if (!document.body.classList.contains("user-dashboard-error-page")) {
+            showUserVerificationPage();
+            title.textContent = "User Access";
+            showNotice(error && error.message ? error.message : "Unable to open the user dashboard.", "error");
+          }
+          hideSplash();
+        }
       }
 
       document.getElementById("save-limits").addEventListener("click", function () {
