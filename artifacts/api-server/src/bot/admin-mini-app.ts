@@ -4736,6 +4736,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       var userLanguageKey = "z28_user_language";
       var userLanguage = "en";
       var userDashboardRefreshTimer = null;
+      var userDashboardRequestId = 0;
       window.__z28GroupSelectionOpen = false;
       window.__z28AboutOpen = false;
 
@@ -5832,6 +5833,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
       async function selectUserGroup(groupId) {
         if (!Number.isSafeInteger(groupId) || groupId >= 0) return;
+        ++userDashboardRequestId;
         window.__z28AboutOpen = false;
         try {
           var loaded = await loadUserDashboard(true, groupId);
@@ -5942,10 +5944,14 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       async function loadUserDashboard(withLoading, groupId) {
         if (!telegramUserId) throw new Error("Unable to identify your Telegram account.");
         if (window.__z28AboutOpen) return true;
+        var requestId = ++userDashboardRequestId;
         var showLoader = withLoading !== false;
         if (showLoader) showUserLoading(true);
         try {
           var data = await apiUserDashboard(telegramUserId,groupId);
+          if (requestId !== userDashboardRequestId || window.__z28GroupSelectionOpen || window.__z28AboutOpen) {
+            return false;
+          }
           if (!data.hasGroups) {
             showUserNoGroupScreen();
             return false;
@@ -5996,6 +6002,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         var greeting = document.getElementById("user-greeting");
         var isAbout = tab === "about";
 
+        ++userDashboardRequestId;
         window.__z28AboutOpen = isAbout;
         dashboardPage.hidden = isAbout;
         dashboardPageShell.hidden = isAbout;
@@ -6035,6 +6042,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         var greeting=document.getElementById("user-greeting");
         if (window.__z28GroupSelectionOpen) return;
 
+        ++userDashboardRequestId;
         window.__z28GroupSelectionOpen = true;
         button.disabled = true;
 
