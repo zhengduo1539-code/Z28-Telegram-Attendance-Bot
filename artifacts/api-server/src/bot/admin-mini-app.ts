@@ -4946,7 +4946,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         new URLSearchParams(window.location.search).get("tgWebAppStartParam") ||
         "";
       var groupMode = /^group_-\d+$/.test(startParam);
-      var userPageMode = window.location.pathname === "/user";
+      var userPageMode = window.__z28MiniAppMode === "user" || window.location.pathname === "/user";
       var userMode = false;
       var adminMode = false;
       var adminVerificationMode = false;
