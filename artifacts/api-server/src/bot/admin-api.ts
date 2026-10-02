@@ -833,3 +833,8 @@ export const adminPageHandler = (_req: Request, res: Response) => {
   res.setHeader("Cache-Control", "no-store");
   res.type("html").send(adminMiniAppHtml);
 };
+
+export const userPageHandler = (_req: Request, res: Response) => {
+  res.setHeader("Cache-Control", "no-store");
+  res.type("html").send(adminMiniAppHtml);
+};
