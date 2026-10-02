@@ -6777,36 +6777,12 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           return;
         }
 
-        try {
-          var modeData = await apiUserMode();
-          if (modeData.isConfiguredAdmin) {
-            setPanelVisibility("admin");
-            title.textContent = "Administration";
-            await createAdminSession();
-            await load();
-            hideSplash();
-            startAdminDashboardRefresh();
-          } else {
-            setPanelVisibility("user");
-            title.textContent = telegramUserId ? String(telegramUserId) + " " + tUser("title") : tUser("title");
-            var stored = getVerifiedUserId();
-            var current = telegramUserId ? String(telegramUserId) : "";
-            if (stored && current && stored === current) {
-              await loadUserDashboard();
-            } else {
-              showUserVerificationPage();
-            }
-            hideSplash();
-          }
-        } catch (error) {
-          setPanelVisibility("user");
-          if (!document.body.classList.contains("user-dashboard-error-page")) {
-            showUserVerificationPage();
-            title.textContent = "User Access";
-            showNotice(error && error.message ? error.message : "Unable to open the user dashboard.", "error");
-          }
-          hideSplash();
-        }
+        setPanelVisibility("admin");
+        title.textContent = "Administration";
+        await createAdminSession();
+        await load();
+        hideSplash();
+        startAdminDashboardRefresh();
       }
 
       document.getElementById("save-limits").addEventListener("click", function () {
