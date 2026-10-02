@@ -1678,15 +1678,37 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
     @keyframes userSpin { to { transform:rotate(360deg); } }
 
-    .user-loader {
-      width:48px;
-      height:48px;
-      border-radius:50%;
-      border:4px solid rgba(126,171,232,.20);
-      border-top-color:#2f8cff;
-      animation:userSpin .8s linear infinite;
-      box-shadow:0 0 22px rgba(37,99,235,.20);
+    .user-loading-panel {
+      width:min(680px,calc(100% - 32px));
+      max-height:min(78vh,760px);
+      padding:18px;
+      border:1px solid rgba(112,170,255,.20);
+      border-radius:22px;
+      background:linear-gradient(145deg,rgba(7,18,36,.94),rgba(4,12,27,.92));
+      box-shadow:0 24px 70px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.04);
+      overflow:hidden;
     }
+    .user-loading-head { display:flex; align-items:center; gap:11px; margin-bottom:16px; }
+    .user-loading-mark { width:38px; height:38px; flex:0 0 38px; border-radius:12px; }
+    .user-loading-title { width:150px; height:13px; border-radius:999px; }
+    .user-loading-subtitle { width:105px; height:9px; margin-top:7px; border-radius:999px; }
+    .user-loading-stats { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-bottom:12px; }
+    .user-loading-stat { min-height:82px; padding:14px; border:1px solid rgba(91,155,255,.13); border-radius:15px; background:rgba(8,22,43,.62); }
+    .user-loading-line { height:10px; border-radius:999px; }
+    .user-loading-line.short { width:42%; }
+    .user-loading-value { width:34%; height:24px; margin-top:12px; border-radius:8px; }
+    .user-loading-card { min-height:118px; margin-top:10px; padding:15px; border:1px solid rgba(91,155,255,.13); border-radius:16px; background:rgba(8,22,43,.62); }
+    .user-loading-card-head { width:38%; height:13px; margin-bottom:15px; border-radius:999px; }
+    .user-loading-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
+    .user-loading-field { height:43px; border-radius:11px; border:1px solid rgba(91,155,255,.10); }
+    .user-loading-sheen { position:relative; overflow:hidden; background:rgba(42,78,124,.30); }
+    .user-loading-sheen::after { content:""; position:absolute; inset:0; transform:translateX(-100%); background:linear-gradient(90deg,transparent,rgba(185,220,255,.13),transparent); animation:userSkeletonShimmer 1.35s ease-in-out infinite; }
+    @keyframes userSkeletonShimmer { to { transform:translateX(100%); } }
+    @media (max-width:520px) {
+      .user-loading-panel { padding:14px; border-radius:19px; }
+      .user-loading-card { min-height:108px; }
+    }
+    @media (prefers-reduced-motion: reduce) { .user-loading-sheen::after { animation:none !important; } }
 
     @media (prefers-reduced-motion: reduce) {
       .user-group-box-title::before,
@@ -4015,7 +4037,35 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
   </style>
 </head>
 <body>
-  <div id="user-loading" class="user-loading" aria-live="polite" aria-label="Loading"><div class="user-loader"></div></div>
+  <div id="user-loading" class="user-loading" aria-live="polite" aria-label="Loading">
+    <div class="user-loading-panel" role="status">
+      <div class="user-loading-head">
+        <div class="user-loading-mark user-loading-sheen" aria-hidden="true"></div>
+        <div>
+          <div class="user-loading-title user-loading-sheen" aria-hidden="true"></div>
+          <div class="user-loading-subtitle user-loading-sheen" aria-hidden="true"></div>
+        </div>
+      </div>
+      <div class="user-loading-stats" aria-hidden="true">
+        <div class="user-loading-stat"><div class="user-loading-line short user-loading-sheen"></div><div class="user-loading-value user-loading-sheen"></div></div>
+        <div class="user-loading-stat"><div class="user-loading-line short user-loading-sheen"></div><div class="user-loading-value user-loading-sheen"></div></div>
+      </div>
+      <div class="user-loading-card" aria-hidden="true">
+        <div class="user-loading-card-head user-loading-sheen"></div>
+        <div class="user-loading-fields">
+          <div class="user-loading-field user-loading-sheen"></div><div class="user-loading-field user-loading-sheen"></div>
+          <div class="user-loading-field user-loading-sheen"></div><div class="user-loading-field user-loading-sheen"></div>
+        </div>
+      </div>
+      <div class="user-loading-card" aria-hidden="true">
+        <div class="user-loading-card-head user-loading-sheen"></div>
+        <div class="user-loading-fields">
+          <div class="user-loading-field user-loading-sheen"></div><div class="user-loading-field user-loading-sheen"></div>
+          <div class="user-loading-field user-loading-sheen"></div><div class="user-loading-field user-loading-sheen"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div id="splash" aria-label="Loading">
     <div>
