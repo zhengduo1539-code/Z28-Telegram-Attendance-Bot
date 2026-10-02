@@ -850,6 +850,10 @@ export class AttendanceService {
     return this.store.getActiveActivity(chatId, userId);
   }
 
+  async listActiveActivities(): Promise<ActiveActivity[]> {
+    return this.store.listActiveActivities();
+  }
+
   async snapshot(): Promise<BotState> {
     const state = structuredClone(await this.store.load());
     const activities = await this.store.listActiveActivities();
