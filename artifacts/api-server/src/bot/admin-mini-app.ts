@@ -4837,6 +4837,39 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       var userLanguage = "en";
       var userDashboardRequestId = 0;
       var userDashboardData = null;
+      var userDashboardStateKey = "z28_user_dashboard_state";
+
+      function getUserDashboardStateKey() {
+        return userDashboardStateKey + "_" + String(telegramUserId || "");
+      }
+
+      function getUserDashboardState() {
+        try {
+          var raw = localStorage.getItem(getUserDashboardStateKey());
+          if (!raw) return null;
+          var state = JSON.parse(raw);
+          if (!state || typeof state !== "object") return null;
+          var groupId = Number(state.groupId);
+          var tab = state.tab === "about" ? "about" : "dashboard";
+          return Number.isSafeInteger(groupId) && groupId < 0
+            ? { groupId: groupId, tab: tab }
+            : { groupId: null, tab: tab };
+        } catch (error) {
+          return null;
+        }
+      }
+
+      function saveUserDashboardState(patch) {
+        if (!telegramUserId) return;
+        try {
+          var current = getUserDashboardState() || { groupId: null, tab: "dashboard" };
+          var next = {
+            groupId: patch && patch.groupId !== undefined ? patch.groupId : current.groupId,
+            tab: patch && patch.tab ? patch.tab : current.tab
+          };
+          localStorage.setItem(getUserDashboardStateKey(), JSON.stringify(next));
+        } catch (error) {}
+      }
       window.__z28GroupSelectionOpen = false;
       window.__z28AboutOpen = false;
 
@@ -5956,6 +5989,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         if (!group) return;
         window.__z28SelectedGroupId = group.id;
         userDashboardData = data;
+        saveUserDashboardState({ groupId: group.id });
         window.__z28GroupSelectionOpen = false;
         window.__z28AboutOpen = false;
         document.getElementById("user-group-options").hidden = true;
@@ -6002,6 +6036,11 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
         bindUserSettingButtons();
         updateUserBackButton();
+
+        var savedState = getUserDashboardState();
+        if (savedState && savedState.tab === "about") {
+          setUserDashboardTab("about");
+        }
       }
 
       function renderUserDashboard(data) {
@@ -6009,6 +6048,15 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         dashboard.classList.add("visible");
         if (!data.groups || !data.groups.length) return;
         if (data.selectionRequired) {
+          var savedState = getUserDashboardState();
+          var savedGroup = savedState && Number.isSafeInteger(savedState.groupId) ? savedState.groupId : null;
+          var savedGroupExists = savedGroup !== null && data.groups.some(function(group) {
+            return Number(group.id) === savedGroup;
+          });
+          if (savedGroupExists) {
+            selectUserGroup(savedGroup);
+            return;
+          }
           document.getElementById("user-group-options").hidden = false;
           document.getElementById("user-dashboard-page-shell").hidden = true;
           document.getElementById("user-selected-dashboard").hidden = true;
@@ -6288,6 +6336,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         var greeting = document.getElementById("user-greeting");
         var isAbout = tab === "about";
 
+        saveUserDashboardState({ tab: tab });
         ++userDashboardRequestId;
         window.__z28AboutOpen = isAbout;
         dashboardPage.hidden = isAbout;
