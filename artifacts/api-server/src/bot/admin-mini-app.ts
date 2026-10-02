@@ -4938,6 +4938,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           cancel: "Cancel",
           unsavedChanges: "Unsaved changes",
           unsavedSwitchWarning: "Save or cancel your unsaved changes before switching groups.",
+          unsavedRefreshWarning: "Save or cancel your unsaved changes before refreshing.",
+          unsavedLanguageWarning: "Save or cancel your unsaved changes before changing language.",
           invalidSettingValue: "Enter a positive whole number.",
           saving: "Saving…",
           saved: "Saved",
@@ -5190,6 +5192,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       }
 
       function isUserSettingsEditing() {
+        if (hasUserSettingUnsavedChanges()) return true;
         var activeElement = document.activeElement;
         if (!activeElement || typeof activeElement.matches !== "function") return false;
         return activeElement.matches("#user-settings-limits-card input, #user-settings-counts-card input");
@@ -6211,8 +6214,14 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
                 if (!Number.isSafeInteger(value) || value <= 0) throw new Error("Enter positive integers for all settings.");
                 await apiUserSettings(groupId, type, kind, value);
               }
+              inputs.forEach(function(input) {
+                input.setAttribute("data-original-value", input.value);
+              });
               button.innerHTML = "✓ " + escapeHtml(tUser("saved"));
               window.setTimeout(function(){ button.textContent = original; delete button.dataset.saving; button.disabled=false; button.setAttribute("aria-disabled", "false"); },1500);
+              if (document.activeElement && typeof document.activeElement.blur === "function") {
+                document.activeElement.blur();
+              }
               await loadUserDashboard(false, groupId);
             } catch(error) {
               delete button.dataset.saving;
@@ -6330,6 +6339,10 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         var button=document.getElementById("refresh");
         var groupOptions = document.getElementById("user-group-options");
         if (userMode && (window.__z28AboutOpen || (groupOptions && !groupOptions.hidden))) return;
+        if (userMode && hasUserSettingUnsavedChanges()) {
+          showNotice(tUser("unsavedRefreshWarning"), "error");
+          return;
+        }
         runAction(button,"Refreshing…",async function(){
           if(userMode){
             var verified=getVerifiedUserId();
@@ -6457,6 +6470,14 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         option.addEventListener("click", function () {
           var selected = option.getAttribute("data-user-lang");
           if (selected !== "en" && selected !== "my" && selected !== "zh") return;
+          if (
+            userMode &&
+            document.body.classList.contains("user-dashboard-page") &&
+            hasUserSettingUnsavedChanges()
+          ) {
+            showNotice(tUser("unsavedLanguageWarning"), "error");
+            return;
+          }
           userLanguage = selected;
           try { localStorage.setItem(userLanguageKey, userLanguage); } catch {}
           document.querySelectorAll(".user-language-menu").forEach(function(menu) {
