@@ -5097,13 +5097,13 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           noGroupLead: "Add this bot to a group, then make sure your Telegram account is a group owner or administrator.",
           noGroupTail: "Groups where the bot is no longer available are not shown.",
           noGroupMessage: "Add this bot to a group, then make sure your Telegram account is a group owner or administrator. Groups where the bot is no longer available are not shown.",
-          idMismatch: "The entered ID does not match your Telegram account."
+          idMismatch: "The entered ID does not match your Telegram account.",
           dashboardLoadError: "暂时无法加载您的控制面板。",
           dashboardLoadErrorLead: "加载控制面板时出现问题。您已保存的设置没有被更改。",
-          retry: "再试一次"
+          retry: "再试一次",
           dashboardLoadError: "Unable to load your dashboard right now.",
           dashboardLoadErrorLead: "Something went wrong while loading your dashboard. Your saved settings were not changed.",
-          retry: "Try Again"
+          retry: "Try Again",
         },
         my: {
           title: "User Dashboard",
