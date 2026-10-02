@@ -4825,6 +4825,40 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       window.__z28GroupSelectionOpen = false;
       window.__z28AboutOpen = false;
 
+      function updateUserBackButton() {
+        if (!tg || !tg.BackButton) return;
+        var shouldShow =
+          userMode &&
+          document.body.classList.contains("user-dashboard-page") &&
+          (
+            window.__z28AboutOpen ||
+            (window.__z28GroupSelectionOpen && userDashboardData && userDashboardData.selectedGroup)
+          );
+        if (shouldShow) {
+          tg.BackButton.show();
+        } else {
+          tg.BackButton.hide();
+        }
+      }
+
+      function handleUserBackButton() {
+        if (!userMode || !document.body.classList.contains("user-dashboard-page")) return;
+        if (window.__z28GroupSelectionOpen && userDashboardData && userDashboardData.selectedGroup) {
+          window.__z28GroupSelectionOpen = false;
+          window.__z28AboutOpen = false;
+          renderSelectedDashboard(userDashboardData);
+          return;
+        }
+        if (window.__z28AboutOpen) {
+          setUserDashboardTab("dashboard");
+        }
+      }
+
+      if (tg && tg.BackButton && typeof tg.BackButton.onClick === "function") {
+        tg.BackButton.onClick(handleUserBackButton);
+        tg.BackButton.hide();
+      }
+
       var userUiText = {
         en: {
           title: "User Dashboard",
@@ -5931,6 +5965,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           settingEditorMarkup("count", countLimits, group.id);
 
         bindUserSettingButtons();
+        updateUserBackButton();
       }
 
       function renderUserDashboard(data) {
@@ -5948,6 +5983,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           document.getElementById("user-greeting").classList.remove("visible");
           title.textContent = tUser("groupOptions");
           renderGroupOptions(data.groups);
+          updateUserBackButton();
           return;
         }
         renderSelectedDashboard(data);
@@ -6200,6 +6236,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           title.textContent = tUser("title");
           renderUserGreeting();
         }
+        updateUserBackButton();
       }
 
       document.querySelectorAll("[data-user-tab]").forEach(function(button) {
@@ -6229,6 +6266,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         button.hidden = true;
         greeting.classList.remove("visible");
         title.textContent = tUser("groupOptions");
+        updateUserBackButton();
 
         apiUserDashboard(telegramUserId).then(function(data){
           renderGroupOptions(data.groups || []);
@@ -6244,6 +6282,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           title.textContent = tUser("title");
           greeting.classList.add("visible");
           renderUserGreeting();
+          updateUserBackButton();
           showNotice(error && error.message ? error.message : "Unable to load groups.","error");
         }).finally(function(){
           button.disabled = false;
