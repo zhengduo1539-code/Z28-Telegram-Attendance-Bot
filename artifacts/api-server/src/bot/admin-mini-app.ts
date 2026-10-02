@@ -899,133 +899,9 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     .user-dashboard-page .top .sub { display:none; }
     .user-mode.user-dashboard-page .top .credit-marquee { display:block; }
 
-    .user-greeting {
-      display:none;
-      margin-top:4px;
-      color:#90a6c0;
-      font-size:13px;
-      font-weight:650;
-      letter-spacing:-.01em;
-      opacity:0;
-      transform:translateY(7px);
-      transition:opacity .42s ease,transform .42s cubic-bezier(.22,1,.36,1),color .35s ease;
-    }
-    .user-greeting.visible { display:block; opacity:1; transform:translateY(0); }
-
-    .user-header-tools { position:relative; display:flex; align-items:center; gap:7px; flex:0 0 auto; }
-    .user-appearance-switcher { position:relative; z-index:11; }
-    .user-header-tools .dashboard-language-switcher { position:relative; top:auto; right:auto; }
-    .user-appearance-button {
-      width:42px;height:42px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;
-      border:1px solid rgba(111,196,255,.34);background:linear-gradient(145deg,rgba(25,126,255,.22),rgba(8,34,66,.92));
-      color:#b4dcff;cursor:pointer;box-shadow:0 8px 22px rgba(0,86,190,.18);
-      transition:transform .28s ease,border-color .28s ease,background .35s ease,box-shadow .35s ease;
-    }
-    .user-appearance-button:active { transform:scale(.94); }
-    .user-appearance-button:hover { transform:translateY(-1px) scale(1.025); }
-    .user-appearance-button .theme-icon {
-      width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;
-      transition:transform .42s cubic-bezier(.22,1,.36,1),opacity .28s ease;
-    }
-    .user-appearance-button .theme-moon { opacity:1;transform:rotate(0deg) scale(1); }
-    .user-appearance-button .theme-sun { position:absolute;opacity:0;transform:rotate(-90deg) scale(.65); }
-    .user-appearance-button.theme-is-light .theme-moon { opacity:0;transform:rotate(90deg) scale(.65); }
-    .user-appearance-button.theme-is-light .theme-sun { opacity:1;transform:rotate(0deg) scale(1); }
-
-    .user-appearance-menu {
-      position:absolute;top:49px;right:0;width:196px;padding:7px;border:1px solid rgba(91,155,255,.24);border-radius:17px;
-      background:rgba(4,12,25,.96);box-shadow:0 20px 42px rgba(0,0,0,.38);
-      backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
-      animation:appearanceMenuIn .22s cubic-bezier(.22,1,.36,1);transform-origin:top right;
-    }
-    .user-appearance-menu[hidden] { display:none; }
-    @keyframes appearanceMenuIn {
-      from { opacity:0;transform:translateY(-5px) scale(.96); }
-      to { opacity:1;transform:translateY(0) scale(1); }
-    }
-    .user-appearance-label { padding:6px 10px 7px;color:#8294ab;font-size:10px;font-weight:800;letter-spacing:.10em;text-transform:uppercase; }
-    .user-theme-option {
-      width:100%;min-height:43px;display:grid;grid-template-columns:24px minmax(0,1fr) 18px;align-items:center;gap:8px;
-      border:1px solid transparent;border-radius:12px;padding:0 10px;background:transparent;color:#dbeafe;text-align:left;font-weight:750;cursor:pointer;
-      transition:background .2s ease,border-color .2s ease,color .2s ease,transform .18s ease;
-    }
-    .user-theme-option:hover { background:rgba(36,127,255,.12);border-color:rgba(91,155,255,.14);transform:translateX(1px); }
-    .user-theme-option.active { background:linear-gradient(90deg,rgba(36,127,255,.17),rgba(99,102,241,.10));border-color:rgba(91,155,255,.20);color:#fff; }
-    .user-theme-option-icon { width:24px;height:24px;display:grid;place-items:center;border-radius:8px;background:rgba(36,127,255,.11);color:#8fcaff;font-size:16px;line-height:1; }
-    .user-theme-check { color:#55d89b;opacity:0;transform:scale(.65);transition:opacity .2s ease,transform .2s ease; }
-    .user-theme-option.active .user-theme-check { opacity:1;transform:scale(1); }
-    .user-mode.user-dashboard-page .user-appearance-menu { z-index:30; }
-
-    @media (prefers-reduced-motion: reduce) {
-      .user-greeting,.user-appearance-button,.user-appearance-button .theme-icon,.user-appearance-menu,.user-theme-option,.user-theme-check {
-        animation:none !important;transition:none !important;
-      }
-    }
-
     .user-mode.user-dashboard-page .user-card#user-verify-card {
       display: none !important;
     }
-
-    body.user-mode.user-theme-light {
-      background:
-        radial-gradient(circle at 8% 8%,rgba(37,99,235,.12),transparent 27%),
-        radial-gradient(circle at 90% 12%,rgba(14,165,233,.10),transparent 25%),
-        linear-gradient(145deg,#f7fbff 0%,#eef5ff 48%,#f7f8ff 100%);
-      color:#0f172a;
-    }
-    body.user-mode.user-theme-light::before { background:rgba(37,99,235,.13);opacity:.45; }
-    body.user-mode.user-theme-light::after { background:rgba(14,165,233,.10);opacity:.40; }
-    body.user-mode.user-theme-light .user-greeting { color:#53657d; }
-    body.user-mode.user-theme-light .credit-text { color:#718198; }
-    body.user-mode.user-theme-light .credit-text strong { color:#4b607b; }
-    body.user-mode.user-theme-light .user-page-title { color:#10213a; }
-    body.user-mode.user-theme-light .user-page-sub { color:#63748a; }
-    body.user-mode.user-theme-light .user-dashboard-section-label { color:#43546c; }
-    body.user-mode.user-theme-light .user-group-box,
-    body.user-mode.user-theme-light .user-setting-card,
-    body.user-mode.user-theme-light .user-group-option {
-      background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(239,246,255,.90));
-      border-color:rgba(71,119,183,.20);box-shadow:0 16px 34px rgba(41,76,120,.12),inset 0 1px 0 rgba(255,255,255,.86);
-    }
-    body.user-mode.user-theme-light .user-group-box-title,
-    body.user-mode.user-theme-light .user-setting-title,
-    body.user-mode.user-theme-light .user-group-option { color:#12243d; }
-    body.user-mode.user-theme-light .user-group-name { color:#2470bd; }
-    body.user-mode.user-theme-light .user-live-metric,
-    body.user-mode.user-theme-light .user-setting-value,
-    body.user-mode.user-theme-light .user-setting-editor .editor-row {
-      background:rgba(239,246,255,.72);border-color:rgba(71,119,183,.15);
-    }
-    body.user-mode.user-theme-light .user-live-label,
-    body.user-mode.user-theme-light .user-setting-sub,
-    body.user-mode.user-theme-light .user-setting-value-label,
-    body.user-mode.user-theme-light .hint { color:#667992; }
-    body.user-mode.user-theme-light .user-live-value,
-    body.user-mode.user-theme-light .user-setting-value-number,
-    body.user-mode.user-theme-light .user-setting-editor label { color:#10213a; }
-    body.user-mode.user-theme-light .user-empty { background:rgba(255,244,214,.78);color:#8b641c;border-color:rgba(206,151,40,.32); }
-    body.user-mode.user-theme-light .user-empty strong { color:#614711; }
-    body.user-mode.user-theme-light .user-empty p { color:#876c35; }
-    body.user-mode.user-theme-light .user-appearance-button,
-    body.user-mode.user-theme-light .user-language-button {
-      background:linear-gradient(145deg,rgba(255,255,255,.94),rgba(231,241,255,.92));border-color:rgba(71,119,183,.24);color:#2569a8;
-      box-shadow:0 8px 22px rgba(42,91,150,.14);
-    }
-    body.user-mode.user-theme-light .user-appearance-menu,
-    body.user-mode.user-theme-light .user-language-menu { background:rgba(255,255,255,.95);border-color:rgba(71,119,183,.20);box-shadow:0 20px 42px rgba(41,76,120,.16); }
-    body.user-mode.user-theme-light .user-appearance-label { color:#6b7d94; }
-    body.user-mode.user-theme-light .user-theme-option,
-    body.user-mode.user-theme-light .user-language-option { color:#33465f; }
-    body.user-mode.user-theme-light .user-theme-option:hover,
-    body.user-mode.user-theme-light .user-theme-option.active,
-    body.user-mode.user-theme-light .user-language-option:hover,
-    body.user-mode.user-theme-light .user-language-option.active { background:rgba(36,127,255,.10);color:#10213a; }
-    body.user-mode.user-theme-light .user-theme-option.active { border-color:rgba(71,119,183,.15); }
-    body.user-mode.user-theme-light .user-theme-option-icon { background:rgba(36,127,255,.10);color:#2569a8; }
-    body.user-mode.user-theme-light input[type="number"],
-    body.user-mode.user-theme-light input[type="text"],
-    body.user-mode.user-theme-light .user-id-input { background:rgba(255,255,255,.78);border-color:rgba(71,119,183,.22);color:#10213a; }
-    body.user-mode.user-theme-light input::placeholder { color:#8291a4; }
 
     .admin-verification-page .panel-only-admin-verify {
       display: block !important;
@@ -1256,17 +1132,6 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
     .user-dashboard { display: none; }
     .user-dashboard.visible { display: block; }
-    body.user-mode .user-group-box,
-    body.user-mode .user-setting-card,
-    body.user-mode .user-live-metric,
-    body.user-mode .user-setting-value,
-    body.user-mode .user-setting-editor .editor-row,
-    body.user-mode .user-page-title,
-    body.user-mode .user-page-sub,
-    body.user-mode .user-dashboard-section-label,
-    body.user-mode .user-greeting {
-      transition:background .36s ease,border-color .36s ease,color .32s ease,box-shadow .36s ease;
-    }
 
     .user-page-head {
       display:flex;
@@ -2763,14 +2628,282 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
     body.user-mode.user-dashboard-page .top h1 {
       margin-left: 14px;
       font-size: clamp(22px,5.5vw,29px);
-      letter-spacing: -.025em;
-      animation: none;
-      color: #f4f9ff;
-      background: none;
-      -webkit-background-clip: initial;
-      background-clip: initial;
-      text-shadow: 0 0 22px rgba(79,220,255,.10);
+      line-height: 1.1;
+      letter-spacing: -.035em;
+      font-weight: 820;
+      color: transparent;
+      background: linear-gradient(
+        108deg,
+        #f6fbff 0%,
+        #dff9ff 18%,
+        #86e8ff 42%,
+        #c8c0ff 63%,
+        #f7f3ff 82%,
+        #b7ecff 100%
+      );
+      background-size: 220% auto;
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 24px rgba(87,214,255,.14), 0 0 44px rgba(126,112,255,.10);
+      animation: userDashboardTitleShine 5.8s ease-in-out infinite, userDashboardTitleIn .62s cubic-bezier(.22,1,.36,1) both;
     }
+
+    @keyframes userDashboardTitleShine {
+      0%, 100% { background-position: 100% center; filter: brightness(1); }
+      50% { background-position: 0% center; filter: brightness(1.14); }
+    }
+
+    @keyframes userDashboardTitleIn {
+      from { opacity: 0; transform: translateY(5px); filter: blur(4px); }
+      to { opacity: 1; transform: translateY(0); filter: blur(0); }
+    }
+
+    body.user-mode.user-dashboard-page .top {
+      padding: 12px 14px 13px;
+      margin: 0 0 15px;
+      border: 1px solid rgba(205,235,255,.13);
+      border-radius: 22px;
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.085), rgba(255,255,255,.025)),
+        linear-gradient(145deg, rgba(5,13,25,.78), rgba(7,28,52,.62));
+      box-shadow:
+        0 18px 42px rgba(0,0,0,.30),
+        inset 0 1px 0 rgba(255,255,255,.075),
+        inset 0 -1px 0 rgba(255,255,255,.018);
+      backdrop-filter: blur(24px) saturate(145%);
+      -webkit-backdrop-filter: blur(24px) saturate(145%);
+      overflow: visible;
+    }
+
+    body.user-mode.user-dashboard-page .top::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      background: linear-gradient(120deg, rgba(255,255,255,.08), transparent 24%, transparent 74%, rgba(115,218,255,.045));
+      opacity: .8;
+    }
+
+    body.user-mode.user-dashboard-page .top > div:first-child,
+    body.user-mode.user-dashboard-page .top > div:last-child {
+      position: relative;
+      z-index: 1;
+    }
+
+    body.user-mode.user-dashboard-page .user-greeting {
+      display: block;
+      margin: 5px 0 0 14px;
+      color: rgba(190,218,238,.72);
+      font-size: 12px;
+      font-weight: 650;
+      letter-spacing: -.005em;
+      opacity: 0;
+      transform: translateY(5px);
+      animation: userGreetingIn .7s .13s cubic-bezier(.22,1,.36,1) both;
+    }
+
+    @keyframes userGreetingIn {
+      from { opacity: 0; transform: translateY(5px); filter: blur(2px); }
+      to { opacity: 1; transform: translateY(0); filter: blur(0); }
+    }
+
+    body.user-mode.user-dashboard-page .credit-marquee {
+      margin-top: 5px;
+      width: min(390px, 46vw);
+      opacity: .76;
+    }
+
+    body.user-mode.user-dashboard-page .user-language-switcher {
+      position: relative;
+      top: auto;
+      right: auto;
+      z-index: 3;
+    }
+
+    body.user-mode.user-dashboard-page .user-language-button {
+      width: 40px;
+      height: 40px;
+      border: 1px solid rgba(214,239,255,.16);
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.10), rgba(255,255,255,.035)),
+        rgba(7,18,34,.58);
+      box-shadow:
+        0 10px 26px rgba(0,0,0,.24),
+        inset 0 1px 0 rgba(255,255,255,.08);
+      backdrop-filter: blur(18px) saturate(140%);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
+      transition: transform .22s ease, border-color .22s ease, background .22s ease, box-shadow .22s ease;
+    }
+
+    body.user-mode.user-dashboard-page .user-language-button:hover {
+      transform: translateY(-1px) scale(1.025);
+      border-color: rgba(132,220,255,.30);
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.13), rgba(255,255,255,.045)),
+        rgba(8,24,44,.64);
+      box-shadow: 0 13px 30px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.10);
+    }
+
+    body.user-mode.user-dashboard-page .user-language-button:active {
+      transform: scale(.96);
+    }
+
+    body.user-mode.user-dashboard-page .user-language-menu {
+      margin-top: 6px;
+      border-color: rgba(205,235,255,.14);
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.08), rgba(255,255,255,.025)),
+        rgba(4,11,22,.78);
+      box-shadow: 0 22px 46px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.075);
+      backdrop-filter: blur(26px) saturate(145%);
+      -webkit-backdrop-filter: blur(26px) saturate(145%);
+    }
+
+    body.user-mode.user-dashboard-page #user-dashboard {
+      animation: userDashboardGlassIn .58s cubic-bezier(.22,1,.36,1) both;
+    }
+
+    @keyframes userDashboardGlassIn {
+      from { opacity: 0; transform: translateY(9px) scale(.995); filter: blur(2px); }
+      to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    }
+
+    body.user-mode.user-dashboard-page .user-group-box,
+    body.user-mode.user-dashboard-page .user-setting-card,
+    body.user-mode.user-dashboard-page .user-group-option {
+      position: relative;
+      overflow: hidden;
+      border-color: rgba(214,238,255,.12);
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.080), rgba(255,255,255,.018)),
+        linear-gradient(145deg, rgba(5,15,29,.78), rgba(8,29,53,.58));
+      box-shadow:
+        0 18px 38px rgba(0,0,0,.30),
+        inset 0 1px 0 rgba(255,255,255,.065),
+        inset 0 -1px 0 rgba(255,255,255,.018);
+      backdrop-filter: blur(24px) saturate(140%);
+      -webkit-backdrop-filter: blur(24px) saturate(140%);
+      transition: transform .24s ease, border-color .24s ease, box-shadow .28s ease, background .28s ease;
+    }
+
+    body.user-mode.user-dashboard-page .user-group-box::after,
+    body.user-mode.user-dashboard-page .user-setting-card::after,
+    body.user-mode.user-dashboard-page .user-group-option::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      background: linear-gradient(125deg, rgba(255,255,255,.065), transparent 28%, transparent 72%, rgba(107,209,255,.035));
+    }
+
+    body.user-mode.user-dashboard-page .user-group-box:hover,
+    body.user-mode.user-dashboard-page .user-setting-card:hover,
+    body.user-mode.user-dashboard-page .user-group-option:hover {
+      border-color: rgba(147,222,255,.20);
+      box-shadow:
+        0 22px 46px rgba(0,0,0,.34),
+        inset 0 1px 0 rgba(255,255,255,.085),
+        0 0 0 1px rgba(91,181,255,.035);
+    }
+
+    body.user-mode.user-dashboard-page .user-setting-card {
+      margin-bottom: 13px;
+    }
+
+    body.user-mode.user-dashboard-page .user-setting-head {
+      position: relative;
+      z-index: 1;
+    }
+
+    body.user-mode.user-dashboard-page .user-group-box-title,
+    body.user-mode.user-dashboard-page .user-live-label,
+    body.user-mode.user-dashboard-page .user-live-value,
+    body.user-mode.user-dashboard-page .user-setting-title,
+    body.user-mode.user-dashboard-page .user-setting-sub,
+    body.user-mode.user-dashboard-page .user-setting-value,
+    body.user-mode.user-dashboard-page .user-setting-editor {
+      position: relative;
+      z-index: 1;
+    }
+
+    body.user-mode.user-dashboard-page .user-live-metric,
+    body.user-mode.user-dashboard-page .user-setting-value,
+    body.user-mode.user-dashboard-page .user-setting-editor .editor-row {
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.050), rgba(255,255,255,.012)),
+        rgba(2,10,21,.32);
+      border-color: rgba(213,239,255,.085);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    body.user-mode.user-dashboard-page .user-live-metric:hover,
+    body.user-mode.user-dashboard-page .user-setting-value:hover,
+    body.user-mode.user-dashboard-page .user-setting-editor .editor-row:hover {
+      border-color: rgba(116,211,255,.15);
+    }
+
+    body.user-mode.user-dashboard-page .user-page-sub {
+      color: rgba(151,180,204,.70);
+    }
+
+    body.user-mode.user-dashboard-page .user-group-name {
+      color: rgba(139,212,255,.80);
+    }
+
+    body.user-mode.user-dashboard-page .user-dashboard-section-label {
+      color: rgba(201,224,242,.76);
+      letter-spacing: .11em;
+    }
+
+    body.user-mode.user-dashboard-page .user-setting-save {
+      position: relative;
+      z-index: 2;
+      border-color: rgba(151,221,255,.22);
+      background:
+        linear-gradient(180deg, rgba(83,183,255,.85), rgba(32,108,211,.82));
+      box-shadow:
+        0 12px 28px rgba(16,93,194,.24),
+        inset 0 1px 0 rgba(255,255,255,.16);
+      transition: transform .18s ease, filter .18s ease, box-shadow .22s ease;
+    }
+
+    body.user-mode.user-dashboard-page .user-setting-save:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+      box-shadow: 0 14px 32px rgba(16,93,194,.30), inset 0 1px 0 rgba(255,255,255,.18);
+    }
+
+    body.user-mode.user-dashboard-page .user-setting-save:active {
+      transform: translateY(0) scale(.985);
+    }
+
+    body.user-mode.user-dashboard-page .user-group-box::before,
+    body.user-mode.user-dashboard-page .user-setting-card::before {
+      width: 3px;
+      opacity: .72;
+      background: linear-gradient(180deg, rgba(113,224,255,.86), rgba(65,141,255,.64), rgba(151,125,255,.58));
+      box-shadow: 0 0 16px rgba(67,181,255,.18);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      body.user-mode.user-dashboard-page .top h1,
+      body.user-mode.user-dashboard-page .user-greeting,
+      body.user-mode.user-dashboard-page #user-dashboard {
+        animation: none !important;
+      }
+      body.user-mode.user-dashboard-page .user-group-box,
+      body.user-mode.user-dashboard-page .user-setting-card,
+      body.user-mode.user-dashboard-page .user-group-option,
+      body.user-mode.user-dashboard-page .user-language-button {
+        transition: none !important;
+      }
+    }
+
 
     body.user-mode.user-dashboard-page .credit-marquee {
       width: min(390px,46vw);
@@ -3599,21 +3732,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             <h2 class="user-page-title" id="user-selected-group-title">Group Dashboard</h2>
             <div class="user-page-sub" id="user-dashboard-sub">Live activity overview</div>
           </div>
-          <div class="user-header-tools">
-            <div class="user-appearance-switcher" id="user-appearance-switcher">
-              <button class="user-appearance-button" id="user-appearance-button" type="button" aria-label="Appearance" aria-expanded="false">
-                <svg class="theme-icon theme-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15.4A8.5 8.5 0 0 1 8.6 4a8.5 8.5 0 1 0 11.4 11.4Z"></path></svg>
-                <svg class="theme-icon theme-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2.5v2.1M12 19.4v2.1M21.5 12h-2.1M4.6 12H2.5M18.7 5.3l-1.5 1.5M6.8 17.2l-1.5 1.5M18.7 18.7l-1.5-1.5M6.8 6.8L5.3 5.3"></path></svg>
-              </button>
-              <div class="user-appearance-menu" id="user-appearance-menu" hidden>
-                <div class="user-appearance-label" id="user-appearance-label">Appearance</div>
-                <button class="user-theme-option active" type="button" data-user-theme="dark"><span class="user-theme-option-icon">☾</span><span id="user-theme-dark">Dark</span><span class="user-theme-check">✓</span></button>
-                <button class="user-theme-option" type="button" data-user-theme="light"><span class="user-theme-option-icon">☀</span><span id="user-theme-light">Light</span><span class="user-theme-check">✓</span></button>
-                <button class="user-theme-option" type="button" data-user-theme="system"><span class="user-theme-option-icon">◌</span><span id="user-theme-system">System</span><span class="user-theme-check">✓</span></button>
-              </div>
-            </div>
-
-            <div class="user-language-switcher dashboard-language-switcher">
+          <div class="user-language-switcher dashboard-language-switcher">
               <button class="user-language-button" id="user-dashboard-language-button" type="button" aria-label="Change language" aria-expanded="false">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18"></path><path d="M12 3c2.4 2.5 3.6 5.5 3.6 9s-1.2 6.5-3.6 9S9.6 15.5 9.6 12 10.8 5.5 12 3z"></path></svg>
               </button>
@@ -3809,19 +3928,12 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       var adminVerifiedKey = "z28_verified_admin_id";
       var userLanguageKey = "z28_user_language";
       var userLanguage = "en";
-      var userThemeKey = "z28_user_theme";
-      var userTheme = "dark";
-      var userThemeMedia = null;
       var userDashboardRefreshTimer = null;
 
       var userUiText = {
         en: {
           title: "User Dashboard",
           hello: "Hello",
-          appearance: "Appearance",
-          themeDark: "Dark",
-          themeLight: "Light",
-          themeSystem: "System",
           verifyTitle: "Verify Your Telegram ID",
           verifySubtitle: "User Access",
           verifyLead: "Enter your Telegram user ID to open your group dashboard.",
@@ -3863,10 +3975,6 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         my: {
           title: "User Dashboard",
           hello: "မင်္ဂလာပါ",
-          appearance: "Appearance",
-          themeDark: "Dark",
-          themeLight: "Light",
-          themeSystem: "System",
           verifyTitle: "Telegram ID အတည်ပြုရန်",
           verifySubtitle: "User Access",
           verifyLead: "သင့် Group Dashboard ကိုဖွင့်ရန် Telegram User ID ကိုထည့်ပါ။",
@@ -3908,10 +4016,6 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         zh: {
           title: "用户仪表板",
           hello: "你好",
-          appearance: "外观",
-          themeDark: "深色",
-          themeLight: "浅色",
-          themeSystem: "跟随系统",
           verifyTitle: "验证您的 Telegram ID",
           verifySubtitle: "用户访问",
           verifyLead: "输入您的 Telegram 用户 ID 以打开群组仪表板。",
@@ -3979,42 +4083,6 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         greeting.textContent = tUser("hello") + ", " + getTelegramDisplayName();
       }
 
-      function loadUserTheme() {
-        try {
-          var saved = localStorage.getItem(userThemeKey);
-          if (saved === "dark" || saved === "light" || saved === "system") userTheme = saved;
-        } catch {}
-      }
-
-      function getEffectiveUserTheme() {
-        if (userTheme !== "system") return userTheme;
-        return userThemeMedia && userThemeMedia.matches ? "light" : "dark";
-      }
-
-      function applyUserTheme() {
-        var isLight = getEffectiveUserTheme() === "light";
-        document.body.classList.toggle("user-theme-light", isLight);
-        var button = document.getElementById("user-appearance-button");
-        if (button) {
-          button.classList.toggle("theme-is-light", isLight);
-          button.setAttribute("aria-label", tUser("appearance"));
-        }
-        document.querySelectorAll(".user-theme-option").forEach(function (option) {
-          option.classList.toggle("active", option.getAttribute("data-user-theme") === userTheme);
-        });
-      }
-
-      function selectUserTheme(theme) {
-        if (theme !== "dark" && theme !== "light" && theme !== "system") return;
-        userTheme = theme;
-        try { localStorage.setItem(userThemeKey, userTheme); } catch {}
-        applyUserTheme();
-        var menu = document.getElementById("user-appearance-menu");
-        var button = document.getElementById("user-appearance-button");
-        if (menu) menu.hidden = true;
-        if (button) button.setAttribute("aria-expanded", "false");
-      }
-
       function applyUserLanguage() {
         document.documentElement.lang = userLanguage === "my" ? "my" : userLanguage;
         document.getElementById("user-verify-title").textContent = tUser("verifyTitle");
@@ -4033,10 +4101,6 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         document.querySelector("#user-group-options .user-page-sub").textContent = tUser("groupOptionsSub");
         document.getElementById("user-dashboard-sub").textContent = tUser("dashboardSub");
         renderUserGreeting();
-        document.getElementById("user-appearance-label").textContent = tUser("appearance");
-        document.getElementById("user-theme-dark").textContent = tUser("themeDark");
-        document.getElementById("user-theme-light").textContent = tUser("themeLight");
-        document.getElementById("user-theme-system").textContent = tUser("themeSystem");
         document.getElementById("user-no-group-message").innerHTML =
           '<strong>' + escapeHtml(tUser("noGroup")) + '</strong>' +
           '<span>' + escapeHtml(tUser("noGroupLead")) + ' ' + escapeHtml(tUser("noGroupTail")) + '</span>';
@@ -4046,16 +4110,6 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       }
 
       loadUserLanguage();
-      loadUserTheme();
-      userThemeMedia = window.matchMedia ? window.matchMedia("(prefers-color-scheme: light)") : null;
-      applyUserTheme();
-      if (userThemeMedia) {
-        var onSystemThemeChange = function () {
-          if (userTheme === "system") applyUserTheme();
-        };
-        if (typeof userThemeMedia.addEventListener === "function") userThemeMedia.addEventListener("change", onSystemThemeChange);
-        else if (typeof userThemeMedia.addListener === "function") userThemeMedia.addListener(onSystemThemeChange);
-      }
 
       function startUserDashboardRefresh() {
         if (userDashboardRefreshTimer) return;
@@ -4846,7 +4900,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         window.__z28SelectedGroupId = group.id;
         document.getElementById("user-group-options").hidden = true;
         document.getElementById("user-selected-dashboard").hidden = false;
-        title.textContent = "👤 " + tUser("title");
+        title.textContent = tUser("title");
         document.getElementById("user-greeting").classList.add("visible");
         renderUserGreeting();
         document.getElementById("switch-group").hidden = false;
@@ -5057,29 +5111,6 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
       bindUserLanguageControl("user-language-button", "user-language-menu");
       bindUserLanguageControl("user-dashboard-language-button", "user-dashboard-language-menu");
-
-      var appearanceButton = document.getElementById("user-appearance-button");
-      var appearanceMenu = document.getElementById("user-appearance-menu");
-      if (appearanceButton && appearanceMenu) {
-        appearanceButton.addEventListener("click", function () {
-          var open = appearanceMenu.hidden;
-          appearanceMenu.hidden = !open;
-          this.setAttribute("aria-expanded", String(open));
-        });
-      }
-
-      document.querySelectorAll(".user-theme-option").forEach(function (option) {
-        option.addEventListener("click", function () {
-          selectUserTheme(option.getAttribute("data-user-theme"));
-        });
-      });
-
-      document.addEventListener("click", function (event) {
-        var switcher = document.getElementById("user-appearance-switcher");
-        if (!switcher || switcher.contains(event.target)) return;
-        if (appearanceMenu) appearanceMenu.hidden = true;
-        if (appearanceButton) appearanceButton.setAttribute("aria-expanded", "false");
-      });
 
       document.querySelectorAll(".user-language-option").forEach(function (option) {
         option.addEventListener("click", function () {
