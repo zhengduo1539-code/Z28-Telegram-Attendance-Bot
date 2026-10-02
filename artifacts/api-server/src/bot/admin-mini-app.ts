@@ -4737,6 +4737,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       var userLanguage = "en";
       var userDashboardRefreshTimer = null;
       var userDashboardRequestId = 0;
+      var userDashboardData = null;
       window.__z28GroupSelectionOpen = false;
       window.__z28AboutOpen = false;
 
@@ -4966,6 +4967,29 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         document.querySelectorAll(".user-language-option").forEach(function(option) {
           option.classList.toggle("active", option.getAttribute("data-user-lang") === userLanguage);
         });
+
+        var dashboardShell = document.getElementById("user-dashboard-page-shell");
+        if (
+          userMode &&
+          document.body.classList.contains("user-dashboard-page") &&
+          dashboardShell &&
+          !dashboardShell.hidden &&
+          userDashboardData &&
+          userDashboardData.selectedGroup
+        ) {
+          var cachedGroup = userDashboardData.selectedGroup;
+          document.getElementById("user-selected-group-title").textContent =
+            cachedGroup.title + " " + tUser("title");
+          document.getElementById("user-group-activities-title").textContent = tUser("groupActivities");
+          document.getElementById("user-group-member-label").textContent = tUser("groupMember");
+          document.getElementById("user-member-active-label").textContent = tUser("memberActive");
+          document.getElementById("switch-group-label").textContent = tUser("switch");
+          document.getElementById("user-settings-limits-card").innerHTML =
+            settingEditorMarkup("duration", userDashboardData.activityLimits || {}, cachedGroup.id);
+          document.getElementById("user-settings-counts-card").innerHTML =
+            settingEditorMarkup("count", userDashboardData.countLimits || {}, cachedGroup.id);
+          bindUserSettingButtons();
+        }
       }
 
       loadUserLanguage();
@@ -5764,6 +5788,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         var group = data.selectedGroup;
         if (!group) return;
         window.__z28SelectedGroupId = group.id;
+        userDashboardData = data;
         window.__z28GroupSelectionOpen = false;
         window.__z28AboutOpen = false;
         document.getElementById("user-group-options").hidden = true;
@@ -6108,9 +6133,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             button.setAttribute("aria-expanded", "false");
           });
           applyUserLanguage();
-          if (userMode && document.body.classList.contains("user-dashboard-page") && window.__z28SelectedGroupId && !window.__z28AboutOpen) {
-            loadUserDashboard(false, window.__z28SelectedGroupId).catch(function () {});
-          }
+
         });
       });
 
