@@ -6510,9 +6510,17 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         if (window.__z28AboutOpen) return true;
         var requestId = ++userDashboardRequestId;
         var showLoader = withLoading !== false;
+        var phase = "request";
         if (showLoader) showUserLoading(true);
         try {
-          var data = await apiUserDashboard(telegramUserId,groupId);
+          var data;
+          try {
+            data = await apiUserDashboard(telegramUserId,groupId);
+          } catch (error) {
+            phase = "api";
+            throw error;
+          }
+
           var groupSelectionRequestBlocked =
             window.__z28GroupSelectionOpen && groupId === undefined;
           if (
@@ -6523,20 +6531,40 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           ) {
             return false;
           }
+          if (!data || typeof data !== "object") {
+            throw new Error("Dashboard API returned an invalid response.");
+          }
           if (!data.hasGroups) {
             showUserNoGroupScreen();
             return false;
           }
-          rememberVerifiedUserId(telegramUserId);
-          document.getElementById("user-dashboard-error-screen").hidden = true;
-          document.body.classList.remove("user-verification-page", "user-dashboard-error-page", "user-no-group-page");
-          document.body.classList.add("user-dashboard-page");
-          document.getElementById("user-verify-card").classList.remove("visible");
-          renderUserDashboard(data);
+
+          try {
+            phase = "render";
+            rememberVerifiedUserId(telegramUserId);
+            document.getElementById("user-dashboard-error-screen").hidden = true;
+            document.body.classList.remove("user-verification-page", "user-dashboard-error-page", "user-no-group-page");
+            document.body.classList.add("user-dashboard-page");
+            document.getElementById("user-verify-card").classList.remove("visible");
+            renderUserDashboard(data);
+          } catch (error) {
+            var renderMessage = error && error.message ? error.message : String(error || "Unknown render error.");
+            console.error("[user-dashboard] render failed", {
+              message: renderMessage,
+              stack: error instanceof Error ? error.stack : undefined
+            });
+            throw new Error("Dashboard render failed: " + renderMessage);
+          }
           return true;
         } catch (error) {
-          if (requestId === userDashboardRequestId && !window.__z28AboutOpen && !isUserSettingsEditing()) showUserDashboardError(error, groupId);
-          throw error;
+          var message = error && error.message ? error.message : String(error || "Unable to load your dashboard.");
+          if (phase === "api") {
+            message = "Dashboard API failed: " + message;
+          }
+          if (requestId === userDashboardRequestId && !window.__z28AboutOpen && !isUserSettingsEditing()) {
+            showUserDashboardError(new Error(message), groupId);
+          }
+          throw new Error(message);
         } finally {
           if (showLoader) showUserLoading(false);
         }
