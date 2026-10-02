@@ -1263,6 +1263,14 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
       padding-bottom:82px;
     }
 
+    #user-selected-dashboard #user-dashboard-page-shell[hidden] {
+      display:none !important;
+    }
+
+    #user-selected-dashboard .user-about-page[hidden] {
+      display:none !important;
+    }
+
     #user-selected-dashboard .user-page-head {
       position: relative;
       padding-right: 54px;
@@ -4437,7 +4445,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           </div>
         </div>
 
-        <div class="user-tab-shell">
+        <div class="user-tab-shell" id="user-dashboard-page-shell">
           <div class="user-tab-panel active" id="user-settings-tab">
             <div class="user-dashboard-section-label">Admin Settings</div>
 
@@ -4459,7 +4467,6 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             <div class="user-setting-card" id="user-settings-limits-card"></div>
             <div class="user-setting-card counts" id="user-settings-counts-card"></div>
           </div>
-
         </div>
 
         <div class="user-about-page" id="user-about-page" hidden>
@@ -5662,6 +5669,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         document.getElementById("user-group-options").hidden = false;
         document.getElementById("user-selected-dashboard").hidden = true;
         document.getElementById("user-about-page").hidden = true;
+        document.getElementById("user-dashboard-page-shell").hidden = true;
         document.getElementById("user-tabbar").hidden = true;
         document.getElementById("switch-group").hidden = true;
         window.__z28AboutOpen = false;
@@ -5751,6 +5759,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
 
       function renderSelectedDashboard(data) {
+        if (window.__z28AboutOpen) return;
         var group = data.selectedGroup;
         if (!group) return;
         window.__z28SelectedGroupId = group.id;
@@ -5761,6 +5770,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         renderUserGreeting();
         window.__z28AboutOpen = false;
         document.getElementById("user-about-page").hidden = true;
+        document.getElementById("user-dashboard-page-shell").hidden = false;
         document.getElementById("user-selected-dashboard").hidden = false;
         document.getElementById("user-tabbar").hidden = false;
         document.getElementById("refresh").hidden = false;
@@ -5804,6 +5814,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         if (!data.groups || !data.groups.length) return;
         if (data.selectionRequired) {
           document.getElementById("user-group-options").hidden = false;
+          document.getElementById("user-dashboard-page-shell").hidden = true;
           document.getElementById("user-selected-dashboard").hidden = true;
           document.getElementById("switch-group").hidden = true;
           document.getElementById("user-about-page").hidden = true;
@@ -5828,6 +5839,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           // Keep Group Options visible until a valid group is selected successfully.
           window.__z28GroupSelectionOpen = true;
           document.getElementById("user-group-options").hidden = false;
+          document.getElementById("user-dashboard-page-shell").hidden = true;
           document.getElementById("user-selected-dashboard").hidden = true;
           document.getElementById("switch-group").hidden = true;
           document.getElementById("user-greeting").classList.remove("visible");
@@ -5926,6 +5938,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
       async function loadUserDashboard(withLoading, groupId) {
         if (!telegramUserId) throw new Error("Unable to identify your Telegram account.");
+        if (window.__z28AboutOpen) return true;
         var showLoader = withLoading !== false;
         if (showLoader) showUserLoading(true);
         try {
@@ -5972,6 +5985,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         if (window.__z28GroupSelectionOpen) return;
 
         var dashboardPage = document.getElementById("user-selected-dashboard");
+        var dashboardPageShell = document.getElementById("user-dashboard-page-shell");
         var aboutPage = document.getElementById("user-about-page");
         var tabbar = document.getElementById("user-tabbar");
         var refreshButton = document.getElementById("refresh");
@@ -5981,6 +5995,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
         window.__z28AboutOpen = isAbout;
         dashboardPage.hidden = isAbout;
+        dashboardPageShell.hidden = isAbout;
         aboutPage.hidden = !isAbout;
         tabbar.hidden = false;
         refreshButton.hidden = isAbout;
@@ -5993,9 +6008,11 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         });
 
         if (isAbout) {
+          dashboardPageShell.hidden = true;
           greeting.classList.remove("visible");
           title.textContent = tUser("about");
         } else {
+          dashboardPageShell.hidden = false;
           greeting.classList.add("visible");
           title.textContent = tUser("title");
           renderUserGreeting();
@@ -6020,6 +6037,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
         // Enter a dedicated selection state immediately.
         groupOptions.hidden = false;
+        document.getElementById("user-dashboard-page-shell").hidden = true;
         selectedDashboard.hidden = true;
         button.hidden = true;
         greeting.classList.remove("visible");
@@ -6071,7 +6089,7 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
             button.setAttribute("aria-expanded", "false");
           });
           applyUserLanguage();
-          if (userMode && document.body.classList.contains("user-dashboard-page") && window.__z28SelectedGroupId) {
+          if (userMode && document.body.classList.contains("user-dashboard-page") && window.__z28SelectedGroupId && !window.__z28AboutOpen) {
             loadUserDashboard(false, window.__z28SelectedGroupId).catch(function () {});
           }
         });
