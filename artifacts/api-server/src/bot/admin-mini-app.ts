@@ -4908,20 +4908,27 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         splash.classList.add("hide");
       }, 5500);
 
-      window.addEventListener("error", function () {
+      function handleStartupFailure(error) {
+        var message = error && error.message ? error.message : "Unable to start the Mini App.";
+        if (identity) identity.textContent = "Startup error. Please reopen the Mini App.";
+        if (title) title.textContent = "Unable to open";
+        if (notice) {
+          notice.textContent = message;
+          notice.className = "notice error visible";
+        }
         if (splash && !splashHidden) {
           splashHidden = true;
           window.clearTimeout(splashHideTimer);
           splash.classList.add("hide");
         }
+      }
+
+      window.addEventListener("error", function (event) {
+        handleStartupFailure(event && event.error ? event.error : new Error("Mini App startup error."));
       });
 
-      window.addEventListener("unhandledrejection", function () {
-        if (splash && !splashHidden) {
-          splashHidden = true;
-          window.clearTimeout(splashHideTimer);
-          splash.classList.add("hide");
-        }
+      window.addEventListener("unhandledrejection", function (event) {
+        handleStartupFailure(event && event.reason ? event.reason : new Error("Mini App startup error."));
       });
 
       if (!tg || !tg.initData) {
@@ -6441,10 +6448,25 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
         headers.set("X-Telegram-Init-Data", initData);
         headers.set("Accept", "application/json");
 
-        var response = await fetch("/api/user/mode", {
-          method: "GET",
-          headers: headers
-        });
+        var controller = typeof AbortController === "function" ? new AbortController() : null;
+        var timeout = controller
+          ? window.setTimeout(function () { controller.abort(); }, 8000)
+          : null;
+        var response;
+        try {
+          response = await fetch("/api/user/mode", {
+            method: "GET",
+            headers: headers,
+            signal: controller ? controller.signal : undefined
+          });
+        } catch (error) {
+          if (error && error.name === "AbortError") {
+            throw new Error("Access check timed out. Please reopen the Mini App.");
+          }
+          throw error;
+        } finally {
+          if (timeout !== null) window.clearTimeout(timeout);
+        }
         var data = await response.json().catch(function () { return {}; });
         if (!response.ok) {
           throw new Error(
@@ -6745,13 +6767,8 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
           if (modeData.isConfiguredAdmin) {
             setPanelVisibility("admin");
             title.textContent = "Administration";
-            try {
-              await load();
-            } catch (error) {
-              hideSplash();
-              showNotice(error && error.message ? error.message : "Unable to load the admin dashboard.", "error");
-              return;
-            }
+            await createAdminSession();
+            await load();
             hideSplash();
             startAdminDashboardRefresh();
           } else {
@@ -7156,7 +7173,9 @@ export const adminMiniAppHtml = String.raw`<!doctype html>
 
       loadUserLanguage();
       applyUserLanguage();
-      initializeMode();
+      initializeMode().catch(function (error) {
+        handleStartupFailure(error);
+      });
     })();
   </script>
 </body>
