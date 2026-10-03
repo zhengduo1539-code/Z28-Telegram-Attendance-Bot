@@ -395,6 +395,94 @@
         </article>
       </section>
 
+      <section id="user-tools-page" class="tools-page" hidden aria-labelledby="user-tools-title">
+        <div class="dashboard-head tools-head">
+          <div class="dashboard-title-wrap">
+            <div class="eyebrow">GROUP TOOLS</div>
+            <h2 id="user-tools-title">Tools</h2>
+            <p id="user-tools-sub">Connect bot-installed groups with a secure, guided flow.</p>
+          </div>
+        </div>
+
+        <article class="tools-card">
+          <div class="tools-card-header">
+            <div class="tools-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M9 7.5 15 16.5"></path><path d="M7.2 9.8a3.2 3.2 0 1 1 4.5-4.5l1 1-4.5 4.5-1-1Z"></path><path d="M16.8 14.2a3.2 3.2 0 1 1-4.5 4.5l-1-1 4.5-4.5 1 1Z"></path></svg>
+            </div>
+            <div>
+              <div class="tools-kicker">CONNECTION CONTROL</div>
+              <h3 id="user-connect-title">Group Connection</h3>
+              <p id="user-connect-sub">Connect one bot-installed group to another for timeout notifications.</p>
+            </div>
+            <span class="tools-live-badge"><i aria-hidden="true"></i><span>SECURE</span></span>
+          </div>
+
+          <div class="connect-flow">
+            <div class="connect-field">
+              <div class="connect-field-heading">
+                <div>
+                  <label id="user-connect-source-label" for="user-connect-source">Source Group</label>
+                  <span id="user-connect-source-sub">The group where activity timeouts are detected.</span>
+                </div>
+                <span class="connect-step">01</span>
+              </div>
+              <div class="connect-select-wrap">
+                <select class="connect-select" id="user-connect-source" aria-labelledby="user-connect-source-label" aria-describedby="user-connect-source-sub">
+                  <option value="">Select a group</option>
+                </select>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+              </div>
+            </div>
+
+            <div class="connect-link-visual" aria-hidden="true">
+              <span class="connect-link-line"></span>
+              <span class="connect-link-node">→</span>
+              <span class="connect-link-line"></span>
+            </div>
+
+            <div class="connect-field">
+              <div class="connect-field-heading">
+                <div>
+                  <label id="user-connect-target-label" for="user-connect-target">Target Group</label>
+                  <span id="user-connect-target-sub">The bot will send timeout notifications to this group.</span>
+                </div>
+                <span class="connect-step">02</span>
+              </div>
+              <div class="connect-select-wrap">
+                <select class="connect-select" id="user-connect-target" aria-labelledby="user-connect-target-label" aria-describedby="user-connect-target-sub">
+                  <option value="">Select a group</option>
+                </select>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="connect-helper" role="note">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v5"></path><path d="M12 6.5h.01"></path><circle cx="12" cy="12" r="8.5"></circle></svg>
+            <span id="user-connect-note">Only groups where Z28 is currently installed are shown.</span>
+          </div>
+
+          <div class="connect-actions">
+            <button id="user-connect-submit" class="primary-button connect-submit" type="button" disabled>
+              <span class="button-label">Connect Groups</span>
+            </button>
+            <button id="user-connect-refresh" class="secondary-button connect-refresh" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 8A8 8 0 0 0 5.1 6.1L3.5 8"></path><path d="M3.5 4.5V8h3.5"></path><path d="M4.5 16A8 8 0 0 0 18.9 17.9l1.6-1.9"></path><path d="M20.5 19.5V16H17"></path></svg>
+              <span class="button-label">Refresh</span>
+            </button>
+          </div>
+
+          <div class="connect-status-card" aria-live="polite">
+            <div class="connect-status-icon" aria-hidden="true"><span></span></div>
+            <div class="connect-status-copy">
+              <span class="about-label" id="user-connect-status-title">Current Connection</span>
+              <strong id="user-connect-status-value">No connection is configured for this source group.</strong>
+              <small id="user-connect-status-meta">—</small>
+            </div>
+          </div>
+        </article>
+      </section>
+
       <section id="user-support-page" class="support-page" hidden>
         <div class="dashboard-head support-head">
           <div class="dashboard-title-wrap">
@@ -522,20 +610,23 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1.3"></rect><rect x="14" y="4" width="6" height="6" rx="1.3"></rect><rect x="4" y="14" width="6" height="6" rx="1.3"></rect><rect x="14" y="14" width="6" height="6" rx="1.3"></rect></svg>
           <span id="user-dashboard-tab-label">Dashboard</span>
         </button>
+        <button class="tab-button" type="button" data-user-tab="tools" aria-current="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 6.2a4 4 0 0 0-5.5 5.5l3.1 3.1a4 4 0 0 0 5.5-5.5l-1.2 1.2"></path><path d="m9.3 17.8 5.4-5.4"></path><path d="M7.2 9.8 5.9 8.5A2.5 2.5 0 1 1 9.4 5l1.3 1.3"></path></svg>
+          <span id="user-tools-tab-label">Tools</span>
+        </button>
         <button class="tab-button" type="button" data-user-tab="support" aria-current="false">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 6.5h5l1.6 2h6.4a1.5 1.5 0 0 1 1.5 1.5v8a1.5 1.5 0 0 1-1.5 1.5H5.5A1.5 1.5 0 0 1 4 18V8a1.5 1.5 0 0 1 1.5-1.5Z"></path><path d="M4 9.5h16"></path></svg>
           <span id="user-support-tab-label">Help &amp; Support</span>
-        </button>
-        <button class="tab-button" type="button" data-user-tab="appearance" aria-current="false">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M8 12h8"></path><path d="M12 8v8"></path></svg>
-          <span id="user-appearance-tab-label">Appearance</span>
         </button>
         <button class="tab-button" type="button" data-user-tab="about" aria-current="false">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 10.7v5"></path><path d="M12 7.4h.01"></path></svg>
           <span id="user-about-tab-label">About</span>
         </button>
-      </nav>
-    </section>
+        <button class="tab-button" type="button" data-user-tab="appearance" aria-current="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M8 12h8"></path><path d="M12 8v8"></path></svg>
+          <span id="user-appearance-tab-label">Appearance</span>
+        </button>
+      </nav>    </section>
   </main>
 
   <script>__Z28_APP__</script>
