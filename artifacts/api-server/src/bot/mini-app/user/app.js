@@ -79,6 +79,7 @@
       switch: "Switch",
       refresh: "Refresh",
       refreshing: "Refreshing",
+      refreshSuccess: "Dashboard updated successfully.",
       dashboard: "Dashboard",
       about: "About",
       aboutSub: "App information and credits",
@@ -154,6 +155,7 @@
       switch: "ပြောင်းမည်",
       refresh: "Refresh",
       refreshing: "Refresh လုပ်နေသည်",
+      refreshSuccess: "Dashboard ကို နောက်ဆုံးအချက်အလက်များဖြင့် update လုပ်ပြီးပါပြီ။",
       dashboard: "Dashboard",
       about: "About",
       aboutSub: "App အချက်အလက်နှင့် Credits",
@@ -229,6 +231,7 @@
       switch: "切换",
       refresh: "刷新",
       refreshing: "刷新中",
+      refreshSuccess: "仪表板已更新为最新数据。",
       dashboard: "仪表板",
       about: "关于",
       aboutSub: "应用信息与创作者",
@@ -383,6 +386,7 @@
     var content = button.querySelector(".button-label");
     if (mode === "loading") {
       button.disabled = true;
+      button.setAttribute("aria-busy", "true");
       button.classList.add("is-loading");
       if (content) {
         content.innerHTML = '<span class="button-spinner" aria-hidden="true"></span>' + escapeHtml(label || text("saving"));
@@ -390,6 +394,7 @@
       return;
     }
     button.disabled = false;
+    button.setAttribute("aria-busy", "false");
     button.classList.remove("is-loading");
     if (content) content.textContent = label || text("save");
   }
@@ -1156,6 +1161,9 @@
       if (state.aboutOpen || state.groupPickerOpen || state.settingsSaving) return;
       setButton(els.refresh, "loading", text("refreshing") + "…");
       loadUserDashboard(false, state.selectedGroupId)
+        .then(function () {
+          showNotice(text("refreshSuccess"), "ok");
+        })
         .catch(function (error) {
           showNotice(error && error.message ? error.message : "Refresh failed.", "error");
         })
