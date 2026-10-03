@@ -404,81 +404,112 @@
           </div>
         </div>
 
-        <article class="tools-card">
-          <div class="tools-card-header">
-            <div class="tools-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M9 7.5 15 16.5"></path><path d="M7.2 9.8a3.2 3.2 0 1 1 4.5-4.5l1 1-4.5 4.5-1-1Z"></path><path d="M16.8 14.2a3.2 3.2 0 1 1-4.5 4.5l-1-1 4.5-4.5 1 1Z"></path></svg>
+        <article class="connection-card">
+          <div class="connection-card-header">
+            <div class="connection-header-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M8.8 12h6.4"></path>
+                <path d="M7.1 8.9 5.4 7.2a3.4 3.4 0 0 0-4.8 4.8l1.7 1.7a3.4 3.4 0 0 0 4.8 0"></path>
+                <path d="m16.9 15.1 1.7 1.7a3.4 3.4 0 0 0 4.8-4.8l-1.7-1.7a3.4 3.4 0 0 0-4.8 0"></path>
+              </svg>
             </div>
-            <div>
-              <div class="tools-kicker">CONNECTION CONTROL</div>
+            <div class="connection-header-copy">
+              <div class="connection-kicker">CONNECTION BUILDER</div>
               <h3 id="user-connect-title">Group Connection</h3>
               <p id="user-connect-sub">Connect one bot-installed group to another for timeout notifications.</p>
             </div>
-            <span class="tools-live-badge"><i aria-hidden="true"></i><span>SECURE</span></span>
-          </div>
-
-          <div class="connect-flow">
-            <div class="connect-field">
-              <div class="connect-field-heading">
-                <div>
-                  <label id="user-connect-source-label" for="user-connect-source">Source Group</label>
-                  <span id="user-connect-source-sub">The group where activity timeouts are detected.</span>
-                </div>
-                <span class="connect-step">01</span>
-              </div>
-              <div class="connect-select-wrap">
-                <select class="connect-select" id="user-connect-source" aria-labelledby="user-connect-source-label" aria-describedby="user-connect-source-sub">
-                  <option value="">Select a group</option>
-                </select>
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
-              </div>
-            </div>
-
-            <div class="connect-link-visual" aria-hidden="true">
-              <span class="connect-link-line"></span>
-              <span class="connect-link-node">→</span>
-              <span class="connect-link-line"></span>
-            </div>
-
-            <div class="connect-field">
-              <div class="connect-field-heading">
-                <div>
-                  <label id="user-connect-target-label" for="user-connect-target">Target Group</label>
-                  <span id="user-connect-target-sub">The bot will send timeout notifications to this group.</span>
-                </div>
-                <span class="connect-step">02</span>
-              </div>
-              <div class="connect-select-wrap">
-                <select class="connect-select" id="user-connect-target" aria-labelledby="user-connect-target-label" aria-describedby="user-connect-target-sub">
-                  <option value="">Select a group</option>
-                </select>
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
-              </div>
+            <div class="connection-header-state">
+              <span class="connection-state-dot" aria-hidden="true"></span>
+              <span>SECURE</span>
             </div>
           </div>
 
-          <div class="connect-helper" role="note">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v5"></path><path d="M12 6.5h.01"></path><circle cx="12" cy="12" r="8.5"></circle></svg>
-            <span id="user-connect-note">Only groups where Z28 is currently installed are shown.</span>
-          </div>
-
-          <div class="connect-actions">
-            <button id="user-connect-submit" class="primary-button connect-submit" type="button" disabled>
-              <span class="button-label">Connect Group</span>
-            </button>
-            <button id="user-connect-change" class="secondary-button connect-change" type="button" disabled>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 8A8 8 0 0 0 5.1 6.1L3.5 8"></path><path d="M3.5 4.5V8h3.5"></path><path d="M4.5 16A8 8 0 0 0 18.9 17.9l1.6-1.9"></path><path d="M20.5 19.5V16H17"></path></svg>
-              <span class="button-label">Change Group</span>
-            </button>
-          </div>
-
-          <div class="connect-status-card" aria-live="polite">
-            <div class="connect-status-icon" aria-hidden="true"><span></span></div>
-            <div class="connect-status-copy">
-              <span class="about-label" id="user-connect-status-title">Current Connection</span>
+          <div class="connection-overview" aria-live="polite">
+            <div class="connection-overview-icon" aria-hidden="true">
+              <span></span>
+            </div>
+            <div class="connection-overview-copy">
+              <span class="connection-overview-label" id="user-connect-status-title">Current Connection</span>
               <strong id="user-connect-status-value">No connection is configured for this source group.</strong>
               <small id="user-connect-status-meta">—</small>
             </div>
+            <div class="connection-overview-badge" aria-hidden="true">
+              <span></span>
+            </div>
+          </div>
+
+          <div class="connection-builder">
+            <div class="connection-builder-intro">
+              <div>
+                <div class="connection-builder-kicker">CONFIGURE ROUTE</div>
+                <div class="connection-builder-title">Choose the notification path</div>
+              </div>
+              <div class="connection-builder-line" aria-hidden="true"></div>
+            </div>
+
+            <div class="connection-route">
+              <section class="connection-step-card">
+                <div class="connection-step-head">
+                  <div class="connection-step-number">01</div>
+                  <div>
+                    <label id="user-connect-source-label" for="user-connect-source">Source Group</label>
+                    <span id="user-connect-source-sub">The group where activity timeouts are detected.</span>
+                  </div>
+                </div>
+                <div class="connect-select-wrap">
+                  <select class="connect-select" id="user-connect-source" aria-labelledby="user-connect-source-label" aria-describedby="user-connect-source-sub">
+                    <option value="">Select a group</option>
+                  </select>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                </div>
+                <div class="connection-step-caption">Activity &amp; timeout source</div>
+              </section>
+
+              <div class="connection-bridge" aria-hidden="true">
+                <div class="connection-bridge-line"></div>
+                <div class="connection-bridge-core">
+                  <svg viewBox="0 0 24 24"><path d="M5 12h13"></path><path d="m14 7 5 5-5 5"></path></svg>
+                </div>
+                <div class="connection-bridge-line"></div>
+              </div>
+
+              <section class="connection-step-card">
+                <div class="connection-step-head">
+                  <div class="connection-step-number">02</div>
+                  <div>
+                    <label id="user-connect-target-label" for="user-connect-target">Target Group</label>
+                    <span id="user-connect-target-sub">The bot will send timeout notifications to this group.</span>
+                  </div>
+                </div>
+                <div class="connect-select-wrap">
+                  <select class="connect-select" id="user-connect-target" aria-labelledby="user-connect-target-label" aria-describedby="user-connect-target-sub">
+                    <option value="">Select a group</option>
+                  </select>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                </div>
+                <div class="connection-step-caption">Notification destination</div>
+              </section>
+            </div>
+          </div>
+
+          <div class="connection-guidance" role="note">
+            <div class="connection-guidance-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 9v5"></path><path d="M12 6.5h.01"></path><circle cx="12" cy="12" r="8.5"></circle></svg>
+            </div>
+            <div class="connection-guidance-copy">
+              <strong>Available groups</strong>
+              <span id="user-connect-note">Only groups where Z28 is currently installed are shown.</span>
+            </div>
+          </div>
+
+          <div class="connection-actions">
+            <button id="user-connect-submit" class="primary-button connection-save" type="button" disabled>
+              <span class="button-label">Connect Group</span>
+            </button>
+            <button id="user-connect-change" class="secondary-button connection-edit" type="button" hidden>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 8A8 8 0 0 0 5.1 6.1L3.5 8"></path><path d="M3.5 4.5V8h3.5"></path><path d="M4.5 16A8 8 0 0 0 18.9 17.9l1.6-1.9"></path><path d="M20.5 19.5V16H17"></path></svg>
+              <span class="button-label">Edit Connection</span>
+            </button>
           </div>
         </article>
       </section>
