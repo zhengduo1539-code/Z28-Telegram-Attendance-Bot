@@ -1926,3 +1926,127 @@ html[data-theme="amoled"] .appearance-card{background:linear-gradient(145deg,rgb
     transition:none!important;
   }
 }
+
+
+/* Background wallpaper presets: CSS-only, lightweight, and persisted client-side. */
+html[data-wallpaper="default"] body{
+  background-image:
+    radial-gradient(circle at 15% -10%,rgba(72,168,255,.13),transparent 34%),
+    radial-gradient(circle at 94% 12%,rgba(122,104,255,.12),transparent 30%),
+    linear-gradient(180deg,var(--bg-1),var(--bg-0) 72%);
+  background-color:var(--bg-0);
+}
+html[data-wallpaper="aurora"] body{
+  background-image:
+    radial-gradient(circle at 10% 18%,rgba(39,181,255,.2),transparent 31%),
+    radial-gradient(circle at 88% 20%,rgba(137,87,255,.19),transparent 34%),
+    radial-gradient(circle at 52% 100%,rgba(45,226,188,.11),transparent 38%),
+    conic-gradient(from 218deg at 52% 48%,rgba(72,168,255,.07),rgba(104,88,255,.11),rgba(71,215,162,.05),rgba(72,168,255,.07)),
+    linear-gradient(180deg,var(--bg-1),var(--bg-0) 78%);
+  background-color:var(--bg-0);
+}
+html[data-wallpaper="grid"] body{
+  background-image:
+    linear-gradient(rgba(72,168,255,.045) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(72,168,255,.045) 1px,transparent 1px),
+    radial-gradient(circle at 50% -14%,rgba(72,168,255,.16),transparent 34%),
+    linear-gradient(180deg,var(--bg-1),var(--bg-0) 82%);
+  background-size:32px 32px,32px 32px,100% 100%,100% 100%;
+  background-position:center;
+  background-color:var(--bg-0);
+}
+html[data-wallpaper="nebula"] body{
+  background-image:
+    radial-gradient(circle at 24% 26%,rgba(255,91,168,.12),transparent 22%),
+    radial-gradient(circle at 72% 34%,rgba(110,88,255,.16),transparent 28%),
+    radial-gradient(circle at 46% 82%,rgba(55,164,255,.12),transparent 31%),
+    radial-gradient(circle at 12% 70%,rgba(255,201,111,.06),transparent 17%),
+    linear-gradient(180deg,var(--bg-1),var(--bg-0) 78%);
+  background-color:var(--bg-0);
+}
+html[data-wallpaper="ocean"] body{
+  background-image:
+    radial-gradient(circle at 10% 8%,rgba(0,209,255,.19),transparent 30%),
+    radial-gradient(circle at 82% 36%,rgba(46,127,255,.17),transparent 34%),
+    radial-gradient(circle at 45% 100%,rgba(0,255,203,.09),transparent 36%),
+    linear-gradient(180deg,var(--bg-1),var(--bg-0) 80%);
+  background-color:var(--bg-0);
+}
+html[data-wallpaper="violet"] body{
+  background-image:
+    radial-gradient(circle at 12% 16%,rgba(122,104,255,.18),transparent 30%),
+    radial-gradient(circle at 88% 20%,rgba(208,107,255,.14),transparent 28%),
+    radial-gradient(circle at 52% 96%,rgba(72,168,255,.09),transparent 34%),
+    linear-gradient(180deg,var(--bg-1),var(--bg-0) 80%);
+  background-color:var(--bg-0);
+}
+html[data-wallpaper="grid"] body::before{opacity:.09}
+html[data-wallpaper="aurora"] body::before,
+html[data-wallpaper="aurora"] body::after,
+html[data-wallpaper="nebula"] body::before,
+html[data-wallpaper="nebula"] body::after,
+html[data-wallpaper="ocean"] body::before,
+html[data-wallpaper="ocean"] body::after,
+html[data-wallpaper="violet"] body::before,
+html[data-wallpaper="violet"] body::after{opacity:.08}
+
+html[data-theme="amoled"][data-wallpaper="default"] body{background:#000}
+html[data-theme="amoled"][data-wallpaper="grid"] body{
+  background-color:#000;
+  background-image:
+    linear-gradient(rgba(114,216,255,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(114,216,255,.035) 1px,transparent 1px),
+    #000;
+  background-size:28px 28px;
+}
+
+.appearance-wallpaper-section{margin-top:18px;padding-top:2px}
+.appearance-section-mini-head{display:flex;align-items:center;gap:10px}
+.appearance-mini-icon{
+  width:34px;height:34px;flex:0 0 34px;
+  display:grid;place-items:center;
+  border:1px solid rgba(72,168,255,.13);
+  border-radius:10px;
+  color:#9ed5ff;
+  background:rgba(72,168,255,.065);
+}
+.appearance-mini-icon svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.appearance-section-mini-head strong{display:block;color:#dfefff;font-size:12px;font-weight:820}
+.appearance-section-mini-head small{display:block;margin-top:2px;color:var(--muted-2);font-size:9.5px;line-height:1.45}
+.appearance-wallpaper-fieldset{border:0;padding:0;margin:12px 0 0;min-inline-size:0}
+.appearance-wallpaper-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.appearance-wallpaper-option{
+  position:relative;min-width:0;padding:7px;
+  display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;align-items:center;gap:5px 7px;
+  border:1px solid rgba(123,165,216,.11);border-radius:14px;
+  background:rgba(7,16,28,.48);cursor:pointer;overflow:hidden;
+  transition:transform var(--motion-fast) var(--ease-out),border-color var(--motion-fast) ease,background var(--motion-fast) ease,box-shadow var(--motion-base) ease;
+}
+.appearance-wallpaper-option:hover{transform:translateY(-2px);border-color:rgba(72,168,255,.25);background:rgba(12,27,48,.68);box-shadow:0 12px 24px rgba(0,0,0,.14)}
+.appearance-wallpaper-option:focus-within{outline:2px solid rgba(72,168,255,.72);outline-offset:3px}
+.appearance-wallpaper-option.is-selected{border-color:rgba(72,168,255,.4);background:linear-gradient(145deg,rgba(72,168,255,.085),rgba(104,88,255,.055));box-shadow:0 10px 24px rgba(32,102,177,.12),inset 0 1px rgba(255,255,255,.04)}
+.appearance-wallpaper-option input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.appearance-wallpaper-preview{grid-column:1 / -1;display:block;width:100%;height:54px;border-radius:10px;border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 1px rgba(255,255,255,.06)}
+.wallpaper-preview-default{background:radial-gradient(circle at 22% 18%,rgba(72,168,255,.42),transparent 32%),radial-gradient(circle at 80% 24%,rgba(122,104,255,.32),transparent 34%),linear-gradient(145deg,#0d2038,#050a12)}
+.wallpaper-preview-aurora{background:radial-gradient(circle at 22% 30%,rgba(75,211,255,.6),transparent 30%),radial-gradient(circle at 78% 28%,rgba(151,100,255,.58),transparent 32%),radial-gradient(circle at 54% 90%,rgba(71,215,162,.3),transparent 28%),linear-gradient(145deg,#07192b,#0a0820)}
+.wallpaper-preview-grid{background:linear-gradient(rgba(72,168,255,.15) 1px,transparent 1px),linear-gradient(90deg,rgba(72,168,255,.15) 1px,transparent 1px),radial-gradient(circle at 50% 20%,rgba(72,168,255,.24),transparent 48%),#07111e;background-size:16px 16px,16px 16px,100% 100%,100% 100%}
+.wallpaper-preview-nebula{background:radial-gradient(circle at 20% 72%,rgba(255,91,168,.54),transparent 26%),radial-gradient(circle at 70% 34%,rgba(111,88,255,.56),transparent 35%),radial-gradient(circle at 50% 18%,rgba(55,164,255,.3),transparent 22%),linear-gradient(145deg,#120818,#050710)}
+.wallpaper-preview-ocean{background:radial-gradient(circle at 18% 18%,rgba(0,209,255,.58),transparent 31%),radial-gradient(circle at 78% 48%,rgba(46,127,255,.52),transparent 34%),radial-gradient(circle at 45% 92%,rgba(0,255,203,.24),transparent 26%),linear-gradient(145deg,#041923,#04101b)}
+.wallpaper-preview-violet{background:radial-gradient(circle at 20% 22%,rgba(122,104,255,.58),transparent 32%),radial-gradient(circle at 82% 26%,rgba(208,107,255,.44),transparent 34%),radial-gradient(circle at 46% 88%,rgba(72,168,255,.25),transparent 28%),linear-gradient(145deg,#0d0822,#070914)}
+.appearance-wallpaper-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#a9bdd4;font-size:9.5px;font-weight:780}
+.appearance-wallpaper-option.is-selected .appearance-wallpaper-name{color:#e6f5ff}
+.appearance-wallpaper-check{width:20px;height:20px;flex:0 0 20px;display:grid;place-items:center;border:1px solid transparent;border-radius:50%;color:transparent;font-size:10px;font-weight:900}
+.appearance-wallpaper-option.is-selected .appearance-wallpaper-check{color:#04101b;background:#72c8ff;border-color:rgba(255,255,255,.26);box-shadow:0 0 14px rgba(72,168,255,.2)}
+html[data-compact="on"] .appearance-wallpaper-preview{height:48px}
+@media(max-width:520px){
+  .appearance-wallpaper-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .appearance-wallpaper-preview{height:58px}
+}
+@media(max-width:430px){
+  .appearance-wallpaper-option{padding:6px}
+  .appearance-wallpaper-preview{height:52px}
+  .appearance-wallpaper-name{font-size:9px}
+}
+@media(prefers-reduced-motion:reduce){
+  .appearance-wallpaper-option{animation:none!important;transition:none!important}
+}
