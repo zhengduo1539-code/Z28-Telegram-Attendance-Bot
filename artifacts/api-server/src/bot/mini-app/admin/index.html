@@ -1,0 +1,829 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <title>Admin Panel</title>
+  <script src="https://telegram.org/js/telegram-web-app.js?63"></script>
+  <style>__Z28_STYLE__</style>
+</head>
+<body>
+  <div id="user-loading" class="user-loading" aria-live="polite" aria-label="Loading">
+    <div class="user-loading-panel" role="status">
+      <div class="user-loading-head">
+        <div class="user-loading-mark user-loading-sheen" aria-hidden="true"></div>
+        <div>
+          <div class="user-loading-title user-loading-sheen" aria-hidden="true"></div>
+          <div class="user-loading-subtitle user-loading-sheen" aria-hidden="true"></div>
+        </div>
+      </div>
+      <div class="user-loading-stats" aria-hidden="true">
+        <div class="user-loading-stat"><div class="user-loading-line short user-loading-sheen"></div><div class="user-loading-value user-loading-sheen"></div></div>
+        <div class="user-loading-stat"><div class="user-loading-line short user-loading-sheen"></div><div class="user-loading-value user-loading-sheen"></div></div>
+      </div>
+      <div class="user-loading-card" aria-hidden="true">
+        <div class="user-loading-card-head user-loading-sheen"></div>
+        <div class="user-loading-fields">
+          <div class="user-loading-field user-loading-sheen"></div><div class="user-loading-field user-loading-sheen"></div>
+          <div class="user-loading-field user-loading-sheen"></div><div class="user-loading-field user-loading-sheen"></div>
+        </div>
+      </div>
+      <div class="user-loading-card" aria-hidden="true">
+        <div class="user-loading-card-head user-loading-sheen"></div>
+        <div class="user-loading-fields">
+          <div class="user-loading-field user-loading-sheen"></div><div class="user-loading-field user-loading-sheen"></div>
+          <div class="user-loading-field user-loading-sheen"></div><div class="user-loading-field user-loading-sheen"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="splash" aria-label="Loading">
+    <div>
+      <h1 id="splash-title">Welcome</h1>
+      <div class="splash-subtitle">Z28 • TELEGRAM ATTENDANCE</div>
+    </div>
+  </div>
+
+  <main class="wrap" id="app">
+    <div class="top">
+      <div>
+        <h1 id="title">⚙️ Admin Panel</h1>
+        <div class="user-greeting" id="user-greeting" aria-live="polite"></div>
+        <div class="credit-marquee" aria-label="Creator credit">
+          <div class="credit-track">
+            <span class="credit-text"><strong>This bot was created by Chan Myae</strong></span>
+            <span class="credit-text" aria-hidden="true"><strong>This bot was created by Chan Myae</strong></span>
+          </div>
+        </div>
+        <div class="sub" id="identity">Checking access…</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:stretch;justify-content:flex-start">
+        <button class="refresh action-button" id="refresh" type="button"><span class="button-content"><span>Refresh</span></span></button>
+        <button class="switch-group" id="switch-group" type="button" hidden aria-label="Switch group">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 7h10l-2.5-2.5"></path>
+            <path d="M17 7l-2.5 2.5"></path>
+            <path d="M17 17H7l2.5 2.5"></path>
+            <path d="M7 17l2.5-2.5"></path>
+          </svg>
+          <span id="switch-group-label">Switch</span>
+        </button>
+      </div>
+    </div>
+
+    <div id="notice" class="notice" role="status" aria-live="polite"></div>
+
+    <section id="admin-shell" class="panel-only-private" aria-label="Administrator dashboard">
+      <aside class="admin-sidebar">
+        <div class="admin-brand">
+          <div class="admin-brand-mark">Z28</div>
+          <div class="admin-brand-copy">
+            <div class="admin-brand-title">Control Center</div>
+            <div class="admin-brand-sub">Attendance Bot</div>
+          </div>
+        </div>
+
+        <div class="admin-nav" aria-label="Admin folders">
+          <div class="admin-nav-label">Folders</div>
+          <button class="admin-nav-item admin-folder-item active" type="button" data-admin-folder="dashboard"><span class="admin-nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="3" width="7" height="7" rx="2"></rect><rect x="3" y="14" width="7" height="7" rx="2"></rect><rect x="14" y="14" width="7" height="7" rx="2"></rect></svg></span><span>Dashboard</span></button>
+          <button class="admin-nav-item admin-folder-item" type="button" data-admin-folder="management"><span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 19V9"></path><path d="M10 19V5"></path><path d="M16 19v-7"></path><path d="M22 19V3"></path></svg></span><span>Management</span></button>
+          <button class="admin-nav-item admin-folder-item" type="button" data-admin-folder="analytics"><span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h16"></path><path d="m7 15 4-4 3 2 5-6"></path></svg></span><span>Analytics</span></button>
+          <button class="admin-nav-item admin-folder-item" type="button" data-admin-folder="configuration"><span class="admin-nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19 12a7 7 0 0 1-1 3.5"></path><path d="M5 12a7 7 0 0 1 1-3.5"></path><path d="M12 5V3M12 21v-2"></path></svg></span><span>Configuration</span></button>
+          <button class="admin-nav-item admin-folder-item" type="button" data-admin-folder="operations"><span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"></path><path d="M8 8h8M8 12h6M8 16h4"></path></svg></span><span>Operations</span></button>
+          <button class="admin-nav-item admin-folder-item" type="button" data-admin-folder="security"><span class="admin-nav-icon"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.6-2.8 8.2-7 10-4.2-1.8-7-5.4-7-10V6l7-3z"></path><path d="M9.5 12l1.7 1.7 3.6-4"></path></svg></span><span>Security</span></button>
+        </div>
+
+        <div class="admin-sidebar-footer">
+          <div class="admin-secure-line"><span class="admin-secure-dot"></span><span>Protected workspace</span></div>
+          <div class="admin-role-caption" id="admin-sidebar-role">Authorized owner / administrator</div>
+        </div>
+      </aside>
+
+      <div class="admin-main">
+        <div class="admin-folder-strip" aria-label="Admin folder tabs">
+          <button class="admin-folder-tab active" type="button" data-admin-folder="dashboard"><span>Dashboard</span></button>
+          <button class="admin-folder-tab" type="button" data-admin-folder="management"><span>Management</span></button>
+          <button class="admin-folder-tab" type="button" data-admin-folder="analytics"><span>Analytics</span></button>
+          <button class="admin-folder-tab" type="button" data-admin-folder="configuration"><span>Configuration</span></button>
+          <button class="admin-folder-tab" type="button" data-admin-folder="operations"><span>Operations</span></button>
+          <button class="admin-folder-tab" type="button" data-admin-folder="security"><span>Security</span></button>
+        </div>
+
+        <header class="admin-header">
+          <div class="admin-header-copy">
+            <div class="admin-eyebrow">Z28 Attendance Bot</div>
+            <h1 class="admin-heading">Administration</h1>
+            <div class="admin-heading-sub">Manage global activity policy, usage limits, and automated reminders.</div>
+          </div>
+
+          <div class="admin-header-actions">
+            <button class="admin-notification-button" id="admin-notifications-button" type="button" aria-label="Notifications" aria-expanded="false">
+              <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg>
+              <span class="admin-notification-badge" id="admin-notification-badge">0</span>
+            </button>
+            <div class="admin-session">
+              <div class="admin-avatar" id="admin-avatar">A</div>
+              <div>
+                <div class="admin-session-name" id="admin-session-name">Administrator</div>
+                <div class="admin-session-role" id="admin-session-role">Authorized session</div>
+              </div>
+            </div>
+            <button class="admin-refresh action-button" id="admin-refresh" type="button" aria-label="Refresh dashboard">
+              <span class="button-content"><svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.9-4"></path><path d="M4 4v5h5"></path><path d="M4 13a8 8 0 0 0 14.9 4"></path><path d="M20 20v-5h-5"></path></svg></span>
+            </button>
+          </div>
+        </header>
+
+        <div class="admin-notification-panel" id="admin-notification-panel" aria-label="Notifications" aria-hidden="true">
+          <div class="admin-notification-head">
+            <div><div class="admin-notification-title">Notifications</div><div class="admin-notification-sub" id="admin-notification-sub">System and dashboard errors</div></div>
+            <button class="admin-notification-close" id="admin-notification-close" type="button" aria-label="Close notifications">×</button>
+          </div>
+          <div class="admin-notification-list" id="admin-notification-list"><div class="admin-notification-empty">No notifications yet.</div></div>
+        </div>
+
+        <section class="admin-section" id="admin-overview">
+          <div class="admin-kpis">
+            <article class="admin-kpi">
+              <div class="admin-kpi-icon"><svg viewBox="0 0 24 24"><path d="M16 20v-1.7a4.3 4.3 0 0 0-4.3-4.3H7.3A4.3 4.3 0 0 0 3 18.3V20"></path><circle cx="9.5" cy="7.5" r="3.5"></circle><path d="M16 4.8a3.5 3.5 0 0 1 0 5.4"></path><path d="M21 19.8v-1.5a4.3 4.3 0 0 0-3.2-4.1"></path></svg></div>
+              <div class="admin-kpi-label">Private Users</div>
+              <div class="admin-kpi-value" id="admin-users">—</div>
+              <div class="admin-kpi-note">Users who opened the bot privately</div>
+            </article>
+
+            <article class="admin-kpi" data-tone="indigo">
+              <div class="admin-kpi-icon"><svg viewBox="0 0 24 24"><path d="M4 7.5A3.5 3.5 0 0 1 7.5 4h9A3.5 3.5 0 0 1 20 7.5v6A3.5 3.5 0 0 1 16.5 17H11l-4 3v-3.2A3.5 3.5 0 0 1 4 13.5z"></path><path d="M8 9h8"></path><path d="M8 12h5"></path></svg></div>
+              <div class="admin-kpi-label">Managed Groups</div>
+              <div class="admin-kpi-value" id="admin-groups">—</div>
+              <div class="admin-kpi-note">Groups currently known by the bot</div>
+            </article>
+
+            <article class="admin-kpi" data-tone="green">
+              <div class="admin-kpi-icon"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9"></path><path d="M12 7v5l3 2"></path><path d="M16 3h5v5"></path><path d="M21 3l-4 4"></path></svg></div>
+              <div class="admin-kpi-label">Active Activities</div>
+              <div class="admin-kpi-value" id="admin-active">—</div>
+              <div class="admin-kpi-note">Live member sessions across groups</div>
+            </article>
+
+            <article class="admin-kpi" data-tone="amber">
+              <div class="admin-kpi-icon"><svg viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg></div>
+              <div class="admin-kpi-label">Overdue Reminder</div>
+              <div class="admin-kpi-value" id="admin-reminder-status">—</div>
+              <div class="admin-kpi-note" id="admin-reminder-note">Automation status</div>
+            </article>
+          </div>
+        </section>
+
+        <section class="admin-section" id="admin-analytics">
+          <div class="admin-panel">
+            <div class="admin-panel-head"><div>
+              <h2 class="admin-panel-title">Analytics & Reports</h2>
+              <div class="admin-panel-sub">Attendance activity trends and usage summaries for the selected period.</div>
+            </div>
+            <select class="admin-users-filter" id="admin-analytics-period" aria-label="Analytics period">
+              <option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option>
+            </select></div>
+            <div class="admin-panel-body">
+              <div class="admin-kpi-grid" id="admin-analytics-kpis"></div>
+              <div class="admin-report-actions">
+                <button class="admin-report-button" id="admin-export-csv" type="button">Export CSV</button>
+                <span class="admin-panel-sub">Exports completed attendance records for the selected period.</span>
+              </div>
+              <div class="admin-analytics-grid">
+                <div class="admin-analytics-card"><h3>Daily activity</h3><div id="admin-analytics-daily" class="admin-analytics-list"></div></div>
+                <div class="admin-analytics-card"><h3>Activity types</h3><div id="admin-analytics-kinds" class="admin-analytics-list"></div></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="admin-section" id="admin-audit">
+          <div class="admin-panel">
+            <div class="admin-panel-head"><div>
+              <h2 class="admin-panel-title">Audit Log</h2>
+              <div class="admin-panel-sub">Review administrative changes made through the protected dashboard.</div>
+            </div><div class="admin-status-pill">Protected history</div></div>
+            <div class="admin-panel-body">
+              <div class="admin-users-toolbar">
+                <input class="admin-users-search" id="admin-audit-search" type="search" autocomplete="off" placeholder="Search admin, action, target, or details">
+                <select class="admin-users-filter" id="admin-audit-filter" aria-label="Filter audit actions">
+                  <option value="">All actions</option><option value="activity_limit.updated">Activity limits</option><option value="daily_limit.updated">Daily limits</option><option value="automation.updated">Automation</option>
+                </select>
+                <span class="admin-users-meta" id="admin-audit-meta">Loading audit history…</span>
+              </div>
+              <div class="admin-users-table-wrap"><table class="admin-users-table">
+                <thead><tr><th>Time</th><th>Administrator</th><th>Action</th><th>Target</th><th>Details</th></tr></thead>
+                <tbody id="admin-audit-table-body"><tr><td colspan="5"><div class="admin-users-empty">Loading audit history…</div></td></tr></tbody>
+              </table></div>
+              <div class="admin-users-footer"><span class="admin-users-meta" id="admin-audit-page-meta">—</span><div class="admin-users-pagination">
+                <button class="admin-users-page" id="admin-audit-prev" type="button">Previous</button><button class="admin-users-page" id="admin-audit-next" type="button">Next</button>
+              </div></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="admin-section" id="admin-groups-management">
+          <div class="admin-panel">
+            <div class="admin-panel-head"><div>
+              <h2 class="admin-panel-title">Group Management</h2>
+              <div class="admin-panel-sub">Monitor managed groups, live attendance activity, and connected destinations.</div>
+            </div><div class="admin-status-pill">Managed groups</div></div>
+            <div class="admin-panel-body">
+              <div class="admin-users-toolbar">
+                <input class="admin-users-search" id="admin-groups-search" type="search" autocomplete="off" placeholder="Search group name, username, or chat ID">
+                <span class="admin-users-meta" id="admin-groups-meta">Loading groups…</span>
+              </div>
+              <div class="admin-users-table-wrap">
+                <table class="admin-users-table">
+                  <thead><tr><th>Group</th><th>Chat ID</th><th>Members</th><th>Active</th><th>Connection</th><th>Last Updated</th><th>Health</th></tr></thead>
+                  <tbody id="admin-groups-table-body"><tr><td colspan="7"><div class="admin-users-empty">Loading groups…</div></td></tr></tbody>
+                </table>
+              <div class="admin-health-result" id="admin-group-health-result" hidden></div>
+              </div>
+              <div class="admin-users-footer">
+                <span class="admin-users-meta" id="admin-groups-page-meta">—</span>
+                <div class="admin-users-pagination">
+                  <button class="admin-users-page" id="admin-groups-prev" type="button">Previous</button>
+                  <button class="admin-users-page" id="admin-groups-next" type="button">Next</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="admin-section" id="admin-users-management">
+          <div class="admin-panel">
+            <div class="admin-panel-head"><div>
+              <h2 class="admin-panel-title">User Management</h2>
+              <div class="admin-panel-sub">Search private users, inspect activity usage, and monitor current sessions.</div>
+            </div><div class="admin-status-pill">Live data</div></div>
+            <div class="admin-panel-body">
+              <div class="admin-users-toolbar">
+                <input class="admin-users-search" id="admin-users-search" type="search" autocomplete="off" placeholder="Search name, username, or Telegram ID">
+                <select class="admin-users-filter" id="admin-users-filter" aria-label="Filter users">
+                  <option value="all">All users</option><option value="active">Active now</option><option value="inactive">Inactive</option>
+                </select>
+                <span class="admin-users-meta" id="admin-users-meta">Loading users…</span>
+              </div>
+              <div class="admin-users-table-wrap">
+                <table class="admin-users-table">
+                  <thead><tr><th>User</th><th>Telegram ID</th><th>Status</th><th>Current Activity</th><th>Activities</th><th>Warnings</th><th>Last Active</th></tr></thead>
+                  <tbody id="admin-users-table-body"><tr><td colspan="7"><div class="admin-users-empty">Loading users…</div></td></tr></tbody>
+                </table>
+              </div>
+              <div class="admin-users-footer">
+                <span class="admin-users-meta" id="admin-users-page-meta">—</span>
+                <div class="admin-users-pagination">
+                  <button class="admin-users-page" id="admin-users-prev" type="button">Previous</button>
+                  <button class="admin-users-page" id="admin-users-next" type="button">Next</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="admin-section" id="admin-maintenance">
+          <div class="admin-panel">
+            <div class="admin-panel-head"><div>
+              <h2 class="admin-panel-title">Maintenance</h2>
+              <div class="admin-panel-sub">Keep administrative history manageable by removing old audit entries.</div>
+            </div><div class="admin-status-pill">Admin only</div></div>
+            <div class="admin-panel-body">
+              <div class="admin-maintenance-box">
+                <div class="admin-maintenance-card">
+                  <div class="admin-maintenance-title">Audit log retention</div>
+                  <div class="admin-maintenance-note">Only audit logs older than the selected retention period are removed. This does not delete attendance records, users, groups, or active activities.</div>
+                </div>
+                <div class="admin-maintenance-controls">
+                  <select class="admin-maintenance-select" id="admin-retention-days" aria-label="Audit log retention">
+                    <option value="90">90 days</option>
+                    <option value="180" selected>180 days</option>
+                    <option value="365">1 year</option>
+                    <option value="730">2 years</option>
+                  </select>
+                  <button class="admin-save" id="admin-retention-cleanup" type="button">Clean old audit logs</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="admin-section" id="admin-backup">
+          <div class="admin-panel">
+            <div class="admin-panel-head"><div>
+              <h2 class="admin-panel-title">Data Backup</h2>
+              <div class="admin-panel-sub">Create a complete JSON snapshot of the bot's stored attendance data and current live activities.</div>
+            </div><div class="admin-status-pill">Admin only</div></div>
+            <div class="admin-panel-body">
+              <div class="admin-backup-box">
+                <div class="admin-backup-card">
+                  <div class="admin-backup-title">Full backup</div>
+                  <div class="admin-backup-note">The backup contains users, attendance records, group settings, warning history, connected groups, and active activities. Bot credentials are not included.</div>
+                </div>
+                <button class="admin-save" id="admin-backup-download" type="button">Download JSON Backup</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="admin-section" id="admin-broadcast">
+          <div class="admin-panel">
+            <div class="admin-panel-head"><div>
+              <h2 class="admin-panel-title">Broadcast Center</h2>
+              <div class="admin-panel-sub">Send an administrative announcement to users who have a private chat with the bot.</div>
+            </div><div class="admin-status-pill">Admin only</div></div>
+            <div class="admin-panel-body">
+              <div class="admin-broadcast-box">
+                <textarea class="admin-broadcast-textarea" id="admin-broadcast-message" maxlength="4000" placeholder="Write your announcement…"></textarea>
+                <div class="admin-broadcast-footer">
+                  <span class="admin-panel-sub" id="admin-broadcast-count">0 / 4000</span>
+                  <button class="admin-broadcast-send" id="admin-broadcast-send" type="button">Send announcement</button>
+                </div>
+                <div class="admin-broadcast-result" id="admin-broadcast-result"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="admin-section" id="admin-health">
+          <div class="admin-panel">
+            <div class="admin-panel-head"><div>
+              <h2 class="admin-panel-title">System Health</h2>
+              <div class="admin-panel-sub">Live diagnostics for the admin API, persistent storage, and Telegram connection.</div>
+            </div><button class="admin-save" id="admin-health-refresh" type="button">Check now</button></div>
+            <div class="admin-panel-body">
+              <div class="admin-health-grid">
+                <div class="admin-health-card"><div class="admin-health-head"><div class="admin-health-name">Admin API</div><span class="admin-health-dot" id="health-api-dot"></span></div><div class="admin-health-value" id="health-api-value">Checking…</div></div>
+                <div class="admin-health-card"><div class="admin-health-head"><div class="admin-health-name">Persistent Storage</div><span class="admin-health-dot" id="health-storage-dot"></span></div><div class="admin-health-value" id="health-storage-value">Checking…</div></div>
+                <div class="admin-health-card"><div class="admin-health-head"><div class="admin-health-name">Telegram API</div><span class="admin-health-dot" id="health-telegram-dot"></span></div><div class="admin-health-value" id="health-telegram-value">Checking…</div></div>
+                <div class="admin-health-card"><div class="admin-health-head"><div class="admin-health-name">MongoDB Storage</div><span class="admin-health-dot" id="health-mongodb-dot"></span></div><div class="admin-health-value" id="health-mongodb-value">Checking…</div><div class="admin-health-meta" id="health-mongodb-meta">Storage protection status</div></div>
+              </div>
+              <div class="admin-health-meta">
+                <div class="admin-health-meta-card"><div class="admin-health-meta-label">Overall status</div><div class="admin-health-meta-value" id="health-overall">Checking…</div></div>
+                <div class="admin-health-meta-card"><div class="admin-health-meta-label">Uptime</div><div class="admin-health-meta-value" id="health-uptime">—</div></div>
+                <div class="admin-health-meta-card"><div class="admin-health-meta-label">Memory</div><div class="admin-health-meta-value" id="health-memory">—</div><div class="admin-health-meta" id="health-memory-meta">Memory thresholds</div></div>
+              </div>
+              <div class="admin-panel-sub" id="health-checked-at" style="margin-top:14px">Last checked: —</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="admin-section" id="admin-duration">
+          <div class="admin-panel">
+            <div class="admin-panel-head">
+              <div>
+                <h2 class="admin-panel-title">Activity duration policy</h2>
+                <div class="admin-panel-sub">Set the global time limit for each tracked activity. Group-specific settings remain separate.</div>
+              </div>
+              <div class="admin-status-pill">Global policy</div>
+            </div>
+            <div class="admin-panel-body">
+              <div class="admin-control-grid">
+                <div class="admin-control">
+                  <div class="admin-control-head"><div class="admin-control-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7.5"></circle><path d="M9 3h6"></path><path d="M12 5.5v2"></path><path d="M12 13l2.7-2"></path></svg></div><div><div class="admin-control-name">Eat</div><div class="admin-control-hint">Meal break duration</div></div></div>
+                  <label class="admin-field-label" for="admin-limit-eat">Minutes</label>
+                  <div class="admin-field-suffix"><input class="admin-field" id="admin-limit-eat" type="number" min="1" step="1"><span class="admin-field-unit">min</span></div>
+                </div>
+                <div class="admin-control">
+                  <div class="admin-control-head"><div class="admin-control-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7.5"></circle><path d="M9 3h6"></path><path d="M12 5.5v2"></path><path d="M12 13l2.7-2"></path></svg></div><div><div class="admin-control-name">WC</div><div class="admin-control-hint">Toilet break duration</div></div></div>
+                  <label class="admin-field-label" for="admin-limit-wc">Minutes</label>
+                  <div class="admin-field-suffix"><input class="admin-field" id="admin-limit-wc" type="number" min="1" step="1"><span class="admin-field-unit">min</span></div>
+                </div>
+                <div class="admin-control">
+                  <div class="admin-control-head"><div class="admin-control-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7.5"></circle><path d="M9 3h6"></path><path d="M12 5.5v2"></path><path d="M12 13l2.7-2"></path></svg></div><div><div class="admin-control-name">Smoke</div><div class="admin-control-hint">Smoke break duration</div></div></div>
+                  <label class="admin-field-label" for="admin-limit-smoke">Minutes</label>
+                  <div class="admin-field-suffix"><input class="admin-field" id="admin-limit-smoke" type="number" min="1" step="1"><span class="admin-field-unit">min</span></div>
+                </div>
+                <div class="admin-control">
+                  <div class="admin-control-head"><div class="admin-control-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7.5"></circle><path d="M9 3h6"></path><path d="M12 5.5v2"></path><path d="M12 13l2.7-2"></path></svg></div><div><div class="admin-control-name">WCD</div><div class="admin-control-hint">WCD duration</div></div></div>
+                  <label class="admin-field-label" for="admin-limit-wcd">Minutes</label>
+                  <div class="admin-field-suffix"><input class="admin-field" id="admin-limit-wcd" type="number" min="1" step="1"><span class="admin-field-unit">min</span></div>
+                </div>
+              </div>
+              <div class="admin-action-bar">
+                <span class="admin-empty-note">Changes apply globally to groups without an override.</span>
+                <button class="admin-save action-button" id="admin-save-duration" type="button"><span class="button-content">Save duration limits</span></button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="admin-section" id="admin-counts">
+          <div class="admin-panel">
+            <div class="admin-panel-head">
+              <div>
+                <h2 class="admin-panel-title">Daily activity usage policy</h2>
+                <div class="admin-panel-sub">Control how many times members can use each activity per day.</div>
+              </div>
+              <div class="admin-status-pill">Daily policy</div>
+            </div>
+            <div class="admin-panel-body">
+              <div class="admin-control-grid">
+                <div class="admin-control">
+                  <div class="admin-control-head"><div class="admin-control-icon"><svg viewBox="0 0 24 24"><path d="M4 21h16"></path><rect x="5" y="13" width="3" height="5" rx="1.5"></rect><rect x="10.5" y="9" width="3" height="9" rx="1.5"></rect><rect x="16" y="5" width="3" height="13" rx="1.5"></rect></svg></div><div><div class="admin-control-name">WC</div><div class="admin-control-hint">Uses per day</div></div></div>
+                  <label class="admin-field-label" for="admin-count-wc">Maximum uses</label>
+                  <input class="admin-field" id="admin-count-wc" type="number" min="1" step="1">
+                </div>
+                <div class="admin-control">
+                  <div class="admin-control-head"><div class="admin-control-icon"><svg viewBox="0 0 24 24"><path d="M4 21h16"></path><rect x="5" y="13" width="3" height="5" rx="1.5"></rect><rect x="10.5" y="9" width="3" height="9" rx="1.5"></rect><rect x="16" y="5" width="3" height="13" rx="1.5"></rect></svg></div><div><div class="admin-control-name">Smoke</div><div class="admin-control-hint">Uses per day</div></div></div>
+                  <label class="admin-field-label" for="admin-count-smoke">Maximum uses</label>
+                  <input class="admin-field" id="admin-count-smoke" type="number" min="1" step="1">
+                </div>
+                <div class="admin-control">
+                  <div class="admin-control-head"><div class="admin-control-icon"><svg viewBox="0 0 24 24"><path d="M4 21h16"></path><rect x="5" y="13" width="3" height="5" rx="1.5"></rect><rect x="10.5" y="9" width="3" height="9" rx="1.5"></rect><rect x="16" y="5" width="3" height="13" rx="1.5"></rect></svg></div><div><div class="admin-control-name">WCD</div><div class="admin-control-hint">Uses per day</div></div></div>
+                  <label class="admin-field-label" for="admin-count-wcd">Maximum uses</label>
+                  <input class="admin-field" id="admin-count-wcd" type="number" min="1" step="1">
+                </div>
+                <div class="admin-control">
+                  <div class="admin-control-head"><div class="admin-control-icon"><svg viewBox="0 0 24 24"><path d="M12 4v16"></path><path d="M4 12h16"></path></svg></div><div><div class="admin-control-name">Eat</div><div class="admin-control-hint">Unlimited by default</div></div></div>
+                  <label class="admin-field-label">Usage</label>
+                  <input class="admin-field" type="text" value="Unlimited" disabled aria-label="Eat daily limit">
+                </div>
+              </div>
+              <div class="admin-action-bar">
+                <span class="admin-empty-note">Eat remains unlimited by policy.</span>
+                <button class="admin-save action-button" id="admin-save-counts" type="button"><span class="button-content">Save daily limits</span></button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="admin-section" id="admin-automation">
+          <div class="admin-panel">
+            <div class="admin-panel-head">
+              <div>
+                <h2 class="admin-panel-title">Automation</h2>
+                <div class="admin-panel-sub">Configure automatic reminders when a member remains away past the allowed time.</div>
+              </div>
+              <div class="admin-status-pill">Live</div>
+            </div>
+            <div class="admin-panel-body">
+              <div class="admin-automation">
+                <div class="admin-automation-copy">
+                  <div class="admin-automation-icon"><svg viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg></div>
+                  <div>
+                    <div class="admin-automation-title">Overdue activity reminders</div>
+                    <div class="admin-automation-sub">A reminder is sent after the configured activity limit plus the 45-second grace period. Turning this off stops automatic reminder delivery.</div>
+                  </div>
+                </div>
+                <label class="admin-switch" aria-label="Enable overdue activity reminders">
+                  <input id="admin-reminder" type="checkbox">
+                  <span class="admin-switch-track"><span class="admin-switch-thumb"></span></span>
+                </label>
+              </div>
+              <div class="admin-action-bar">
+                <span class="admin-empty-note" id="admin-reminder-detail">Current automation state</span>
+                <button class="admin-save action-button" id="admin-save-reminder" type="button"><span class="button-content">Save automation</span></button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="card panel-only-private" id="stats-card" data-section="stats">
+      <h2>
+        <span class="section-icon stats-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M4 19V10"></path>
+            <path d="M10 19V6"></path>
+            <path d="M16 19v-8"></path>
+            <path d="M22 19V3"></path>
+            <path d="M2.5 21h20"></path>
+            <path d="M4 7l4-3 6 3 7-5"></path>
+          </svg>
+        </span>
+        <span class="section-title"><span>Bot Statistics</span><small>System Overview</small></span>
+      </h2>
+      <div class="stats">
+        <div class="stat"><div class="stat-label">Users (PM)</div><div class="stat-value" id="users">—</div></div>
+        <div class="stat"><div class="stat-label">Groups</div><div class="stat-value" id="groups">—</div></div>
+      </div>
+    </section>
+
+    <section class="card user-card panel-only-admin-verify panel-only-user" id="user-verify-card">
+      <div class="user-language-switcher">
+        <button class="user-language-button" id="user-language-button" type="button" aria-label="Change language" aria-expanded="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="9"></circle>
+            <path d="M3 12h18"></path>
+            <path d="M12 3c2.4 2.5 3.6 5.5 3.6 9s-1.2 6.5-3.6 9c-2.4-2.5-3.6-5.5-3.6-9S9.6 5.5 12 3z"></path>
+          </svg>
+        </button>
+        <div class="user-language-menu" id="user-language-menu" hidden>
+          <button class="user-language-option active" type="button" data-user-lang="en">English</button>
+          <button class="user-language-option" type="button" data-user-lang="my">Burmese</button>
+          <button class="user-language-option" type="button" data-user-lang="zh">Chinese (Simplified)</button>
+        </div>
+      </div>
+      <h2>
+        <span class="section-icon stats-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 3l7 3v5c0 4.6-2.8 8.2-7 10-4.2-1.8-7-5.4-7-10V6l7-3z"></path>
+            <path d="M9.5 12l1.7 1.7 3.6-4"></path>
+          </svg>
+        </span>
+        <span class="section-title"><span id="user-verify-title">Verify Your Telegram ID</span><small id="user-verify-subtitle">User Access</small></span>
+      </h2>
+      <p class="user-lead" id="user-verify-lead">Enter your Telegram user ID to open your group dashboard.</p>
+      <div class="user-id-wrap">
+        <label for="user-id-input" id="user-id-label">Telegram User ID</label>
+        <input class="user-id-input" id="user-id-input" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="Enter your Telegram ID">
+        <span class="user-id-hint" id="user-id-hint">Your ID must match the Telegram account currently opening this Mini App.</span>
+      </div>
+      <button class="user-confirm" id="user-confirm" type="button" disabled>Confirm</button>
+    </section>
+
+    <section class="panel-only-user user-no-group-screen" id="user-no-group-screen" aria-live="polite">
+      <p class="user-no-group-message" id="user-no-group-message">
+        <strong>No eligible group found</strong>
+        <span>Add this bot to a group, then make sure your Telegram account is a group owner or administrator. Groups where the bot is no longer available are not shown.</span>
+      </p>
+    </section>
+
+    <section class="panel-only-user user-dashboard-error-screen" id="user-dashboard-error-screen" aria-live="assertive" hidden>
+      <div class="user-dashboard-error-message">
+        <div class="user-dashboard-error-icon" aria-hidden="true">!</div>
+        <strong id="user-dashboard-error-title">Unable to load your dashboard right now.</strong>
+        <span id="user-dashboard-error-lead">Something went wrong while loading your dashboard. Your saved settings were not changed.</span>
+        <button class="user-dashboard-error-retry" id="user-dashboard-error-retry" type="button">Try Again</button>
+      </div>
+    </section>
+
+    <section class="panel-only-user user-dashboard" id="user-dashboard">
+      <div class="user-group-options" id="user-group-options">
+        <div class="user-page-head"><div>
+          <h2 class="user-page-title">Group Options</h2>
+          <div class="user-page-sub">Select a group to open its dashboard.</div>
+        </div></div>
+        <div id="user-group-options-list"></div>
+      </div>
+
+      <div id="user-selected-dashboard" hidden>
+        <div class="user-page-head">
+          <div>
+            <h2 class="user-page-title" id="user-selected-group-title">Group Dashboard</h2>
+            <div class="user-page-sub" id="user-dashboard-sub">Live activity overview</div>
+          </div>
+          <div class="user-language-switcher dashboard-language-switcher">
+              <button class="user-language-button" id="user-dashboard-language-button" type="button" aria-label="Change language" aria-expanded="false">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18"></path><path d="M12 3c2.4 2.5 3.6 5.5 3.6 9s-1.2 6.5-3.6 9S9.6 15.5 9.6 12 10.8 5.5 12 3z"></path></svg>
+              </button>
+              <div class="user-language-menu" id="user-dashboard-language-menu" hidden>
+                <button class="user-language-option active" type="button" data-user-lang="en">English</button>
+                <button class="user-language-option" type="button" data-user-lang="my">Burmese</button>
+                <button class="user-language-option" type="button" data-user-lang="zh">Chinese (Simplified)</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="user-tab-shell" id="user-dashboard-page-shell">
+          <div class="user-tab-panel active" id="user-settings-tab">
+            <div class="user-dashboard-section-label">Admin Settings</div>
+
+            <div class="user-group-box compact" id="user-group-activities-card">
+              <div class="user-group-box-title" id="user-group-activities-title">Group Activities</div>
+              <div class="user-group-name" id="user-group-name"></div>
+              <div class="user-group-metrics">
+                <div class="user-live-metric">
+                  <div class="user-live-label" id="user-group-member-label">Group member</div>
+                  <div class="user-live-value" id="user-member-count">—</div>
+                </div>
+                <div class="user-live-metric">
+                  <div class="user-live-label" id="user-member-active-label">Member active</div>
+                  <div class="user-live-value active" id="user-active-count">—</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="user-setting-card" id="user-settings-limits-card"></div>
+            <div class="user-setting-card counts" id="user-settings-counts-card"></div>
+          </div>
+        </div>
+      </div>
+
+        <div class="user-about-page" id="user-about-page" hidden>
+          <div class="user-page-head user-about-page-head">
+            <div>
+              <h2 class="user-page-title" id="user-about-title">About</h2>
+              <div class="user-page-sub" id="user-about-sub">App information and credits</div>
+            </div>
+          </div>
+
+          <div class="user-about-grid">
+            <article class="user-about-card">
+              <div class="user-about-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M7 4.5h10"></path><path d="M6 8.5h12"></path>
+                  <path d="M8 4.5v15"></path><path d="M16 4.5v15"></path><path d="M8 19.5h8"></path>
+                </svg>
+              </div>
+              <div class="user-about-copy-block">
+                <div class="user-about-label" id="user-about-bot-name-label">Bot</div>
+                <div class="user-about-value">Z28</div>
+              </div>
+            </article>
+
+            <article class="user-about-card">
+              <div class="user-about-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="5" y="4" width="14" height="16" rx="3"></rect>
+                  <path d="M8.5 8h7"></path><path d="M8.5 12h4.5"></path><path d="M8.5 16h6"></path>
+                </svg>
+              </div>
+              <div class="user-about-copy-block">
+                <div class="user-about-label" id="user-about-bot-version-label">Bot Version</div>
+                <div class="user-about-value">1.0.0</div>
+              </div>
+            </article>
+
+            <article class="user-about-card">
+              <div class="user-about-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="5" y="4" width="14" height="16" rx="3"></rect>
+                  <path d="M8.5 8h7"></path><path d="M8.5 12h4.5"></path><path d="M8.5 16h6"></path>
+                </svg>
+              </div>
+              <div class="user-about-copy-block">
+                <div class="user-about-label" id="user-about-mini-version-label">Mini App Version</div>
+                <div class="user-about-value">1.0.0</div>
+              </div>
+            </article>
+
+            <details class="user-about-card user-about-details">
+              <summary>
+                <span class="user-about-icon">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10a2 2 0 0 1 2 2v12l-3-1.5L12 18l-3-1.5L6 18V6a2 2 0 0 1 2-2Z"></path></svg>
+                </span>
+                <span class="user-about-summary-copy">
+                  <span class="user-about-label" id="user-about-terms-label">Terms of Use</span>
+                  <span class="user-about-summary-arrow">›</span>
+                </span>
+              </summary>
+              <div class="user-about-copy" id="user-about-terms-copy">Use this Mini App only for the attendance and group-management functions provided by the bot. Keep your Telegram account secure and use the service according to your group rules.</div>
+            </details>
+
+            <details class="user-about-card user-about-details">
+              <summary>
+                <span class="user-about-icon">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 19 6v5c0 4.8-2.9 7.9-7 10-4.1-2.1-7-5.2-7-10V6l7-3Z"></path><path d="m9.5 12 1.7 1.7 3.5-3.5"></path></svg>
+                </span>
+                <span class="user-about-summary-copy">
+                  <span class="user-about-label" id="user-about-privacy-label">Privacy</span>
+                  <span class="user-about-summary-arrow">›</span>
+                </span>
+              </summary>
+              <div class="user-about-copy" id="user-about-privacy-copy">The Mini App uses Telegram WebApp account information to verify access and show the groups available to you. Information shown in this dashboard is used only for the bot features provided to your account and groups.</div>
+            </details>
+
+            <article class="user-about-card user-about-credit-card">
+              <div class="user-about-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 14.6 9l5.9.8-4.3 4.1 1 5.8-5.2-2.8 1-5.8-4.3-4.1L9.4 9 12 3.5Z"></path></svg>
+              </div>
+              <div class="user-about-copy-block">
+                <div class="user-about-label" id="user-about-credits-label">Credits</div>
+                <div class="user-about-value">Chan Myae</div>
+                <div class="user-about-credit-sub" id="user-about-creator-label">Creator</div>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <nav class="user-tabbar" id="user-tabbar" hidden aria-label="User dashboard sections">
+          <button class="user-tab active" type="button" data-user-tab="dashboard" aria-selected="true">
+            <span class="user-tab-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <rect x="4" y="4" width="6" height="6" rx="1.5"></rect><rect x="14" y="4" width="6" height="6" rx="1.5"></rect>
+                <rect x="4" y="14" width="6" height="6" rx="1.5"></rect><rect x="14" y="14" width="6" height="6" rx="1.5"></rect>
+              </svg>
+            </span>
+            <span id="user-dashboard-tab-label">Dashboard</span>
+          </button>
+          <button class="user-tab" type="button" data-user-tab="about" aria-selected="false">
+            <span class="user-tab-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="8.5"></circle><path d="M12 10.5v5"></path><path d="M12 7.25h.01"></path>
+              </svg>
+            </span>
+            <span id="user-about-tab-label">About</span>
+          </button>
+        </nav>
+
+    </section>
+
+    <section class="card panel-only-private panel-only-group" id="limits-card" data-section="activity">
+      <h2>
+        <span class="section-icon activity-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <circle class="clock-ring" cx="12" cy="13" r="7.5"></circle>
+            <path d="M9 3h6"></path>
+            <path d="M12 5.5v2"></path>
+            <g class="clock-hand">
+              <path d="M12 13l3-2"></path>
+            </g>
+          </svg>
+        </span>
+        <span class="section-title"><span>Activity Limits</span><small>Duration Control</small></span>
+      </h2>
+      <div class="section-caption" id="limits-scope"></div>
+      <div class="rows">
+        <div class="row"><div><label for="limit-eat">Eat</label><span class="hint">minutes</span></div><input id="limit-eat" type="number" min="1" step="1"></div>
+        <div class="row"><div><label for="limit-wc">WC</label><span class="hint">minutes</span></div><input id="limit-wc" type="number" min="1" step="1"></div>
+        <div class="row"><div><label for="limit-smoke">Smoke</label><span class="hint">minutes</span></div><input id="limit-smoke" type="number" min="1" step="1"></div>
+        <div class="row"><div><label for="limit-wcd">WCD</label><span class="hint">minutes</span></div><input id="limit-wcd" type="number" min="1" step="1"></div>
+      </div>
+      <div class="actions">
+        <button class="save save-limits action-button" id="save-limits" type="button">
+          <span class="button-content"><span>Save Limits</span></span>
+        </button>
+        <span class="success-badge" id="success-limits" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"></path></svg>
+          Successfully saved
+        </span>
+      </div>
+    </section>
+
+    <section class="card panel-only-private panel-only-group" id="counts-card" data-section="counts">
+      <h2>
+        <span class="section-icon counts-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M4 21h16"></path>
+            <rect class="count-bar count-bar-1" x="5" y="13" width="3" height="5" rx="1.5" fill="currentColor" stroke="none"></rect>
+            <rect class="count-bar count-bar-2" x="10.5" y="9" width="3" height="9" rx="1.5" fill="currentColor" stroke="none"></rect>
+            <rect class="count-bar count-bar-3" x="16" y="5" width="3" height="13" rx="1.5" fill="currentColor" stroke="none"></rect>
+            <path class="count-trend" d="M4.5 10l3.5-3 4 2 4-4 4.5 1"></path>
+          </svg>
+        </span>
+        <span class="section-title"><span>Daily Count Limits</span><small>Daily Usage Control</small></span>
+      </h2>
+      <div class="section-caption">Set how many times each activity can be used in one day.</div>
+      <div class="rows">
+        <div class="row"><div><label for="count-eat">Eat</label><span class="hint">unlimited by default</span></div><input id="count-eat" type="number" min="1" step="1" disabled></div>
+        <div class="row"><div><label for="count-wc">WC</label><span class="hint">times per day</span></div><input id="count-wc" type="number" min="1" step="1"></div>
+        <div class="row"><div><label for="count-smoke">Smoke</label><span class="hint">times per day</span></div><input id="count-smoke" type="number" min="1" step="1"></div>
+        <div class="row"><div><label for="count-wcd">WCD</label><span class="hint">times per day</span></div><input id="count-wcd" type="number" min="1" step="1"></div>
+      </div>
+      <div class="actions">
+        <button class="save save-counts action-button" id="save-counts" type="button">
+          <span class="button-content"><span>Save Count Limits</span></span>
+        </button>
+        <span class="success-badge" id="success-counts" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"></path></svg>
+          Successfully saved
+        </span>
+      </div>
+    </section>
+
+    <section class="card panel-only-private" id="reminder-card" data-section="reminder">
+      <h2>
+        <span class="section-icon reminder-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path class="ring-wave ring-wave-1" d="M4 8.5L2.7 7.2"></path>
+            <path class="ring-wave ring-wave-2" d="M20 8.5l1.3-1.3"></path>
+            <g class="bell-shape">
+              <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
+              <path d="M10 21h4"></path>
+            </g>
+          </svg>
+        </span>
+        <span class="section-title"><span>Overdue Reminder</span><small>Automatic Notification</small></span>
+      </h2>
+      <div class="toggle">
+        <div class="toggle-copy">
+          <label for="reminder">Reminder</label>
+          <span class="hint">45-second grace period</span>
+        </div>
+        <label class="switch" aria-label="Enable overdue reminder">
+          <input id="reminder" type="checkbox">
+          <span class="switch-track"><span class="switch-thumb"></span></span>
+        </label>
+      </div>
+      <div class="actions">
+        <button class="save save-reminder action-button" id="save-reminder" type="button">
+          <span class="button-content"><span>Save Reminder</span></span>
+        </button>
+        <span class="success-badge" id="success-reminder" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"></path></svg>
+          Successfully saved
+        </span>
+      </div>
+    </section>
+
+    <section class="card panel-only-group" id="connect-card">
+      <h2>🔗 Group Connection</h2>
+      <div class="connection" id="connection">Loading connection…</div>
+      <div>
+        <label for="target">Target notification group</label>
+        <span class="hint">Group ID such as -1001234567890 or a public t.me group link</span>
+        <input id="target" type="text" inputmode="text" placeholder="-1001234567890">
+      </div>
+      <div class="actions"><button class="save" id="save-connect" type="button">Save Connection</button></div>
+    </section>
+  </main>
+
+  <script>__Z28_APP__</script>
+</body>
+</html>

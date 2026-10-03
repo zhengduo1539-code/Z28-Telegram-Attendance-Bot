@@ -8,6 +8,21 @@ import { rm } from "node:fs/promises";
 // Plugins (e.g. 'esbuild-plugin-pino') may use `require` to resolve dependencies
 globalThis.require = createRequire(import.meta.url);
 
+const miniAppTextPlugin = {
+  name: "mini-app-text",
+  setup(build) {
+    const filter = /mini-app\/(admin|user)\/(index\.html|style\.css|app\.js)$/;
+    build.onResolve({ filter }, (args) => ({
+      path: path.resolve(args.resolveDir, args.path),
+      namespace: "mini-app-text",
+    }));
+    build.onLoad({ filter: /.*/, namespace: "mini-app-text" }, async (args) => ({
+      contents: await (await import("node:fs/promises")).readFile(args.path, "utf8"),
+      loader: "text",
+    }));
+  },
+};
+
 const artifactDir = path.dirname(fileURLToPath(import.meta.url));
 
 async function buildAll() {
@@ -103,6 +118,7 @@ async function buildAll() {
     ],
     sourcemap: "linked",
     plugins: [
+      miniAppTextPlugin,
       // pino relies on workers to handle logging, instead of externalizing it we use a plugin to handle it
       esbuildPluginPino({ transports: ["pino-pretty"] })
     ],

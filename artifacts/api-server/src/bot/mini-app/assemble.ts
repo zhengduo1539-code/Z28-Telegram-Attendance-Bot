@@ -1,0 +1,1 @@
+export const assembleMiniApp = (indexHtml: string, styleCss: string, appJs: string) =>\n  indexHtml\n    .replace("__Z28_STYLE__", styleCss)\n    .replace("__Z28_APP__", appJs);\n
