@@ -206,6 +206,98 @@
         <div id="user-settings-counts-card" class="settings-card"></div>
       </div>
 
+      <section id="user-appearance-page" class="appearance-page" hidden aria-labelledby="user-appearance-title">
+        <div class="dashboard-head appearance-head">
+          <div class="dashboard-title-wrap">
+            <div class="eyebrow">INTERFACE SETTINGS</div>
+            <h2 id="user-appearance-title">Appearance</h2>
+            <p id="user-appearance-sub">Personalize the Mini App interface.</p>
+          </div>
+        </div>
+
+        <article class="appearance-card">
+          <div class="appearance-section-head">
+            <div class="appearance-section-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M5 6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5v8A2.5 2.5 0 0 1 16.5 17H12l-3.5 3v-3H7.5A2.5 2.5 0 0 1 5 14.5Z"></path><path d="M8.5 10h7"></path><path d="M8.5 13h4.5"></path></svg>
+            </div>
+            <div>
+              <div class="appearance-kicker" id="user-appearance-theme-kicker">DISPLAY</div>
+              <h3 id="user-appearance-theme-title">Theme</h3>
+              <p id="user-appearance-theme-sub">Choose the interface style for this device.</p>
+            </div>
+          </div>
+
+          <fieldset class="appearance-theme-fieldset">
+            <legend class="sr-only" id="user-appearance-theme-legend">Theme</legend>
+            <div class="appearance-theme-grid">
+              <label class="appearance-theme-option is-selected" data-theme-option="dark">
+                <input id="appearance-theme-dark" type="radio" name="appearance-theme" value="dark" checked>
+                <span class="appearance-theme-visual appearance-theme-visual-dark" aria-hidden="true">
+                  <span></span><span></span><span></span>
+                </span>
+                <span class="appearance-theme-copy">
+                  <strong id="user-appearance-theme-dark-title">Dark</strong>
+                  <span id="user-appearance-theme-dark-sub">Balanced dark interface</span>
+                </span>
+                <span class="appearance-theme-check" aria-hidden="true">✓</span>
+              </label>
+
+              <label class="appearance-theme-option" data-theme-option="midnight">
+                <input id="appearance-theme-midnight" type="radio" name="appearance-theme" value="midnight">
+                <span class="appearance-theme-visual appearance-theme-visual-midnight" aria-hidden="true">
+                  <span></span><span></span><span></span>
+                </span>
+                <span class="appearance-theme-copy">
+                  <strong id="user-appearance-theme-midnight-title">Midnight</strong>
+                  <span id="user-appearance-theme-midnight-sub">Cooler navy and violet finish</span>
+                </span>
+                <span class="appearance-theme-check" aria-hidden="true">✓</span>
+              </label>
+
+              <label class="appearance-theme-option" data-theme-option="amoled">
+                <input id="appearance-theme-amoled" type="radio" name="appearance-theme" value="amoled">
+                <span class="appearance-theme-visual appearance-theme-visual-amoled" aria-hidden="true">
+                  <span></span><span></span><span></span>
+                </span>
+                <span class="appearance-theme-copy">
+                  <strong id="user-appearance-theme-amoled-title">AMOLED</strong>
+                  <span id="user-appearance-theme-amoled-sub">Pure black for OLED displays</span>
+                </span>
+                <span class="appearance-theme-check" aria-hidden="true">✓</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <div class="appearance-divider"></div>
+
+          <div class="appearance-controls" aria-label="Interface behavior settings">
+            <button id="appearance-animations-toggle" class="appearance-control" type="button" role="switch" aria-checked="true" aria-labelledby="user-appearance-animations-title" aria-describedby="user-appearance-animations-sub">
+              <span class="appearance-control-icon appearance-control-icon-motion" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M5 12c2.5-4.2 4.4-6.3 7-6.3s4.5 2.1 7 6.3c-2.5 4.2-4.4 6.3-7 6.3S7.5 16.2 5 12Z"></path><circle cx="12" cy="12" r="2.4"></circle></svg>
+              </span>
+              <span class="appearance-control-copy">
+                <strong id="user-appearance-animations-title">Animations</strong>
+                <span id="user-appearance-animations-sub">Keep interface motion and transitions enabled.</span>
+              </span>
+              <span class="appearance-switch" aria-hidden="true"><span></span></span>
+              <span class="appearance-control-state" id="user-appearance-animations-state">ON</span>
+            </button>
+
+            <button id="appearance-compact-toggle" class="appearance-control" type="button" role="switch" aria-checked="false" aria-labelledby="user-appearance-compact-title" aria-describedby="user-appearance-compact-sub">
+              <span class="appearance-control-icon appearance-control-icon-compact" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M5 7.5h14"></path><path d="M5 12h14"></path><path d="M5 16.5h9"></path></svg>
+              </span>
+              <span class="appearance-control-copy">
+                <strong id="user-appearance-compact-title">Compact Mode</strong>
+                <span id="user-appearance-compact-sub">Reduce spacing for a denser layout.</span>
+              </span>
+              <span class="appearance-switch" aria-hidden="true"><span></span></span>
+              <span class="appearance-control-state" id="user-appearance-compact-state">OFF</span>
+            </button>
+          </div>
+        </article>
+      </section>
+
       <section id="user-about-page" class="about-page" hidden>
         <div class="dashboard-head about-head">
           <div class="dashboard-title-wrap">
@@ -379,6 +471,10 @@
         <button class="tab-button" type="button" data-user-tab="support" aria-current="false">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 6.5h5l1.6 2h6.4a1.5 1.5 0 0 1 1.5 1.5v8a1.5 1.5 0 0 1-1.5 1.5H5.5A1.5 1.5 0 0 1 4 18V8a1.5 1.5 0 0 1 1.5-1.5Z"></path><path d="M4 9.5h16"></path></svg>
           <span id="user-support-tab-label">Help &amp; Support</span>
+        </button>
+        <button class="tab-button" type="button" data-user-tab="appearance" aria-current="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M8 12h8"></path><path d="M12 8v8"></path></svg>
+          <span id="user-appearance-tab-label">Appearance</span>
         </button>
         <button class="tab-button" type="button" data-user-tab="about" aria-current="false">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 10.7v5"></path><path d="M12 7.4h.01"></path></svg>
