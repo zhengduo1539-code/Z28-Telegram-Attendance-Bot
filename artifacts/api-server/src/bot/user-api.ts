@@ -80,6 +80,7 @@ const serializeSupportTicket = (ticket: SupportTicket) => ({
   groupId: ticket.groupId,
   groupTitle: ticket.groupTitle,
   category: ticket.category,
+  categoryLabel: reportCategoryLabels[ticket.category as keyof typeof reportCategoryLabels] || ticket.category,
   message: ticket.message,
   status: ticket.status,
   createdAt: ticket.createdAt,
