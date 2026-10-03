@@ -1,1 +1,9 @@
-declare module "*.html" {\n  const content: string;\n  export default content;\n}\n\ndeclare module "*.css" {\n  const content: string;\n  export default content;\n}\n
+declare module "*.html" {
+  const content: string;
+  export default content;
+}
+
+declare module "*.css" {
+  const content: string;
+  export default content;
+}
