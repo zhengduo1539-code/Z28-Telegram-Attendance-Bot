@@ -61,7 +61,7 @@ const resolveMiniAppUrl = (target: "admin" | "user"): string | undefined => {
     if (url.protocol !== "https:") return undefined;
 
     const normalizedPath = url.pathname.replace(/\/+$/, "");
-    if (normalizedPath.endsWith("/admin") || normalizedPath.endsWith("/user")) {
+    if (normalizedPath.endsWith("/admin") || normalizedPath.endsWith("/user") || normalizedPath.endsWith("/user-app")) {
       url.pathname = normalizedPath.replace(/\/(?:admin|user|user-app)$/, MINI_APP_PATHS[target]);
     } else {
       url.pathname = normalizedPath + MINI_APP_PATHS[target];
