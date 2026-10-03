@@ -160,24 +160,6 @@
       wallpaperOcean: "Ocean Glow",
       wallpaperViolet: "Violet Glass",
       themeCreator: "Theme Creator",
-      themeCreatorSub: "ကိုယ်ပိုင်အပြင်အဆင်ကို ဖန်တီးပြီး ဤစက်ပေါ်မှာပဲ သိမ်းထားနိုင်ပါသည်။",
-      themeCreatorPresets: "အမြန်ရွေးချယ်ရန် Palette များ",
-      themeCreatorPresetsSub: "Preset တစ်ခုရွေးပြီး အသေးစိတ်ညှိနိုင်ပါသည်။",
-      themePaletteOcean: "Ocean",
-      themePaletteViolet: "Violet",
-      themePaletteMint: "Mint",
-      themePaletteSunset: "Sunset",
-      themeCreatorPrimary: "အဓိကအရောင်",
-      themeCreatorSecondary: "ဒုတိယအရောင်",
-      themeCreatorGlow: "Glow အားပြင်းမှု",
-      themeCreatorRadius: "ထောင့်ဝိုင်းမှု",
-      themeCreatorBackground: "Background အားပြင်းမှု",
-      themeCreatorCustom: "Custom",
-      themeCreatorDeviceOnly: "ဤစက်တွင်သာ",
-      themeCreatorActive: "Custom theme ကို ဖွင့်ထားပြီး ဤစက်ပေါ်တွင် သိမ်းထားပါသည်။",
-      themeCreatorInactive: "Custom theme ကို မဖွင့်ရသေးပါ။",
-      themeCreatorReset: "မူလသို့ ပြန်ထားမည်"
-      themeCreator: "Theme Creator",
       themeCreatorSub: "Create your own look and keep it saved on this device.",
       themeCreatorPresets: "Quick palettes",
       themeCreatorPresetsSub: "Start with a preset, then fine-tune it.",
@@ -194,7 +176,7 @@
       themeCreatorDeviceOnly: "DEVICE ONLY",
       themeCreatorActive: "Custom theme is active • saved on this device.",
       themeCreatorInactive: "Custom theme is not active.",
-      themeCreatorReset: "Reset"
+      themeCreatorReset: "Reset",
       tools: "Tools",
       toolsSub: "Connect bot-installed groups with a secure, guided flow.",
       connectTitle: "Group Connection",
@@ -372,6 +354,24 @@
       wallpaperNebula: "Nebula",
       wallpaperOcean: "Ocean Glow",
       wallpaperViolet: "Violet Glass",
+      themeCreator: "Theme Creator",
+      themeCreatorSub: "ကိုယ်ပိုင်အပြင်အဆင်ကို ဖန်တီးပြီး ဤစက်ပေါ်မှာပဲ သိမ်းထားနိုင်ပါသည်။",
+      themeCreatorPresets: "အမြန်ရွေးချယ်ရန် Palette များ",
+      themeCreatorPresetsSub: "Preset တစ်ခုရွေးပြီး အသေးစိတ်ညှိနိုင်ပါသည်။",
+      themePaletteOcean: "Ocean",
+      themePaletteViolet: "Violet",
+      themePaletteMint: "Mint",
+      themePaletteSunset: "Sunset",
+      themeCreatorPrimary: "အဓိကအရောင်",
+      themeCreatorSecondary: "ဒုတိယအရောင်",
+      themeCreatorGlow: "Glow အားပြင်းမှု",
+      themeCreatorRadius: "ထောင့်ဝိုင်းမှု",
+      themeCreatorBackground: "Background အားပြင်းမှု",
+      themeCreatorCustom: "Custom",
+      themeCreatorDeviceOnly: "ဤစက်တွင်သာ",
+      themeCreatorActive: "Custom theme ကို ဖွင့်ထားပြီး ဤစက်ပေါ်တွင် သိမ်းထားပါသည်။",
+      themeCreatorInactive: "Custom theme ကို မဖွင့်ရသေးပါ။",
+      themeCreatorReset: "မူလသို့ ပြန်ထားမည်",
       tools: "Tools",
       toolsSub: "Group tools and connection controls.",
       connectTitle: "Group Connection",
@@ -497,8 +497,7 @@
       idLabel: "Telegram 用户 ID",
       idPlaceholder: "请输入 Telegram ID",
       idHint: "输入的 ID 必须与当前打开此 Mini App 的 Telegram 账号一致。",
-      confirm: "确认",
-      confirmed: "已确认",
+      confirm: "确认",      confirmed: "已确认",
       yourGroups: "您的群组",
       groupOptions: "群组选择",
       groupOptionsSub: "选择一个群组以打开其仪表板。",
@@ -566,7 +565,7 @@
       themeCreatorDeviceOnly: "仅此设备",
       themeCreatorActive: "自定义主题已启用 • 已保存在此设备。",
       themeCreatorInactive: "自定义主题未启用。",
-      themeCreatorReset: "重置"
+      themeCreatorReset: "重置",
       tools: "工具",
       toolsSub: "用于群组连接与常用管理操作。",
       connectTitle: "群组连接",
@@ -997,8 +996,7 @@
 
     els["appearance-animations-toggle"].setAttribute("aria-checked", String(state.animationsEnabled));
     els["appearance-animations-toggle"].classList.toggle("is-enabled", state.animationsEnabled);
-    els["user-appearance-animations-state"].textContent =
-      state.animationsEnabled ? text("appearanceOn") : text("appearanceOff");
+    els["user-appearance-animations-state"].textContent =      state.animationsEnabled ? text("appearanceOn") : text("appearanceOff");
 
     els["appearance-compact-toggle"].setAttribute("aria-checked", String(state.compactMode));
     els["appearance-compact-toggle"].classList.toggle("is-enabled", state.compactMode);
@@ -1497,8 +1495,7 @@
     if (!visible) {
       stopAutoRefresh();
     } else {
-      updateAutoRefreshControl();
-      scheduleAutoRefresh();
+      updateAutoRefreshControl();      scheduleAutoRefresh();
     }
   }
 
@@ -1997,8 +1994,7 @@
     scheduleAutoRefresh();
     updateBackButton();
 
-    if (languageOnly) return;
-  }
+    if (languageOnly) return;  }
 
   function renderDashboard(data) {
     if (!data || typeof data !== "object") {
@@ -2497,8 +2493,7 @@
       els["user-tools-page"].hidden = false;
       els.title.textContent = text("tools");
       els.identity.textContent = userGreeting();
-      setDashboardControls(false);
-      updateConnectStatus();
+      setDashboardControls(false);      updateConnectStatus();
       void loadConnectGroups();
     } else if (state.appearanceOpen) {
       els["user-selected-dashboard"].hidden = true;
