@@ -35,6 +35,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.get("/admin", adminPageHandler);
 app.get("/user", userPageHandler);
+app.get("/user-app", userPageHandler);
 app.use("/api/admin", adminApiRouter);
 app.use("/api/group-admin", groupAdminApiRouter);
 app.use("/api/user", userApiRouter);
