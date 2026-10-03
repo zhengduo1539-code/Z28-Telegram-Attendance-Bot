@@ -1806,6 +1806,15 @@
     select.disabled = safeGroups.length === 0;
   }
 
+  function getSourceConnection() {
+    var sourceId = els["user-connect-source"]
+      ? String(els["user-connect-source"].value || "")
+      : "";
+    return sourceId && state.connectConnections
+      ? state.connectConnections[sourceId]
+      : null;
+  }
+
   function updateConnectStatus() {
     if (!els["user-connect-status-value"] || !els["user-connect-status-meta"]) return;
 
