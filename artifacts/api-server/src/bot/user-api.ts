@@ -422,7 +422,7 @@ userApiRouter.post("/report", async (req, res) => {
   const message = typeof req.body?.message === "string" ? req.body.message.trim() : "";
   const groupId = req.body?.groupId;
 
-  if (!(category in reportCategoryLabels)) {
+  if (!Object.prototype.hasOwnProperty.call(reportCategoryLabels, category)) {
     sendError(res, 400, "Select a valid report category.");
     return;
   }
