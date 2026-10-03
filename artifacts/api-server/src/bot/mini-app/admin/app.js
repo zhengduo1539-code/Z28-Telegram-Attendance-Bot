@@ -856,34 +856,81 @@
         }
       }
 
+      function syncAdminBroadcastMode() {
+        var modeBox = document.getElementById("admin-broadcast-mode");
+        var directBox = document.getElementById("admin-broadcast-direct");
+        var userIdBox = document.getElementById("admin-broadcast-user-id");
+        var button = document.getElementById("admin-broadcast-send");
+        var messageBox = document.getElementById("admin-broadcast-message");
+        if (!modeBox || !directBox || !button || !messageBox) return;
+
+        var direct = modeBox.value === "direct";
+        directBox.hidden = !direct;
+        button.textContent = direct ? "Send direct reply" : "Send announcement";
+        messageBox.placeholder = direct ? "Write your reply…" : "Write your announcement…";
+        if (!direct && userIdBox) userIdBox.value = "";
+        if (direct && userIdBox) userIdBox.focus();
+      }
+
       async function sendAdminBroadcast() {
         var messageBox = document.getElementById("admin-broadcast-message");
+        var modeBox = document.getElementById("admin-broadcast-mode");
+        var userIdBox = document.getElementById("admin-broadcast-user-id");
         var button = document.getElementById("admin-broadcast-send");
         var resultBox = document.getElementById("admin-broadcast-result");
-        if (!messageBox || !button || !resultBox) return;
+        if (!messageBox || !modeBox || !button || !resultBox) return;
+
         var message = messageBox.value.trim();
-        if (!message) throw new Error("Please enter an announcement.");
+        if (!message) throw new Error("Please enter a message.");
+
+        var mode = modeBox.value === "direct" ? "direct" : "broadcast";
+        var userId = undefined;
+        if (mode === "direct") {
+          var rawUserId = userIdBox ? userIdBox.value.trim() : "";
+          if (!/^\d{1,20}$/.test(rawUserId)) {
+            throw new Error("Enter a valid Telegram User ID.");
+          }
+          userId = Number(rawUserId);
+          if (!Number.isSafeInteger(userId) || userId <= 0) {
+            throw new Error("Enter a valid Telegram User ID.");
+          }
+        }
+
         button.disabled = true;
-        button.textContent = "Sending…";
+        button.textContent = mode === "direct" ? "Sending reply…" : "Sending…";
         resultBox.style.display = "none";
         try {
           var headers = new Headers();
           headers.set("X-Telegram-Init-Data", initData);
           headers.set("Content-Type", "application/json");
           headers.set("Accept", "application/json");
+          var payload = { message: message };
+          if (mode === "direct") {
+            payload.mode = "direct";
+            payload.userId = userId;
+          }
           var response = await fetch("/api/admin/broadcast", {
             method: "POST",
             headers: headers,
-            body: JSON.stringify({ message: message })
+            body: JSON.stringify(payload)
           });
           var data = await response.json().catch(function(){ return {}; });
-          if (!response.ok) throw new Error(data.error || "Broadcast failed.");
-          resultBox.textContent = "Completed: " + String(data.sent || 0) + " sent, " + String(data.failed || 0) + " failed, " + String(data.total || 0) + " total.";
+          if (!response.ok) throw new Error(data.error || (mode === "direct" ? "Direct reply failed." : "Broadcast failed."));
+
+          if (mode === "direct") {
+            var recipient = data.recipient || {};
+            var recipientName = recipient.displayName || ("User " + String(userId));
+            var recipientHandle = recipient.username ? " · @" + recipient.username : "";
+            resultBox.textContent = "Sent to " + recipientName + recipientHandle + " (" + String(userId) + ").";
+            showNotice("Direct reply sent.", "ok");
+          } else {
+            resultBox.textContent = "Completed: " + String(data.sent || 0) + " sent, " + String(data.failed || 0) + " failed, " + String(data.total || 0) + " total.";
+            showNotice("Broadcast completed.", "ok");
+          }
           resultBox.style.display = "block";
-          showNotice("Broadcast completed.", "ok");
         } finally {
           button.disabled = false;
-          button.textContent = "Send announcement";
+          syncAdminBroadcastMode();
         }
       }
 
@@ -2153,8 +2200,13 @@
         });
       });
 
+      var broadcastMode = document.getElementById("admin-broadcast-mode");
       var broadcastMessage = document.getElementById("admin-broadcast-message");
       var broadcastCount = document.getElementById("admin-broadcast-count");
+      if (broadcastMode) {
+        broadcastMode.addEventListener("change", syncAdminBroadcastMode);
+        syncAdminBroadcastMode();
+      }
       if (broadcastMessage && broadcastCount) {
         broadcastMessage.addEventListener("input", function() {
           broadcastCount.textContent = String(broadcastMessage.value.length) + " / 4000";
