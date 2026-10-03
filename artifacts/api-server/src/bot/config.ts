@@ -48,6 +48,8 @@ export type BotConfig = {
   memoryRssCriticalPercent: number;
 };
 
+const MINI_APP_PATHS = { admin: "/admin", user: "/user-app" } as const;
+
 const resolveMiniAppUrl = (target: "admin" | "user"): string | undefined => {
   const explicit = process.env["ADMIN_MINI_APP_URL"]?.trim();
   const renderBase = process.env["RENDER_EXTERNAL_URL"]?.trim();
@@ -59,10 +61,10 @@ const resolveMiniAppUrl = (target: "admin" | "user"): string | undefined => {
     if (url.protocol !== "https:") return undefined;
 
     const normalizedPath = url.pathname.replace(/\/+$/, "");
-    if (normalizedPath.endsWith("/admin") || normalizedPath.endsWith("/user")) {
-      url.pathname = normalizedPath.replace(/\/(?:admin|user)$/, "/" + target);
+    if (normalizedPath.endsWith("/admin") || normalizedPath.endsWith("/user") || normalizedPath.endsWith("/user-app")) {
+      url.pathname = normalizedPath.replace(/\/(?:admin|user|user-app)$/, MINI_APP_PATHS[target]);
     } else {
-      url.pathname = normalizedPath + "/" + target;
+      url.pathname = normalizedPath + MINI_APP_PATHS[target];
     }
 
     const deployVersion = process.env["RENDER_GIT_COMMIT"]?.trim();
