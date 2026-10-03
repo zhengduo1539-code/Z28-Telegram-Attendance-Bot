@@ -18,6 +18,7 @@
     settingsSaving: false,
     groupPickerOpen: false,
     aboutOpen: false,
+    supportOpen: false,
     autoRefreshEnabled: false,
     autoRefreshTimer: null,
     refreshInProgress: false
@@ -116,7 +117,27 @@
       apiPrefix: "Dashboard API failed",
       renderPrefix: "Dashboard render failed",
       mismatch: "The entered ID does not match your Telegram account.",
-      selected: "Selected"
+      selected: "Selected",
+      helpSupport: "Help & Support",
+      helpSupportSub: "Get help or report a problem",
+      reportProblem: "Report a Problem",
+      reportProblemLead: "Tell us what went wrong. Your report will be sent to the bot administrators.",
+      reportCategory: "Category",
+      reportCategoryBug: "Bug / Unexpected behavior",
+      reportCategoryAccess: "Access / Verification",
+      reportCategoryGroup: "Group / Permissions",
+      reportCategorySettings: "Settings",
+      reportCategoryOther: "Other",
+      reportMessage: "Describe the problem",
+      reportPlaceholder: "Please describe what happened…",
+      reportHint: "Please do not include passwords or other sensitive information.",
+      reportCount: "0 / 1200",
+      reportContext: "Selected group",
+      reportSend: "Send Report",
+      reportSending: "Sending",
+      reportSent: "Report sent successfully. Thank you.",
+      reportMinLength: "Please enter at least 10 characters.",
+      reportFailed: "Unable to send the report. Please try again."
     },
     my: {
       title: "User Dashboard",
@@ -198,7 +219,27 @@
       apiPrefix: "Dashboard API မအောင်မြင်ပါ",
       renderPrefix: "Dashboard render မအောင်မြင်ပါ",
       mismatch: "ထည့်ထားသော ID သည် သင့် Telegram account နှင့် မကိုက်ညီပါ။",
-      selected: "ရွေးထားသည်"
+      selected: "ရွေးထားသည်",
+      helpSupport: "Help & Support",
+      helpSupportSub: "အကူအညီရယူရန် သို့မဟုတ် ပြဿနာတင်ပြရန်",
+      reportProblem: "ပြဿနာတင်ပြရန်",
+      reportProblemLead: "ဖြစ်ပေါ်နေသော ပြဿနာကို ရေးပေးပါ။ သင့်တင်ပြချက်ကို Bot administrator များထံ ပို့ပေးပါမည်။",
+      reportCategory: "အမျိုးအစား",
+      reportCategoryBug: "Bug / မမျှော်လင့်ထားသော လုပ်ဆောင်ချက်",
+      reportCategoryAccess: "Access / အတည်ပြုခြင်း",
+      reportCategoryGroup: "Group / Permission",
+      reportCategorySettings: "Settings",
+      reportCategoryOther: "အခြား",
+      reportMessage: "ပြဿနာကို ရှင်းပြပါ",
+      reportPlaceholder: "ဘာဖြစ်ခဲ့သည်ကို အသေးစိတ်ရေးပေးပါ…",
+      reportHint: "Password သို့မဟုတ် အခြား sensitive information များကို မထည့်ပါနှင့်။",
+      reportCount: "0 / 1200",
+      reportContext: "ရွေးထားသော Group",
+      reportSend: "Report ပို့မည်",
+      reportSending: "ပို့နေသည်",
+      reportSent: "Report ကို အောင်မြင်စွာ ပို့ပြီးပါပြီ။ ကျေးဇူးတင်ပါသည်။",
+      reportMinLength: "အနည်းဆုံး စာလုံး ၁၀ လုံး ရေးပေးပါ။",
+      reportFailed: "Report ပို့၍ မရပါ။ ထပ်မံကြိုးစားပါ။"
     },
     zh: {
       title: "用户仪表板",
@@ -280,7 +321,27 @@
       apiPrefix: "Dashboard API 加载失败",
       renderPrefix: "Dashboard 渲染失败",
       mismatch: "输入的 ID 与您的 Telegram 账号不匹配。",
-      selected: "已选择"
+      selected: "已选择",
+      helpSupport: "帮助与支持",
+      helpSupportSub: "获取帮助或报告问题",
+      reportProblem: "报告问题",
+      reportProblemLead: "请描述发生的问题。您的报告将发送给机器人管理员。",
+      reportCategory: "问题类型",
+      reportCategoryBug: "Bug / 异常行为",
+      reportCategoryAccess: "访问 / 验证",
+      reportCategoryGroup: "群组 / 权限",
+      reportCategorySettings: "设置",
+      reportCategoryOther: "其他",
+      reportMessage: "描述问题",
+      reportPlaceholder: "请描述发生了什么…",
+      reportHint: "请不要填写密码或其他敏感信息。",
+      reportCount: "0 / 1200",
+      reportContext: "当前群组",
+      reportSend: "发送报告",
+      reportSending: "发送中",
+      reportSent: "报告已成功发送，谢谢。",
+      reportMinLength: "请至少输入 10 个字符。",
+      reportFailed: "报告发送失败，请重试。"
     }
   };
 
@@ -304,7 +365,13 @@
       "user-about-bot-version-label","user-about-mini-version-label",
       "user-about-terms-label","user-about-terms-copy","user-about-privacy-label",
       "user-about-privacy-copy","user-about-credits-label","user-about-creator-label",
-      "user-tabbar","user-dashboard-tab-label","user-about-tab-label"
+      "user-support-page","user-support-title","user-support-sub","user-report-title",
+      "user-report-lead","user-report-category-label","user-report-category-bug",
+      "user-report-category-access","user-report-category-group","user-report-category-settings",
+      "user-report-category-other","user-report-message-label","user-report-message",
+      "user-report-hint","user-report-count","user-report-context-label","user-report-context-value",
+      "user-report-submit","user-tabbar","user-dashboard-tab-label","user-about-tab-label",
+      "user-support-tab-label","user-report-form"
     ].forEach(function (id) { els[id] = document.getElementById(id); });
   }
 
@@ -501,6 +568,7 @@
     els["user-dashboard-error-screen"].hidden = true;
     els["user-dashboard"].hidden = true;
     els["user-about-page"].hidden = true;
+    els["user-support-page"].hidden = true;
   }
 
   function applyLanguage() {
