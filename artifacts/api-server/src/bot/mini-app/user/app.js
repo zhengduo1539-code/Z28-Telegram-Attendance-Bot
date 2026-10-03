@@ -20,6 +20,11 @@
     aboutOpen: false,
     supportOpen: false,
     toolsOpen: false,
+    connectEditMode: false,
+    connectLoading: false,
+    connectSaving: false,
+    connectGroups: [],
+    connectConnections: {},
     appearanceOpen: false,
     appearanceTheme: "dark",
     wallpaper: "default",
@@ -148,7 +153,6 @@
       connectLoadFailed: "Unable to load installed groups. Please try again.",
       connectSuccess: "Group connection saved successfully.",
       connectFailed: "Unable to connect these groups. Please try again.",
-      connectRefresh: "Refresh",
       appearance: "Appearance",
       appearanceSub: "Personalize the Mini App interface.",
       appearanceKicker: "INTERFACE SETTINGS",
@@ -314,6 +318,7 @@
       connectNoGroups: "Bot ထည့်ထားသော Group မရှိသေးပါ။",
       connectInstalledOnly: "Z28 Bot ထည့်သွင်းထားသော Group များကိုသာ ပြသပါသည်။",
       connectButton: "Group ချိတ်ဆက်မည်",
+      connectChange: "Group ပြောင်းမည်",
       connectConnecting: "ချိတ်ဆက်နေသည်",
       connectConnected: "ချိတ်ဆက်ပြီး",
       connectStatus: "လက်ရှိ ချိတ်ဆက်မှု",
@@ -323,7 +328,6 @@
       connectLoadFailed: "Bot ထည့်ထားသော Group များကို မဖတ်နိုင်ပါ။ ထပ်စမ်းကြည့်ပါ။",
       connectSuccess: "Group ချိတ်ဆက်မှုကို အောင်မြင်စွာ သိမ်းပြီးပါပြီ။",
       connectFailed: "Group ချိတ်ဆက်၍ မရပါ။ ထပ်စမ်းကြည့်ပါ။",
-      connectRefresh: "Refresh",
       appearance: "Appearance",
       appearanceSub: "Mini App ရဲ့ အပြင်အဆင်ကို စိတ်ကြိုက်ပြင်ဆင်ပါ။",
       appearanceKicker: "INTERFACE SETTINGS",
@@ -489,6 +493,7 @@
       connectNoGroups: "暂无已安装 Bot 的群组。",
       connectInstalledOnly: "仅显示当前已安装 Z28 Bot 的群组。",
       connectButton: "连接群组",
+      connectChange: "更换群组",
       connectConnecting: "连接中",
       connectConnected: "已连接",
       connectStatus: "当前连接",
@@ -498,7 +503,6 @@
       connectLoadFailed: "无法加载已安装 Bot 的群组，请重试。",
       connectSuccess: "群组连接已成功保存。",
       connectFailed: "无法连接所选群组，请重试。",
-      connectRefresh: "刷新",
       appearance: "外观",
       appearanceSub: "自定义 Mini App 的界面显示方式。",
       appearanceKicker: "界面设置",
@@ -601,7 +605,7 @@
       "user-connect-source-label","user-connect-source-sub","user-connect-source",
       "user-connect-target-label","user-connect-target-sub","user-connect-target",
       "user-connect-note","user-connect-submit","user-connect-status-title","user-connect-status-value",
-      "user-connect-status-meta","user-connect-refresh",
+      "user-connect-status-meta","user-connect-change",
       "user-about-page","user-about-title","user-about-sub","user-about-bot-name-label",
       "user-about-bot-version-label","user-about-mini-version-label",
       "user-about-terms-label","user-about-terms-copy","user-about-privacy-label",
@@ -959,20 +963,23 @@
     els["user-support-tab-label"].textContent = text("helpSupport");
     els["user-tools-tab-label"].textContent = text("tools");
     els["user-appearance-tab-label"].textContent = text("appearance");
-    els["user-tools-title"].textContent = text("tools");
-    els["user-tools-sub"].textContent = text("toolsSub");
-    els["user-connect-title"].textContent = text("connectTitle");
-    els["user-connect-sub"].textContent = text("connectSub");
-    els["user-connect-source-label"].textContent = text("connectSource");
-    els["user-connect-source-sub"].textContent = text("connectSourceSub");
-    els["user-connect-target-label"].textContent = text("connectTarget");
-    els["user-connect-target-sub"].textContent = text("connectTargetSub");
-    els["user-connect-note"].textContent = text("connectInstalledOnly");
-    els["user-connect-status-title"].textContent = text("connectStatus");
-    els["user-connect-refresh"].querySelector(".button-label").textContent = text("connectRefresh");
-    var connectButtonLabel = els["user-connect-submit"].querySelector(".button-label");
-    if (connectButtonLabel && !state.connectSaving) connectButtonLabel.textContent = text("connectButton");
-    updateConnectStatus();
+    if (els["user-tools-page"]) {
+      els["user-tools-title"].textContent = text("tools");
+      els["user-tools-sub"].textContent = text("toolsSub");
+      els["user-connect-title"].textContent = text("connectTitle");
+      els["user-connect-sub"].textContent = text("connectSub");
+      els["user-connect-source-label"].textContent = text("connectSource");
+      els["user-connect-source-sub"].textContent = text("connectSourceSub");
+      els["user-connect-target-label"].textContent = text("connectTarget");
+      els["user-connect-target-sub"].textContent = text("connectTargetSub");
+      els["user-connect-note"].textContent = text("connectInstalledOnly");
+      els["user-connect-status-title"].textContent = text("connectStatus");
+      var connectChangeLabel = els["user-connect-change"] && els["user-connect-change"].querySelector(".button-label");
+      if (connectChangeLabel) connectChangeLabel.textContent = text("connectChange");
+      var connectButtonLabel = els["user-connect-submit"].querySelector(".button-label");
+      if (connectButtonLabel && !state.connectSaving) connectButtonLabel.textContent = text("connectButton");
+      updateConnectStatus();
+    }
     els["user-appearance-title"].textContent = text("appearance");
     els["user-appearance-sub"].textContent = text("appearanceSub");
     els["user-appearance-theme-kicker"].textContent = text("appearanceKicker");
@@ -1774,18 +1781,17 @@
     }
   }
 
-  function getConnectGroupById(groupId) {
-    var numericId = Number(groupId);
-    return (state.connectGroups || []).find(function (group) {
-      return Number(group.id) === numericId;
-    }) || null;
+  function getSourceConnection() {
+    var sourceId = els["user-connect-source"] ? String(els["user-connect-source"].value || "") : "";
+    return sourceId && state.connectConnections ? state.connectConnections[sourceId] : null;
   }
 
   function populateConnectSelect(select, groups, preferredId) {
     if (!select) return;
-    var current = String(preferredId || "");
     var safeGroups = Array.isArray(groups) ? groups : [];
+    var current = String(preferredId || "");
     var placeholder = safeGroups.length ? text("connectSelect") : text("connectNoGroups");
+
     select.innerHTML =
       '<option value="">' + escapeHtml(placeholder) + '</option>' +
       safeGroups.map(function (group) {
@@ -1793,20 +1799,21 @@
           escapeHtml(group.title || String(group.id)) +
           '</option>';
       }).join("");
+
     var preferred = safeGroups.find(function (group) {
       return String(group.id) === current;
     });
     select.value = preferred ? current : "";
-    select.disabled = safeGroups.length === 0;
   }
 
   function updateConnectStatus() {
     if (!els["user-connect-status-value"] || !els["user-connect-status-meta"]) return;
-    var sourceId = Number(els["user-connect-source"] && els["user-connect-source"].value);
-    var connection = state.connectConnections && state.connectConnections[String(sourceId)];
+
+    var connection = getSourceConnection();
     var statusIcon = els["user-connect-status-value"].closest(".connect-status-copy")
       ? els["user-connect-status-value"].closest(".connect-status-copy").previousElementSibling
       : null;
+
     if (!connection) {
       els["user-connect-status-value"].textContent = text("connectNone");
       els["user-connect-status-value"].classList.remove("is-connected");
@@ -1824,28 +1831,60 @@
 
     var connectedAt = connection.connectedAt ? new Date(connection.connectedAt) : null;
     els["user-connect-status-meta"].textContent =
-      connectedAt && Number.isFinite(connectedAt.getTime())
-        ? connectedAt.toLocaleString()
-        : "—";
+      connectedAt && Number.isFinite(connectedAt.getTime()) ? connectedAt.toLocaleString() : "—";
   }
 
   function updateConnectControls() {
-    if (!els["user-connect-source"] || !els["user-connect-target"] || !els["user-connect-submit"]) return;
+    if (!els["user-connect-source"] || !els["user-connect-target"] || !els["user-connect-submit"] || !els["user-connect-change"]) return;
+
     var sourceValue = els["user-connect-source"].value;
     var targetValue = els["user-connect-target"].value;
-    var valid = Boolean(sourceValue && targetValue && sourceValue !== targetValue && !state.connectSaving && !state.connectLoading);
-    els["user-connect-submit"].disabled = !valid;
-    els["user-connect-submit"].setAttribute("aria-disabled", String(!valid));
-    var same = Boolean(sourceValue && targetValue && sourceValue === targetValue);
-    els["user-connect-source"].setAttribute("aria-invalid", String(same));
-    els["user-connect-target"].setAttribute("aria-invalid", String(same));
+    var connection = state.connectConnections && state.connectConnections[String(sourceValue)];
+    var sameGroup = Boolean(sourceValue && targetValue && sourceValue === targetValue);
+
+    var canSubmit = Boolean(
+      state.connectEditMode &&
+      sourceValue &&
+      targetValue &&
+      !sameGroup &&
+      !state.connectSaving &&
+      !state.connectLoading
+    );
+
+    els["user-connect-submit"].disabled = !canSubmit;
+    els["user-connect-submit"].setAttribute("aria-disabled", String(!canSubmit));
+    els["user-connect-source"].setAttribute("aria-invalid", String(sameGroup));
+    els["user-connect-target"].setAttribute("aria-invalid", String(sameGroup));
+
+    var locked = Boolean(connection && !state.connectEditMode);
+    els["user-connect-source"].disabled = locked || state.connectLoading || state.connectSaving;
+    els["user-connect-target"].disabled = locked || state.connectLoading || state.connectSaving;
+    els["user-connect-change"].disabled = !connection || state.connectLoading || state.connectSaving || state.connectEditMode;
+  }
+
+  function applyExistingConnectionState() {
+    var connection = getSourceConnection();
+    if (connection) {
+      var targetId = String(connection.targetChatId);
+      var targetExists = (state.connectGroups || []).some(function (group) {
+        return String(group.id) === targetId;
+      });
+      if (targetExists) {
+        els["user-connect-target"].value = targetId;
+        writeStorage(STORAGE_KEYS.connectTargetGroup, targetId);
+      }
+    }
+    updateConnectStatus();
+    updateConnectControls();
   }
 
   async function loadConnectGroups() {
     if (!state.toolsOpen || state.connectLoading) return;
+
     state.connectLoading = true;
+    state.connectEditMode = false;
     els["user-connect-submit"].disabled = true;
-    els["user-connect-refresh"].disabled = true;
+    els["user-connect-change"].disabled = true;
     els["user-connect-source"].setAttribute("aria-busy", "true");
     els["user-connect-target"].setAttribute("aria-busy", "true");
 
@@ -1855,50 +1894,72 @@
 
       var groups = Array.isArray(data.groups) ? data.groups : [];
       state.connectGroups = groups;
-      state.connectConnections =
-        data.connections && typeof data.connections === "object"
-          ? data.connections
-          : {};
+      state.connectConnections = data.connections && typeof data.connections === "object" ? data.connections : {};
 
       var savedSource = readStorage(STORAGE_KEYS.connectSourceGroup);
       var savedTarget = readStorage(STORAGE_KEYS.connectTargetGroup);
-      var validSavedSource = savedSource && groups.some(function (group) { return String(group.id) === savedSource; });
-      var validSavedTarget = savedTarget && groups.some(function (group) { return String(group.id) === savedTarget; });
-      var defaultSource = validSavedSource
-        ? savedSource
-        : (state.selectedGroupId && groups.some(function (group) { return Number(group.id) === Number(state.selectedGroupId); })
+      var validSavedSource = Boolean(savedSource && groups.some(function (group) { return String(group.id) === savedSource; }));
+      var validSavedTarget = Boolean(savedTarget && groups.some(function (group) { return String(group.id) === savedTarget; }));
+
+      var defaultSource =
+        state.selectedGroupId && groups.some(function (group) { return Number(group.id) === Number(state.selectedGroupId); })
           ? String(state.selectedGroupId)
-          : groups.length ? String(groups[0].id) : "");
-      var differentTarget = groups.find(function (group) { return String(group.id) !== String(defaultSource); });
-      var defaultTarget = validSavedTarget && String(savedTarget) !== String(defaultSource)
-        ? savedTarget
-        : (differentTarget ? String(differentTarget.id) : "");
+          : validSavedSource
+            ? savedSource
+            : groups.length
+              ? String(groups[0].id)
+              : "";
+
+      var sourceConnection = defaultSource ? state.connectConnections[String(defaultSource)] : null;
+      var connectedTarget = sourceConnection ? String(sourceConnection.targetChatId) : "";
+      var fallbackTarget = groups.find(function (group) { return String(group.id) !== String(defaultSource); });
+
+      var defaultTarget =
+        connectedTarget && groups.some(function (group) { return String(group.id) === connectedTarget; })
+          ? connectedTarget
+          : validSavedTarget && savedTarget !== defaultSource
+            ? savedTarget
+            : fallbackTarget
+              ? String(fallbackTarget.id)
+              : "";
+
+      state.connectEditMode = !Boolean(sourceConnection);
 
       populateConnectSelect(els["user-connect-source"], groups, defaultSource);
       populateConnectSelect(els["user-connect-target"], groups, defaultTarget);
 
-      if (defaultSource) writeStorage(STORAGE_KEYS.connectSourceGroup, defaultSource);
-      if (defaultTarget) writeStorage(STORAGE_KEYS.connectTargetGroup, defaultTarget);
-
-      updateConnectStatus();
-      updateConnectControls();
+      writeStorage(STORAGE_KEYS.connectSourceGroup, defaultSource || "");
+      writeStorage(STORAGE_KEYS.connectTargetGroup, defaultTarget || "");
+      applyExistingConnectionState();
     } catch (error) {
       if (!state.toolsOpen) return;
-      showNotice(
-        error && error.message ? error.message : text("connectLoadFailed"),
-        "error"
-      );
+      showNotice(error && error.message ? error.message : text("connectLoadFailed"), "error");
     } finally {
       state.connectLoading = false;
-      els["user-connect-refresh"].disabled = false;
       els["user-connect-source"].removeAttribute("aria-busy");
       els["user-connect-target"].removeAttribute("aria-busy");
-      updateConnectControls();
+      applyExistingConnectionState();
     }
+  }
+
+  function beginConnectEdit() {
+    if (state.connectSaving || state.connectLoading) return;
+    state.connectEditMode = true;
+    els["user-connect-source"].disabled = false;
+    els["user-connect-target"].disabled = false;
+    els["user-connect-change"].disabled = true;
+
+    var label = els["user-connect-submit"].querySelector(".button-label");
+    if (label) label.textContent = text("connectButton");
+    updateConnectControls();
+    window.requestAnimationFrame(function () {
+      if (!els["user-connect-source"].disabled) els["user-connect-source"].focus({ preventScroll: true });
+    });
   }
 
   async function submitGroupConnection() {
     if (state.connectSaving || state.connectLoading) return;
+
     var sourceId = Number(els["user-connect-source"].value);
     var targetId = Number(els["user-connect-target"].value);
     if (!Number.isSafeInteger(sourceId) || sourceId >= 0 || !Number.isSafeInteger(targetId) || targetId >= 0) return;
@@ -1912,6 +1973,7 @@
     setButton(els["user-connect-submit"], "loading", text("connectConnecting"));
     els["user-connect-source"].disabled = true;
     els["user-connect-target"].disabled = true;
+    els["user-connect-change"].disabled = true;
 
     try {
       var result = await apiUserConnect(sourceId, targetId);
@@ -1920,7 +1982,14 @@
 
       state.connectConnections = state.connectConnections || {};
       state.connectConnections[String(sourceId)] = connection;
-      updateConnectStatus();
+      state.connectEditMode = false;
+
+      writeStorage(STORAGE_KEYS.connectSourceGroup, String(sourceId));
+      writeStorage(STORAGE_KEYS.connectTargetGroup, String(targetId));
+
+      els["user-connect-source"].value = String(sourceId);
+      els["user-connect-target"].value = String(targetId);
+
       showNotice(text("connectSuccess"), "ok");
     } catch (error) {
       var message = error && error.message ? error.message : "";
@@ -1933,10 +2002,8 @@
       }
     } finally {
       state.connectSaving = false;
-      els["user-connect-source"].disabled = false;
-      els["user-connect-target"].disabled = false;
       setButton(els["user-connect-submit"], "idle", text("connectButton"));
-      updateConnectControls();
+      applyExistingConnectionState();
     }
   }
 
@@ -2171,21 +2238,33 @@
     els["user-report-message"].oninput = updateReportCharacterCount;
     els["user-report-form"].onsubmit = submitProblemReport;
 
-    els["user-connect-source"].onchange = function () {
-      writeStorage(STORAGE_KEYS.connectSourceGroup, els["user-connect-source"].value);
-      updateConnectStatus();
-      updateConnectControls();
-    };
+    if (els["user-tools-page"]) {
+      els["user-connect-source"].onchange = function () {
+        writeStorage(STORAGE_KEYS.connectSourceGroup, els["user-connect-source"].value);
 
-    els["user-connect-target"].onchange = function () {
-      writeStorage(STORAGE_KEYS.connectTargetGroup, els["user-connect-target"].value);
-      updateConnectControls();
-    };
+        var connection = state.connectConnections[String(els["user-connect-source"].value)];
+        if (connection) {
+          var targetId = String(connection.targetChatId);
+          if ((state.connectGroups || []).some(function (group) {
+            return String(group.id) === targetId;
+          })) {
+            els["user-connect-target"].value = targetId;
+            writeStorage(STORAGE_KEYS.connectTargetGroup, targetId);
+          }
+        }
 
-    els["user-connect-submit"].onclick = submitGroupConnection;
-    els["user-connect-refresh"].onclick = function () {
-      void loadConnectGroups();
-    };
+        updateConnectStatus();
+        updateConnectControls();
+      };
+
+      els["user-connect-target"].onchange = function () {
+        writeStorage(STORAGE_KEYS.connectTargetGroup, els["user-connect-target"].value);
+        updateConnectControls();
+      };
+
+      els["user-connect-submit"].onclick = submitGroupConnection;
+      els["user-connect-change"].onclick = beginConnectEdit;
+    }
 
     document.querySelectorAll('input[name="appearance-theme"]').forEach(function (input) {
       input.onchange = function () {
