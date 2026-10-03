@@ -2200,7 +2200,13 @@ html[data-compact="on"] .connect-select{min-height:44px}
 .connect-submit.is-loading{
   cursor:wait!important;
   transform:none!important;
+  opacity:1!important;
+  filter:none!important;
   box-shadow:0 16px 34px rgba(51,133,230,.28),0 0 24px rgba(72,168,255,.1);
+}
+.connect-submit.is-loading:disabled{
+  opacity:1!important;
+  filter:none!important;
 }
 .connect-submit.is-loading::before{
   content:"";
@@ -2215,8 +2221,14 @@ html[data-compact="on"] .connect-select{min-height:44px}
   color:#041914;
   background:linear-gradient(135deg,#a5f3d7,#59d7ac 58%,#69bfff);
   border-color:rgba(131,240,205,.34);
+  opacity:1!important;
   box-shadow:0 12px 28px rgba(71,215,162,.18),0 0 22px rgba(71,215,162,.07);
   filter:saturate(1.03);
+}
+.connect-submit.is-connected:disabled{
+  opacity:1!important;
+  filter:saturate(1.03)!important;
+  cursor:default;
 }
 .connect-submit.is-success{
   animation:connectSubmitSuccess 760ms var(--ease-out) both;
