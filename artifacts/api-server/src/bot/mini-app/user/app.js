@@ -19,6 +19,10 @@
     groupPickerOpen: false,
     aboutOpen: false,
     supportOpen: false,
+    appearanceOpen: false,
+    appearanceTheme: "dark",
+    animationsEnabled: true,
+    compactMode: false,
     autoRefreshEnabled: false,
     autoRefreshTimer: null,
     refreshInProgress: false
@@ -28,7 +32,10 @@
     verifiedUser: "z28_verified_user_id",
     language: "z28_user_language",
     dashboard: "z28_user_dashboard_state",
-    autoRefresh: "z28_user_auto_refresh"
+    autoRefresh: "z28_user_auto_refresh",
+    appearanceTheme: "z28_appearance_theme",
+    animations: "z28_appearance_animations",
+    compactMode: "z28_appearance_compact"
   };
 
   var DEFAULTS = {
@@ -107,6 +114,23 @@
       autoRefreshEnabled: "Auto refresh enabled. Updates every 30 seconds.",
       autoRefreshDisabled: "Auto refresh disabled.",
       dashboard: "Dashboard",
+      appearance: "Appearance",
+      appearanceSub: "Personalize the Mini App interface.",
+      appearanceKicker: "INTERFACE SETTINGS",
+      appearanceTheme: "Theme",
+      appearanceThemeSub: "Choose the interface style for this device.",
+      themeDark: "Dark",
+      themeDarkSub: "Balanced dark interface",
+      themeMidnight: "Midnight",
+      themeMidnightSub: "Cooler navy and violet finish",
+      themeAmoled: "AMOLED",
+      themeAmoledSub: "Pure black for OLED displays",
+      animations: "Animations",
+      animationsSub: "Keep interface motion and transitions enabled.",
+      compactMode: "Compact Mode",
+      compactModeSub: "Reduce spacing for a denser layout.",
+      appearanceOn: "ON",
+      appearanceOff: "OFF",
       about: "About",
       aboutSub: "App information and credits",
       bot: "Bot",
@@ -235,6 +259,23 @@
       autoRefreshEnabled: "Auto Refresh ဖွင့်ပြီးပါပြီ။ 30 စက္ကန့်တစ်ကြိမ် update လုပ်မည်။",
       autoRefreshDisabled: "Auto Refresh ပိတ်ပြီးပါပြီ။",
       dashboard: "Dashboard",
+      appearance: "Appearance",
+      appearanceSub: "Mini App ရဲ့ အပြင်အဆင်ကို စိတ်ကြိုက်ပြင်ဆင်ပါ။",
+      appearanceKicker: "INTERFACE SETTINGS",
+      appearanceTheme: "Theme",
+      appearanceThemeSub: "ဤ device အတွက် အသုံးပြုမည့် interface ပုံစံကို ရွေးပါ။",
+      themeDark: "Dark",
+      themeDarkSub: "မူလ dark interface ပုံစံ",
+      themeMidnight: "Midnight",
+      themeMidnightSub: "Navy နှင့် violet အရောင်ပိုင်း ပိုမိုနက်ရှိုင်းသောပုံစံ",
+      themeAmoled: "AMOLED",
+      themeAmoledSub: "OLED display များအတွက် pure black ပုံစံ",
+      animations: "Animations",
+      animationsSub: "Interface ရဲ့ motion နဲ့ transition များကို ဖွင့်ထားမည်။",
+      compactMode: "Compact Mode",
+      compactModeSub: "Screen space သက်သာစေရန် spacing ကို လျှော့မည်။",
+      appearanceOn: "ON",
+      appearanceOff: "OFF",
       about: "About",
       aboutSub: "App အချက်အလက်နှင့် Credits",
       bot: "Bot",
@@ -363,6 +404,23 @@
       autoRefreshEnabled: "自动刷新已开启，每30秒更新一次。",
       autoRefreshDisabled: "自动刷新已关闭。",
       dashboard: "仪表板",
+      appearance: "外观",
+      appearanceSub: "自定义 Mini App 的界面显示方式。",
+      appearanceKicker: "界面设置",
+      appearanceTheme: "主题",
+      appearanceThemeSub: "选择此设备使用的界面风格。",
+      themeDark: "深色",
+      themeDarkSub: "平衡的深色界面",
+      themeMidnight: "午夜",
+      themeMidnightSub: "更深的海军蓝与紫色风格",
+      themeAmoled: "AMOLED",
+      themeAmoledSub: "适合 OLED 屏幕的纯黑风格",
+      animations: "动画",
+      animationsSub: "保持界面动画和过渡效果。",
+      compactMode: "紧凑模式",
+      compactModeSub: "减少间距，让布局更加紧凑。",
+      appearanceOn: "开启",
+      appearanceOff: "关闭",
       about: "关于",
       aboutSub: "应用信息与创作者",
       bot: "机器人",
@@ -454,7 +512,16 @@
       "user-report-category-settings","user-report-category-other","user-report-message-label","user-report-message",
       "user-report-hint","user-report-count","user-report-context-label","user-report-context-value",
       "user-report-submit","user-tabbar","user-dashboard-tab-label","user-about-tab-label",
-      "user-support-tab-label","user-report-form",
+      "user-support-tab-label","user-appearance-tab-label","user-report-form",
+      "user-appearance-page","user-appearance-title","user-appearance-sub",
+      "user-appearance-theme-kicker","user-appearance-theme-title","user-appearance-theme-sub",
+      "appearance-theme-dark","appearance-theme-midnight","appearance-theme-amoled",
+      "user-appearance-theme-dark-title","user-appearance-theme-dark-sub",
+      "user-appearance-theme-midnight-title","user-appearance-theme-midnight-sub",
+      "user-appearance-theme-amoled-title","user-appearance-theme-amoled-sub",
+      "appearance-animations-toggle","user-appearance-animations-title","user-appearance-animations-sub",
+      "user-appearance-animations-state","appearance-compact-toggle","user-appearance-compact-title",
+      "user-appearance-compact-sub","user-appearance-compact-state",
       "user-faq-title","user-faq-sub",
       "user-faq-q1","user-faq-a1","user-faq-q2","user-faq-a2",
       "user-faq-q3","user-faq-a3","user-faq-q4","user-faq-a4",
@@ -502,6 +569,54 @@
     try { localStorage.removeItem(key); } catch (_) {}
   }
 
+  function applyAppearancePreferences() {
+    var root = document.documentElement;
+    root.setAttribute("data-theme", state.appearanceTheme);
+    root.setAttribute("data-animations", state.animationsEnabled ? "on" : "off");
+    root.setAttribute("data-compact", state.compactMode ? "on" : "off");
+    updateAppearanceControls();
+  }
+
+  function updateAppearanceControls() {
+    if (!els["appearance-animations-toggle"]) return;
+
+    document.querySelectorAll('input[name="appearance-theme"]').forEach(function (input) {
+      var selected = input.value === state.appearanceTheme;
+      input.checked = selected;
+      var option = input.closest(".appearance-theme-option");
+      if (option) option.classList.toggle("is-selected", selected);
+    });
+
+    els["appearance-animations-toggle"].setAttribute("aria-checked", String(state.animationsEnabled));
+    els["appearance-animations-toggle"].classList.toggle("is-enabled", state.animationsEnabled);
+    els["user-appearance-animations-state"].textContent =
+      state.animationsEnabled ? text("appearanceOn") : text("appearanceOff");
+
+    els["appearance-compact-toggle"].setAttribute("aria-checked", String(state.compactMode));
+    els["appearance-compact-toggle"].classList.toggle("is-enabled", state.compactMode);
+    els["user-appearance-compact-state"].textContent =
+      state.compactMode ? text("appearanceOn") : text("appearanceOff");
+  }
+
+  function setAppearanceTheme(theme) {
+    if (theme !== "dark" && theme !== "midnight" && theme !== "amoled") return;
+    state.appearanceTheme = theme;
+    writeStorage(STORAGE_KEYS.appearanceTheme, theme);
+    applyAppearancePreferences();
+  }
+
+  function toggleAnimations() {
+    state.animationsEnabled = !state.animationsEnabled;
+    writeStorage(STORAGE_KEYS.animations, state.animationsEnabled ? "1" : "0");
+    applyAppearancePreferences();
+  }
+
+  function toggleCompactMode() {
+    state.compactMode = !state.compactMode;
+    writeStorage(STORAGE_KEYS.compactMode, state.compactMode ? "1" : "0");
+    applyAppearancePreferences();
+  }
+
   function readDashboardState() {
     var raw = readStorage(STORAGE_KEYS.dashboard);
     if (!raw) return { groupId: null, tab: "dashboard" };
@@ -510,7 +625,12 @@
       var groupId = Number(parsed && parsed.groupId);
       return {
         groupId: Number.isSafeInteger(groupId) && groupId < 0 ? groupId : null,
-        tab: parsed && parsed.tab === "about" ? "about" : "dashboard"
+        tab:
+          parsed && parsed.tab === "about"
+            ? "about"
+            : parsed && parsed.tab === "appearance"
+              ? "appearance"
+              : "dashboard"
       };
     } catch (_) {
       return { groupId: null, tab: "dashboard" };
@@ -608,6 +728,7 @@
     return (
       state.autoRefreshEnabled &&
       !state.aboutOpen &&
+      !state.appearanceOpen &&
       !state.groupPickerOpen &&
       !state.settingsSaving &&
       !state.refreshInProgress &&
@@ -656,6 +777,7 @@
     els["user-dashboard"].hidden = true;
     els["user-about-page"].hidden = true;
     els["user-support-page"].hidden = true;
+    els["user-appearance-page"].hidden = true;
   }
 
   function applyLanguage() {
@@ -707,6 +829,22 @@
     els["user-dashboard-tab-label"].textContent = text("dashboard");
     els["user-about-tab-label"].textContent = text("about");
     els["user-support-tab-label"].textContent = text("helpSupport");
+    els["user-appearance-tab-label"].textContent = text("appearance");
+    els["user-appearance-title"].textContent = text("appearance");
+    els["user-appearance-sub"].textContent = text("appearanceSub");
+    els["user-appearance-theme-kicker"].textContent = text("appearanceKicker");
+    els["user-appearance-theme-title"].textContent = text("appearanceTheme");
+    els["user-appearance-theme-sub"].textContent = text("appearanceThemeSub");
+    els["user-appearance-theme-dark-title"].textContent = text("themeDark");
+    els["user-appearance-theme-dark-sub"].textContent = text("themeDarkSub");
+    els["user-appearance-theme-midnight-title"].textContent = text("themeMidnight");
+    els["user-appearance-theme-midnight-sub"].textContent = text("themeMidnightSub");
+    els["user-appearance-theme-amoled-title"].textContent = text("themeAmoled");
+    els["user-appearance-theme-amoled-sub"].textContent = text("themeAmoledSub");
+    els["user-appearance-animations-title"].textContent = text("animations");
+    els["user-appearance-animations-sub"].textContent = text("animationsSub");
+    els["user-appearance-compact-title"].textContent = text("compactMode");
+    els["user-appearance-compact-sub"].textContent = text("compactModeSub");
     els["user-about-title"].textContent = text("about");
     els["user-about-sub"].textContent = text("aboutSub");
     els["user-about-bot-name-label"].textContent = text("bot");
@@ -765,10 +903,16 @@
     });
 
     updateAutoRefreshControl();
+    updateAppearanceControls();
 
     if (state.dashboard && state.dashboard.selectedGroup) {
       if (state.supportOpen) updateReportContext();
-      else renderSelectedDashboard(state.dashboard, true);
+      else if (!state.appearanceOpen) renderSelectedDashboard(state.dashboard, true);
+    }
+
+    if (state.appearanceOpen) {
+      els.title.textContent = text("appearance");
+      els.identity.textContent = userGreeting();
     }
   }
 
@@ -804,6 +948,7 @@
     state.groupPickerOpen = false;
     state.aboutOpen = false;
     state.supportOpen = false;
+    state.appearanceOpen = false;
     state.dashboard = null;
     state.selectedGroupId = null;
     hideAllPrimaryScreens();
@@ -830,6 +975,7 @@
     state.groupPickerOpen = false;
     state.aboutOpen = false;
     state.supportOpen = false;
+    state.appearanceOpen = false;
     hideAllPrimaryScreens();
     els["user-no-group-screen"].hidden = false;
     els.title.textContent = text("noGroup");
@@ -847,6 +993,7 @@
     state.groupPickerOpen = false;
     state.aboutOpen = false;
     state.supportOpen = false;
+    state.appearanceOpen = false;
     hideAllPrimaryScreens();
     els["user-dashboard-error-screen"].hidden = false;
     els.title.textContent = text("dashboardError");
@@ -1300,13 +1447,14 @@
     state.selectedGroupId = Number(group.id);
     saveDashboardState({ groupId: state.selectedGroupId });
 
-    if (languageOnly && (state.aboutOpen || state.supportOpen)) return;
+    if (languageOnly && (state.aboutOpen || state.supportOpen || state.appearanceOpen)) return;
 
     els["user-group-options"].hidden = true;
     els["user-selected-dashboard"].hidden = false;
     els["user-dashboard"].hidden = false;
     els["user-about-page"].hidden = true;
     els["user-support-page"].hidden = true;
+    els["user-appearance-page"].hidden = true;
     els["user-tabbar"].hidden = false;
 
     els.title.textContent = text("title");
@@ -1369,6 +1517,7 @@
       els["user-selected-dashboard"].hidden = true;
       els["user-about-page"].hidden = true;
       els["user-support-page"].hidden = true;
+      els["user-appearance-page"].hidden = true;
       els["user-tabbar"].hidden = true;
       els.title.textContent = text("groupOptions");
       els.identity.textContent = userGreeting();
@@ -1384,7 +1533,7 @@
 
   async function loadUserDashboard(showLoading, groupId, silent) {
     if (!telegramUserId) throw new Error(text("identifyError"));
-    if (state.aboutOpen || state.supportOpen) return true;
+    if (state.aboutOpen || state.supportOpen || state.appearanceOpen) return true;
 
     var requestId = ++state.requestId;
     var shouldShowLoading = showLoading !== false;
@@ -1440,31 +1589,44 @@
     if (!state.dashboard || !els["user-tabbar"] || els["user-tabbar"].hidden) return;
     if (state.groupPickerOpen) return;
 
-    tab = tab === "about" || tab === "support" ? tab : "dashboard";
+    tab = tab === "about" || tab === "support" || tab === "appearance" ? tab : "dashboard";
     state.aboutOpen = tab === "about";
     state.supportOpen = tab === "support";
+    state.appearanceOpen = tab === "appearance";
     saveDashboardState({ tab: tab });
 
     ++state.requestId;
 
     if (state.aboutOpen) {
       els["user-selected-dashboard"].hidden = true;
-      els["user-about-page"].hidden = false;
       els["user-support-page"].hidden = true;
+      els["user-appearance-page"].hidden = true;
+      els["user-about-page"].hidden = false;
       els.title.textContent = text("about");
       els.identity.textContent = userGreeting();
       setDashboardControls(false);
     } else if (state.supportOpen) {
       els["user-selected-dashboard"].hidden = true;
       els["user-about-page"].hidden = true;
+      els["user-appearance-page"].hidden = true;
       els["user-support-page"].hidden = false;
       els.title.textContent = text("helpSupport");
       els.identity.textContent = userGreeting();
       updateReportContext();
       setDashboardControls(false);
+    } else if (state.appearanceOpen) {
+      els["user-selected-dashboard"].hidden = true;
+      els["user-about-page"].hidden = true;
+      els["user-support-page"].hidden = true;
+      els["user-appearance-page"].hidden = false;
+      els.title.textContent = text("appearance");
+      els.identity.textContent = userGreeting();
+      setDashboardControls(false);
+      updateAppearanceControls();
     } else {
       els["user-about-page"].hidden = true;
       els["user-support-page"].hidden = true;
+      els["user-appearance-page"].hidden = true;
       els["user-selected-dashboard"].hidden = false;
       els.title.textContent = text("title");
       els.identity.textContent = userGreeting();
@@ -1475,14 +1637,14 @@
     document.querySelectorAll("[data-user-tab]").forEach(function (button) {
       var active = button.getAttribute("data-user-tab") === tab;
       button.classList.toggle("active", active);
-      button.setAttribute("aria-selected", String(active));
+      button.setAttribute("aria-current", active ? "page" : "false");
     });
 
     updateBackButton();
   }
 
   async function openGroupPicker() {
-    if (!state.dashboard || state.aboutOpen || state.supportOpen || state.groupPickerOpen || state.settingsSaving || state.refreshInProgress) return;
+    if (!state.dashboard || state.aboutOpen || state.supportOpen || state.appearanceOpen || state.groupPickerOpen || state.settingsSaving || state.refreshInProgress) return;
     var hasUnsaved = false;
     document.querySelectorAll(".editor-input[data-original-value]").forEach(function (input) {
       if (input.value !== input.getAttribute("data-original-value")) hasUnsaved = true;
@@ -1502,11 +1664,13 @@
     state.groupPickerOpen = true;
     state.aboutOpen = false;
     state.supportOpen = false;
+    state.appearanceOpen = false;
     ++state.requestId;
     els["user-group-options"].hidden = false;
     els["user-selected-dashboard"].hidden = true;
     els["user-about-page"].hidden = true;
     els["user-support-page"].hidden = true;
+    els["user-appearance-page"].hidden = true;
     els["user-tabbar"].hidden = true;
     els.title.textContent = text("groupOptions");
     els.identity.textContent = userGreeting();
@@ -1537,7 +1701,7 @@
     if (!tg || !tg.BackButton) return;
     var shouldShow =
       Boolean(state.dashboard) &&
-      (state.groupPickerOpen || state.aboutOpen || state.supportOpen);
+      (state.groupPickerOpen || state.aboutOpen || state.supportOpen || state.appearanceOpen);
     if (shouldShow) tg.BackButton.show();
     else tg.BackButton.hide();
   }
@@ -1551,7 +1715,7 @@
       }
       return;
     }
-    if (state.aboutOpen || state.supportOpen) setDashboardTab("dashboard");
+    if (state.aboutOpen || state.supportOpen || state.appearanceOpen) setDashboardTab("dashboard");
   }
 
   function bindStaticEvents() {
@@ -1633,6 +1797,15 @@
 
     els["user-report-message"].oninput = updateReportCharacterCount;
     els["user-report-form"].onsubmit = submitProblemReport;
+
+    document.querySelectorAll('input[name="appearance-theme"]').forEach(function (input) {
+      input.onchange = function () {
+        setAppearanceTheme(input.value);
+      };
+    });
+
+    els["appearance-animations-toggle"].onclick = toggleAnimations;
+    els["appearance-compact-toggle"].onclick = toggleCompactMode;
 
     els["user-no-group-back"].onclick = function () {
       state.verifiedUserId = null;
@@ -1737,6 +1910,18 @@
 
     var savedAutoRefresh = readStorage(STORAGE_KEYS.autoRefresh);
     state.autoRefreshEnabled = savedAutoRefresh === "1";
+
+    var storedTheme = readStorage(STORAGE_KEYS.appearanceTheme);
+    state.appearanceTheme =
+      storedTheme === "midnight" || storedTheme === "amoled" ? storedTheme : "dark";
+
+    var storedAnimations = readStorage(STORAGE_KEYS.animations);
+    state.animationsEnabled = storedAnimations !== "0";
+
+    var storedCompact = readStorage(STORAGE_KEYS.compactMode);
+    state.compactMode = storedCompact === "1";
+
+    applyAppearancePreferences();
   }
 
   function hideSplash() {
