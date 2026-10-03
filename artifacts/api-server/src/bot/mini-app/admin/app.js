@@ -864,12 +864,34 @@
         var messageBox = document.getElementById("admin-broadcast-message");
         if (!modeBox || !directBox || !button || !messageBox) return;
 
-        var direct = modeBox.value === "direct";
+        var mode = modeBox.value === "direct" ? "direct" : "broadcast";
+        var direct = mode === "direct";
         directBox.hidden = !direct;
         button.textContent = direct ? "Send direct reply" : "Send announcement";
         messageBox.placeholder = direct ? "Write your reply…" : "Write your announcement…";
+
+        document.querySelectorAll("[data-admin-broadcast-mode]").forEach(function (option) {
+          var active = option.getAttribute("data-admin-broadcast-mode") === mode;
+          option.classList.toggle("is-active", active);
+          option.setAttribute("aria-pressed", String(active));
+        });
+
         if (!direct && userIdBox) userIdBox.value = "";
-        if (direct && userIdBox) userIdBox.focus();
+        if (direct && userIdBox && document.activeElement !== userIdBox) {
+          userIdBox.focus();
+        }
+      }
+
+      function setAdminBroadcastMode(mode) {
+        if (mode !== "broadcast" && mode !== "direct") return;
+        var modeBox = document.getElementById("admin-broadcast-mode");
+        if (!modeBox) return;
+        if (modeBox.value === mode) {
+          syncAdminBroadcastMode();
+          return;
+        }
+        modeBox.value = mode;
+        syncAdminBroadcastMode();
       }
 
       async function sendAdminBroadcast() {
@@ -2207,6 +2229,12 @@
         broadcastMode.addEventListener("change", syncAdminBroadcastMode);
         syncAdminBroadcastMode();
       }
+
+      document.querySelectorAll("[data-admin-broadcast-mode]").forEach(function (option) {
+        option.addEventListener("click", function () {
+          setAdminBroadcastMode(option.getAttribute("data-admin-broadcast-mode"));
+        });
+      });
       if (broadcastMessage && broadcastCount) {
         broadcastMessage.addEventListener("input", function() {
           broadcastCount.textContent = String(broadcastMessage.value.length) + " / 4000";
