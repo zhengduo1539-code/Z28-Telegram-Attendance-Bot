@@ -130,6 +130,7 @@
       noGroupStep3Title: "Reopen the Mini App",
       noGroupStep3Copy: "Open the Mini App again after the access changes are complete.",
       noGroupNote: "Groups that are no longer available to the bot are not shown in your dashboard.",
+      noGroupBack: "Back to verification",
       dashboardError: "Unable to load your dashboard right now.",
       dashboardErrorCopy: "Something went wrong while loading your dashboard. Your saved settings were not changed.",
       tryAgain: "Try Again",
@@ -257,6 +258,7 @@
       noGroupStep3Title: "Mini App ကို ပြန်ဖွင့်ပါ",
       noGroupStep3Copy: "Access ပြောင်းလဲမှုများ ပြီးစီးပြီးနောက် Mini App ကို ပြန်ဖွင့်ပါ။",
       noGroupNote: "Bot မှ အသုံးပြုခွင့်မရှိတော့သော Group များကို Dashboard တွင် မပြပါ။",
+      noGroupBack: "ID အတည်ပြုရန် ပြန်သွားမည်",
       dashboardError: "Dashboard ကို ယခုဖွင့်၍ မရသေးပါ။",
       dashboardErrorCopy: "Dashboard ကိုဖွင့်နေစဉ် ပြဿနာတစ်ခု ဖြစ်ပေါ်ခဲ့ပါသည်။ သိမ်းထားပြီးသော setting များကို မပြောင်းလဲထားပါ။",
       tryAgain: "ထပ်ကြိုးစားမည်",
@@ -384,6 +386,7 @@
       noGroupStep3Title: "重新打开 Mini App",
       noGroupStep3Copy: "完成访问权限调整后，再次打开 Mini App。",
       noGroupNote: "Bot 已无法使用的群组不会显示在您的 Dashboard 中。",
+      noGroupBack: "返回验证",
       dashboardError: "暂时无法加载您的控制面板。",
       dashboardErrorCopy: "加载控制面板时出现问题。您已保存的设置没有被更改。",
       tryAgain: "再试一次",
@@ -431,6 +434,7 @@
       "user-no-group-step1-title","user-no-group-step1-copy",
       "user-no-group-step2-title","user-no-group-step2-copy",
       "user-no-group-step3-title","user-no-group-step3-copy","user-no-group-note",
+      "user-no-group-back","user-no-group-back-label",
       "user-dashboard-error-screen","user-dashboard-error-title","user-dashboard-error-lead",
       "user-dashboard-error-retry","user-dashboard","user-group-options",
       "group-options-title","group-options-subtitle","user-group-options-list",
@@ -674,6 +678,7 @@
     els["user-no-group-step3-title"].textContent = text("noGroupStep3Title");
     els["user-no-group-step3-copy"].textContent = text("noGroupStep3Copy");
     els["user-no-group-note"].textContent = text("noGroupNote");
+    els["user-no-group-back-label"].textContent = text("noGroupBack");
     els["user-id-label"].textContent = text("idLabel");
     els["user-id-input"].placeholder = text("idPlaceholder");
     els["user-id-hint"].textContent = text("idHint");
@@ -801,14 +806,7 @@
     setDashboardControls(false);
     updateBackButton();
 
-    window.clearTimeout(showNoGroup.timer);
-    showNoGroup.timer = window.setTimeout(function () {
-      if (els["user-no-group-screen"].hidden) return;
-      state.verifiedUserId = null;
-      state.selectedGroupId = null;
-      removeStorage(STORAGE_KEYS.verifiedUser);
-      showVerification();
-    }, 5000);
+
   }
 
   function showDashboardError(error, groupId) {
@@ -1568,6 +1566,13 @@
 
     els["user-report-message"].oninput = updateReportCharacterCount;
     els["user-report-form"].onsubmit = submitProblemReport;
+
+    els["user-no-group-back"].onclick = function () {
+      state.verifiedUserId = null;
+      state.selectedGroupId = null;
+      removeStorage(STORAGE_KEYS.verifiedUser);
+      showVerification();
+    };
 
     els["auto-refresh-toggle"].onclick = function () {
       if (state.aboutOpen || state.groupPickerOpen || !state.dashboard || !state.dashboard.selectedGroup) return;
