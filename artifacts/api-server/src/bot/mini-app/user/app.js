@@ -1048,8 +1048,8 @@
     updateBackButton();
   }
 
-  function openGroupPicker() {
-    if (!state.dashboard || state.aboutOpen || state.groupPickerOpen) return;
+  async function openGroupPicker() {
+    if (!state.dashboard || state.aboutOpen || state.groupPickerOpen || state.settingsSaving) return;
     var hasUnsaved = false;
     document.querySelectorAll(".editor-input[data-original-value]").forEach(function (input) {
       if (input.value !== input.getAttribute("data-original-value")) hasUnsaved = true;
@@ -1073,9 +1073,28 @@
     els["user-about-page"].hidden = true;
     els["user-tabbar"].hidden = true;
     els.title.textContent = text("groupOptions");
+    els.identity.textContent = userGreeting();
     setDashboardControls(false);
-    renderGroupOptions(state.dashboard.groups || []);
     updateBackButton();
+
+    try {
+      setLoading(true);
+      var data = await apiUserDashboard(telegramUserId);
+      if (!data || typeof data !== "object" || !Array.isArray(data.groups)) {
+        throw new Error(text("invalidResponse"));
+      }
+      state.dashboard = Object.assign({}, state.dashboard, data);
+      renderGroupOptions(data.groups);
+    } catch (error) {
+      state.groupPickerOpen = false;
+      if (state.dashboard && state.dashboard.selectedGroup) {
+        renderSelectedDashboard(state.dashboard, true);
+      }
+      showNotice(error && error.message ? error.message : "Unable to load groups.", "error");
+    } finally {
+      setLoading(false);
+      updateBackButton();
+    }
   }
 
   function updateBackButton() {
