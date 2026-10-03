@@ -153,7 +153,6 @@
       connectLoadFailed: "Unable to load installed groups. Please try again.",
       connectSuccess: "Group connection saved successfully.",
       connectFailed: "Unable to connect these groups. Please try again.",
-      connectReady: "ချိတ်ဆက်ရန် အဆင်သင့်ဖြစ်ပါပြီ",
       connectReady: "Ready to connect",
       appearance: "Appearance",
       appearanceSub: "Personalize the Mini App interface.",
@@ -1929,6 +1928,7 @@
 
     state.connectLoading = true;
     state.connectEditMode = false;
+    state.connectEditSnapshot = null;
     els["user-connect-submit"].disabled = true;
     els["user-connect-change"].disabled = true;
     els["user-connect-source"].setAttribute("aria-busy", "true");
