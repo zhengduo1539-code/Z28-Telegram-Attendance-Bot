@@ -597,6 +597,7 @@
     els["switch-group-label"].textContent = text("switch");
     els["user-dashboard-tab-label"].textContent = text("dashboard");
     els["user-about-tab-label"].textContent = text("about");
+    els["user-support-tab-label"].textContent = text("helpSupport");
     els["user-about-title"].textContent = text("about");
     els["user-about-sub"].textContent = text("aboutSub");
     els["user-about-bot-name-label"].textContent = text("bot");
@@ -608,6 +609,25 @@
     els["user-about-privacy-copy"].textContent = text("privacyCopy");
     els["user-about-credits-label"].textContent = text("credits");
     els["user-about-creator-label"].textContent = text("creator");
+    els["user-support-title"].textContent = text("helpSupport");
+    els["user-support-sub"].textContent = text("helpSupportSub");
+    els["user-report-title"].textContent = text("reportProblem");
+    els["user-report-lead"].textContent = text("reportProblemLead");
+    els["user-report-category-label"].textContent = text("reportCategory");
+    els["user-report-category-bug"].textContent = text("reportCategoryBug");
+    els["user-report-category-access"].textContent = text("reportCategoryAccess");
+    els["user-report-category-group"].textContent = text("reportCategoryGroup");
+    els["user-report-category-settings"].textContent = text("reportCategorySettings");
+    els["user-report-category-other"].textContent = text("reportCategoryOther");
+    els["user-report-message-label"].textContent = text("reportMessage");
+    els["user-report-message"].placeholder = text("reportPlaceholder");
+    els["user-report-hint"].textContent = text("reportHint");
+    els["user-report-context-label"].textContent = text("reportContext");
+    if (!els["user-report-submit"].classList.contains("is-loading")) {
+      var reportLabel = els["user-report-submit"].querySelector(".button-label");
+      if (reportLabel) reportLabel.textContent = text("reportSend");
+    }
+    updateReportCharacterCount();
 
     els["user-no-group-title"].textContent = text("noGroup");
     els["user-no-group-message"].textContent = text("noGroupCopy");
@@ -624,7 +644,8 @@
     updateAutoRefreshControl();
 
     if (state.dashboard && state.dashboard.selectedGroup) {
-      renderSelectedDashboard(state.dashboard, true);
+      if (state.supportOpen) updateReportContext();
+      else renderSelectedDashboard(state.dashboard, true);
     }
   }
 
@@ -642,6 +663,7 @@
   function showVerification() {
     state.groupPickerOpen = false;
     state.aboutOpen = false;
+    state.supportOpen = false;
     state.dashboard = null;
     state.selectedGroupId = null;
     hideAllPrimaryScreens();
@@ -659,6 +681,9 @@
   }
 
   function showNoGroup() {
+    state.groupPickerOpen = false;
+    state.aboutOpen = false;
+    state.supportOpen = false;
     hideAllPrimaryScreens();
     els["user-no-group-screen"].hidden = false;
     els.title.textContent = text("noGroup");
@@ -678,6 +703,9 @@
   }
 
   function showDashboardError(error, groupId) {
+    state.groupPickerOpen = false;
+    state.aboutOpen = false;
+    state.supportOpen = false;
     hideAllPrimaryScreens();
     els["user-dashboard-error-screen"].hidden = false;
     els.title.textContent = text("dashboardError");
@@ -1065,12 +1093,13 @@
     state.selectedGroupId = Number(group.id);
     saveDashboardState({ groupId: state.selectedGroupId });
 
-    if (languageOnly && state.aboutOpen) return;
+    if (languageOnly && (state.aboutOpen || state.supportOpen)) return;
 
     els["user-group-options"].hidden = true;
     els["user-selected-dashboard"].hidden = false;
     els["user-dashboard"].hidden = false;
     els["user-about-page"].hidden = true;
+    els["user-support-page"].hidden = true;
     els["user-tabbar"].hidden = false;
 
     els.title.textContent = text("title");
@@ -1129,6 +1158,7 @@
       els["user-group-options"].hidden = false;
       els["user-selected-dashboard"].hidden = true;
       els["user-about-page"].hidden = true;
+      els["user-support-page"].hidden = true;
       els["user-tabbar"].hidden = true;
       els.title.textContent = text("groupOptions");
       els.identity.textContent = userGreeting();
@@ -1144,7 +1174,7 @@
 
   async function loadUserDashboard(showLoading, groupId, silent) {
     if (!telegramUserId) throw new Error(text("identifyError"));
-    if (state.aboutOpen) return true;
+    if (state.aboutOpen || state.supportOpen) return true;
 
     var requestId = ++state.requestId;
     var shouldShowLoading = showLoading !== false;
@@ -1159,7 +1189,7 @@
         throw new Error(text("apiPrefix") + ": " + apiMessage);
       }
 
-      if (requestId !== state.requestId || state.aboutOpen) return false;
+      if (requestId !== state.requestId || state.aboutOpen || state.supportOpen) return false;
       if (state.groupPickerOpen && groupId === undefined) return false;
 
       var opened;
