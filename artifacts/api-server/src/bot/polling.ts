@@ -22,15 +22,16 @@ export class TelegramPollingBot {
     await this.telegram.deleteWebhook();
     await this.telegram.setMyCommands();
 
-    if (this.config.adminMiniAppUrl) {
+    const defaultMiniAppUrl = this.config.userMiniAppUrl || this.config.adminMiniAppUrl;
+    if (defaultMiniAppUrl) {
       await this.telegram.setChatMenuButton(undefined, {
         type: "web_app",
-        text: "Open Mini App",
-        web_app: { url: this.config.adminMiniAppUrl },
+        text: "📊 My Dashboard",
+        web_app: { url: defaultMiniAppUrl },
       });
       this.logger.info(
-        { miniAppUrl: this.config.adminMiniAppUrl },
-        "Telegram Mini App menu button configured for all private chats",
+        { miniAppUrl: defaultMiniAppUrl },
+        "Telegram user Mini App menu button configured as the default for private chats",
       );
     } else {
       this.logger.warn(
@@ -43,12 +44,26 @@ export class TelegramPollingBot {
       ...this.config.adminIds,
     ]);
     await Promise.allSettled(
-      [...adminIds].map((userId) =>
-        this.telegram.setMyCommands(ADMIN_MENU_COMMANDS, {
-          type: "chat",
-          chat_id: userId,
-        }),
-      ),
+      [...adminIds].flatMap((userId) => {
+        const operations: Promise<unknown>[] = [
+          this.telegram.setMyCommands(ADMIN_MENU_COMMANDS, {
+            type: "chat",
+            chat_id: userId,
+          }),
+        ];
+
+        if (this.config.adminMiniAppUrl) {
+          operations.push(
+            this.telegram.setChatMenuButton(userId, {
+              type: "web_app",
+              text: "⚙️ Admin Panel",
+              web_app: { url: this.config.adminMiniAppUrl },
+            }),
+          );
+        }
+
+        return operations;
+      }),
     );
 
     setBotStatus({ enabled: true, running: true, lastError: undefined });
