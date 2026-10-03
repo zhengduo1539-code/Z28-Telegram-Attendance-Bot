@@ -17,13 +17,17 @@
     requestId: 0,
     settingsSaving: false,
     groupPickerOpen: false,
-    aboutOpen: false
+    aboutOpen: false,
+    autoRefreshEnabled: false,
+    autoRefreshTimer: null,
+    refreshInProgress: false
   };
 
   var STORAGE_KEYS = {
     verifiedUser: "z28_verified_user_id",
     language: "z28_user_language",
-    dashboard: "z28_user_dashboard_state"
+    dashboard: "z28_user_dashboard_state",
+    autoRefresh: "z28_user_auto_refresh"
   };
 
   var DEFAULTS = {
@@ -80,6 +84,12 @@
       refresh: "Refresh",
       refreshing: "Refreshing",
       refreshSuccess: "Dashboard updated successfully.",
+      autoRefreshOn: "Auto • 30s",
+      autoRefreshOff: "Auto • Off",
+      autoRefreshOnHint: "Automatically refreshes the dashboard every 30 seconds.",
+      autoRefreshOffHint: "Automatic dashboard refresh is turned off.",
+      autoRefreshEnabled: "Auto refresh enabled. Updates every 30 seconds.",
+      autoRefreshDisabled: "Auto refresh disabled.",
       dashboard: "Dashboard",
       about: "About",
       aboutSub: "App information and credits",
@@ -156,6 +166,12 @@
       refresh: "Refresh",
       refreshing: "Refresh လုပ်နေသည်",
       refreshSuccess: "Dashboard ကို နောက်ဆုံးအချက်အလက်များဖြင့် update လုပ်ပြီးပါပြီ။",
+      autoRefreshOn: "Auto • 30s",
+      autoRefreshOff: "Auto • ပိတ်ထားသည်",
+      autoRefreshOnHint: "Dashboard ကို 30 စက္ကန့်တစ်ကြိမ် အလိုအလျောက် update လုပ်မည်။",
+      autoRefreshOffHint: "Dashboard အလိုအလျောက် update ကို ပိတ်ထားသည်။",
+      autoRefreshEnabled: "Auto Refresh ဖွင့်ပြီးပါပြီ။ 30 စက္ကန့်တစ်ကြိမ် update လုပ်မည်။",
+      autoRefreshDisabled: "Auto Refresh ပိတ်ပြီးပါပြီ။",
       dashboard: "Dashboard",
       about: "About",
       aboutSub: "App အချက်အလက်နှင့် Credits",
@@ -232,6 +248,12 @@
       refresh: "刷新",
       refreshing: "刷新中",
       refreshSuccess: "仪表板已更新为最新数据。",
+      autoRefreshOn: "自动 • 30秒",
+      autoRefreshOff: "自动 • 关闭",
+      autoRefreshOnHint: "每30秒自动更新仪表板。",
+      autoRefreshOffHint: "自动更新仪表板已关闭。",
+      autoRefreshEnabled: "自动刷新已开启，每30秒更新一次。",
+      autoRefreshDisabled: "自动刷新已关闭。",
       dashboard: "仪表板",
       about: "关于",
       aboutSub: "应用信息与创作者",
@@ -273,7 +295,8 @@
       "user-dashboard-error-retry","user-dashboard","user-group-options",
       "group-options-title","group-options-subtitle","user-group-options-list",
       "user-selected-dashboard","selected-group-eyebrow","user-selected-group-title",
-      "user-dashboard-sub","refresh","switch-group","switch-group-label",
+      "user-dashboard-sub","refresh","auto-refresh-toggle","auto-refresh-label",
+      "switch-group","switch-group-label",
       "user-member-count","user-active-count","user-group-member-label",
       "user-member-active-label","settings-title","settings-subtitle",
       "user-settings-limits-card","user-settings-counts-card",
@@ -399,6 +422,79 @@
     if (content) content.textContent = label || text("save");
   }
 
+  function updateAutoRefreshControl() {
+    var button = els["auto-refresh-toggle"];
+    var label = els["auto-refresh-label"];
+    if (!button || !label) return;
+    var enabled = state.autoRefreshEnabled;
+    var hint = enabled ? text("autoRefreshOnHint") : text("autoRefreshOffHint");
+    button.classList.toggle("is-enabled", enabled);
+    button.setAttribute("aria-pressed", String(enabled));
+    button.setAttribute("aria-label", hint);
+    button.setAttribute("title", hint);
+    label.textContent = enabled ? text("autoRefreshOn") : text("autoRefreshOff");
+  }
+
+  function hasOpenSettingsEditor() {
+    var editors = document.querySelectorAll(".setting-editor");
+    for (var index = 0; index < editors.length; index += 1) {
+      if (!editors[index].hidden) return true;
+    }
+    return false;
+  }
+
+  function stopAutoRefresh() {
+    if (state.autoRefreshTimer !== null) {
+      window.clearTimeout(state.autoRefreshTimer);
+      state.autoRefreshTimer = null;
+    }
+  }
+
+  function canAutoRefresh() {
+    return (
+      state.autoRefreshEnabled &&
+      !state.aboutOpen &&
+      !state.groupPickerOpen &&
+      !state.settingsSaving &&
+      !state.refreshInProgress &&
+      !hasOpenSettingsEditor() &&
+      !document.hidden &&
+      Boolean(state.dashboard && state.dashboard.selectedGroup) &&
+      Boolean(els["user-selected-dashboard"] && !els["user-selected-dashboard"].hidden)
+    );
+  }
+
+  function scheduleAutoRefresh() {
+    stopAutoRefresh();
+    if (!canAutoRefresh()) return;
+    state.autoRefreshTimer = window.setTimeout(function () {
+      state.autoRefreshTimer = null;
+      runAutoRefresh();
+    }, 30000);
+  }
+
+  async function runAutoRefresh() {
+    if (!state.autoRefreshEnabled) return;
+    if (!canAutoRefresh()) {
+      scheduleAutoRefresh();
+      return;
+    }
+
+    state.refreshInProgress = true;
+    els.refresh.classList.add("is-auto-syncing");
+    els["auto-refresh-toggle"].classList.add("is-syncing");
+    try {
+      await loadUserDashboard(false, state.selectedGroupId, true);
+    } catch (_) {
+      // Background refresh failures must not replace a working dashboard.
+    } finally {
+      state.refreshInProgress = false;
+      els.refresh.classList.remove("is-auto-syncing");
+      els["auto-refresh-toggle"].classList.remove("is-syncing");
+      scheduleAutoRefresh();
+    }
+  }
+
   function hideAllPrimaryScreens() {
     els["user-verify-card"].hidden = true;
     els["user-no-group-screen"].hidden = true;
@@ -456,6 +552,8 @@
     document.querySelectorAll(".language-option").forEach(function (option) {
       option.classList.toggle("active", option.getAttribute("data-user-lang") === state.language);
     });
+
+    updateAutoRefreshControl();
 
     if (state.dashboard && state.dashboard.selectedGroup) {
       renderSelectedDashboard(state.dashboard, true);
@@ -529,7 +627,14 @@
 
   function setDashboardControls(visible) {
     els.refresh.hidden = !visible;
+    els["auto-refresh-toggle"].hidden = !visible;
     els["switch-group"].hidden = !visible;
+    if (!visible) {
+      stopAutoRefresh();
+    } else {
+      updateAutoRefreshControl();
+      scheduleAutoRefresh();
+    }
   }
 
   function userGreeting() {
@@ -710,6 +815,7 @@
         if (status) status.hidden = true;
         editor.hidden = true;
         card.querySelector(".setting-view").hidden = false;
+        scheduleAutoRefresh();
       };
     });
 
@@ -919,6 +1025,8 @@
     });
 
     setDashboardControls(true);
+    updateAutoRefreshControl();
+    scheduleAutoRefresh();
     updateBackButton();
 
     if (languageOnly) return;
@@ -966,7 +1074,7 @@
     return true;
   }
 
-  async function loadUserDashboard(showLoading, groupId) {
+  async function loadUserDashboard(showLoading, groupId, silent) {
     if (!telegramUserId) throw new Error(text("identifyError"));
     if (state.aboutOpen) return true;
 
@@ -999,7 +1107,7 @@
       }
       return opened;
     } catch (error) {
-      if (requestId === state.requestId && !state.aboutOpen) {
+      if (requestId === state.requestId && !state.aboutOpen && !silent) {
         showDashboardError(error, groupId);
       }
       throw error;
@@ -1054,7 +1162,7 @@
   }
 
   async function openGroupPicker() {
-    if (!state.dashboard || state.aboutOpen || state.groupPickerOpen || state.settingsSaving) return;
+    if (!state.dashboard || state.aboutOpen || state.groupPickerOpen || state.settingsSaving || state.refreshInProgress) return;
     var hasUnsaved = false;
     document.querySelectorAll(".editor-input[data-original-value]").forEach(function (input) {
       if (input.value !== input.getAttribute("data-original-value")) hasUnsaved = true;
@@ -1158,7 +1266,9 @@
     els["user-confirm"].onclick = verifyUser;
 
     els.refresh.onclick = function () {
-      if (state.aboutOpen || state.groupPickerOpen || state.settingsSaving) return;
+      if (state.aboutOpen || state.groupPickerOpen || state.settingsSaving || state.refreshInProgress) return;
+      state.refreshInProgress = true;
+      stopAutoRefresh();
       setButton(els.refresh, "loading", text("refreshing") + "…");
       loadUserDashboard(false, state.selectedGroupId)
         .then(function () {
@@ -1168,9 +1278,33 @@
           showNotice(error && error.message ? error.message : "Refresh failed.", "error");
         })
         .finally(function () {
+          state.refreshInProgress = false;
           setButton(els.refresh, "idle", text("refresh"));
+          scheduleAutoRefresh();
         });
     };
+
+    els["auto-refresh-toggle"].onclick = function () {
+      if (state.aboutOpen || state.groupPickerOpen || !state.dashboard || !state.dashboard.selectedGroup) return;
+      state.autoRefreshEnabled = !state.autoRefreshEnabled;
+      writeStorage(
+        STORAGE_KEYS.autoRefresh,
+        state.autoRefreshEnabled ? "1" : "0"
+      );
+      updateAutoRefreshControl();
+      if (state.autoRefreshEnabled) {
+        showNotice(text("autoRefreshEnabled"), "ok");
+        scheduleAutoRefresh();
+      } else {
+        stopAutoRefresh();
+        showNotice(text("autoRefreshDisabled"), "ok");
+      }
+    };
+
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden) stopAutoRefresh();
+      else scheduleAutoRefresh();
+    });
 
     els["switch-group"].onclick = openGroupPicker;
     els["user-dashboard-error-retry"].onclick = function () {
@@ -1243,6 +1377,9 @@
 
     var savedDashboard = readDashboardState();
     state.selectedGroupId = savedDashboard.groupId;
+
+    var savedAutoRefresh = readStorage(STORAGE_KEYS.autoRefresh);
+    state.autoRefreshEnabled = savedAutoRefresh === "1";
   }
 
   function hideSplash() {
