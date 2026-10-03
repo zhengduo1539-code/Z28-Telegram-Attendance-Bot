@@ -29,6 +29,14 @@
     wallpaper: "default",
     animationsEnabled: true,
     compactMode: false,
+    themeCreator: {
+      enabled: false,
+      primary: "#48a8ff",
+      secondary: "#7a68ff",
+      glow: 60,
+      radius: 18,
+      background: 70
+    },
     autoRefreshEnabled: false,
     autoRefreshTimer: null,
     refreshInProgress: false
@@ -44,12 +52,32 @@
     appearanceTheme: "z28_appearance_theme",
     wallpaper: "z28_appearance_wallpaper",
     animations: "z28_appearance_animations",
-    compactMode: "z28_appearance_compact"
+    compactMode: "z28_appearance_compact",
+    themeCreator: "z28_appearance_theme_creator"
   };
 
   var DEFAULTS = {
     duration: { eat: 30, wc: 7, smoke: 7, wcd: 15 },
     count: { eat: Infinity, wc: 7, smoke: 7, wcd: 2 }
+  };
+
+  var THEME_PALETTES = {
+    dark: { primary: "#48a8ff", secondary: "#7a68ff" },
+    midnight: { primary: "#8a91ff", secondary: "#63b9ff" },
+    amoled: { primary: "#72d8ff", secondary: "#9a8cff" },
+    ocean: { primary: "#27c9ff", secondary: "#3d7dff" },
+    violet: { primary: "#a66cff", secondary: "#5d7cff" },
+    mint: { primary: "#35e0b3", secondary: "#37a8ff" },
+    sunset: { primary: "#ff9a62", secondary: "#ff5e93" }
+  };
+
+  var THEME_CREATOR_DEFAULTS = {
+    enabled: false,
+    primary: "#48a8ff",
+    secondary: "#7a68ff",
+    glow: 60,
+    radius: 18,
+    background: 70
   };
 
   var TEXT = {
@@ -131,6 +159,42 @@
       wallpaperNebula: "Nebula",
       wallpaperOcean: "Ocean Glow",
       wallpaperViolet: "Violet Glass",
+      themeCreator: "Theme Creator",
+      themeCreatorSub: "ကိုယ်ပိုင်အပြင်အဆင်ကို ဖန်တီးပြီး ဤစက်ပေါ်မှာပဲ သိမ်းထားနိုင်ပါသည်။",
+      themeCreatorPresets: "အမြန်ရွေးချယ်ရန် Palette များ",
+      themeCreatorPresetsSub: "Preset တစ်ခုရွေးပြီး အသေးစိတ်ညှိနိုင်ပါသည်။",
+      themePaletteOcean: "Ocean",
+      themePaletteViolet: "Violet",
+      themePaletteMint: "Mint",
+      themePaletteSunset: "Sunset",
+      themeCreatorPrimary: "အဓိကအရောင်",
+      themeCreatorSecondary: "ဒုတိယအရောင်",
+      themeCreatorGlow: "Glow အားပြင်းမှု",
+      themeCreatorRadius: "ထောင့်ဝိုင်းမှု",
+      themeCreatorBackground: "Background အားပြင်းမှု",
+      themeCreatorCustom: "Custom",
+      themeCreatorDeviceOnly: "ဤစက်တွင်သာ",
+      themeCreatorActive: "Custom theme ကို ဖွင့်ထားပြီး ဤစက်ပေါ်တွင် သိမ်းထားပါသည်။",
+      themeCreatorInactive: "Custom theme ကို မဖွင့်ရသေးပါ။",
+      themeCreatorReset: "မူလသို့ ပြန်ထားမည်"
+      themeCreator: "Theme Creator",
+      themeCreatorSub: "Create your own look and keep it saved on this device.",
+      themeCreatorPresets: "Quick palettes",
+      themeCreatorPresetsSub: "Start with a preset, then fine-tune it.",
+      themePaletteOcean: "Ocean",
+      themePaletteViolet: "Violet",
+      themePaletteMint: "Mint",
+      themePaletteSunset: "Sunset",
+      themeCreatorPrimary: "Primary color",
+      themeCreatorSecondary: "Secondary color",
+      themeCreatorGlow: "Glow intensity",
+      themeCreatorRadius: "Corner radius",
+      themeCreatorBackground: "Background intensity",
+      themeCreatorCustom: "Custom",
+      themeCreatorDeviceOnly: "DEVICE ONLY",
+      themeCreatorActive: "Custom theme is active • saved on this device.",
+      themeCreatorInactive: "Custom theme is not active.",
+      themeCreatorReset: "Reset"
       tools: "Tools",
       toolsSub: "Connect bot-installed groups with a secure, guided flow.",
       connectTitle: "Group Connection",
@@ -485,6 +549,24 @@
       wallpaperNebula: "星云",
       wallpaperOcean: "海洋光",
       wallpaperViolet: "紫色玻璃",
+      themeCreator: "主题创建器",
+      themeCreatorSub: "创建自己的界面风格，并仅保存在此设备上。",
+      themeCreatorPresets: "快速配色",
+      themeCreatorPresetsSub: "先选择预设，再进行细节调整。",
+      themePaletteOcean: "海洋",
+      themePaletteViolet: "紫色",
+      themePaletteMint: "薄荷",
+      themePaletteSunset: "日落",
+      themeCreatorPrimary: "主色",
+      themeCreatorSecondary: "辅助色",
+      themeCreatorGlow: "光晕强度",
+      themeCreatorRadius: "圆角大小",
+      themeCreatorBackground: "背景强度",
+      themeCreatorCustom: "自定义",
+      themeCreatorDeviceOnly: "仅此设备",
+      themeCreatorActive: "自定义主题已启用 • 已保存在此设备。",
+      themeCreatorInactive: "自定义主题未启用。",
+      themeCreatorReset: "重置"
       tools: "工具",
       toolsSub: "用于群组连接与常用管理操作。",
       connectTitle: "群组连接",
@@ -637,6 +719,17 @@
       "appearance-animations-toggle","user-appearance-animations-title","user-appearance-animations-sub",
       "user-appearance-animations-state","appearance-compact-toggle","user-appearance-compact-title",
       "user-appearance-compact-sub","user-appearance-compact-state",
+      "theme-creator-title","theme-creator-sub","theme-creator-badge",
+      "theme-creator-preview","theme-creator-preview-title","theme-creator-preview-status",
+      "theme-creator-preview-label","theme-creator-preview-value","theme-creator-preview-chip",
+      "theme-creator-presets-title","theme-creator-presets-sub",
+      "theme-palette-ocean-label","theme-palette-violet-label","theme-palette-mint-label","theme-palette-sunset-label",
+      "theme-creator-primary","theme-creator-primary-value","theme-creator-primary-label","theme-creator-primary-swatch",
+      "theme-creator-secondary","theme-creator-secondary-value","theme-creator-secondary-label","theme-creator-secondary-swatch",
+      "theme-creator-glow","theme-creator-glow-value","theme-creator-glow-label",
+      "theme-creator-radius","theme-creator-radius-value","theme-creator-radius-label",
+      "theme-creator-background","theme-creator-background-value","theme-creator-background-label",
+      "theme-creator-save-dot","theme-creator-save-state","theme-creator-reset","theme-creator-reset-label",
       "user-faq-title","user-faq-sub",
       "user-faq-q1","user-faq-a1","user-faq-q2","user-faq-a2",
       "user-faq-q3","user-faq-a3","user-faq-q4","user-faq-a4",
@@ -684,13 +777,203 @@
     try { localStorage.removeItem(key); } catch (_) {}
   }
 
+  function clampNumber(value, min, max, fallback) {
+    var numeric = Number(value);
+    if (!Number.isFinite(numeric)) return fallback;
+    return Math.min(max, Math.max(min, numeric));
+  }
+
+  function normalizeHex(value, fallback) {
+    var normalized = String(value == null ? "" : value).trim().toLowerCase();
+    return /^#[0-9a-f]{6}$/.test(normalized) ? normalized : fallback;
+  }
+
+  function hexToRgbChannels(hex) {
+    var normalized = normalizeHex(hex, "#000000").slice(1);
+    return [
+      parseInt(normalized.slice(0, 2), 16),
+      parseInt(normalized.slice(2, 4), 16),
+      parseInt(normalized.slice(4, 6), 16)
+    ].join(", ");
+  }
+
+  function getThemeBasePalette(theme) {
+    return THEME_PALETTES[theme] || THEME_PALETTES.dark;
+  }
+
+  function normalizeThemeCreator(raw) {
+    var base = getThemeBasePalette(state.appearanceTheme);
+    var value = raw && typeof raw === "object" ? raw : {};
+    return {
+      enabled: value.enabled === true,
+      primary: normalizeHex(value.primary, base.primary),
+      secondary: normalizeHex(value.secondary, base.secondary),
+      glow: Math.round(clampNumber(value.glow, 0, 100, THEME_CREATOR_DEFAULTS.glow)),
+      radius: Math.round(clampNumber(value.radius, 10, 28, THEME_CREATOR_DEFAULTS.radius)),
+      background: Math.round(clampNumber(value.background, 0, 100, THEME_CREATOR_DEFAULTS.background))
+    };
+  }
+
+  function getThemeCreatorStorage() {
+    var raw = readStorage(STORAGE_KEYS.themeCreator);
+    if (!raw) return null;
+    try {
+      var parsed = JSON.parse(raw);
+      return parsed && typeof parsed === "object" ? normalizeThemeCreator(parsed) : null;
+    } catch (_) {
+      removeStorage(STORAGE_KEYS.themeCreator);
+      return null;
+    }
+  }
+
+  function saveThemeCreator() {
+    var normalized = normalizeThemeCreator(state.themeCreator);
+    state.themeCreator = normalized;
+    writeStorage(STORAGE_KEYS.themeCreator, JSON.stringify(normalized));
+  }
+
+  function applyThemeCreatorStyles() {
+    var root = document.documentElement;
+    var custom = normalizeThemeCreator(state.themeCreator);
+    state.themeCreator = custom;
+
+    if (!custom.enabled) {
+      root.setAttribute("data-custom-theme", "off");
+      [
+        "--creator-accent",
+        "--creator-secondary",
+        "--creator-accent-rgb",
+        "--creator-secondary-rgb",
+        "--creator-glow-1",
+        "--creator-glow-2",
+        "--creator-shadow-alpha",
+        "--creator-bg-1",
+        "--creator-bg-2",
+        "--creator-surface-glow",
+        "--radius-xl",
+        "--radius-lg",
+        "--radius-md"
+      ].forEach(function (property) {
+        root.style.removeProperty(property);
+      });
+      return;
+    }
+
+    var glowRatio = custom.glow / 100;
+    var backgroundRatio = custom.background / 100;
+    root.setAttribute("data-custom-theme", "on");
+    root.style.setProperty("--creator-accent", custom.primary);
+    root.style.setProperty("--creator-secondary", custom.secondary);
+    root.style.setProperty("--creator-accent-rgb", hexToRgbChannels(custom.primary));
+    root.style.setProperty("--creator-secondary-rgb", hexToRgbChannels(custom.secondary));
+    root.style.setProperty("--creator-glow-1", (0.035 + glowRatio * 0.135).toFixed(3));
+    root.style.setProperty("--creator-glow-2", (0.03 + glowRatio * 0.12).toFixed(3));
+    root.style.setProperty("--creator-shadow-alpha", (0.08 + glowRatio * 0.22).toFixed(3));
+    root.style.setProperty("--creator-bg-1", (0.015 + backgroundRatio * 0.125).toFixed(3));
+    root.style.setProperty("--creator-bg-2", (0.012 + backgroundRatio * 0.11).toFixed(3));
+    root.style.setProperty("--creator-surface-glow", (0.025 + glowRatio * 0.09).toFixed(3));
+
+    var radius = custom.radius;
+    root.style.setProperty("--radius-xl", (radius + 6) + "px");
+    root.style.setProperty("--radius-lg", radius + "px");
+    root.style.setProperty("--radius-md", Math.max(8, radius - 4) + "px");
+  }
+
   function applyAppearancePreferences() {
     var root = document.documentElement;
     root.setAttribute("data-theme", state.appearanceTheme);
     root.setAttribute("data-wallpaper", state.wallpaper);
     root.setAttribute("data-animations", state.animationsEnabled ? "on" : "off");
     root.setAttribute("data-compact", state.compactMode ? "on" : "off");
+    applyThemeCreatorStyles();
     updateAppearanceControls();
+  }
+
+  function updateThemeCreatorControls() {
+    if (!els["theme-creator-primary"]) return;
+
+    var custom = normalizeThemeCreator(state.themeCreator);
+    var base = getThemeBasePalette(state.appearanceTheme);
+    var palette = custom.enabled
+      ? custom
+      : Object.assign({}, custom, base);
+
+    els["theme-creator-primary"].value = normalizeHex(palette.primary, THEME_CREATOR_DEFAULTS.primary);
+    els["theme-creator-secondary"].value = normalizeHex(palette.secondary, THEME_CREATOR_DEFAULTS.secondary);
+    els["theme-creator-glow"].value = String(custom.glow);
+    els["theme-creator-radius"].value = String(custom.radius);
+    els["theme-creator-background"].value = String(custom.background);
+
+    els["theme-creator-primary-value"].textContent = els["theme-creator-primary"].value.toUpperCase();
+    els["theme-creator-secondary-value"].textContent = els["theme-creator-secondary"].value.toUpperCase();
+    els["theme-creator-glow-value"].textContent = custom.glow + "%";
+    els["theme-creator-radius-value"].textContent = custom.radius + "px";
+    els["theme-creator-background-value"].textContent = custom.background + "%";
+
+    els["theme-creator-primary-swatch"].style.background = palette.primary;
+    els["theme-creator-secondary-swatch"].style.background = palette.secondary;
+
+    els["theme-creator-save-state"].textContent = custom.enabled
+      ? text("themeCreatorActive")
+      : text("themeCreatorInactive");
+    els["theme-creator-save-dot"].classList.toggle("is-active", custom.enabled);
+    els["theme-creator-badge"].textContent = custom.enabled
+      ? text("themeCreatorCustom")
+      : text("themeCreatorDeviceOnly");
+
+    els["theme-creator-preview"].style.setProperty("--preview-primary", palette.primary);
+    els["theme-creator-preview"].style.setProperty("--preview-secondary", palette.secondary);
+    els["theme-creator-preview"].style.setProperty("--preview-glow", String(0.08 + (custom.glow / 100) * 0.28));
+    els["theme-creator-preview"].style.setProperty("--preview-radius", custom.radius + "px");
+    els["theme-creator-preview-status"].textContent = custom.enabled
+      ? text("themeCreatorCustom").toUpperCase()
+      : text("themeCreator").toUpperCase();
+  }
+
+  function setThemeCreatorField(field, value) {
+    var custom = normalizeThemeCreator(state.themeCreator);
+    if (field === "primary" || field === "secondary") {
+      custom[field] = normalizeHex(value, custom[field]);
+    } else if (field === "glow") {
+      custom.glow = Math.round(clampNumber(value, 0, 100, custom.glow));
+    } else if (field === "radius") {
+      custom.radius = Math.round(clampNumber(value, 10, 28, custom.radius));
+    } else if (field === "background") {
+      custom.background = Math.round(clampNumber(value, 0, 100, custom.background));
+    } else {
+      return;
+    }
+    custom.enabled = true;
+    state.themeCreator = custom;
+    saveThemeCreator();
+    applyAppearancePreferences();
+  }
+
+  function applyThemePalette(palette) {
+    var selected = THEME_PALETTES[palette];
+    if (!selected) return;
+
+    var custom = normalizeThemeCreator(state.themeCreator);
+    custom.enabled = true;
+    custom.primary = selected.primary;
+    custom.secondary = selected.secondary;
+    state.themeCreator = custom;
+    saveThemeCreator();
+    applyAppearancePreferences();
+  }
+
+  function resetThemeCreator() {
+    var base = getThemeBasePalette(state.appearanceTheme);
+    state.themeCreator = {
+      enabled: false,
+      primary: base.primary,
+      secondary: base.secondary,
+      glow: THEME_CREATOR_DEFAULTS.glow,
+      radius: THEME_CREATOR_DEFAULTS.radius,
+      background: THEME_CREATOR_DEFAULTS.background
+    };
+    removeStorage(STORAGE_KEYS.themeCreator);
+    applyAppearancePreferences();
   }
 
   function updateAppearanceControls() {
@@ -724,6 +1007,14 @@
   function setAppearanceTheme(theme) {
     if (theme !== "dark" && theme !== "midnight" && theme !== "amoled") return;
     state.appearanceTheme = theme;
+    if (!state.themeCreator || !state.themeCreator.enabled) {
+      var base = getThemeBasePalette(theme);
+      state.themeCreator = Object.assign({}, normalizeThemeCreator(state.themeCreator), {
+        enabled: false,
+        primary: base.primary,
+        secondary: base.secondary
+      });
+    }
     writeStorage(STORAGE_KEYS.appearanceTheme, theme);
     applyAppearancePreferences();
   }
@@ -1005,6 +1296,26 @@
     els["user-appearance-animations-sub"].textContent = text("animationsSub");
     els["user-appearance-compact-title"].textContent = text("compactMode");
     els["user-appearance-compact-sub"].textContent = text("compactModeSub");
+    els["theme-creator-title"].textContent = text("themeCreator");
+    els["theme-creator-sub"].textContent = text("themeCreatorSub");
+    els["theme-creator-presets-title"].textContent = text("themeCreatorPresets");
+    els["theme-creator-presets-sub"].textContent = text("themeCreatorPresetsSub");
+    els["theme-palette-ocean-label"].textContent = text("themePaletteOcean");
+    els["theme-palette-violet-label"].textContent = text("themePaletteViolet");
+    els["theme-palette-mint-label"].textContent = text("themePaletteMint");
+    els["theme-palette-sunset-label"].textContent = text("themePaletteSunset");
+    els["theme-creator-primary-label"].textContent = text("themeCreatorPrimary");
+    els["theme-creator-secondary-label"].textContent = text("themeCreatorSecondary");
+    els["theme-creator-glow-label"].textContent = text("themeCreatorGlow");
+    els["theme-creator-radius-label"].textContent = text("themeCreatorRadius");
+    els["theme-creator-background-label"].textContent = text("themeCreatorBackground");
+    els["theme-creator-reset-label"].textContent = text("themeCreatorReset");
+    els["theme-creator-save-state"].textContent = state.themeCreator && state.themeCreator.enabled
+      ? text("themeCreatorActive")
+      : text("themeCreatorInactive");
+    els["theme-creator-badge"].textContent = state.themeCreator && state.themeCreator.enabled
+      ? text("themeCreatorCustom")
+      : text("themeCreatorDeviceOnly");
     els["user-about-title"].textContent = text("about");
     els["user-about-sub"].textContent = text("aboutSub");
     els["user-about-bot-name-label"].textContent = text("bot");
@@ -2419,6 +2730,32 @@
     els["appearance-animations-toggle"].onclick = toggleAnimations;
     els["appearance-compact-toggle"].onclick = toggleCompactMode;
 
+    if (els["theme-creator-primary"]) {
+      els["theme-creator-primary"].oninput = function () {
+        setThemeCreatorField("primary", els["theme-creator-primary"].value);
+      };
+      els["theme-creator-secondary"].oninput = function () {
+        setThemeCreatorField("secondary", els["theme-creator-secondary"].value);
+      };
+      els["theme-creator-glow"].oninput = function () {
+        setThemeCreatorField("glow", els["theme-creator-glow"].value);
+      };
+      els["theme-creator-radius"].oninput = function () {
+        setThemeCreatorField("radius", els["theme-creator-radius"].value);
+      };
+      els["theme-creator-background"].oninput = function () {
+        setThemeCreatorField("background", els["theme-creator-background"].value);
+      };
+
+      document.querySelectorAll("[data-theme-palette]").forEach(function (button) {
+        button.onclick = function () {
+          applyThemePalette(button.getAttribute("data-theme-palette"));
+        };
+      });
+
+      els["theme-creator-reset"].onclick = resetThemeCreator;
+    }
+
     els["user-no-group-back"].onclick = function () {
       state.verifiedUserId = null;
       state.selectedGroupId = null;
@@ -2538,6 +2875,17 @@
 
     var storedCompact = readStorage(STORAGE_KEYS.compactMode);
     state.compactMode = storedCompact === "1";
+
+    var storedThemeCreator = getThemeCreatorStorage();
+    if (storedThemeCreator) {
+      state.themeCreator = storedThemeCreator;
+    } else {
+      var base = getThemeBasePalette(state.appearanceTheme);
+      state.themeCreator = Object.assign({}, THEME_CREATOR_DEFAULTS, {
+        primary: base.primary,
+        secondary: base.secondary
+      });
+    }
 
     applyAppearancePreferences();
   }
