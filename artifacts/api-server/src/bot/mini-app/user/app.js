@@ -597,7 +597,7 @@
       "user-member-count","user-active-count","user-group-member-label",
       "user-member-active-label","settings-title","settings-subtitle",
       "user-settings-limits-card","user-settings-counts-card",
-      "user-tools-page","user-tools-title","user-tools-sub","user-connect-title","user-connect-sub",
+      "user-tools-page","user-tools-tab-label","user-tools-title","user-tools-sub","user-connect-title","user-connect-sub",
       "user-connect-source-label","user-connect-source-sub","user-connect-source",
       "user-connect-target-label","user-connect-target-sub","user-connect-target",
       "user-connect-note","user-connect-submit","user-connect-status-title","user-connect-status-value",
@@ -905,7 +905,6 @@
     els["user-support-page"].hidden = true;
     els["user-tools-page"].hidden = true;
     els["user-appearance-page"].hidden = true;
-    els["user-tools-page"].hidden = true;
   }
 
   function applyLanguage() {
