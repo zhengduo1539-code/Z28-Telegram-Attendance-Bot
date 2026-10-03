@@ -2783,10 +2783,10 @@ html[data-custom-theme="on"] textarea:focus-visible{
   border:1px solid rgba(123,165,216,.12);
   border-radius:var(--preview-radius);
   background:
-    radial-gradient(circle at 18% 10%,color-mix(in srgb,var(--preview-primary) 22%,transparent),transparent 42%),
-    radial-gradient(circle at 92% 90%,color-mix(in srgb,var(--preview-secondary) 20%,transparent),transparent 48%),
+    radial-gradient(circle at 18% 10%,rgba(var(--preview-primary-rgb),.22),transparent 42%),
+    radial-gradient(circle at 92% 90%,rgba(var(--preview-secondary-rgb),.20),transparent 48%),
     linear-gradient(145deg,#0d1b30,#070e1b);
-  box-shadow:0 14px 34px rgba(0,0,0,.18),0 0 34px color-mix(in srgb,var(--preview-primary) calc(var(--preview-glow) * 100%),transparent);
+  box-shadow:0 14px 34px rgba(0,0,0,.18),0 0 34px rgba(var(--preview-primary-rgb),var(--preview-glow));
 }
 .theme-creator-preview-glow{
   position:absolute;
@@ -2795,7 +2795,7 @@ html[data-custom-theme="on"] textarea:focus-visible{
   left:-85px;
   bottom:-110px;
   border-radius:50%;
-  background:radial-gradient(circle,color-mix(in srgb,var(--preview-primary) 28%,transparent),transparent 68%);
+  background:radial-gradient(circle,rgba(var(--preview-primary-rgb),.28),transparent 68%);
   animation:themeCreatorFloat 5s ease-in-out infinite alternate;
 }
 .theme-creator-preview-window{
@@ -2842,9 +2842,9 @@ html[data-custom-theme="on"] textarea:focus-visible{
   gap:10px;
   margin-top:8px;
   padding:10px;
-  border:1px solid color-mix(in srgb,var(--preview-primary) 24%,transparent);
+  border:1px solid rgba(var(--preview-primary-rgb),.24);
   border-radius:calc(var(--preview-radius) - 6px);
-  background:linear-gradient(135deg,color-mix(in srgb,var(--preview-primary) 9%,transparent),color-mix(in srgb,var(--preview-secondary) 7%,transparent));
+  background:linear-gradient(135deg,rgba(var(--preview-primary-rgb),.09),rgba(var(--preview-secondary-rgb),.07));
 }
 .theme-creator-preview-card small{
   display:block;
