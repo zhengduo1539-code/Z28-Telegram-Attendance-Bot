@@ -2088,8 +2088,8 @@ html[data-compact="on"] .appearance-wallpaper-preview{height:48px}
 .connect-helper svg{width:14px;height:14px;flex:0 0 14px;margin-top:1px;fill:none;stroke:#7fb9df;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .connect-actions{display:flex;gap:8px;margin-top:13px}
 .connect-submit{flex:1;min-height:46px}
-.connect-refresh{min-width:104px;min-height:46px;display:inline-flex;align-items:center;justify-content:center;gap:7px}
-.connect-refresh svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.connect-change{min-width:104px;min-height:46px;display:inline-flex;align-items:center;justify-content:center;gap:7px}
+.connect-change svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .connect-status-card{display:grid;grid-template-columns:auto 1fr;gap:11px;margin-top:14px;padding:13px 14px;border-radius:15px;border:1px solid rgba(123,165,216,.11);background:linear-gradient(145deg,rgba(9,20,34,.66),rgba(5,12,22,.74))}
 .connect-status-icon{width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:rgba(123,165,216,.055);border:1px solid rgba(123,165,216,.1)}
 .connect-status-icon span{width:8px;height:8px;border-radius:50%;background:#718198;box-shadow:0 0 10px rgba(113,129,152,.25);transition:background var(--motion-fast) ease,box-shadow var(--motion-fast) ease}
@@ -2109,6 +2109,29 @@ html[data-compact="on"] .connect-select{min-height:44px}
 @keyframes connectFieldReveal{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @keyframes connectPulse{0%,100%{transform:scale(.86);opacity:.65}50%{transform:scale(1.18);opacity:1}}
 @keyframes connectNodeFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
-@media(max-width:620px){.tools-card{padding:17px}.tools-card-header{grid-template-columns:auto 1fr}.tools-live-badge{grid-column:2;justify-self:start;margin-top:-4px}.connect-flow{grid-template-columns:1fr;gap:8px}.connect-link-visual{transform:rotate(90deg);height:30px;padding:0;margin:-1px 0}.connect-actions{flex-direction:column}.connect-refresh{width:100%}}
+@media(max-width:620px){.tools-card{padding:17px}.tools-card-header{grid-template-columns:auto 1fr}.tools-live-badge{grid-column:2;justify-self:start;margin-top:-4px}.connect-flow{grid-template-columns:1fr;gap:8px}.connect-link-visual{transform:rotate(90deg);height:30px;padding:0;margin:-1px 0}.connect-actions{flex-direction:column}.connect-change{width:100%}}
 @media(max-width:430px){.tools-card{padding:15px}.tools-card-header{gap:10px}.tools-icon{width:40px;height:40px}.tools-icon svg{width:19px;height:19px}.tools-card-header h3{font-size:16px}.connect-field-heading label{font-size:10.5px}.connect-field-heading span:not(.connect-step){font-size:8.5px}}
 @media(prefers-reduced-motion:reduce){.tools-card,.connect-field,.connect-link-node,.tools-live-badge i,.connect-status-icon.is-connected span{animation:none!important}}
+
+
+/* Connect workflow action states. */
+.connect-change:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+  transform:none!important;
+  box-shadow:none;
+}
+.connect-change:not(:disabled):hover{
+  border-color:rgba(72,168,255,.3);
+  background:rgba(13,29,49,.72);
+}
+#user-connect-submit:not(:disabled){
+  animation:connectButtonReady 1.8s ease-in-out infinite;
+}
+@keyframes connectButtonReady{
+  0%,100%{box-shadow:0 10px 26px rgba(72,168,255,.12)}
+  50%{box-shadow:0 10px 30px rgba(72,168,255,.25),0 0 0 1px rgba(114,200,255,.08)}
+}
+@media(prefers-reduced-motion:reduce){
+  #user-connect-submit:not(:disabled){animation:none!important}
+}
