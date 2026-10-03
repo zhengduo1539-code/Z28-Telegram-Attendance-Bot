@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { MongoClient } from "mongodb";
-import { emptyState, FileBotStore, isBotState } from "./file-store";
+import { emptyState, FileBotStore, isBotState, stripLegacySupportTickets } from "./file-store";
 import type {
   ActiveActivity,
   AuditLogEntry,
@@ -201,7 +201,8 @@ export class MongoBotStore implements BotStore {
         throw new Error("MongoDB bot state document is invalid.");
       }
 
-      const legacyActiveActivities = document.state.activeActivities || {};
+      const normalizedState = stripLegacySupportTickets(document.state);
+      const legacyActiveActivities = normalizedState.activeActivities || {};
       if (Object.keys(legacyActiveActivities).length) {
         const activeCollection = await this.activeActivityCollection();
         for (const activity of Object.values(legacyActiveActivities)) {
@@ -215,7 +216,7 @@ export class MongoBotStore implements BotStore {
           );
         }
 
-        const migratedState = { ...document.state, activeActivities: {} };
+        const migratedState = { ...normalizedState, activeActivities: {} };
         await collection.replaceOne(
           { _id: STATE_ID },
           {
@@ -226,7 +227,17 @@ export class MongoBotStore implements BotStore {
         );
         this.state = migratedState;
       } else {
-        this.state = { ...document.state, activeActivities: {} };
+        this.state = { ...normalizedState, activeActivities: {} };
+        if (normalizedState !== document.state) {
+          await collection.replaceOne(
+            { _id: STATE_ID },
+            {
+              _id: STATE_ID,
+              state: this.state,
+              updatedAt: new Date(),
+            },
+          );
+        }
       }
 
       return this.state;
@@ -258,8 +269,9 @@ export class MongoBotStore implements BotStore {
   }
 
   async save(state: BotState): Promise<void> {
+    const cleanedState = stripLegacySupportTickets(state);
     const stateWithoutActiveActivities = {
-      ...state,
+      ...cleanedState,
       activeActivities: {},
     };
     this.state = stateWithoutActiveActivities;

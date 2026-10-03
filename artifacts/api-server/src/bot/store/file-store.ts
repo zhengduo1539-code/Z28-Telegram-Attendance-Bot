@@ -15,6 +15,13 @@ export const emptyState = (): BotState => ({
 const isObjectRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
+export const stripLegacySupportTickets = (state: BotState): BotState => {
+  if (!Object.prototype.hasOwnProperty.call(state, "supportTickets")) return state;
+  const cleanedState = { ...state } as BotState & { supportTickets?: unknown };
+  delete cleanedState.supportTickets;
+  return cleanedState;
+};
+
 export const isBotState = (value: unknown): value is BotState => {
   if (!isObjectRecord(value)) return false;
   const candidate = value as Partial<BotState>;
@@ -99,17 +106,20 @@ export class FileBotStore implements BotStore {
       return this.state;
     }
 
-    this.state = parsed;
+    const cleanedState = stripLegacySupportTickets(parsed);
+    if (cleanedState !== parsed) await this.save(cleanedState);
+    else this.state = cleanedState;
     return this.state;
   }
 
   async save(state: BotState): Promise<void> {
-    this.state = state;
+    const cleanedState = stripLegacySupportTickets(state);
+    this.state = cleanedState;
     const directory = path.dirname(this.filePath);
     const temporaryPath = `${this.filePath}.tmp`;
     const write = this.writeQueue.then(async () => {
       await mkdir(directory, { recursive: true });
-      await writeFile(temporaryPath, JSON.stringify(state, null, 2), "utf8");
+      await writeFile(temporaryPath, JSON.stringify(cleanedState, null, 2), "utf8");
       await rename(temporaryPath, this.filePath);
     });
     this.writeQueue = write.catch(() => undefined);
