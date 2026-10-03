@@ -4157,3 +4157,109 @@ body.admin-mode .admin-broadcast-input:focus {
   .admin-broadcast-target { grid-template-columns:1fr; }
   .admin-broadcast-direct-head { flex-direction:column; }
 }
+
+/* Explicit Broadcast Center delivery-mode controls. Scoped to Broadcast Center only. */
+.admin-broadcast-mode-switch {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  padding:4px;
+  border:1px solid rgba(76,201,240,.13);
+  border-radius:13px;
+  background:rgba(2,9,20,.58);
+}
+.admin-broadcast-mode-option {
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  min-height:58px;
+  padding:9px 11px;
+  border:1px solid transparent;
+  border-radius:10px;
+  color:#8fa9bc;
+  background:transparent;
+  cursor:pointer;
+  text-align:left;
+  transition:
+    transform .16s ease,
+    border-color .18s ease,
+    background .22s ease,
+    color .18s ease,
+    box-shadow .22s ease;
+}
+.admin-broadcast-mode-option:hover {
+  color:#dff8ff;
+  border-color:rgba(76,201,240,.18);
+  background:rgba(34,211,238,.045);
+}
+.admin-broadcast-mode-option:active {
+  transform:scale(.985);
+}
+.admin-broadcast-mode-option.is-active {
+  color:#effcff;
+  border-color:rgba(34,211,238,.30);
+  background:linear-gradient(135deg,rgba(16,65,84,.72),rgba(12,33,57,.82));
+  box-shadow:
+    0 8px 20px rgba(0,0,0,.22),
+    0 0 18px rgba(34,211,238,.07),
+    inset 0 1px 0 rgba(255,255,255,.05);
+}
+.admin-broadcast-mode-option.is-active::after {
+  content:"";
+  position:absolute;
+  right:9px;
+  top:9px;
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:#67e8f9;
+  box-shadow:0 0 11px rgba(103,232,249,.65);
+  animation:adminBroadcastModePulse 1.8s ease-in-out infinite;
+}
+.admin-broadcast-mode-option-title {
+  font-size:11px;
+  font-weight:850;
+  line-height:1.2;
+}
+.admin-broadcast-mode-option-sub {
+  margin-top:3px;
+  color:#7692a7;
+  font-size:8.5px;
+  line-height:1.35;
+}
+.admin-broadcast-mode-option.is-active .admin-broadcast-mode-option-sub {
+  color:#93b8ca;
+}
+.admin-broadcast-mode-option:focus-visible {
+  outline:2px solid rgba(103,232,249,.35);
+  outline-offset:2px;
+}
+.admin-broadcast-mode-native {
+  position:absolute;
+  width:1px;
+  height:1px;
+  margin:-1px;
+  padding:0;
+  border:0;
+  clip:rect(0 0 0 0);
+  clip-path:inset(50%);
+  overflow:hidden;
+  pointer-events:none;
+}
+@keyframes adminBroadcastModePulse {
+  0%,100% { opacity:.52; transform:scale(.86); }
+  50% { opacity:1; transform:scale(1); }
+}
+@media (max-width:700px) {
+  .admin-broadcast-mode-switch { grid-template-columns:1fr; }
+  .admin-broadcast-mode-option { min-height:52px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .admin-broadcast-mode-option,
+  .admin-broadcast-mode-option.is-active::after {
+    transition:none!important;
+    animation:none!important;
+  }
+}
