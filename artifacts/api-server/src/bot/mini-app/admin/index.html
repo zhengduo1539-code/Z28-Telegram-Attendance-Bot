@@ -385,6 +385,63 @@
           </div>
         </section>
 
+        <section class="admin-section" id="admin-support-inbox">
+          <div class="admin-panel">
+            <div class="admin-panel-head"><div>
+              <h2 class="admin-panel-title">Support Inbox</h2>
+              <div class="admin-panel-sub">Review user reports and reply directly inside the protected support workflow.</div>
+            </div><div class="admin-status-pill">Admin only</div></div>
+            <div class="admin-panel-body">
+              <div class="admin-users-toolbar">
+                <input class="admin-users-search" id="admin-support-search" type="search" autocomplete="off" placeholder="Search ticket, user, group, or message">
+                <select class="admin-users-filter" id="admin-support-status" aria-label="Filter support tickets">
+                  <option value="all">All tickets</option>
+                  <option value="open">Open</option>
+                  <option value="answered">Answered</option>
+                </select>
+                <span class="admin-users-meta" id="admin-support-meta">Loading support tickets…</span>
+              </div>
+
+              <div class="admin-support-layout">
+                <div class="admin-support-list-wrap">
+                  <div class="admin-support-list" id="admin-support-list">
+                    <div class="admin-users-empty">Loading support tickets…</div>
+                  </div>
+                  <div class="admin-users-footer">
+                    <span class="admin-users-meta" id="admin-support-page-meta">—</span>
+                    <div class="admin-users-pagination">
+                      <button class="admin-users-page" id="admin-support-prev" type="button">Previous</button>
+                      <button class="admin-users-page" id="admin-support-next" type="button">Next</button>
+                    </div>
+                  </div>
+                </div>
+
+                <section class="admin-support-detail" id="admin-support-detail" aria-live="polite" hidden>
+                  <div class="admin-support-detail-head">
+                    <div>
+                      <div class="admin-support-detail-title" id="admin-support-detail-title">Support ticket</div>
+                      <div class="admin-support-detail-sub" id="admin-support-detail-sub">—</div>
+                    </div>
+                    <span class="admin-support-detail-status" id="admin-support-detail-status">—</span>
+                  </div>
+
+                  <div class="admin-support-original" id="admin-support-original">—</div>
+                  <div class="admin-support-thread" id="admin-support-thread"></div>
+
+                  <div class="admin-support-reply">
+                    <textarea id="admin-support-reply-message" maxlength="1200" rows="4" placeholder="Write your reply…"></textarea>
+                    <div class="admin-support-reply-footer">
+                      <span class="admin-panel-sub" id="admin-support-reply-count">0 / 1200</span>
+                      <button class="admin-save action-button" id="admin-support-reply-send" type="button"><span class="button-content">Send Reply</span></button>
+                    </div>
+                    <div class="admin-support-reply-result" id="admin-support-reply-result"></div>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section class="admin-section" id="admin-health">
           <div class="admin-panel">
             <div class="admin-panel-head"><div>
