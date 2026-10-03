@@ -1815,8 +1815,9 @@
     var targetGroup = getConnectGroupById(targetValue);
     var connection = state.connectConnections && state.connectConnections[sourceValue];
     var sameGroup = Boolean(sourceValue && targetValue && sourceValue === targetValue);
-    var statusIcon = els["user-connect-status-value"].closest(".connection-overview-copy")
-      ? els["user-connect-status-value"].closest(".connection-current-copy").previousElementSibling
+    var connectionOverview = els["user-connect-status-value"].closest(".connection-overview");
+    var statusIcon = connectionOverview
+      ? connectionOverview.querySelector(".connection-overview-icon")
       : null;
 
     els["user-connect-status-value"].classList.remove("is-connected", "is-ready", "is-invalid");
