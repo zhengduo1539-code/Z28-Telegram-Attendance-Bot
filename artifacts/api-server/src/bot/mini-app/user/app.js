@@ -23,6 +23,8 @@
     connectEditMode: false,
     connectLoading: false,
     connectSaving: false,
+    connectFeedback: "idle",
+    connectFeedbackTimer: null,
     appearanceOpen: false,
     appearanceTheme: "dark",
     wallpaper: "default",
@@ -1803,38 +1805,53 @@
     select.disabled = safeGroups.length === 0;
   }
 
-  function updateConnectStatus() {
-    if (!els["user-connect-status-value"] || !els["user-connect-status-meta"]) return;
-    var sourceId = Number(els["user-connect-source"] && els["user-connect-source"].value);
-    var connection = state.connectConnections && state.connectConnections[String(sourceId)];
-    var statusIcon = els["user-connect-status-value"].closest(".connect-status-copy")
-      ? els["user-connect-status-value"].closest(".connect-status-copy").previousElementSibling
-      : null;
-    if (!connection) {
-      els["user-connect-status-value"].textContent = text("connectNone");
-      els["user-connect-status-value"].classList.remove("is-connected");
-      els["user-connect-status-meta"].textContent = "—";
-      if (statusIcon) statusIcon.classList.remove("is-connected");
-      return;
-    }
-
-    els["user-connect-status-value"].innerHTML =
-      '<span class="connect-status-dot" aria-hidden="true"></span>' +
-      '<strong>' + escapeHtml(text("connectConnected")) + '</strong> · ' +
-      escapeHtml(connection.targetGroupName || String(connection.targetChatId));
-    els["user-connect-status-value"].classList.add("is-connected");
-    if (statusIcon) statusIcon.classList.add("is-connected");
-
-    var connectedAt = connection.connectedAt ? new Date(connection.connectedAt) : null;
-    els["user-connect-status-meta"].textContent =
-      connectedAt && Number.isFinite(connectedAt.getTime())
-        ? connectedAt.toLocaleString()
-        : "—";
-  }
-
   function getSourceConnection() {
+ {
     var sourceId = els["user-connect-source"] ? String(els["user-connect-source"].value || "") : "";
     return sourceId && state.connectConnections ? state.connectConnections[sourceId] : null;
+  }
+
+  function updateConnectCardState() {
+    var card = els["user-connect-submit"]
+      ? els["user-connect-submit"].closest(".tools-card")
+      : null;
+    if (!card) return;
+    card.classList.toggle(
+      "is-editing",
+      Boolean(state.connectEditMode && !state.connectLoading && !state.connectSaving)
+    );
+    card.classList.toggle("is-success", state.connectFeedback === "success");
+    card.classList.toggle("is-error", state.connectFeedback === "error");
+  }
+
+  function triggerConnectHaptic(type) {
+    try {
+      if (
+        tg &&
+        tg.HapticFeedback &&
+        typeof tg.HapticFeedback.notificationOccurred === "function"
+      ) {
+        tg.HapticFeedback.notificationOccurred(type);
+      }
+    } catch (_) {}
+  }
+
+  function setConnectFeedback(kind) {
+    state.connectFeedback = kind || "idle";
+    if (state.connectFeedbackTimer !== null) {
+      window.clearTimeout(state.connectFeedbackTimer);
+      state.connectFeedbackTimer = null;
+    }
+
+    updateConnectCardState();
+
+    if (state.connectFeedback === "success" || state.connectFeedback === "error") {
+      state.connectFeedbackTimer = window.setTimeout(function () {
+        state.connectFeedback = "idle";
+        state.connectFeedbackTimer = null;
+        updateConnectCardState();
+      }, state.connectFeedback === "success" ? 2600 : 3400);
+    }
   }
 
   function updateConnectStatus() {
@@ -1844,12 +1861,15 @@
     var statusIcon = els["user-connect-status-value"].closest(".connect-status-copy")
       ? els["user-connect-status-value"].closest(".connect-status-copy").previousElementSibling
       : null;
+    var statusCard = els["user-connect-status-value"].closest(".connect-status-card");
 
     if (!connection) {
       els["user-connect-status-value"].textContent = text("connectNone");
       els["user-connect-status-value"].classList.remove("is-connected");
       els["user-connect-status-meta"].textContent = "—";
       if (statusIcon) statusIcon.classList.remove("is-connected");
+      if (statusCard) statusCard.classList.remove("is-success", "is-error");
+      updateConnectCardState();
       return;
     }
 
@@ -1863,6 +1883,11 @@
     var connectedAt = connection.connectedAt ? new Date(connection.connectedAt) : null;
     els["user-connect-status-meta"].textContent =
       connectedAt && Number.isFinite(connectedAt.getTime()) ? connectedAt.toLocaleString() : "—";
+    if (statusCard) {
+      statusCard.classList.toggle("is-success", state.connectFeedback === "success");
+      statusCard.classList.remove("is-error");
+    }
+    updateConnectCardState();
   }
 
   function updateConnectControls() {
@@ -1872,6 +1897,7 @@
     var targetValue = els["user-connect-target"].value;
     var connection = state.connectConnections && state.connectConnections[String(sourceValue)];
     var sameGroup = Boolean(sourceValue && targetValue && sourceValue === targetValue);
+    var connectedLocked = Boolean(connection && !state.connectEditMode);
 
     var canSubmit = Boolean(
       state.connectEditMode &&
@@ -1882,16 +1908,45 @@
       !state.connectSaving
     );
 
-    els["user-connect-submit"].disabled = !canSubmit;
-    els["user-connect-submit"].setAttribute("aria-disabled", String(!canSubmit));
+    var submit = els["user-connect-submit"];
+    var submitLabel = submit.querySelector(".button-label");
+    submit.disabled = !canSubmit;
+    submit.setAttribute("aria-disabled", String(!canSubmit));
+    submit.classList.toggle("is-ready", canSubmit);
+    submit.classList.toggle("is-connected", connectedLocked);
+    submit.setAttribute(
+      "aria-label",
+      connectedLocked ? text("connectConnected") : text("connectButton")
+    );
+    submit.setAttribute(
+      "title",
+      connectedLocked ? text("connectConnected") : text("connectButton")
+    );
+
+    if (!state.connectSaving && submitLabel) {
+      submitLabel.textContent = connectedLocked
+        ? text("connectConnected") + " ✓"
+        : text("connectButton");
+    }
+
     els["user-connect-source"].setAttribute("aria-invalid", String(sameGroup));
     els["user-connect-target"].setAttribute("aria-invalid", String(sameGroup));
 
-    var locked = Boolean(connection && !state.connectEditMode);
+    var locked = connectedLocked;
     els["user-connect-source"].disabled = locked || state.connectLoading || state.connectSaving;
     els["user-connect-target"].disabled = locked || state.connectLoading || state.connectSaving;
-    els["user-connect-change"].disabled =
-      !connection || state.connectEditMode || state.connectLoading || state.connectSaving;
+
+    var canChange = Boolean(
+      connection &&
+      !state.connectEditMode &&
+      !state.connectLoading &&
+      !state.connectSaving
+    );
+    els["user-connect-change"].disabled = !canChange;
+    els["user-connect-change"].classList.toggle("is-available", canChange);
+    els["user-connect-change"].setAttribute("aria-disabled", String(!canChange));
+
+    updateConnectCardState();
   }
 
   function applyExistingConnectionState() {
@@ -1914,6 +1969,11 @@
   async function loadConnectGroups() {
     if (!state.toolsOpen || state.connectLoading) return;
 
+    state.connectFeedback = "idle";
+    if (state.connectFeedbackTimer !== null) {
+      window.clearTimeout(state.connectFeedbackTimer);
+      state.connectFeedbackTimer = null;
+    }
     state.connectLoading = true;
     state.connectEditMode = false;
     els["user-connect-submit"].disabled = true;
@@ -2009,6 +2069,8 @@
   function beginConnectEdit() {
     if (state.connectSaving || state.connectLoading) return;
     state.connectEditMode = true;
+    setConnectFeedback("idle");
+    triggerConnectHaptic("success");
     els["user-connect-source"].disabled = false;
     els["user-connect-target"].disabled = false;
     els["user-connect-change"].disabled = true;
@@ -2038,7 +2100,13 @@
     }
 
     state.connectSaving = true;
-    setButton(els["user-connect-submit"], "loading", text("connectConnecting"));
+    setConnectFeedback("idle");
+    triggerConnectHaptic("light");
+    setButton(
+      els["user-connect-submit"],
+      "loading",
+      text("connectConnecting") + "…"
+    );
     els["user-connect-source"].disabled = true;
     els["user-connect-target"].disabled = true;
     els["user-connect-change"].disabled = true;
@@ -2057,8 +2125,12 @@
       els["user-connect-source"].value = String(sourceId);
       els["user-connect-target"].value = String(targetId);
 
+      setConnectFeedback("success");
+      triggerConnectHaptic("success");
       showNotice(text("connectSuccess"), "ok");
     } catch (error) {
+      setConnectFeedback("error");
+      triggerConnectHaptic("error");
       showNotice(
         error && error.message ? error.message : text("connectFailed"),
         "error"
@@ -2303,9 +2375,15 @@
 
     if (els["user-connect-source"] && els["user-connect-target"]) {
       els["user-connect-source"].onchange = function () {
+        if (!state.connectLoading && !state.connectSaving) {
+          state.connectEditMode = true;
+          setConnectFeedback("idle");
+        }
         writeStorage(STORAGE_KEYS.connectSourceGroup, els["user-connect-source"].value);
 
-        var connection = state.connectConnections[String(els["user-connect-source"].value)];
+        var connection =
+          state.connectConnections &&
+          state.connectConnections[String(els["user-connect-source"].value)];
         if (connection && state.connectEditMode) {
           var targetId = String(connection.targetChatId);
           if ((state.connectGroups || []).some(function (group) {
@@ -2321,12 +2399,18 @@
       };
 
       els["user-connect-target"].onchange = function () {
+        if (!state.connectLoading && !state.connectSaving) {
+          state.connectEditMode = true;
+          setConnectFeedback("idle");
+        }
         writeStorage(STORAGE_KEYS.connectTargetGroup, els["user-connect-target"].value);
         updateConnectControls();
       };
 
       els["user-connect-submit"].onclick = submitGroupConnection;
-      els["user-connect-change"].onclick = beginConnectEdit;
+      els["user-connect-change"].onclick = function () {
+        beginConnectEdit();
+      };
     }
 
     document.querySelectorAll('input[name="appearance-theme"]').forEach(function (input) {
