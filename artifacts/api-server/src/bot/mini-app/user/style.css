@@ -466,6 +466,32 @@ button:focus-visible,input:focus-visible,summary:focus-visible{
   font-size:10px;
   line-height:1.6;
 }
+.empty-state-actions{
+  display:flex;
+  justify-content:flex-end;
+  margin-top:14px;
+}
+.empty-state-back{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  min-height:40px;
+  padding:0 13px;
+  font-size:10px;
+}
+.empty-state-back svg{
+  width:15px;
+  height:15px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.8;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.empty-state-back:hover:not(:disabled){
+  transform:translateY(-1px);
+}
 .state-icon-muted{color:#a8bdd6;background:rgba(124,151,181,.08);border:1px solid rgba(124,151,181,.13)}
 .state-icon-error{
   color:#ffacb6;
