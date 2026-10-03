@@ -21,6 +21,7 @@
     supportOpen: false,
     appearanceOpen: false,
     appearanceTheme: "dark",
+    wallpaper: "default",
     animationsEnabled: true,
     compactMode: false,
     autoRefreshEnabled: false,
@@ -34,6 +35,7 @@
     dashboard: "z28_user_dashboard_state",
     autoRefresh: "z28_user_auto_refresh",
     appearanceTheme: "z28_appearance_theme",
+    wallpaper: "z28_appearance_wallpaper",
     animations: "z28_appearance_animations",
     compactMode: "z28_appearance_compact"
   };
@@ -114,6 +116,14 @@
       autoRefreshEnabled: "Auto refresh enabled. Updates every 30 seconds.",
       autoRefreshDisabled: "Auto refresh disabled.",
       dashboard: "Dashboard",
+      wallpaperTitle: "Background Wallpaper",
+      wallpaperSub: "Choose a lightweight background style.",
+      wallpaperDefault: "Default",
+      wallpaperAurora: "Aurora",
+      wallpaperGrid: "Neon Grid",
+      wallpaperNebula: "Nebula",
+      wallpaperOcean: "Ocean Glow",
+      wallpaperViolet: "Violet Glass",
       appearance: "Appearance",
       appearanceSub: "Personalize the Mini App interface.",
       appearanceKicker: "INTERFACE SETTINGS",
@@ -259,6 +269,14 @@
       autoRefreshEnabled: "Auto Refresh ဖွင့်ပြီးပါပြီ။ 30 စက္ကန့်တစ်ကြိမ် update လုပ်မည်။",
       autoRefreshDisabled: "Auto Refresh ပိတ်ပြီးပါပြီ။",
       dashboard: "Dashboard",
+      wallpaperTitle: "Background Wallpaper",
+      wallpaperSub: "ပေါ့ပါးပြီး လှပသော background ပုံစံကို ရွေးချယ်ပါ။",
+      wallpaperDefault: "Default",
+      wallpaperAurora: "Aurora",
+      wallpaperGrid: "Neon Grid",
+      wallpaperNebula: "Nebula",
+      wallpaperOcean: "Ocean Glow",
+      wallpaperViolet: "Violet Glass",
       appearance: "Appearance",
       appearanceSub: "Mini App ရဲ့ အပြင်အဆင်ကို စိတ်ကြိုက်ပြင်ဆင်ပါ။",
       appearanceKicker: "INTERFACE SETTINGS",
@@ -404,6 +422,14 @@
       autoRefreshEnabled: "自动刷新已开启，每30秒更新一次。",
       autoRefreshDisabled: "自动刷新已关闭。",
       dashboard: "仪表板",
+      wallpaperTitle: "背景壁纸",
+      wallpaperSub: "选择轻量且具有动画效果的背景样式。",
+      wallpaperDefault: "默认",
+      wallpaperAurora: "极光",
+      wallpaperGrid: "霓虹网格",
+      wallpaperNebula: "星云",
+      wallpaperOcean: "海洋光",
+      wallpaperViolet: "紫色玻璃",
       appearance: "外观",
       appearanceSub: "自定义 Mini App 的界面显示方式。",
       appearanceKicker: "界面设置",
@@ -519,6 +545,12 @@
       "user-appearance-theme-dark-title","user-appearance-theme-dark-sub",
       "user-appearance-theme-midnight-title","user-appearance-theme-midnight-sub",
       "user-appearance-theme-amoled-title","user-appearance-theme-amoled-sub",
+      "user-appearance-wallpaper-title","user-appearance-wallpaper-sub",
+      "appearance-wallpaper-default","appearance-wallpaper-aurora","appearance-wallpaper-grid",
+      "appearance-wallpaper-nebula","appearance-wallpaper-ocean","appearance-wallpaper-violet",
+      "user-appearance-wallpaper-default","user-appearance-wallpaper-aurora",
+      "user-appearance-wallpaper-grid","user-appearance-wallpaper-nebula",
+      "user-appearance-wallpaper-ocean","user-appearance-wallpaper-violet",
       "appearance-animations-toggle","user-appearance-animations-title","user-appearance-animations-sub",
       "user-appearance-animations-state","appearance-compact-toggle","user-appearance-compact-title",
       "user-appearance-compact-sub","user-appearance-compact-state",
@@ -572,6 +604,7 @@
   function applyAppearancePreferences() {
     var root = document.documentElement;
     root.setAttribute("data-theme", state.appearanceTheme);
+    root.setAttribute("data-wallpaper", state.wallpaper);
     root.setAttribute("data-animations", state.animationsEnabled ? "on" : "off");
     root.setAttribute("data-compact", state.compactMode ? "on" : "off");
     updateAppearanceControls();
@@ -585,6 +618,13 @@
       input.checked = selected;
       var option = input.closest(".appearance-theme-option");
       if (option) option.classList.toggle("is-selected", selected);
+    });
+
+    document.querySelectorAll('input[name="appearance-wallpaper"]').forEach(function (input) {
+      var selectedWallpaper = input.value === state.wallpaper;
+      input.checked = selectedWallpaper;
+      var wallpaperOption = input.closest(".appearance-wallpaper-option");
+      if (wallpaperOption) wallpaperOption.classList.toggle("is-selected", selectedWallpaper);
     });
 
     els["appearance-animations-toggle"].setAttribute("aria-checked", String(state.animationsEnabled));
@@ -602,6 +642,14 @@
     if (theme !== "dark" && theme !== "midnight" && theme !== "amoled") return;
     state.appearanceTheme = theme;
     writeStorage(STORAGE_KEYS.appearanceTheme, theme);
+    applyAppearancePreferences();
+  }
+
+  function setWallpaper(wallpaper) {
+    var allowed = ["default","aurora","grid","nebula","ocean","violet"];
+    if (allowed.indexOf(wallpaper) === -1) return;
+    state.wallpaper = wallpaper;
+    writeStorage(STORAGE_KEYS.wallpaper, wallpaper);
     applyAppearancePreferences();
   }
 
@@ -841,6 +889,14 @@
     els["user-appearance-theme-midnight-sub"].textContent = text("themeMidnightSub");
     els["user-appearance-theme-amoled-title"].textContent = text("themeAmoled");
     els["user-appearance-theme-amoled-sub"].textContent = text("themeAmoledSub");
+    els["user-appearance-wallpaper-title"].textContent = text("wallpaperTitle");
+    els["user-appearance-wallpaper-sub"].textContent = text("wallpaperSub");
+    els["user-appearance-wallpaper-default"].textContent = text("wallpaperDefault");
+    els["user-appearance-wallpaper-aurora"].textContent = text("wallpaperAurora");
+    els["user-appearance-wallpaper-grid"].textContent = text("wallpaperGrid");
+    els["user-appearance-wallpaper-nebula"].textContent = text("wallpaperNebula");
+    els["user-appearance-wallpaper-ocean"].textContent = text("wallpaperOcean");
+    els["user-appearance-wallpaper-violet"].textContent = text("wallpaperViolet");
     els["user-appearance-animations-title"].textContent = text("animations");
     els["user-appearance-animations-sub"].textContent = text("animationsSub");
     els["user-appearance-compact-title"].textContent = text("compactMode");
@@ -1804,6 +1860,12 @@
       };
     });
 
+    document.querySelectorAll('input[name="appearance-wallpaper"]').forEach(function (input) {
+      input.onchange = function () {
+        setWallpaper(input.value);
+      };
+    });
+
     els["appearance-animations-toggle"].onclick = toggleAnimations;
     els["appearance-compact-toggle"].onclick = toggleCompactMode;
 
@@ -1914,6 +1976,12 @@
     var storedTheme = readStorage(STORAGE_KEYS.appearanceTheme);
     state.appearanceTheme =
       storedTheme === "midnight" || storedTheme === "amoled" ? storedTheme : "dark";
+
+    var storedWallpaper = readStorage(STORAGE_KEYS.wallpaper);
+    state.wallpaper =
+      ["default","aurora","grid","nebula","ocean","violet"].indexOf(storedWallpaper) >= 0
+        ? storedWallpaper
+        : "default";
 
     var storedAnimations = readStorage(STORAGE_KEYS.animations);
     state.animationsEnabled = storedAnimations !== "0";
