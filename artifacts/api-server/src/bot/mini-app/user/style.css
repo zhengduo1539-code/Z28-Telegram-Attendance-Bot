@@ -41,9 +41,13 @@ body{
 button,input{font:inherit}
 button{color:inherit}
 button:disabled{cursor:default}
-button:focus-visible,input:focus-visible,summary:focus-visible{
-  outline:2px solid rgba(72,168,255,.78);
-  outline-offset:2px;
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{
+  outline:2px solid rgba(72,168,255,.9);
+  outline-offset:3px;
+  box-shadow:0 0 0 4px rgba(72,168,255,.1);
+}
+button:focus:not(:focus-visible),input:focus:not(:focus-visible),select:focus:not(:focus-visible),textarea:focus:not(:focus-visible){
+  outline:none;
 }
 
 [hidden]{display:none!important}
@@ -1586,4 +1590,21 @@ body::after{
 }
 @media(prefers-reduced-motion:reduce){
   .faq-card,.faq-item,.faq-toggle{animation:none!important;transition:none!important;}
+}
+
+
+/* Accessibility: keep keyboard focus clear without changing the visual language. */
+[tabindex="-1"]:focus{
+  outline:none;
+}
+.language-option:focus-visible{
+  box-shadow:inset 0 0 0 2px rgba(72,168,255,.22);
+}
+.tab-button[aria-current="page"]{
+  background:rgba(72,168,255,.1);
+  color:#addcff;
+  box-shadow:inset 0 1px rgba(255,255,255,.025);
+}
+.support-select,.support-textarea{
+  scroll-margin-top:18px;
 }
