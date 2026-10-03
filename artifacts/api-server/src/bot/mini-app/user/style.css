@@ -713,8 +713,8 @@ body::after{
   opacity:0;
   animation:cardReveal 620ms var(--ease-out) both;
 }
-.settings-card:nth-of-type(1){animation-delay:250ms}
-.settings-card:nth-of-type(2){animation-delay:330ms}
+.settings-card{animation-delay:250ms}
+.settings-card + .settings-card{animation-delay:330ms}
 
 .group-option{
   opacity:0;
@@ -742,7 +742,7 @@ body::after{
 .about-details{
   animation:fadeSlideUp 500ms var(--ease-out) 280ms both;
 }
-.about-details:nth-of-type(2){animation-delay:340ms}
+.about-details + .about-details{animation-delay:340ms}
 .credit-card{
   animation:fadeSlideUp 560ms var(--ease-out) 400ms both;
 }
