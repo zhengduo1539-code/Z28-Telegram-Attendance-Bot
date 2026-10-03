@@ -3,6 +3,7 @@ import { getHeapStatistics } from "node:v8";
 import { isConfiguredAdmin, getTelegramInitData, validateTelegramInitData, createAdminSession, getAdminSession } from "./admin-auth";
 import { getAdminApiContext } from "./admin-runtime";
 import { adminMiniAppHtml } from "./admin-mini-app";
+import { userMiniAppHtml } from "./user-mini-app";
 import type { ActivityKind, AuditLogEntry } from "./types";
 
 const activityKinds: ActivityKind[] = ["eat", "wc", "smoke", "wcd"];
@@ -829,14 +830,30 @@ adminApiRouter.put("/reminder", async (req, res) => {
   res.json({ reminderEnabled });
 });
 
-export const adminPageHandler = (_req: Request, res: Response) => {
+export const adminPageHandler = (req: Request, res: Response) => {
   res.setHeader("Cache-Control", "no-store");
+
+  const context = getAdminApiContext();
+  const validated = context?.config.token
+    ? validateTelegramInitData(getTelegramInitData(req), context.config.token)
+    : undefined;
+
+  if (
+    validated &&
+    !isConfiguredAdmin(
+      validated.user.id,
+      context?.config.botOwnerId,
+      context?.config.adminIds || [],
+    )
+  ) {
+    res.type("html").send(userMiniAppHtml);
+    return;
+  }
+
   res.type("html").send(adminMiniAppHtml);
 };
 
 export const userPageHandler = (_req: Request, res: Response) => {
   res.setHeader("Cache-Control", "no-store");
-  res
-    .type("html")
-    .send(adminMiniAppHtml.replace("<head>", "<head><script>window.__z28MiniAppMode = \"user\";</script>"));
+  res.type("html").send(userMiniAppHtml);
 };
