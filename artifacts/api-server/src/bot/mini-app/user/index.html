@@ -70,12 +70,54 @@
       </button>
     </section>
 
-    <section id="user-no-group-screen" class="state-screen" hidden aria-live="polite">
-      <div class="state-icon state-icon-muted" aria-hidden="true">
-        <svg viewBox="0 0 24 24"><path d="M4.5 7.5h6l1.5 2h7.5v9a2 2 0 0 1-2 2H6.5a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2Z"></path><path d="M4.5 7.5V5.5a2 2 0 0 1 2-2h4l1.7 2h4.8a2 2 0 0 1 2 2v2"></path></svg>
+    <section id="user-no-group-screen" class="state-screen empty-state" hidden aria-live="polite">
+      <div class="empty-state-card">
+        <div class="empty-state-topline">
+          <div class="state-icon state-icon-muted" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M4.5 7.5h6l1.5 2h7.5v9a2 2 0 0 1-2 2H6.5a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2Z"></path><path d="M4.5 7.5V5.5a2 2 0 0 1 2-2h4l1.7 2h4.8a2 2 0 0 1 2 2v2"></path></svg>
+          </div>
+          <div class="eyebrow" id="user-no-group-eyebrow">GROUP ACCESS</div>
+        </div>
+
+        <h2 id="user-no-group-title">No eligible groups yet</h2>
+        <p id="user-no-group-message">This Mini App could not find a group that your Telegram account can manage.</p>
+
+        <div class="empty-state-help">
+          <div class="empty-state-help-head">
+            <span id="user-no-group-help-title">Getting started</span>
+            <span class="empty-state-help-caption" id="user-no-group-help-caption">Complete these checks, then reopen the Mini App.</span>
+          </div>
+
+          <ol class="empty-state-steps">
+            <li class="empty-state-step">
+              <span class="empty-state-step-number" aria-hidden="true">01</span>
+              <div>
+                <strong id="user-no-group-step1-title">Add the bot to your group</strong>
+                <span id="user-no-group-step1-copy">Make sure Z28 is still a member of the group you want to manage.</span>
+              </div>
+            </li>
+            <li class="empty-state-step">
+              <span class="empty-state-step-number" aria-hidden="true">02</span>
+              <div>
+                <strong id="user-no-group-step2-title">Check your group role</strong>
+                <span id="user-no-group-step2-copy">Your Telegram account must be the group owner or an administrator.</span>
+              </div>
+            </li>
+            <li class="empty-state-step">
+              <span class="empty-state-step-number" aria-hidden="true">03</span>
+              <div>
+                <strong id="user-no-group-step3-title">Reopen the Mini App</strong>
+                <span id="user-no-group-step3-copy">Open the Mini App again after the access changes are complete.</span>
+              </div>
+            </li>
+          </ol>
+        </div>
+
+        <div class="empty-state-note">
+          <span class="empty-state-note-icon" aria-hidden="true">i</span>
+          <p id="user-no-group-note">Groups that are no longer available to the bot are not shown in your dashboard.</p>
+        </div>
       </div>
-      <h2 id="user-no-group-title">No eligible group found</h2>
-      <p id="user-no-group-message">Add this bot to a group, then make sure your Telegram account is a group owner or administrator. Groups where the bot is no longer available are not shown.</p>
     </section>
 
     <section id="user-dashboard-error-screen" class="state-screen error-screen" hidden aria-live="assertive">
