@@ -22,6 +22,14 @@ export class TelegramPollingBot {
     await this.telegram.deleteWebhook();
     await this.telegram.setMyCommands();
 
+    if (this.config.adminMiniAppUrl) {
+      await this.telegram.setChatMenuButton(undefined, {
+        type: "web_app",
+        text: "Open Mini App",
+        web_app: { url: this.config.adminMiniAppUrl },
+      });
+    }
+
     const adminIds = new Set<number>([
       ...(this.config.botOwnerId ? [this.config.botOwnerId] : []),
       ...this.config.adminIds,
