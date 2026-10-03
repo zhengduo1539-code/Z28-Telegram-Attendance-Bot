@@ -290,21 +290,16 @@ adminApiRouter.post("/broadcast", async (req, res) => {
       return;
     }
 
+    // The Report a Problem flow authenticates the Telegram user directly.
+    // Do not require a separately stored private profile entry here: users can
+    // legitimately have a valid Mini App session before any private text command
+    // has created their BotState profile.
     const profile = Object.values(snapshot.users).find(
-      (candidate) =>
-        candidate.userId === targetUserId &&
-        candidate.chatId === targetUserId &&
-        candidate.chatId > 0,
+      (candidate) => candidate.userId === targetUserId && candidate.chatId > 0,
     );
-    if (!profile) {
-      res.status(404).json({
-        error: "Private user not found. The user must have an existing private chat with the bot.",
-      });
-      return;
-    }
 
     try {
-      await auth.context.telegram.sendMessage(profile.chatId, safeMessage);
+      await auth.context.telegram.sendMessage(targetUserId, safeMessage);
     } catch (error: unknown) {
       await recordAdminAudit(
         auth,
@@ -312,20 +307,22 @@ adminApiRouter.post("/broadcast", async (req, res) => {
         String(targetUserId),
         "Direct reply delivery failed.",
       );
-      res.status(502).json({ error: "Telegram could not deliver the direct reply." });
+      res.status(502).json({
+        error: "Telegram could not deliver the direct reply. The user may not have an available private chat with the bot.",
+      });
       return;
     }
 
     const recipient = {
-      userId: profile.userId,
-      displayName: profile.displayName,
-      username: profile.username || null,
+      userId: targetUserId,
+      displayName: profile?.displayName || "Telegram User",
+      username: profile?.username || null,
     };
     await recordAdminAudit(
       auth,
       "direct_message.sent",
       String(targetUserId),
-      "Direct reply sent to " + (profile.username ? "@" + profile.username : profile.displayName) + ".",
+      "Direct reply sent to " + (profile?.username ? "@" + profile.username : recipient.displayName) + ".",
     );
 
     res.setHeader("Cache-Control", "no-store");
