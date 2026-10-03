@@ -250,30 +250,7 @@ export class CommandHandler {
         markup = keyboard(locale);
         if (message.chat.type === "private") {
           const botUsername = await this.telegram.getBotUsername();
-          const isConfiguredAdmin =
-            this.config.botOwnerId === profile.userId ||
-            this.config.adminIds.includes(profile.userId);
           const rows: import("./types").InlineKeyboardButton[][] = [];
-
-          const miniAppUrl = isConfiguredAdmin
-            ? this.config.adminMiniAppUrl
-            : this.config.userMiniAppUrl;
-
-          if (miniAppUrl) {
-            rows.push([
-              {
-                text: isConfiguredAdmin
-                  ? locale === "en"
-                    ? "⚙️ Open Admin Panel"
-                    : "⚙️ 打开管理面板"
-                  : locale === "en"
-                    ? "📊 Open My Dashboard"
-                    : "📊 打开我的面板",
-                style: "primary",
-                web_app: { url: miniAppUrl },
-              },
-            ]);
-          }
 
           if (botUsername) {
             rows.push([
