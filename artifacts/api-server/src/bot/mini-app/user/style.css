@@ -109,7 +109,41 @@ button:focus:not(:focus-visible),input:focus:not(:focus-visible),select:focus:no
   margin:4px 0 2px;
   font-size:clamp(20px,5vw,27px);
   line-height:1.08;
-  letter-spacing:-.03em;
+  letter-spacing:-.035em;
+}
+.app-page-title{
+  position:relative;
+  display:inline-block;
+  max-width:100%;
+  background:linear-gradient(100deg,#f4f8ff 0%,#b9ddff 35%,#ffffff 50%,#9ecbff 68%,#f4f8ff 100%);
+  background-size:220% auto;
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  animation:pageTitleShimmer 5.8s ease-in-out infinite;
+  text-shadow:0 0 22px rgba(72,168,255,.1);
+}
+.app-page-title::after{
+  content:"";
+  position:absolute;
+  left:1px;
+  right:18%;
+  bottom:-7px;
+  height:2px;
+  border-radius:999px;
+  background:linear-gradient(90deg,rgba(72,168,255,.8),rgba(104,88,255,.5),transparent);
+  box-shadow:0 0 14px rgba(72,168,255,.18);
+  transform-origin:left center;
+  animation:titleAccentPulse 3.6s ease-in-out infinite;
+}
+@keyframes pageTitleShimmer{
+  0%,18%{background-position:120% 50%}
+  48%,62%{background-position:0% 50%}
+  100%{background-position:120% 50%}
+}
+@keyframes titleAccentPulse{
+  0%,100%{opacity:.62;transform:scaleX(.88)}
+  50%{opacity:1;transform:scaleX(1)}
 }
 .brand-copy p{
   margin:0;
@@ -540,11 +574,74 @@ button:focus:not(:focus-visible),input:focus:not(:focus-visible),select:focus:no
 }
 .dashboard-title-wrap{min-width:0}
 .dashboard-title-wrap h2{
-  margin:5px 0 3px;
+  margin:7px 0 5px;
   font-size:clamp(24px,6vw,31px);
-  line-height:1.05;
+  line-height:1.08;
   letter-spacing:-.04em;
   word-break:break-word;
+}
+.group-dashboard-title{
+  display:flex;
+  align-items:baseline;
+  flex-wrap:wrap;
+  gap:.34em .42em;
+  max-width:100%;
+}
+.group-dashboard-name{
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  min-width:0;
+  max-width:100%;
+  padding:.22em .52em .25em;
+  border:1px solid rgba(72,168,255,.2);
+  border-radius:.62em;
+  background:linear-gradient(135deg,rgba(72,168,255,.13),rgba(104,88,255,.08));
+  color:#bfe3ff;
+  box-shadow:0 8px 22px rgba(31,108,193,.1),inset 0 1px rgba(255,255,255,.055);
+  font-size:.68em;
+  font-weight:850;
+  letter-spacing:-.015em;
+  line-height:1.2;
+  animation:groupNameReveal 520ms var(--ease-out) 90ms both,groupNameGlow 3.8s ease-in-out 700ms infinite;
+}
+.group-dashboard-name::before{
+  content:"";
+  width:.42em;
+  height:.42em;
+  margin-right:.48em;
+  flex:0 0 auto;
+  border-radius:50%;
+  background:#48a8ff;
+  box-shadow:0 0 0 4px rgba(72,168,255,.08),0 0 12px rgba(72,168,255,.4);
+  animation:groupNameDot 2.4s ease-in-out infinite;
+}
+.group-dashboard-suffix{
+  display:inline-block;
+  color:#edf5ff;
+  background:linear-gradient(100deg,#f6f9ff 0%,#b9d9ff 45%,#ffffff 58%,#98c4ff 100%);
+  background-size:200% auto;
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  animation:dashboardSuffixShimmer 6.4s ease-in-out infinite;
+}
+@keyframes groupNameReveal{
+  from{opacity:0;transform:translate3d(-8px,3px,0) scale(.97)}
+  to{opacity:1;transform:translate3d(0,0,0) scale(1)}
+}
+@keyframes groupNameGlow{
+  0%,100%{border-color:rgba(72,168,255,.2);box-shadow:0 8px 22px rgba(31,108,193,.1),inset 0 1px rgba(255,255,255,.055)}
+  50%{border-color:rgba(72,168,255,.32);box-shadow:0 10px 28px rgba(31,108,193,.16),0 0 18px rgba(72,168,255,.06),inset 0 1px rgba(255,255,255,.07)}
+}
+@keyframes groupNameDot{
+  0%,100%{transform:scale(1);opacity:.78}
+  50%{transform:scale(1.18);opacity:1}
+}
+@keyframes dashboardSuffixShimmer{
+  0%,16%{background-position:120% 50%}
+  48%,62%{background-position:0% 50%}
+  100%{background-position:120% 50%}
 }
 .dashboard-title-wrap p{margin:0;color:var(--muted);font-size:12px}
 .dashboard-actions{
@@ -883,6 +980,8 @@ button:focus:not(:focus-visible),input:focus:not(:focus-visible),select:focus:no
   .editor-actions button{flex:1}
 }
 @media(max-width:430px){
+  .group-dashboard-title{gap:.28em .34em}
+  .group-dashboard-name{font-size:.64em}
   .dashboard-head{flex-direction:column}
   .dashboard-actions{
     width:100%;
@@ -1205,7 +1304,12 @@ body::after{
   .group-option,.about-head,.about-card,.about-details,.credit-card,
   .brand-mark,.brand-mark span,.live-dot,.user-loading .loading-panel,
   .state-icon-error,.splash-content,.splash-kicker,.splash h1,.splash p,.tab-bar,.tab-button.active,
-  .auto-refresh-control.is-enabled .auto-refresh-indicator{
+  .auto-refresh-control.is-enabled .auto-refresh-indicator,
+  .app-page-title,
+  .app-page-title::after,
+  .group-dashboard-name,
+  .group-dashboard-name::before,
+  .group-dashboard-suffix{
     animation:none!important;
   }
   .metric-card,.settings-card,.group-option,.about-card,.about-details,.credit-card{
