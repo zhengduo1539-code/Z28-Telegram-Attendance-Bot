@@ -854,6 +854,11 @@ export const adminPageHandler = (req: Request, res: Response) => {
 };
 
 export const userPageHandler = (_req: Request, res: Response) => {
-  res.setHeader("Cache-Control", "no-store");
+  res.setHeader(
+    "Cache-Control",
+    "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
+  );
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
   res.type("html").send(userMiniAppHtml);
 };
