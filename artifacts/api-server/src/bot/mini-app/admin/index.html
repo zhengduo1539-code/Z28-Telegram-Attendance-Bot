@@ -341,13 +341,23 @@
                     <div class="admin-broadcast-target-title">Delivery mode</div>
                     <div class="admin-broadcast-target-hint">Choose whether this message goes to all private users or one specific user.</div>
                   </div>
-                  <label class="admin-broadcast-field">
-                    <span class="admin-broadcast-field-label" for="admin-broadcast-mode">Send as</span>
-                    <select class="admin-broadcast-select" id="admin-broadcast-mode">
+                  <div class="admin-broadcast-field">
+                    <span class="admin-broadcast-field-label">Send as</span>
+                    <div class="admin-broadcast-mode-switch" role="group" aria-label="Broadcast delivery mode">
+                      <button type="button" class="admin-broadcast-mode-option is-active" data-admin-broadcast-mode="broadcast" aria-pressed="true">
+                        <span class="admin-broadcast-mode-option-title">All Private Users</span>
+                        <span class="admin-broadcast-mode-option-sub">Send to every eligible private user</span>
+                      </button>
+                      <button type="button" class="admin-broadcast-mode-option" data-admin-broadcast-mode="direct" aria-pressed="false">
+                        <span class="admin-broadcast-mode-option-title">Specific User</span>
+                        <span class="admin-broadcast-mode-option-sub">Send to one Telegram user</span>
+                      </button>
+                    </div>
+                    <select class="admin-broadcast-select admin-broadcast-mode-native" id="admin-broadcast-mode" aria-hidden="true" tabindex="-1">
                       <option value="broadcast">Broadcast to all private users</option>
                       <option value="direct">Direct reply to one user</option>
                     </select>
-                  </label>
+                  </div>
                 </div>
 
                 <div class="admin-broadcast-direct" id="admin-broadcast-direct" hidden>
