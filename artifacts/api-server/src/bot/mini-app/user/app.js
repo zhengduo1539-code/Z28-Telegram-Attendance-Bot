@@ -21,6 +21,7 @@
     supportOpen: false,
     toolsOpen: false,
     connectEditMode: false,
+    connectEditSnapshot: null,
     connectLoading: false,
     connectSaving: false,
     appearanceOpen: false,
@@ -142,7 +143,7 @@
       connectNoGroups: "No installed groups available.",
       connectInstalledOnly: "Only groups where Z28 is currently installed are shown.",
       connectButton: "Connect Group",
-      connectChange: "Change Group",
+      connectChange: "Edit Connection",
       connectConnecting: "Connecting",
       connectConnected: "Connected",
       connectStatus: "Current Connection",
@@ -152,6 +153,8 @@
       connectLoadFailed: "Unable to load installed groups. Please try again.",
       connectSuccess: "Group connection saved successfully.",
       connectFailed: "Unable to connect these groups. Please try again.",
+      connectReady: "ချိတ်ဆက်ရန် အဆင်သင့်ဖြစ်ပါပြီ",
+      connectReady: "Ready to connect",
       appearance: "Appearance",
       appearanceSub: "Personalize the Mini App interface.",
       appearanceKicker: "INTERFACE SETTINGS",
@@ -972,7 +975,7 @@
     els["user-connect-note"].textContent = text("connectInstalledOnly");
     els["user-connect-status-title"].textContent = text("connectStatus");
     var connectChangeLabel = els["user-connect-change"] && els["user-connect-change"].querySelector(".button-label");
-    if (connectChangeLabel) connectChangeLabel.textContent = text("connectChange");
+    if (connectChangeLabel) connectChangeLabel.textContent = state.connectEditMode ? text("cancel") : text("connectChange");
     var connectButtonLabel = els["user-connect-submit"].querySelector(".button-label");
     if (connectButtonLabel && !state.connectSaving) connectButtonLabel.textContent = text("connectButton");
     updateConnectStatus();
@@ -1805,21 +1808,53 @@
 
   function updateConnectStatus() {
     if (!els["user-connect-status-value"] || !els["user-connect-status-meta"]) return;
-    var sourceId = Number(els["user-connect-source"] && els["user-connect-source"].value);
-    var connection = state.connectConnections && state.connectConnections[String(sourceId)];
-    var statusIcon = els["user-connect-status-value"].closest(".connect-status-copy")
-      ? els["user-connect-status-value"].closest(".connect-status-copy").previousElementSibling
+
+    var sourceValue = String(els["user-connect-source"] && els["user-connect-source"].value || "");
+    var targetValue = String(els["user-connect-target"] && els["user-connect-target"].value || "");
+    var sourceGroup = getConnectGroupById(sourceValue);
+    var targetGroup = getConnectGroupById(targetValue);
+    var connection = state.connectConnections && state.connectConnections[sourceValue];
+    var sameGroup = Boolean(sourceValue && targetValue && sourceValue === targetValue);
+    var statusIcon = els["user-connect-status-value"].closest(".connection-current-copy")
+      ? els["user-connect-status-value"].closest(".connection-current-copy").previousElementSibling
       : null;
+
+    els["user-connect-status-value"].classList.remove("is-connected", "is-ready", "is-invalid");
+    if (statusIcon) statusIcon.classList.remove("is-connected", "is-ready", "is-invalid");
+
+    if (state.connectEditMode) {
+      if (sameGroup) {
+        els["user-connect-status-value"].textContent = text("connectSame");
+        els["user-connect-status-meta"].textContent = "";
+        els["user-connect-status-value"].classList.add("is-invalid");
+        if (statusIcon) statusIcon.classList.add("is-invalid");
+        return;
+      }
+
+      if (!sourceValue || !targetValue) {
+        els["user-connect-status-value"].textContent = text("connectSelect");
+        els["user-connect-status-meta"].textContent = text("connectSub");
+        return;
+      }
+
+      els["user-connect-status-value"].textContent = text("connectReady");
+      els["user-connect-status-meta"].textContent =
+        (sourceGroup ? sourceGroup.title : sourceValue) +
+        " → " +
+        (targetGroup ? targetGroup.title : targetValue);
+      els["user-connect-status-value"].classList.add("is-ready");
+      if (statusIcon) statusIcon.classList.add("is-ready");
+      return;
+    }
+
     if (!connection) {
       els["user-connect-status-value"].textContent = text("connectNone");
-      els["user-connect-status-value"].classList.remove("is-connected");
       els["user-connect-status-meta"].textContent = "—";
-      if (statusIcon) statusIcon.classList.remove("is-connected");
       return;
     }
 
     els["user-connect-status-value"].innerHTML =
-      '<span class="connect-status-dot" aria-hidden="true"></span>' +
+      '<span class="connection-status-dot" aria-hidden="true"></span>' +
       '<strong>' + escapeHtml(text("connectConnected")) + '</strong> · ' +
       escapeHtml(connection.targetGroupName || String(connection.targetChatId));
     els["user-connect-status-value"].classList.add("is-connected");
@@ -1830,39 +1865,6 @@
       connectedAt && Number.isFinite(connectedAt.getTime())
         ? connectedAt.toLocaleString()
         : "—";
-  }
-
-  function getSourceConnection() {
-    var sourceId = els["user-connect-source"] ? String(els["user-connect-source"].value || "") : "";
-    return sourceId && state.connectConnections ? state.connectConnections[sourceId] : null;
-  }
-
-  function updateConnectStatus() {
-    if (!els["user-connect-status-value"] || !els["user-connect-status-meta"]) return;
-
-    var connection = getSourceConnection();
-    var statusIcon = els["user-connect-status-value"].closest(".connect-status-copy")
-      ? els["user-connect-status-value"].closest(".connect-status-copy").previousElementSibling
-      : null;
-
-    if (!connection) {
-      els["user-connect-status-value"].textContent = text("connectNone");
-      els["user-connect-status-value"].classList.remove("is-connected");
-      els["user-connect-status-meta"].textContent = "—";
-      if (statusIcon) statusIcon.classList.remove("is-connected");
-      return;
-    }
-
-    els["user-connect-status-value"].innerHTML =
-      '<span class="connect-status-dot" aria-hidden="true"></span>' +
-      '<strong>' + escapeHtml(text("connectConnected")) + '</strong> · ' +
-      escapeHtml(connection.targetGroupName || String(connection.targetChatId));
-    els["user-connect-status-value"].classList.add("is-connected");
-    if (statusIcon) statusIcon.classList.add("is-connected");
-
-    var connectedAt = connection.connectedAt ? new Date(connection.connectedAt) : null;
-    els["user-connect-status-meta"].textContent =
-      connectedAt && Number.isFinite(connectedAt.getTime()) ? connectedAt.toLocaleString() : "—";
   }
 
   function updateConnectControls() {
@@ -1882,20 +1884,32 @@
       !state.connectSaving
     );
 
+    var hasEditableConnection = Boolean(connection || state.connectEditSnapshot);
+
     els["user-connect-submit"].disabled = !canSubmit;
     els["user-connect-submit"].setAttribute("aria-disabled", String(!canSubmit));
+    els["user-connect-submit"].classList.toggle("is-ready", canSubmit);
     els["user-connect-source"].setAttribute("aria-invalid", String(sameGroup));
     els["user-connect-target"].setAttribute("aria-invalid", String(sameGroup));
 
     var locked = Boolean(connection && !state.connectEditMode);
     els["user-connect-source"].disabled = locked || state.connectLoading || state.connectSaving;
     els["user-connect-target"].disabled = locked || state.connectLoading || state.connectSaving;
-    els["user-connect-change"].disabled =
-      !connection || state.connectEditMode || state.connectLoading || state.connectSaving;
+
+    els["user-connect-change"].hidden = !hasEditableConnection;
+    els["user-connect-change"].disabled = !hasEditableConnection || state.connectLoading || state.connectSaving;
+
+    var changeLabel = els["user-connect-change"].querySelector(".button-label");
+    if (changeLabel) {
+      changeLabel.textContent = state.connectEditMode ? text("cancel") : text("connectChange");
+    }
+
+    updateConnectStatus();
   }
 
   function applyExistingConnectionState() {
     var connection = getSourceConnection();
+
     if (connection && !state.connectEditMode) {
       var targetId = String(connection.targetChatId);
       var targetExists = (state.connectGroups || []).some(function (group) {
@@ -1907,7 +1921,6 @@
       }
     }
 
-    updateConnectStatus();
     updateConnectControls();
   }
 
@@ -2008,13 +2021,18 @@
 
   function beginConnectEdit() {
     if (state.connectSaving || state.connectLoading) return;
+
+    var connection = getSourceConnection();
+    if (!connection) return;
+
+    state.connectEditSnapshot = {
+      sourceId: String(els["user-connect-source"].value || ""),
+      targetId: String(els["user-connect-target"].value || "")
+    };
     state.connectEditMode = true;
+
     els["user-connect-source"].disabled = false;
     els["user-connect-target"].disabled = false;
-    els["user-connect-change"].disabled = true;
-
-    var label = els["user-connect-submit"].querySelector(".button-label");
-    if (label) label.textContent = text("connectButton");
 
     updateConnectControls();
     window.requestAnimationFrame(function () {
@@ -2022,6 +2040,22 @@
         els["user-connect-source"].focus({ preventScroll: true });
       }
     });
+  }
+
+  function cancelConnectEdit() {
+    if (state.connectSaving || state.connectLoading || !state.connectEditSnapshot) return;
+
+    var snapshot = state.connectEditSnapshot;
+    state.connectEditSnapshot = null;
+    state.connectEditMode = false;
+
+    els["user-connect-source"].value = snapshot.sourceId;
+    els["user-connect-target"].value = snapshot.targetId;
+    writeStorage(STORAGE_KEYS.connectSourceGroup, snapshot.sourceId);
+    writeStorage(STORAGE_KEYS.connectTargetGroup, snapshot.targetId);
+
+    updateConnectControls();
+    showNotice(text("connectConnected"), "ok");
   }
 
   async function submitGroupConnection() {
@@ -2051,6 +2085,7 @@
       state.connectConnections = state.connectConnections || {};
       state.connectConnections[String(sourceId)] = connection;
       state.connectEditMode = false;
+      state.connectEditSnapshot = null;
 
       writeStorage(STORAGE_KEYS.connectSourceGroup, String(sourceId));
       writeStorage(STORAGE_KEYS.connectTargetGroup, String(targetId));
@@ -2326,7 +2361,10 @@
       };
 
       els["user-connect-submit"].onclick = submitGroupConnection;
-      els["user-connect-change"].onclick = beginConnectEdit;
+      els["user-connect-change"].onclick = function () {
+        if (state.connectEditMode) cancelConnectEdit();
+        else beginConnectEdit();
+      };
     }
 
     document.querySelectorAll('input[name="appearance-theme"]').forEach(function (input) {
