@@ -769,12 +769,29 @@
     els["user-language-button"].setAttribute("aria-expanded", String(open));
   }
 
-  function closeLanguageMenu() {
+  function closeLanguageMenu(returnFocus) {
     els["user-language-menu"].hidden = true;
     els["user-language-button"].setAttribute("aria-expanded", "false");
+    if (returnFocus) els["user-language-button"].focus({ preventScroll: true });
   }
 
-  function showVerification() {
+  function focusLanguageOption(direction) {
+    var options = Array.from(document.querySelectorAll(".language-option"));
+    if (!options.length || els["user-language-menu"].hidden) return;
+
+    var current = options.indexOf(document.activeElement);
+    var next = direction === "first"
+      ? 0
+      : direction === "last"
+        ? options.length - 1
+        : current < 0
+          ? 0
+          : (current + direction + options.length) % options.length;
+
+    options[next].focus({ preventScroll: true });
+  }
+
+  function showVerification(shouldFocus) {
     state.groupPickerOpen = false;
     state.aboutOpen = false;
     state.supportOpen = false;
@@ -792,6 +809,12 @@
     els["user-tabbar"].hidden = true;
     setDashboardControls(false);
     updateBackButton();
+
+    if (shouldFocus) {
+      window.requestAnimationFrame(function () {
+        if (!els["user-id-input"].hidden) els["user-id-input"].focus({ preventScroll: true });
+      });
+    }
   }
 
   function showNoGroup() {
@@ -806,7 +829,9 @@
     setDashboardControls(false);
     updateBackButton();
 
-
+    window.requestAnimationFrame(function () {
+      if (!els["user-no-group-screen"].hidden) els["user-no-group-back"].focus({ preventScroll: true });
+    });
   }
 
   function showDashboardError(error, groupId) {
@@ -826,6 +851,10 @@
     els["user-tabbar"].hidden = true;
     setDashboardControls(false);
     updateBackButton();
+
+    window.requestAnimationFrame(function () {
+      if (!els["user-dashboard-error-screen"].hidden) els["user-dashboard-error-retry"].focus({ preventScroll: true });
+    });
   }
 
   function setDashboardControls(visible) {
@@ -870,6 +899,7 @@
     }
 
     var category = els["user-report-category"].value;
+    els["user-report-form"].setAttribute("aria-busy", "true");
     setButton(els["user-report-submit"], "loading", text("reportSending") + "…");
     try {
       await apiUserReport(category, message, state.selectedGroupId);
@@ -879,6 +909,7 @@
     } catch (error) {
       showNotice(error && error.message ? error.message : text("reportFailed"), "error");
     } finally {
+      els["user-report-form"].setAttribute("aria-busy", "false");
       setButton(els["user-report-submit"], "idle", text("reportSend"));
     }
   }
@@ -1285,7 +1316,7 @@
     document.querySelectorAll("[data-user-tab]").forEach(function (button) {
       var active = button.getAttribute("data-user-tab") === "dashboard";
       button.classList.toggle("active", active);
-      button.setAttribute("aria-selected", String(active));
+      button.setAttribute("aria-current", active ? "page" : "false");
     });
 
     setDashboardControls(true);
@@ -1519,13 +1550,37 @@
       }
     });
 
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && !els["user-language-menu"].hidden) {
+        event.preventDefault();
+        closeLanguageMenu(true);
+        return;
+      }
+
+      if (els["user-language-menu"].hidden) return;
+
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        focusLanguageOption(1);
+      } else if (event.key === "ArrowUp") {
+        event.preventDefault();
+        focusLanguageOption(-1);
+      } else if (event.key === "Home") {
+        event.preventDefault();
+        focusLanguageOption("first");
+      } else if (event.key === "End") {
+        event.preventDefault();
+        focusLanguageOption("last");
+      }
+    });
+
     document.querySelectorAll(".language-option").forEach(function (option) {
       option.onclick = function () {
         var selected = option.getAttribute("data-user-lang");
         if (!TEXT[selected]) return;
         state.language = selected;
         writeStorage(STORAGE_KEYS.language, selected);
-        closeLanguageMenu();
+        closeLanguageMenu(true);
         applyLanguage();
       };
     });
@@ -1571,7 +1626,7 @@
       state.verifiedUserId = null;
       state.selectedGroupId = null;
       removeStorage(STORAGE_KEYS.verifiedUser);
-      showVerification();
+      showVerification(true);
     };
 
     els["auto-refresh-toggle"].onclick = function () {
