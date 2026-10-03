@@ -1162,7 +1162,7 @@
   }
 
   async function openGroupPicker() {
-    if (!state.dashboard || state.aboutOpen || state.groupPickerOpen || state.settingsSaving) return;
+    if (!state.dashboard || state.aboutOpen || state.groupPickerOpen || state.settingsSaving || state.refreshInProgress) return;
     var hasUnsaved = false;
     document.querySelectorAll(".editor-input[data-original-value]").forEach(function (input) {
       if (input.value !== input.getAttribute("data-original-value")) hasUnsaved = true;
