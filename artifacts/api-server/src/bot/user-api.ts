@@ -260,6 +260,24 @@ const getInstalledConnectGroups = (snapshot: BotState): ConnectGroupOption[] =>
     }))
     .sort((left, right) => left.title.localeCompare(right.title));
 
+const getUserConnectGroups = async (
+  context: NonNullable<ReturnType<typeof getAdminApiContext>>,
+  snapshot: BotState,
+  userId: number,
+): Promise<ConnectGroupOption[]> => {
+  const installedGroups = getInstalledConnectGroups(snapshot);
+  const authorizedGroups = await Promise.all(
+    installedGroups.map(async (group) => {
+      const role = await getVerifiedGroupRole(context, group.id, userId);
+      return role ? group : undefined;
+    }),
+  );
+
+  return authorizedGroups
+    .filter((group): group is ConnectGroupOption => Boolean(group))
+    .sort((left, right) => left.title.localeCompare(right.title));
+};
+
 userApiRouter.get("/mode", (req, res) => {
   const auth = requireTelegramUser(req, res);
   if (!auth) return;
@@ -281,7 +299,7 @@ userApiRouter.get("/connect/groups", async (req, res) => {
 
   try {
     const snapshot = await auth.context.attendance.snapshot();
-    const groups = getInstalledConnectGroups(snapshot);
+    const groups = await getUserConnectGroups(auth.context, snapshot, auth.user.id);
     const connections: Record<string, ConnectConnection> = {};
 
     for (const group of groups) {
@@ -328,22 +346,21 @@ userApiRouter.post("/connect", async (req, res) => {
   }
 
   const snapshot = await auth.context.attendance.snapshot();
-  const installedGroups = getInstalledConnectGroups(snapshot);
-  const installedIds = new Set(installedGroups.map((group) => group.id));
-  if (!installedIds.has(sourceGroupId) || !installedIds.has(targetGroupId)) {
-    sendError(res, 403, "Both groups must currently have the bot installed.");
+  const authorizedGroups = await getUserConnectGroups(auth.context, snapshot, auth.user.id);
+  const authorizedIds = new Set(authorizedGroups.map((group) => group.id));
+  if (!authorizedIds.has(sourceGroupId) || !authorizedIds.has(targetGroupId)) {
+    sendError(
+      res,
+      403,
+      "Both groups must have the bot installed and you must be a group owner or administrator of them.",
+    );
     return;
   }
 
   const sourceGroup = snapshot.managedGroups?.[String(sourceGroupId)];
   const targetGroup = snapshot.managedGroups?.[String(targetGroupId)];
   if (!sourceGroup || !targetGroup) {
-    sendError(res, 403, "Both groups must currently have the bot installed.");
-    return;
-  }
-
-  if (!(await isGroupAdmin(auth.context, sourceGroupId, auth.user.id))) {
-    sendError(res, 403, "You must be a group owner or administrator of the source group.");
+    sendError(res, 403, "Both groups are no longer available to the bot.");
     return;
   }
 
