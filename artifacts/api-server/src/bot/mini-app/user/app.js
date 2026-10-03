@@ -19,6 +19,7 @@
     groupPickerOpen: false,
     aboutOpen: false,
     supportOpen: false,
+    toolsOpen: false,
     appearanceOpen: false,
     appearanceTheme: "dark",
     wallpaper: "default",
@@ -33,6 +34,8 @@
     verifiedUser: "z28_verified_user_id",
     language: "z28_user_language",
     dashboard: "z28_user_dashboard_state",
+    connectSourceGroup: "z28_connect_source_group",
+    connectTargetGroup: "z28_connect_target_group",
     autoRefresh: "z28_user_auto_refresh",
     appearanceTheme: "z28_appearance_theme",
     wallpaper: "z28_appearance_wallpaper",
@@ -124,6 +127,72 @@
       wallpaperNebula: "Nebula",
       wallpaperOcean: "Ocean Glow",
       wallpaperViolet: "Violet Glass",
+      tools: "Tools",
+      toolsSub: "Connect bot-installed groups with a secure, guided flow.",
+      connectTitle: "Group Connection",
+      connectSub: "Connect one bot-installed group to another for timeout notifications.",
+      connectSource: "Source Group",
+      connectSourceSub: "The group where activity timeouts are detected.",
+      connectTarget: "Target Group",
+      connectTargetSub: "The bot will send timeout notifications to this group.",
+      connectSelect: "Select a group",
+      connectNoGroups: "No installed groups available.",
+      connectInstalledOnly: "Only groups where Z28 is currently installed are shown.",
+      connectButton: "Connect Groups",
+      connectConnecting: "Connecting",
+      connectConnected: "Connected",
+      connectStatus: "Current Connection",
+      connectNone: "No connection is configured for this source group.",
+      connectSourceAdmin: "You must be a group owner or administrator of the source group.",
+      connectSame: "Choose two different groups.",
+      connectLoadFailed: "Unable to load installed groups. Please try again.",
+      connectSuccess: "Group connection saved successfully.",
+      connectFailed: "Unable to connect these groups. Please try again.",
+      connectRefresh: "Refresh",
+      tools: "Tools",
+      toolsSub: "Group tools and connection controls.",
+      connectTitle: "Group Connection",
+      connectSub: "Bot ထည့်သွင်းထားသော Group များကို လုံခြုံစွာ ချိတ်ဆက်နိုင်ပါသည်။",
+      connectSource: "Source Group",
+      connectSourceSub: "Activity timeout ဖြစ်ပေါ်မည့် Group။",
+      connectTarget: "Target Group",
+      connectTargetSub: "Timeout notification များကို ဤ Group သို့ ပို့ပါမည်။",
+      connectSelect: "Group ရွေးပါ",
+      connectNoGroups: "Bot ထည့်ထားသော Group မရှိသေးပါ။",
+      connectInstalledOnly: "Z28 Bot ထည့်သွင်းထားသော Group များကိုသာ ပြသပါသည်။",
+      connectButton: "Group ချိတ်ဆက်မည်",
+      connectConnecting: "ချိတ်ဆက်နေသည်",
+      connectConnected: "ချိတ်ဆက်ပြီး",
+      connectStatus: "လက်ရှိ ချိတ်ဆက်မှု",
+      connectNone: "ဤ Source Group အတွက် ချိတ်ဆက်ထားမှု မရှိသေးပါ။",
+      connectSourceAdmin: "Source Group တွင် owner သို့မဟုတ် administrator ဖြစ်ရပါမည်။",
+      connectSame: "မတူညီသော Group နှစ်ခုကို ရွေးပါ။",
+      connectLoadFailed: "Bot ထည့်ထားသော Group များကို မဖတ်နိုင်ပါ။ ထပ်စမ်းကြည့်ပါ။",
+      connectSuccess: "Group ချိတ်ဆက်မှုကို အောင်မြင်စွာ သိမ်းပြီးပါပြီ။",
+      connectFailed: "Group ချိတ်ဆက်၍ မရပါ။ ထပ်စမ်းကြည့်ပါ။",
+      connectRefresh: "Refresh",
+      tools: "工具",
+      toolsSub: "用于群组连接与常用管理操作。",
+      connectTitle: "群组连接",
+      connectSub: "安全地连接已安装 Bot 的群组，用于超时通知。",
+      connectSource: "来源群组",
+      connectSourceSub: "检测到活动超时的群组。",
+      connectTarget: "目标群组",
+      connectTargetSub: "超时通知将发送到此群组。",
+      connectSelect: "选择群组",
+      connectNoGroups: "暂无已安装 Bot 的群组。",
+      connectInstalledOnly: "仅显示当前已安装 Z28 Bot 的群组。",
+      connectButton: "连接群组",
+      connectConnecting: "连接中",
+      connectConnected: "已连接",
+      connectStatus: "当前连接",
+      connectNone: "此来源群组尚未配置连接。",
+      connectSourceAdmin: "您必须是来源群组的创建者或管理员。",
+      connectSame: "请选择两个不同的群组。",
+      connectLoadFailed: "无法加载已安装 Bot 的群组，请重试。",
+      connectSuccess: "群组连接已成功保存。",
+      connectFailed: "无法连接所选群组，请重试。",
+      connectRefresh: "刷新",
       appearance: "Appearance",
       appearanceSub: "Personalize the Mini App interface.",
       appearanceKicker: "INTERFACE SETTINGS",
@@ -528,6 +597,11 @@
       "user-member-count","user-active-count","user-group-member-label",
       "user-member-active-label","settings-title","settings-subtitle",
       "user-settings-limits-card","user-settings-counts-card",
+      "user-tools-page","user-tools-title","user-tools-sub","user-connect-title","user-connect-sub",
+      "user-connect-source-label","user-connect-source-sub","user-connect-source",
+      "user-connect-target-label","user-connect-target-sub","user-connect-target",
+      "user-connect-note","user-connect-submit","user-connect-status-title","user-connect-status-value",
+      "user-connect-status-meta","user-connect-refresh",
       "user-about-page","user-about-title","user-about-sub","user-about-bot-name-label",
       "user-about-bot-version-label","user-about-mini-version-label",
       "user-about-terms-label","user-about-terms-copy","user-about-privacy-label",
@@ -678,7 +752,11 @@
             ? "about"
             : parsed && parsed.tab === "appearance"
               ? "appearance"
-              : "dashboard"
+              : parsed && parsed.tab === "support"
+                ? "support"
+                : parsed && parsed.tab === "tools"
+                  ? "tools"
+                  : "dashboard"
       };
     } catch (_) {
       return { groupId: null, tab: "dashboard" };
@@ -825,7 +903,9 @@
     els["user-dashboard"].hidden = true;
     els["user-about-page"].hidden = true;
     els["user-support-page"].hidden = true;
+    els["user-tools-page"].hidden = true;
     els["user-appearance-page"].hidden = true;
+    els["user-tools-page"].hidden = true;
   }
 
   function applyLanguage() {
@@ -877,7 +957,22 @@
     els["user-dashboard-tab-label"].textContent = text("dashboard");
     els["user-about-tab-label"].textContent = text("about");
     els["user-support-tab-label"].textContent = text("helpSupport");
+    els["user-tools-tab-label"].textContent = text("tools");
     els["user-appearance-tab-label"].textContent = text("appearance");
+    els["user-tools-title"].textContent = text("tools");
+    els["user-tools-sub"].textContent = text("toolsSub");
+    els["user-connect-title"].textContent = text("connectTitle");
+    els["user-connect-sub"].textContent = text("connectSub");
+    els["user-connect-source-label"].textContent = text("connectSource");
+    els["user-connect-source-sub"].textContent = text("connectSourceSub");
+    els["user-connect-target-label"].textContent = text("connectTarget");
+    els["user-connect-target-sub"].textContent = text("connectTargetSub");
+    els["user-connect-note"].textContent = text("connectInstalledOnly");
+    els["user-connect-status-title"].textContent = text("connectStatus");
+    els["user-connect-refresh"].querySelector(".button-label").textContent = text("connectRefresh");
+    var connectButtonLabel = els["user-connect-submit"].querySelector(".button-label");
+    if (connectButtonLabel && !state.connectSaving) connectButtonLabel.textContent = text("connectButton");
+    updateConnectStatus();
     els["user-appearance-title"].textContent = text("appearance");
     els["user-appearance-sub"].textContent = text("appearanceSub");
     els["user-appearance-theme-kicker"].textContent = text("appearanceKicker");
@@ -1031,6 +1126,7 @@
     state.groupPickerOpen = false;
     state.aboutOpen = false;
     state.supportOpen = false;
+    state.toolsOpen = false;
     state.appearanceOpen = false;
     hideAllPrimaryScreens();
     els["user-no-group-screen"].hidden = false;
@@ -1049,6 +1145,7 @@
     state.groupPickerOpen = false;
     state.aboutOpen = false;
     state.supportOpen = false;
+    state.toolsOpen = false;
     state.appearanceOpen = false;
     hideAllPrimaryScreens();
     els["user-dashboard-error-screen"].hidden = false;
@@ -1419,6 +1516,41 @@
     );
   }
 
+  async function apiUserConnectGroups() {
+    if (!initData) throw new Error("Telegram session data is missing.");
+    return fetchJson(
+      "/api/user/connect/groups",
+      {
+        method: "GET",
+        headers: {
+          "X-Telegram-Init-Data": initData,
+          "Accept": "application/json"
+        }
+      },
+      "Connect Groups API"
+    );
+  }
+
+  async function apiUserConnect(sourceGroupId, targetGroupId) {
+    if (!initData) throw new Error("Telegram session data is missing.");
+    return fetchJson(
+      "/api/user/connect",
+      {
+        method: "POST",
+        headers: {
+          "X-Telegram-Init-Data": initData,
+          "Accept": "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          sourceGroupId: Number(sourceGroupId),
+          targetGroupId: Number(targetGroupId)
+        })
+      },
+      "Group Connect"
+    );
+  }
+
   async function apiUserReport(category, message, groupId) {
     if (!initData) throw new Error("Telegram session data is missing.");
     return fetchJson(
@@ -1510,6 +1642,7 @@
     els["user-dashboard"].hidden = false;
     els["user-about-page"].hidden = true;
     els["user-support-page"].hidden = true;
+    els["user-tools-page"].hidden = true;
     els["user-appearance-page"].hidden = true;
     els["user-tabbar"].hidden = false;
 
@@ -1589,7 +1722,7 @@
 
   async function loadUserDashboard(showLoading, groupId, silent) {
     if (!telegramUserId) throw new Error(text("identifyError"));
-    if (state.aboutOpen || state.supportOpen || state.appearanceOpen) return true;
+    if (state.aboutOpen || state.supportOpen || state.toolsOpen || state.appearanceOpen) return true;
 
     var requestId = ++state.requestId;
     var shouldShowLoading = showLoading !== false;
@@ -1604,7 +1737,7 @@
         throw new Error(text("apiPrefix") + ": " + apiMessage);
       }
 
-      if (requestId !== state.requestId || state.aboutOpen || state.supportOpen) return false;
+      if (requestId !== state.requestId || state.aboutOpen || state.supportOpen || state.toolsOpen) return false;
       if (state.groupPickerOpen && groupId === undefined) return false;
 
       var opened;
@@ -1641,13 +1774,180 @@
     }
   }
 
+  function getConnectGroupById(groupId) {
+    var numericId = Number(groupId);
+    return (state.connectGroups || []).find(function (group) {
+      return Number(group.id) === numericId;
+    }) || null;
+  }
+
+  function populateConnectSelect(select, groups, preferredId) {
+    if (!select) return;
+    var current = String(preferredId || "");
+    var safeGroups = Array.isArray(groups) ? groups : [];
+    var placeholder = safeGroups.length ? text("connectSelect") : text("connectNoGroups");
+    select.innerHTML =
+      '<option value="">' + escapeHtml(placeholder) + '</option>' +
+      safeGroups.map(function (group) {
+        return '<option value="' + escapeHtml(String(group.id)) + '">' +
+          escapeHtml(group.title || String(group.id)) +
+          '</option>';
+      }).join("");
+    var preferred = safeGroups.find(function (group) {
+      return String(group.id) === current;
+    });
+    select.value = preferred ? current : "";
+    select.disabled = safeGroups.length === 0;
+  }
+
+  function updateConnectStatus() {
+    if (!els["user-connect-status-value"] || !els["user-connect-status-meta"]) return;
+    var sourceId = Number(els["user-connect-source"] && els["user-connect-source"].value);
+    var connection = state.connectConnections && state.connectConnections[String(sourceId)];
+    var statusIcon = els["user-connect-status-value"].closest(".connect-status-copy")
+      ? els["user-connect-status-value"].closest(".connect-status-copy").previousElementSibling
+      : null;
+    if (!connection) {
+      els["user-connect-status-value"].textContent = text("connectNone");
+      els["user-connect-status-value"].classList.remove("is-connected");
+      els["user-connect-status-meta"].textContent = "—";
+      if (statusIcon) statusIcon.classList.remove("is-connected");
+      return;
+    }
+
+    els["user-connect-status-value"].innerHTML =
+      '<span class="connect-status-dot" aria-hidden="true"></span>' +
+      '<strong>' + escapeHtml(text("connectConnected")) + '</strong> · ' +
+      escapeHtml(connection.targetGroupName || String(connection.targetChatId));
+    els["user-connect-status-value"].classList.add("is-connected");
+    if (statusIcon) statusIcon.classList.add("is-connected");
+
+    var connectedAt = connection.connectedAt ? new Date(connection.connectedAt) : null;
+    els["user-connect-status-meta"].textContent =
+      connectedAt && Number.isFinite(connectedAt.getTime())
+        ? connectedAt.toLocaleString()
+        : "—";
+  }
+
+  function updateConnectControls() {
+    if (!els["user-connect-source"] || !els["user-connect-target"] || !els["user-connect-submit"]) return;
+    var sourceValue = els["user-connect-source"].value;
+    var targetValue = els["user-connect-target"].value;
+    var valid = Boolean(sourceValue && targetValue && sourceValue !== targetValue && !state.connectSaving && !state.connectLoading);
+    els["user-connect-submit"].disabled = !valid;
+    els["user-connect-submit"].setAttribute("aria-disabled", String(!valid));
+    var same = Boolean(sourceValue && targetValue && sourceValue === targetValue);
+    els["user-connect-source"].setAttribute("aria-invalid", String(same));
+    els["user-connect-target"].setAttribute("aria-invalid", String(same));
+  }
+
+  async function loadConnectGroups() {
+    if (!state.toolsOpen || state.connectLoading) return;
+    state.connectLoading = true;
+    els["user-connect-submit"].disabled = true;
+    els["user-connect-refresh"].disabled = true;
+    els["user-connect-source"].setAttribute("aria-busy", "true");
+    els["user-connect-target"].setAttribute("aria-busy", "true");
+
+    try {
+      var data = await apiUserConnectGroups();
+      if (!state.toolsOpen) return;
+
+      var groups = Array.isArray(data.groups) ? data.groups : [];
+      state.connectGroups = groups;
+      state.connectConnections =
+        data.connections && typeof data.connections === "object"
+          ? data.connections
+          : {};
+
+      var savedSource = readStorage(STORAGE_KEYS.connectSourceGroup);
+      var savedTarget = readStorage(STORAGE_KEYS.connectTargetGroup);
+      var validSavedSource = savedSource && groups.some(function (group) { return String(group.id) === savedSource; });
+      var validSavedTarget = savedTarget && groups.some(function (group) { return String(group.id) === savedTarget; });
+      var defaultSource = validSavedSource
+        ? savedSource
+        : (state.selectedGroupId && groups.some(function (group) { return Number(group.id) === Number(state.selectedGroupId); })
+          ? String(state.selectedGroupId)
+          : groups.length ? String(groups[0].id) : "");
+      var differentTarget = groups.find(function (group) { return String(group.id) !== String(defaultSource); });
+      var defaultTarget = validSavedTarget && String(savedTarget) !== String(defaultSource)
+        ? savedTarget
+        : (differentTarget ? String(differentTarget.id) : "");
+
+      populateConnectSelect(els["user-connect-source"], groups, defaultSource);
+      populateConnectSelect(els["user-connect-target"], groups, defaultTarget);
+
+      if (defaultSource) writeStorage(STORAGE_KEYS.connectSourceGroup, defaultSource);
+      if (defaultTarget) writeStorage(STORAGE_KEYS.connectTargetGroup, defaultTarget);
+
+      updateConnectStatus();
+      updateConnectControls();
+    } catch (error) {
+      if (!state.toolsOpen) return;
+      showNotice(
+        error && error.message ? error.message : text("connectLoadFailed"),
+        "error"
+      );
+    } finally {
+      state.connectLoading = false;
+      els["user-connect-refresh"].disabled = false;
+      els["user-connect-source"].removeAttribute("aria-busy");
+      els["user-connect-target"].removeAttribute("aria-busy");
+      updateConnectControls();
+    }
+  }
+
+  async function submitGroupConnection() {
+    if (state.connectSaving || state.connectLoading) return;
+    var sourceId = Number(els["user-connect-source"].value);
+    var targetId = Number(els["user-connect-target"].value);
+    if (!Number.isSafeInteger(sourceId) || sourceId >= 0 || !Number.isSafeInteger(targetId) || targetId >= 0) return;
+
+    if (sourceId === targetId) {
+      showNotice(text("connectSame"), "error");
+      return;
+    }
+
+    state.connectSaving = true;
+    setButton(els["user-connect-submit"], "loading", text("connectConnecting"));
+    els["user-connect-source"].disabled = true;
+    els["user-connect-target"].disabled = true;
+
+    try {
+      var result = await apiUserConnect(sourceId, targetId);
+      var connection = result && result.connection;
+      if (!connection) throw new Error(text("connectFailed"));
+
+      state.connectConnections = state.connectConnections || {};
+      state.connectConnections[String(sourceId)] = connection;
+      updateConnectStatus();
+      showNotice(text("connectSuccess"), "ok");
+    } catch (error) {
+      var message = error && error.message ? error.message : "";
+      if (message.indexOf("group owner or administrator") !== -1) {
+        showNotice(text("connectSourceAdmin"), "error");
+      } else if (message) {
+        showNotice(message, "error");
+      } else {
+        showNotice(text("connectFailed"), "error");
+      }
+    } finally {
+      state.connectSaving = false;
+      els["user-connect-source"].disabled = false;
+      els["user-connect-target"].disabled = false;
+      setButton(els["user-connect-submit"], "idle", text("connectButton"));
+      updateConnectControls();
+    }
+  }
+
   function setDashboardTab(tab) {
     if (!state.dashboard || !els["user-tabbar"] || els["user-tabbar"].hidden) return;
     if (state.groupPickerOpen) return;
 
-    tab = tab === "about" || tab === "support" || tab === "appearance" ? tab : "dashboard";
+    tab = tab === "about" || tab === "support" || tab === "tools" || tab === "appearance" ? tab : "dashboard";
     state.aboutOpen = tab === "about";
     state.supportOpen = tab === "support";
+    state.toolsOpen = tab === "tools";
     state.appearanceOpen = tab === "appearance";
     saveDashboardState({ tab: tab });
 
@@ -1656,6 +1956,7 @@
     if (state.aboutOpen) {
       els["user-selected-dashboard"].hidden = true;
       els["user-support-page"].hidden = true;
+      els["user-tools-page"].hidden = true;
       els["user-appearance-page"].hidden = true;
       els["user-about-page"].hidden = false;
       els.title.textContent = text("about");
@@ -1664,16 +1965,29 @@
     } else if (state.supportOpen) {
       els["user-selected-dashboard"].hidden = true;
       els["user-about-page"].hidden = true;
+      els["user-tools-page"].hidden = true;
       els["user-appearance-page"].hidden = true;
       els["user-support-page"].hidden = false;
       els.title.textContent = text("helpSupport");
       els.identity.textContent = userGreeting();
       updateReportContext();
       setDashboardControls(false);
+    } else if (state.toolsOpen) {
+      els["user-selected-dashboard"].hidden = true;
+      els["user-about-page"].hidden = true;
+      els["user-support-page"].hidden = true;
+      els["user-appearance-page"].hidden = true;
+      els["user-tools-page"].hidden = false;
+      els.title.textContent = text("tools");
+      els.identity.textContent = userGreeting();
+      setDashboardControls(false);
+      updateConnectStatus();
+      void loadConnectGroups();
     } else if (state.appearanceOpen) {
       els["user-selected-dashboard"].hidden = true;
       els["user-about-page"].hidden = true;
       els["user-support-page"].hidden = true;
+      els["user-tools-page"].hidden = true;
       els["user-appearance-page"].hidden = false;
       els.title.textContent = text("appearance");
       els.identity.textContent = userGreeting();
@@ -1682,6 +1996,7 @@
     } else {
       els["user-about-page"].hidden = true;
       els["user-support-page"].hidden = true;
+      els["user-tools-page"].hidden = true;
       els["user-appearance-page"].hidden = true;
       els["user-selected-dashboard"].hidden = false;
       els.title.textContent = text("title");
@@ -1700,7 +2015,7 @@
   }
 
   async function openGroupPicker() {
-    if (!state.dashboard || state.aboutOpen || state.supportOpen || state.appearanceOpen || state.groupPickerOpen || state.settingsSaving || state.refreshInProgress) return;
+    if (!state.dashboard || state.aboutOpen || state.supportOpen || state.toolsOpen || state.appearanceOpen || state.groupPickerOpen || state.settingsSaving || state.refreshInProgress) return;
     var hasUnsaved = false;
     document.querySelectorAll(".editor-input[data-original-value]").forEach(function (input) {
       if (input.value !== input.getAttribute("data-original-value")) hasUnsaved = true;
@@ -1720,12 +2035,14 @@
     state.groupPickerOpen = true;
     state.aboutOpen = false;
     state.supportOpen = false;
+    state.toolsOpen = false;
     state.appearanceOpen = false;
     ++state.requestId;
     els["user-group-options"].hidden = false;
     els["user-selected-dashboard"].hidden = true;
     els["user-about-page"].hidden = true;
     els["user-support-page"].hidden = true;
+    els["user-tools-page"].hidden = true;
     els["user-appearance-page"].hidden = true;
     els["user-tabbar"].hidden = true;
     els.title.textContent = text("groupOptions");
@@ -1757,7 +2074,7 @@
     if (!tg || !tg.BackButton) return;
     var shouldShow =
       Boolean(state.dashboard) &&
-      (state.groupPickerOpen || state.aboutOpen || state.supportOpen || state.appearanceOpen);
+      (state.groupPickerOpen || state.aboutOpen || state.supportOpen || state.toolsOpen || state.appearanceOpen);
     if (shouldShow) tg.BackButton.show();
     else tg.BackButton.hide();
   }
@@ -1771,7 +2088,7 @@
       }
       return;
     }
-    if (state.aboutOpen || state.supportOpen || state.appearanceOpen) setDashboardTab("dashboard");
+    if (state.aboutOpen || state.supportOpen || state.toolsOpen || state.appearanceOpen) setDashboardTab("dashboard");
   }
 
   function bindStaticEvents() {
@@ -1853,6 +2170,22 @@
 
     els["user-report-message"].oninput = updateReportCharacterCount;
     els["user-report-form"].onsubmit = submitProblemReport;
+
+    els["user-connect-source"].onchange = function () {
+      writeStorage(STORAGE_KEYS.connectSourceGroup, els["user-connect-source"].value);
+      updateConnectStatus();
+      updateConnectControls();
+    };
+
+    els["user-connect-target"].onchange = function () {
+      writeStorage(STORAGE_KEYS.connectTargetGroup, els["user-connect-target"].value);
+      updateConnectControls();
+    };
+
+    els["user-connect-submit"].onclick = submitGroupConnection;
+    els["user-connect-refresh"].onclick = function () {
+      void loadConnectGroups();
+    };
 
     document.querySelectorAll('input[name="appearance-theme"]').forEach(function (input) {
       input.onchange = function () {
