@@ -256,7 +256,7 @@
       noGroupStep2Copy: "သင့် Telegram account သည် Group owner သို့မဟုတ် administrator ဖြစ်ရပါမည်။",
       noGroupStep3Title: "Mini App ကို ပြန်ဖွင့်ပါ",
       noGroupStep3Copy: "Access ပြောင်းလဲမှုများ ပြီးစီးပြီးနောက် Mini App ကို ပြန်ဖွင့်ပါ။",
-      noGroupNote: "Bot မှ အသုံးပြုခွင့်မရှိတော့သော Group များကို Dashboard တွင် မပြပါ။"
+      noGroupNote: "Bot မှ အသုံးပြုခွင့်မရှိတော့သော Group များကို Dashboard တွင် မပြပါ။",
       dashboardError: "Dashboard ကို ယခုဖွင့်၍ မရသေးပါ။",
       dashboardErrorCopy: "Dashboard ကိုဖွင့်နေစဉ် ပြဿနာတစ်ခု ဖြစ်ပေါ်ခဲ့ပါသည်။ သိမ်းထားပြီးသော setting များကို မပြောင်းလဲထားပါ။",
       tryAgain: "ထပ်ကြိုးစားမည်",
@@ -383,7 +383,7 @@
       noGroupStep2Copy: "您的 Telegram 账号必须是群主或管理员。",
       noGroupStep3Title: "重新打开 Mini App",
       noGroupStep3Copy: "完成访问权限调整后，再次打开 Mini App。",
-      noGroupNote: "Bot 已无法使用的群组不会显示在您的 Dashboard 中。"
+      noGroupNote: "Bot 已无法使用的群组不会显示在您的 Dashboard 中。",
       dashboardError: "暂时无法加载您的控制面板。",
       dashboardErrorCopy: "加载控制面板时出现问题。您已保存的设置没有被更改。",
       tryAgain: "再试一次",
