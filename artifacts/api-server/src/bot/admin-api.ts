@@ -263,7 +263,18 @@ adminApiRouter.post("/broadcast", async (req, res) => {
     return;
   }
 
-  const mode = req.body?.mode === "direct" ? "direct" : "broadcast";
+  const requestedMode = req.body?.mode;
+  const mode =
+    requestedMode === undefined || requestedMode === null || requestedMode === ""
+      ? "broadcast"
+      : requestedMode === "direct"
+        ? "direct"
+        : "invalid";
+  if (mode === "invalid") {
+    res.status(400).json({ error: "Invalid broadcast delivery mode." });
+    return;
+  }
+
   const snapshot = await auth.context.attendance.snapshot();
 
   const escapeHtml = (value: string) =>
