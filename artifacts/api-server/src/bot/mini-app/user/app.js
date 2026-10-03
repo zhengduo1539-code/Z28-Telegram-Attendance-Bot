@@ -923,6 +923,8 @@
 
     els["theme-creator-preview"].style.setProperty("--preview-primary", palette.primary);
     els["theme-creator-preview"].style.setProperty("--preview-secondary", palette.secondary);
+    els["theme-creator-preview"].style.setProperty("--preview-primary-rgb", hexToRgbChannels(palette.primary));
+    els["theme-creator-preview"].style.setProperty("--preview-secondary-rgb", hexToRgbChannels(palette.secondary));
     els["theme-creator-preview"].style.setProperty("--preview-glow", String(0.08 + (custom.glow / 100) * 0.28));
     els["theme-creator-preview"].style.setProperty("--preview-radius", custom.radius + "px");
     els["theme-creator-preview-status"].textContent = custom.enabled
