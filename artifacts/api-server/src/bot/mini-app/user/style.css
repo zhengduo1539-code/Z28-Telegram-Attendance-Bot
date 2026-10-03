@@ -1903,7 +1903,7 @@ html[data-compact="on"] .appearance-control{min-height:62px}
 html[data-theme="midnight"] .appearance-card{background:linear-gradient(145deg,rgba(18,21,47,.88),rgba(7,8,18,.95))}
 html[data-theme="amoled"] .appearance-card{background:linear-gradient(145deg,rgba(12,12,14,.96),rgba(2,2,3,.99))}
 
-.tab-bar{grid-template-columns:repeat(4,minmax(0,1fr))}
+.tab-bar{grid-template-columns:repeat(5,minmax(0,1fr))}
 @media(max-width:520px){
   .appearance-card{padding:16px}
   .appearance-theme-grid{grid-template-columns:1fr}
