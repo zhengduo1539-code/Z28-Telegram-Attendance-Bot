@@ -336,6 +336,44 @@
             </div><div class="admin-status-pill">Admin only</div></div>
             <div class="admin-panel-body">
               <div class="admin-broadcast-box">
+                <div class="admin-broadcast-target">
+                  <div class="admin-broadcast-target-copy">
+                    <div class="admin-broadcast-target-title">Delivery mode</div>
+                    <div class="admin-broadcast-target-hint">Choose whether this message goes to all private users or one specific user.</div>
+                  </div>
+                  <label class="admin-broadcast-field">
+                    <span class="admin-broadcast-field-label" for="admin-broadcast-mode">Send as</span>
+                    <select class="admin-broadcast-select" id="admin-broadcast-mode">
+                      <option value="broadcast">Broadcast to all private users</option>
+                      <option value="direct">Direct reply to one user</option>
+                    </select>
+                  </label>
+                </div>
+
+                <div class="admin-broadcast-direct" id="admin-broadcast-direct" hidden>
+                  <div class="admin-broadcast-direct-head">
+                    <div>
+                      <div class="admin-broadcast-direct-title">Specific user</div>
+                      <div class="admin-broadcast-direct-hint">Enter the Telegram User ID shown in User Management or Report a Problem.</div>
+                    </div>
+                    <span class="admin-status-pill">Private chat only</span>
+                  </div>
+                  <label class="admin-broadcast-field">
+                    <span class="admin-broadcast-field-label" for="admin-broadcast-user-id">Telegram User ID</span>
+                    <input
+                      class="admin-broadcast-input"
+                      id="admin-broadcast-user-id"
+                      type="text"
+                      inputmode="numeric"
+                      autocomplete="off"
+                      maxlength="20"
+                      placeholder="e.g. 123456789"
+                      aria-describedby="admin-broadcast-user-hint"
+                    >
+                  </label>
+                  <div class="admin-broadcast-user-hint" id="admin-broadcast-user-hint">The bot must have an existing private chat with this user before a direct reply can be sent.</div>
+                </div>
+
                 <textarea class="admin-broadcast-textarea" id="admin-broadcast-message" maxlength="4000" placeholder="Write your announcement…"></textarea>
                 <div class="admin-broadcast-footer">
                   <span class="admin-panel-sub" id="admin-broadcast-count">0 / 4000</span>
