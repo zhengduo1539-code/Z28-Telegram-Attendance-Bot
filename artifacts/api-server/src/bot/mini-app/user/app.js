@@ -1815,7 +1815,7 @@
     var targetGroup = getConnectGroupById(targetValue);
     var connection = state.connectConnections && state.connectConnections[sourceValue];
     var sameGroup = Boolean(sourceValue && targetValue && sourceValue === targetValue);
-    var statusIcon = els["user-connect-status-value"].closest(".connection-current-copy")
+    var statusIcon = els["user-connect-status-value"].closest(".connection-overview-copy")
       ? els["user-connect-status-value"].closest(".connection-current-copy").previousElementSibling
       : null;
 
@@ -1978,9 +1978,7 @@
           ? connectedTarget
           : validSavedTarget && savedTarget !== defaultSource
             ? savedTarget
-            : fallbackTarget
-              ? String(fallbackTarget.id)
-              : "";
+            : "";
 
       state.connectEditMode = !Boolean(sourceConnection);
 
