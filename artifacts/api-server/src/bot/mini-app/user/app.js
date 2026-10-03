@@ -1822,6 +1822,11 @@
     );
     card.classList.toggle("is-success", state.connectFeedback === "success");
     card.classList.toggle("is-error", state.connectFeedback === "error");
+
+    var submit = els["user-connect-submit"];
+    if (submit) {
+      submit.classList.toggle("is-success", state.connectFeedback === "success");
+    }
   }
 
   function triggerConnectHaptic(type) {
@@ -2070,7 +2075,7 @@
     if (state.connectSaving || state.connectLoading) return;
     state.connectEditMode = true;
     setConnectFeedback("idle");
-    triggerConnectHaptic("success");
+    triggerConnectHaptic("light");
     els["user-connect-source"].disabled = false;
     els["user-connect-target"].disabled = false;
     els["user-connect-change"].disabled = true;
