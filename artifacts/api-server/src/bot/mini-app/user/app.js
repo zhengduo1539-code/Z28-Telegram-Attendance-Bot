@@ -366,9 +366,9 @@
       "user-about-terms-label","user-about-terms-copy","user-about-privacy-label",
       "user-about-privacy-copy","user-about-credits-label","user-about-creator-label",
       "user-support-page","user-support-title","user-support-sub","user-report-title",
-      "user-report-lead","user-report-category-label","user-report-category-bug",
-      "user-report-category-access","user-report-category-group","user-report-category-settings",
-      "user-report-category-other","user-report-message-label","user-report-message",
+      "user-report-lead","user-report-category-label","user-report-category",
+      "user-report-category-bug","user-report-category-access","user-report-category-group",
+      "user-report-category-settings","user-report-category-other","user-report-message-label","user-report-message",
       "user-report-hint","user-report-count","user-report-context-label","user-report-context-value",
       "user-report-submit","user-tabbar","user-dashboard-tab-label","user-about-tab-label",
       "user-support-tab-label","user-report-form"
