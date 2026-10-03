@@ -42,19 +42,19 @@
           <p id="identity">Checking your Telegram account…</p>
         </div>
       </div>
-      <button class="icon-button language-button" id="user-language-button" type="button" aria-label="Change language" aria-expanded="false">
+      <button class="icon-button language-button" id="user-language-button" type="button" aria-label="Change language" aria-controls="user-language-menu" aria-haspopup="true" aria-expanded="false">
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.7"></circle><path d="M3.5 12h17"></path><path d="M12 3.3c2.4 2.5 3.6 5.4 3.6 8.7S14.4 18.2 12 20.7 8.4 15.8 8.4 12 9.6 5.8 12 3.3z"></path></svg>
       </button>
-      <div class="language-menu" id="user-language-menu" hidden>
+      <div class="language-menu" id="user-language-menu" aria-label="Language options" hidden>
         <button type="button" class="language-option active" data-user-lang="en">English</button>
         <button type="button" class="language-option" data-user-lang="my">Burmese</button>
         <button type="button" class="language-option" data-user-lang="zh">Chinese (Simplified)</button>
       </div>
     </header>
 
-    <div id="notice" class="notice" role="status" aria-live="polite"></div>
+    <div id="notice" class="notice" role="status" aria-live="polite" aria-atomic="true"></div>
 
-    <section id="user-verify-card" class="surface verify-screen" hidden>
+    <section id="user-verify-card" class="surface verify-screen" aria-labelledby="user-verify-title" aria-describedby="user-verify-lead" hidden>
       <div class="section-icon section-icon-accent" aria-hidden="true">
         <svg viewBox="0 0 24 24"><path d="M12 3.5 19 7v4.7c0 4.4-2.7 7.8-7 8.8-4.3-1-7-4.4-7-8.8V7l7-3.5Z"></path><path d="m9 12 2 2 4-4"></path></svg>
       </div>
@@ -70,7 +70,7 @@
       </button>
     </section>
 
-    <section id="user-no-group-screen" class="state-screen empty-state" hidden aria-live="polite">
+    <section id="user-no-group-screen" class="state-screen empty-state" aria-labelledby="user-no-group-title" aria-describedby="user-no-group-message" hidden aria-live="polite">
       <div class="empty-state-card">
         <div class="empty-state-topline">
           <div class="state-icon state-icon-muted" aria-hidden="true">
@@ -127,7 +127,7 @@
       </div>
     </section>
 
-    <section id="user-dashboard-error-screen" class="state-screen error-screen" hidden aria-live="assertive">
+    <section id="user-dashboard-error-screen" class="state-screen error-screen" aria-labelledby="user-dashboard-error-title" aria-describedby="user-dashboard-error-lead" hidden aria-live="assertive">
       <div class="state-icon state-icon-error" aria-hidden="true">!</div>
       <div class="eyebrow">DASHBOARD ERROR</div>
       <h2 id="user-dashboard-error-title">Unable to load your dashboard right now.</h2>
@@ -266,7 +266,7 @@
             </div>
           </div>
 
-          <form id="user-report-form" class="support-form">
+          <form id="user-report-form" class="support-form" aria-busy="false">
             <div class="support-field">
               <label for="user-report-category" id="user-report-category-label">Category</label>
               <select id="user-report-category" class="support-select">
@@ -285,11 +285,12 @@
                 class="support-textarea"
                 rows="6"
                 maxlength="1200"
+                aria-describedby="user-report-hint user-report-count"
                 placeholder="Please describe what happened…"
               ></textarea>
               <div class="support-form-meta">
                 <span id="user-report-hint">Please do not include passwords or other sensitive information.</span>
-                <span id="user-report-count">0 / 1200</span>
+                <span id="user-report-count" aria-live="polite" aria-atomic="true">0 / 1200</span>
               </div>
             </div>
 
@@ -368,15 +369,15 @@
       </section>
 
       <nav id="user-tabbar" class="tab-bar" hidden aria-label="User dashboard sections">
-        <button class="tab-button active" type="button" data-user-tab="dashboard" aria-selected="true">
+        <button class="tab-button active" type="button" data-user-tab="dashboard" aria-current="page">
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1.3"></rect><rect x="14" y="4" width="6" height="6" rx="1.3"></rect><rect x="4" y="14" width="6" height="6" rx="1.3"></rect><rect x="14" y="14" width="6" height="6" rx="1.3"></rect></svg>
           <span id="user-dashboard-tab-label">Dashboard</span>
         </button>
-        <button class="tab-button" type="button" data-user-tab="support" aria-selected="false">
+        <button class="tab-button" type="button" data-user-tab="support" aria-current="false">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 6.5h5l1.6 2h6.4a1.5 1.5 0 0 1 1.5 1.5v8a1.5 1.5 0 0 1-1.5 1.5H5.5A1.5 1.5 0 0 1 4 18V8a1.5 1.5 0 0 1 1.5-1.5Z"></path><path d="M4 9.5h16"></path></svg>
           <span id="user-support-tab-label">Help &amp; Support</span>
         </button>
-        <button class="tab-button" type="button" data-user-tab="about" aria-selected="false">
+        <button class="tab-button" type="button" data-user-tab="about" aria-current="false">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 10.7v5"></path><path d="M12 7.4h.01"></path></svg>
           <span id="user-about-tab-label">About</span>
         </button>
