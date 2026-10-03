@@ -18,6 +18,7 @@
     settingsSaving: false,
     groupPickerOpen: false,
     aboutOpen: false,
+    supportOpen: false,
     autoRefreshEnabled: false,
     autoRefreshTimer: null,
     refreshInProgress: false
@@ -116,7 +117,27 @@
       apiPrefix: "Dashboard API failed",
       renderPrefix: "Dashboard render failed",
       mismatch: "The entered ID does not match your Telegram account.",
-      selected: "Selected"
+      selected: "Selected",
+      helpSupport: "Help & Support",
+      helpSupportSub: "Get help or report a problem",
+      reportProblem: "Report a Problem",
+      reportProblemLead: "Tell us what went wrong. Your report will be sent to the bot administrators.",
+      reportCategory: "Category",
+      reportCategoryBug: "Bug / Unexpected behavior",
+      reportCategoryAccess: "Access / Verification",
+      reportCategoryGroup: "Group / Permissions",
+      reportCategorySettings: "Settings",
+      reportCategoryOther: "Other",
+      reportMessage: "Describe the problem",
+      reportPlaceholder: "Please describe what happened…",
+      reportHint: "Please do not include passwords or other sensitive information.",
+      reportCount: "0 / 1200",
+      reportContext: "Selected group",
+      reportSend: "Send Report",
+      reportSending: "Sending",
+      reportSent: "Report sent successfully. Thank you.",
+      reportMinLength: "Please enter at least 10 characters.",
+      reportFailed: "Unable to send the report. Please try again."
     },
     my: {
       title: "User Dashboard",
@@ -198,7 +219,27 @@
       apiPrefix: "Dashboard API မအောင်မြင်ပါ",
       renderPrefix: "Dashboard render မအောင်မြင်ပါ",
       mismatch: "ထည့်ထားသော ID သည် သင့် Telegram account နှင့် မကိုက်ညီပါ။",
-      selected: "ရွေးထားသည်"
+      selected: "ရွေးထားသည်",
+      helpSupport: "Help & Support",
+      helpSupportSub: "အကူအညီရယူရန် သို့မဟုတ် ပြဿနာတင်ပြရန်",
+      reportProblem: "ပြဿနာတင်ပြရန်",
+      reportProblemLead: "ဖြစ်ပေါ်နေသော ပြဿနာကို ရေးပေးပါ။ သင့်တင်ပြချက်ကို Bot administrator များထံ ပို့ပေးပါမည်။",
+      reportCategory: "အမျိုးအစား",
+      reportCategoryBug: "Bug / မမျှော်လင့်ထားသော လုပ်ဆောင်ချက်",
+      reportCategoryAccess: "Access / အတည်ပြုခြင်း",
+      reportCategoryGroup: "Group / Permission",
+      reportCategorySettings: "Settings",
+      reportCategoryOther: "အခြား",
+      reportMessage: "ပြဿနာကို ရှင်းပြပါ",
+      reportPlaceholder: "ဘာဖြစ်ခဲ့သည်ကို အသေးစိတ်ရေးပေးပါ…",
+      reportHint: "Password သို့မဟုတ် အခြား sensitive information များကို မထည့်ပါနှင့်။",
+      reportCount: "0 / 1200",
+      reportContext: "ရွေးထားသော Group",
+      reportSend: "Report ပို့မည်",
+      reportSending: "ပို့နေသည်",
+      reportSent: "Report ကို အောင်မြင်စွာ ပို့ပြီးပါပြီ။ ကျေးဇူးတင်ပါသည်။",
+      reportMinLength: "အနည်းဆုံး စာလုံး ၁၀ လုံး ရေးပေးပါ။",
+      reportFailed: "Report ပို့၍ မရပါ။ ထပ်မံကြိုးစားပါ။"
     },
     zh: {
       title: "用户仪表板",
@@ -280,7 +321,27 @@
       apiPrefix: "Dashboard API 加载失败",
       renderPrefix: "Dashboard 渲染失败",
       mismatch: "输入的 ID 与您的 Telegram 账号不匹配。",
-      selected: "已选择"
+      selected: "已选择",
+      helpSupport: "帮助与支持",
+      helpSupportSub: "获取帮助或报告问题",
+      reportProblem: "报告问题",
+      reportProblemLead: "请描述发生的问题。您的报告将发送给机器人管理员。",
+      reportCategory: "问题类型",
+      reportCategoryBug: "Bug / 异常行为",
+      reportCategoryAccess: "访问 / 验证",
+      reportCategoryGroup: "群组 / 权限",
+      reportCategorySettings: "设置",
+      reportCategoryOther: "其他",
+      reportMessage: "描述问题",
+      reportPlaceholder: "请描述发生了什么…",
+      reportHint: "请不要填写密码或其他敏感信息。",
+      reportCount: "0 / 1200",
+      reportContext: "当前群组",
+      reportSend: "发送报告",
+      reportSending: "发送中",
+      reportSent: "报告已成功发送，谢谢。",
+      reportMinLength: "请至少输入 10 个字符。",
+      reportFailed: "报告发送失败，请重试。"
     }
   };
 
@@ -304,7 +365,13 @@
       "user-about-bot-version-label","user-about-mini-version-label",
       "user-about-terms-label","user-about-terms-copy","user-about-privacy-label",
       "user-about-privacy-copy","user-about-credits-label","user-about-creator-label",
-      "user-tabbar","user-dashboard-tab-label","user-about-tab-label"
+      "user-support-page","user-support-title","user-support-sub","user-report-title",
+      "user-report-lead","user-report-category-label","user-report-category-bug",
+      "user-report-category-access","user-report-category-group","user-report-category-settings",
+      "user-report-category-other","user-report-message-label","user-report-message",
+      "user-report-hint","user-report-count","user-report-context-label","user-report-context-value",
+      "user-report-submit","user-tabbar","user-dashboard-tab-label","user-about-tab-label",
+      "user-support-tab-label","user-report-form"
     ].forEach(function (id) { els[id] = document.getElementById(id); });
   }
 
@@ -501,6 +568,7 @@
     els["user-dashboard-error-screen"].hidden = true;
     els["user-dashboard"].hidden = true;
     els["user-about-page"].hidden = true;
+    els["user-support-page"].hidden = true;
   }
 
   function applyLanguage() {
@@ -529,6 +597,7 @@
     els["switch-group-label"].textContent = text("switch");
     els["user-dashboard-tab-label"].textContent = text("dashboard");
     els["user-about-tab-label"].textContent = text("about");
+    els["user-support-tab-label"].textContent = text("helpSupport");
     els["user-about-title"].textContent = text("about");
     els["user-about-sub"].textContent = text("aboutSub");
     els["user-about-bot-name-label"].textContent = text("bot");
@@ -540,6 +609,25 @@
     els["user-about-privacy-copy"].textContent = text("privacyCopy");
     els["user-about-credits-label"].textContent = text("credits");
     els["user-about-creator-label"].textContent = text("creator");
+    els["user-support-title"].textContent = text("helpSupport");
+    els["user-support-sub"].textContent = text("helpSupportSub");
+    els["user-report-title"].textContent = text("reportProblem");
+    els["user-report-lead"].textContent = text("reportProblemLead");
+    els["user-report-category-label"].textContent = text("reportCategory");
+    els["user-report-category-bug"].textContent = text("reportCategoryBug");
+    els["user-report-category-access"].textContent = text("reportCategoryAccess");
+    els["user-report-category-group"].textContent = text("reportCategoryGroup");
+    els["user-report-category-settings"].textContent = text("reportCategorySettings");
+    els["user-report-category-other"].textContent = text("reportCategoryOther");
+    els["user-report-message-label"].textContent = text("reportMessage");
+    els["user-report-message"].placeholder = text("reportPlaceholder");
+    els["user-report-hint"].textContent = text("reportHint");
+    els["user-report-context-label"].textContent = text("reportContext");
+    if (!els["user-report-submit"].classList.contains("is-loading")) {
+      var reportLabel = els["user-report-submit"].querySelector(".button-label");
+      if (reportLabel) reportLabel.textContent = text("reportSend");
+    }
+    updateReportCharacterCount();
 
     els["user-no-group-title"].textContent = text("noGroup");
     els["user-no-group-message"].textContent = text("noGroupCopy");
@@ -556,7 +644,8 @@
     updateAutoRefreshControl();
 
     if (state.dashboard && state.dashboard.selectedGroup) {
-      renderSelectedDashboard(state.dashboard, true);
+      if (state.supportOpen) updateReportContext();
+      else renderSelectedDashboard(state.dashboard, true);
     }
   }
 
@@ -574,6 +663,7 @@
   function showVerification() {
     state.groupPickerOpen = false;
     state.aboutOpen = false;
+    state.supportOpen = false;
     state.dashboard = null;
     state.selectedGroupId = null;
     hideAllPrimaryScreens();
@@ -591,6 +681,9 @@
   }
 
   function showNoGroup() {
+    state.groupPickerOpen = false;
+    state.aboutOpen = false;
+    state.supportOpen = false;
     hideAllPrimaryScreens();
     els["user-no-group-screen"].hidden = false;
     els.title.textContent = text("noGroup");
@@ -610,6 +703,9 @@
   }
 
   function showDashboardError(error, groupId) {
+    state.groupPickerOpen = false;
+    state.aboutOpen = false;
+    state.supportOpen = false;
     hideAllPrimaryScreens();
     els["user-dashboard-error-screen"].hidden = false;
     els.title.textContent = text("dashboardError");
@@ -639,6 +735,45 @@
 
   function userGreeting() {
     return text("hello") + ", " + displayName();
+  }
+
+  function updateReportContext() {
+    if (!els["user-report-context-value"]) return;
+    var group = state.dashboard && state.dashboard.selectedGroup;
+    els["user-report-context-value"].textContent =
+      group && group.title ? group.title : text("reportContext");
+  }
+
+  function updateReportCharacterCount() {
+    if (!els["user-report-message"] || !els["user-report-count"]) return;
+    var length = els["user-report-message"].value.length;
+    els["user-report-count"].textContent = length + " / 1200";
+    els["user-report-count"].classList.toggle("is-near-limit", length >= 1050);
+  }
+
+  async function submitProblemReport(event) {
+    event.preventDefault();
+    if (!state.dashboard || !state.dashboard.selectedGroup || !els["user-report-submit"] || els["user-report-submit"].disabled) return;
+
+    var message = els["user-report-message"].value.trim();
+    if (message.length < 10) {
+      showNotice(text("reportMinLength"), "error");
+      els["user-report-message"].focus();
+      return;
+    }
+
+    var category = els["user-report-category"].value;
+    setButton(els["user-report-submit"], "loading", text("reportSending") + "…");
+    try {
+      await apiUserReport(category, message, state.selectedGroupId);
+      els["user-report-message"].value = "";
+      updateReportCharacterCount();
+      showNotice(text("reportSent"), "ok");
+    } catch (error) {
+      showNotice(error && error.message ? error.message : text("reportFailed"), "error");
+    } finally {
+      setButton(els["user-report-submit"], "idle", text("reportSend"));
+    }
   }
 
   function formatSettingValue(type, value) {
@@ -934,6 +1069,27 @@
     );
   }
 
+  async function apiUserReport(category, message, groupId) {
+    if (!initData) throw new Error("Telegram session data is missing.");
+    return fetchJson(
+      "/api/user/report",
+      {
+        method: "POST",
+        headers: {
+          "X-Telegram-Init-Data": initData,
+          "Accept": "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          category: category,
+          message: message,
+          groupId: Number(groupId)
+        })
+      },
+      "Report"
+    );
+  }
+
   async function apiUserSettings(groupId, type, kind, value) {
     if (!initData) throw new Error("Telegram session data is missing.");
     return fetchJson(
@@ -997,12 +1153,13 @@
     state.selectedGroupId = Number(group.id);
     saveDashboardState({ groupId: state.selectedGroupId });
 
-    if (languageOnly && state.aboutOpen) return;
+    if (languageOnly && (state.aboutOpen || state.supportOpen)) return;
 
     els["user-group-options"].hidden = true;
     els["user-selected-dashboard"].hidden = false;
     els["user-dashboard"].hidden = false;
     els["user-about-page"].hidden = true;
+    els["user-support-page"].hidden = true;
     els["user-tabbar"].hidden = false;
 
     els.title.textContent = text("title");
@@ -1061,6 +1218,7 @@
       els["user-group-options"].hidden = false;
       els["user-selected-dashboard"].hidden = true;
       els["user-about-page"].hidden = true;
+      els["user-support-page"].hidden = true;
       els["user-tabbar"].hidden = true;
       els.title.textContent = text("groupOptions");
       els.identity.textContent = userGreeting();
@@ -1076,7 +1234,7 @@
 
   async function loadUserDashboard(showLoading, groupId, silent) {
     if (!telegramUserId) throw new Error(text("identifyError"));
-    if (state.aboutOpen) return true;
+    if (state.aboutOpen || state.supportOpen) return true;
 
     var requestId = ++state.requestId;
     var shouldShowLoading = showLoading !== false;
@@ -1091,7 +1249,7 @@
         throw new Error(text("apiPrefix") + ": " + apiMessage);
       }
 
-      if (requestId !== state.requestId || state.aboutOpen) return false;
+      if (requestId !== state.requestId || state.aboutOpen || state.supportOpen) return false;
       if (state.groupPickerOpen && groupId === undefined) return false;
 
       var opened;
@@ -1132,7 +1290,9 @@
     if (!state.dashboard || !els["user-tabbar"] || els["user-tabbar"].hidden) return;
     if (state.groupPickerOpen) return;
 
+    tab = tab === "about" || tab === "support" ? tab : "dashboard";
     state.aboutOpen = tab === "about";
+    state.supportOpen = tab === "support";
     saveDashboardState({ tab: tab });
 
     ++state.requestId;
@@ -1140,11 +1300,21 @@
     if (state.aboutOpen) {
       els["user-selected-dashboard"].hidden = true;
       els["user-about-page"].hidden = false;
+      els["user-support-page"].hidden = true;
       els.title.textContent = text("about");
       els.identity.textContent = userGreeting();
       setDashboardControls(false);
+    } else if (state.supportOpen) {
+      els["user-selected-dashboard"].hidden = true;
+      els["user-about-page"].hidden = true;
+      els["user-support-page"].hidden = false;
+      els.title.textContent = text("helpSupport");
+      els.identity.textContent = userGreeting();
+      updateReportContext();
+      setDashboardControls(false);
     } else {
       els["user-about-page"].hidden = true;
+      els["user-support-page"].hidden = true;
       els["user-selected-dashboard"].hidden = false;
       els.title.textContent = text("title");
       els.identity.textContent = userGreeting();
@@ -1162,7 +1332,7 @@
   }
 
   async function openGroupPicker() {
-    if (!state.dashboard || state.aboutOpen || state.groupPickerOpen || state.settingsSaving || state.refreshInProgress) return;
+    if (!state.dashboard || state.aboutOpen || state.supportOpen || state.groupPickerOpen || state.settingsSaving || state.refreshInProgress) return;
     var hasUnsaved = false;
     document.querySelectorAll(".editor-input[data-original-value]").forEach(function (input) {
       if (input.value !== input.getAttribute("data-original-value")) hasUnsaved = true;
@@ -1180,10 +1350,13 @@
     }
 
     state.groupPickerOpen = true;
+    state.aboutOpen = false;
+    state.supportOpen = false;
     ++state.requestId;
     els["user-group-options"].hidden = false;
     els["user-selected-dashboard"].hidden = true;
     els["user-about-page"].hidden = true;
+    els["user-support-page"].hidden = true;
     els["user-tabbar"].hidden = true;
     els.title.textContent = text("groupOptions");
     els.identity.textContent = userGreeting();
@@ -1214,7 +1387,7 @@
     if (!tg || !tg.BackButton) return;
     var shouldShow =
       Boolean(state.dashboard) &&
-      (state.groupPickerOpen || state.aboutOpen);
+      (state.groupPickerOpen || state.aboutOpen || state.supportOpen);
     if (shouldShow) tg.BackButton.show();
     else tg.BackButton.hide();
   }
@@ -1228,7 +1401,7 @@
       }
       return;
     }
-    if (state.aboutOpen) setDashboardTab("dashboard");
+    if (state.aboutOpen || state.supportOpen) setDashboardTab("dashboard");
   }
 
   function bindStaticEvents() {
@@ -1283,6 +1456,9 @@
           scheduleAutoRefresh();
         });
     };
+
+    els["user-report-message"].oninput = updateReportCharacterCount;
+    els["user-report-form"].onsubmit = submitProblemReport;
 
     els["auto-refresh-toggle"].onclick = function () {
       if (state.aboutOpen || state.groupPickerOpen || !state.dashboard || !state.dashboard.selectedGroup) return;

@@ -1030,3 +1030,256 @@ body::after{
     transition:none!important;
   }
 }
+
+
+/* ─────────────────────────────────────────────────────────────
+   Help & Support
+   Purpose: provide a focused, self-contained problem reporting flow.
+   ───────────────────────────────────────────────────────────── */
+
+.tab-bar{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+
+.support-page{
+  padding-top:3px;
+}
+
+.support-head{
+  padding-bottom:16px;
+}
+
+.support-card{
+  padding:18px;
+  border:1px solid var(--line);
+  border-radius:19px;
+  background:linear-gradient(145deg,rgba(13,28,49,.86),rgba(7,17,31,.92));
+  box-shadow:0 16px 40px rgba(0,0,0,.18);
+  animation:cardReveal 600ms var(--ease-out) 110ms both;
+}
+
+.support-intro{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+}
+
+.support-icon{
+  width:44px;
+  height:44px;
+  flex:0 0 44px;
+  display:grid;
+  place-items:center;
+  border-radius:13px;
+  color:#a9d7ff;
+  background:rgba(72,168,255,.08);
+  border:1px solid rgba(72,168,255,.16);
+  box-shadow:0 10px 24px rgba(72,168,255,.07);
+}
+
+.support-icon svg{
+  width:21px;
+  height:21px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.6;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
+.support-card-title{
+  color:#eaf4ff;
+  font-size:15px;
+  font-weight:850;
+  letter-spacing:-.015em;
+}
+
+.support-card-copy{
+  max-width:570px;
+  margin:5px 0 0;
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.65;
+}
+
+.support-form{
+  display:grid;
+  gap:14px;
+  margin-top:18px;
+}
+
+.support-field{
+  display:grid;
+  gap:7px;
+}
+
+.support-field label{
+  color:#aebed1;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.02em;
+}
+
+.support-select,
+.support-textarea{
+  width:100%;
+  box-sizing:border-box;
+  border:1px solid rgba(123,165,216,.14);
+  border-radius:12px;
+  background:rgba(3,10,19,.52);
+  color:#eaf4ff;
+  outline:none;
+  transition:
+    border-color var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease,
+    background var(--motion-fast) ease;
+}
+
+.support-select{
+  min-height:42px;
+  padding:0 12px;
+  appearance:none;
+  -webkit-appearance:none;
+  background-image:
+    linear-gradient(45deg,transparent 50%,#7590af 50%),
+    linear-gradient(135deg,#7590af 50%,transparent 50%);
+  background-position:
+    calc(100% - 16px) 18px,
+    calc(100% - 11px) 18px;
+  background-size:5px 5px,5px 5px;
+  background-repeat:no-repeat;
+}
+
+.support-select option{
+  background:#0a1524;
+  color:#eaf4ff;
+}
+
+.support-textarea{
+  min-height:145px;
+  resize:vertical;
+  padding:12px;
+  font:inherit;
+  font-size:11px;
+  line-height:1.65;
+}
+
+.support-select:focus,
+.support-textarea:focus{
+  border-color:rgba(72,168,255,.42);
+  background:rgba(5,14,25,.72);
+  box-shadow:0 0 0 3px rgba(72,168,255,.07),0 10px 28px rgba(0,0,0,.1);
+}
+
+.support-form-meta{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+  min-height:17px;
+  margin-top:-1px;
+  color:#647b96;
+  font-size:9px;
+  line-height:1.45;
+}
+
+.support-form-meta span:first-child{
+  max-width:75%;
+}
+
+.support-form-meta span:last-child{
+  flex:0 0 auto;
+  white-space:nowrap;
+}
+
+#user-report-count.is-near-limit{
+  color:#e5bd72;
+}
+
+.support-context{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:10px 12px;
+  border:1px solid rgba(123,165,216,.1);
+  border-radius:11px;
+  background:rgba(95,137,184,.045);
+}
+
+.support-context-label{
+  color:#6e84a0;
+  font-size:9px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.07em;
+}
+
+.support-context strong{
+  min-width:0;
+  overflow:hidden;
+  color:#bdd0e5;
+  font-size:10px;
+  font-weight:800;
+  text-align:right;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.support-submit{
+  width:100%;
+  margin-top:1px;
+}
+
+@media(max-width:430px){
+  .tab-button{
+    min-height:44px;
+    gap:5px;
+    font-size:10px;
+  }
+
+  .support-card{
+    padding:15px;
+  }
+
+  .support-intro{
+    gap:10px;
+  }
+
+  .support-icon{
+    width:40px;
+    height:40px;
+    flex-basis:40px;
+  }
+
+  .support-form-meta{
+    display:block;
+  }
+
+  .support-form-meta span:first-child{
+    display:block;
+    max-width:none;
+  }
+
+  .support-form-meta span:last-child{
+    display:block;
+    margin-top:4px;
+  }
+
+  .support-context{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:5px;
+  }
+
+  .support-context strong{
+    max-width:100%;
+    text-align:left;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .support-card{
+    animation:none!important;
+  }
+}
