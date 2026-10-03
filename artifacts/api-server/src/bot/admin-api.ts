@@ -372,7 +372,7 @@ adminApiRouter.post("/support/tickets/:ticketId/reply", async (req, res) => {
 
   await recordAdminAudit(
     auth,
-    "support_reply.sent",
+    telegramDelivered ? "support_reply.sent" : "support_reply.saved",
     ticketId,
     "Support reply added by " + adminName +
       (telegramDelivered ? " and Telegram notification delivered." : "; Telegram notification could not be delivered."),
