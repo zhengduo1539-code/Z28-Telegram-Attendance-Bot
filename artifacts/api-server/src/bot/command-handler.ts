@@ -255,7 +255,11 @@ export class CommandHandler {
             this.config.adminIds.includes(profile.userId);
           const rows: import("./types").InlineKeyboardButton[][] = [];
 
-          if (this.config.adminMiniAppUrl) {
+          const miniAppUrl = isConfiguredAdmin
+            ? this.config.adminMiniAppUrl
+            : this.config.userMiniAppUrl;
+
+          if (miniAppUrl) {
             rows.push([
               {
                 text: isConfiguredAdmin
@@ -266,7 +270,7 @@ export class CommandHandler {
                     ? "📊 Open My Dashboard"
                     : "📊 打开我的面板",
                 style: "primary",
-                web_app: { url: this.config.adminMiniAppUrl },
+                web_app: { url: miniAppUrl },
               },
             ]);
           }
@@ -516,7 +520,9 @@ export class CommandHandler {
         message.chat.id,
         userId,
         locale,
-        this.config.adminMiniAppUrl,
+        isConfiguredAdmin
+          ? this.config.adminMiniAppUrl
+          : this.config.userMiniAppUrl,
       );
     }
 

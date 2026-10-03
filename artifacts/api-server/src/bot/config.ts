@@ -35,6 +35,7 @@ export type BotConfig = {
   botOwnerId?: number;
   adminIds: number[];
   adminMiniAppUrl?: string;
+  userMiniAppUrl?: string;
   historyRetentionDays: number;
   mongodbStorageLimitMb: number;
   mongodbStorageWarnPercent: number;
@@ -47,7 +48,7 @@ export type BotConfig = {
   memoryRssCriticalPercent: number;
 };
 
-const resolveAdminMiniAppUrl = (): string | undefined => {
+const resolveMiniAppUrl = (target: "admin" | "user"): string | undefined => {
   const explicit = process.env["ADMIN_MINI_APP_URL"]?.trim();
   const renderBase = process.env["RENDER_EXTERNAL_URL"]?.trim();
   const base = explicit || renderBase;
@@ -58,10 +59,10 @@ const resolveAdminMiniAppUrl = (): string | undefined => {
     if (url.protocol !== "https:") return undefined;
 
     const normalizedPath = url.pathname.replace(/\/+$/, "");
-    if (!normalizedPath.endsWith("/admin")) {
-      url.pathname = normalizedPath + "/admin";
+    if (normalizedPath.endsWith("/admin") || normalizedPath.endsWith("/user")) {
+      url.pathname = normalizedPath.replace(/\/(?:admin|user)$/, "/" + target);
     } else {
-      url.pathname = normalizedPath;
+      url.pathname = normalizedPath + "/" + target;
     }
 
     const deployVersion = process.env["RENDER_GIT_COMMIT"]?.trim();
@@ -74,6 +75,9 @@ const resolveAdminMiniAppUrl = (): string | undefined => {
     return undefined;
   }
 };
+
+const resolveAdminMiniAppUrl = (): string | undefined => resolveMiniAppUrl("admin");
+const resolveUserMiniAppUrl = (): string | undefined => resolveMiniAppUrl("user");
 
 export const getBotConfig = (): BotConfig => ({
   token: process.env["TELEGRAM_BOT_TOKEN"]?.trim() || undefined,
@@ -91,6 +95,7 @@ export const getBotConfig = (): BotConfig => ({
   botOwnerId: parseUserId(process.env["BOT_OWNER_ID"]),
   adminIds: parseAdminIds(process.env["ADMIN_IDS"]),
   adminMiniAppUrl: resolveAdminMiniAppUrl(),
+  userMiniAppUrl: resolveUserMiniAppUrl(),
   historyRetentionDays: positiveInteger(process.env["HISTORY_RETENTION_DAYS"], 365),
   mongodbStorageLimitMb: positiveInteger(process.env["MONGODB_STORAGE_LIMIT_MB"], 500),
   mongodbStorageWarnPercent: Math.min(Math.max(Number(process.env["MONGODB_STORAGE_WARN_PERCENT"]) || 70, 1), 99),
