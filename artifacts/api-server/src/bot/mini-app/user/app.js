@@ -38,6 +38,21 @@
 
   var TEXT = {
     en: {
+
+      faqTitle: "FAQ / Help Center",
+      faqSub: "Quick answers to common questions about the Z28 Attendance Bot.",
+      faqQ1: "What is the Z28 Attendance Bot?",
+      faqA1: "Z28 helps groups manage attendance activities and monitor current activity from the Telegram Mini App.",
+      faqQ2: "Who can access the group dashboard?",
+      faqA2: "Your Telegram account must be a group owner or administrator, and the bot must still be available in that group.",
+      faqQ3: "How do I change activity limits?",
+      faqA3: "Open the group dashboard, choose Edit on the relevant settings card, update the values, then press Save. You need the required group permissions.",
+      faqQ4: "What does Auto Refresh do?",
+      faqA4: "When enabled, the dashboard checks for updated group activity every 30 seconds. It is off by default and can be turned on from the dashboard header.",
+      faqQ5: "Why can’t I see a group?",
+      faqA5: "Make sure the bot is still in the group and that your Telegram account is a group owner or administrator. Groups that are no longer available to the bot are not shown.",
+      faqQ6: "How do I report a problem?",
+      faqA6: "Open Help & Support, choose a category, describe the problem, and send the report. Do not include passwords or other sensitive information.",
       title: "User Dashboard",
       dashboardEyebrow: "LIVE GROUP DASHBOARD",
       hello: "Hello",
@@ -140,6 +155,21 @@
       reportFailed: "Unable to send the report. Please try again."
     },
     my: {
+
+      faqTitle: "FAQ / Help Center",
+      faqSub: "Z28 Attendance Bot အကြောင်း မေးလေ့ရှိသော မေးခွန်းများကို အမြန်ကြည့်နိုင်ပါသည်။",
+      faqQ1: "Z28 Attendance Bot က ဘာလုပ်ပေးတာလဲ?",
+      faqA1: "Z28 သည် Group များအတွက် attendance activity များကို စီမံရန်နှင့် Telegram Mini App မှ လက်ရှိ activity များကို ကြည့်ရှုရန် ကူညီပေးပါသည်။",
+      faqQ2: "Group Dashboard ကို ဘယ်သူတွေ ဝင်ကြည့်နိုင်သလဲ?",
+      faqA2: "သင့် Telegram account သည် Group owner သို့မဟုတ် administrator ဖြစ်ရမည်။ ထို့အပြင် Bot သည်လည်း ထို Group တွင် ရှိနေဆဲဖြစ်ရပါမည်။",
+      faqQ3: "Activity limit တွေကို ဘယ်လိုပြောင်းရမလဲ?",
+      faqA3: "Group Dashboard ကိုဖွင့်ပြီး သက်ဆိုင်ရာ settings card မှ Edit ကိုနှိပ်ပါ။ တန်ဖိုးများပြောင်းပြီး Save ကိုနှိပ်ပါ။ လိုအပ်သော Group permission ရှိရပါမည်။",
+      faqQ4: "Auto Refresh က ဘာလုပ်ပေးတာလဲ?",
+      faqA4: "ဖွင့်ထားပါက Dashboard က Group activity အချက်အလက်အသစ်များကို စက္ကန့် ၃၀ တစ်ကြိမ် စစ်ဆေးပေးပါသည်။ ပုံမှန်အားဖြင့် ပိတ်ထားပြီး Dashboard header မှ ဖွင့်နိုင်ပါသည်။",
+      faqQ5: "Group တစ်ခုကို ဘာကြောင့် မမြင်ရတာလဲ?",
+      faqA5: "Bot သည် ထို Group ထဲတွင် ရှိနေဆဲဖြစ်ကြောင်းနှင့် သင့် Telegram account သည် Group owner သို့မဟုတ် administrator ဖြစ်ကြောင်း စစ်ဆေးပါ။ Bot အသုံးမပြုနိုင်တော့သော Group များကို မပြပါ။",
+      faqQ6: "ပြဿနာတစ်ခုကို ဘယ်လိုတင်ပြရမလဲ?",
+      faqA6: "Help & Support ကိုဖွင့်ပြီး အမျိုးအစားရွေးပါ။ ပြဿနာကို ရေးပြီး Report ပို့ပါ။ Password သို့မဟုတ် sensitive information များကို မထည့်ပါနှင့်။",
       title: "User Dashboard",
       dashboardEyebrow: "LIVE GROUP DASHBOARD",
       hello: "မင်္ဂလာပါ",
@@ -242,6 +272,21 @@
       reportFailed: "Report ပို့၍ မရပါ။ ထပ်မံကြိုးစားပါ။"
     },
     zh: {
+
+      faqTitle: "常见问题 / 帮助中心",
+      faqSub: "快速查看关于 Z28 考勤机器人的常见问题解答。",
+      faqQ1: "Z28 考勤机器人是做什么的？",
+      faqA1: "Z28 帮助群组管理考勤活动，并通过 Telegram Mini App 查看当前活动状态。",
+      faqQ2: "谁可以访问群组仪表板？",
+      faqA2: "您的 Telegram 账号必须是群主或管理员，并且机器人仍然在该群组中。",
+      faqQ3: "如何修改活动限制？",
+      faqA3: "打开群组仪表板，在相应设置卡片中选择编辑，修改数值后点击保存。您需要具备相应的群组权限。",
+      faqQ4: "自动刷新有什么作用？",
+      faqA4: "开启后，仪表板每 30 秒检查一次最新的群组活动数据。默认关闭，可在仪表板顶部开启。",
+      faqQ5: "为什么看不到某个群组？",
+      faqA5: "请确认机器人仍在该群组中，并确认您的 Telegram 账号是群主或管理员。机器人无法使用的群组不会显示。",
+      faqQ6: "如何报告问题？",
+      faqA6: "打开帮助与支持，选择问题类型，描述问题并发送报告。请不要填写密码或其他敏感信息。",
       title: "用户仪表板",
       dashboardEyebrow: "实时群组仪表板",
       hello: "你好",
@@ -371,7 +416,11 @@
       "user-report-category-settings","user-report-category-other","user-report-message-label","user-report-message",
       "user-report-hint","user-report-count","user-report-context-label","user-report-context-value",
       "user-report-submit","user-tabbar","user-dashboard-tab-label","user-about-tab-label",
-      "user-support-tab-label","user-report-form"
+      "user-support-tab-label","user-report-form",
+      "user-faq-title","user-faq-sub",
+      "user-faq-q1","user-faq-a1","user-faq-q2","user-faq-a2",
+      "user-faq-q3","user-faq-a3","user-faq-q4","user-faq-a4",
+      "user-faq-q5","user-faq-a5","user-faq-q6","user-faq-a6"
     ].forEach(function (id) { els[id] = document.getElementById(id); });
   }
 
@@ -610,6 +659,20 @@
     els["user-about-credits-label"].textContent = text("credits");
     els["user-about-creator-label"].textContent = text("creator");
     els["user-support-title"].textContent = text("helpSupport");
+    els["user-faq-title"].textContent = text("faqTitle");
+    els["user-faq-sub"].textContent = text("faqSub");
+    els["user-faq-q1"].textContent = text("faqQ1");
+    els["user-faq-a1"].textContent = text("faqA1");
+    els["user-faq-q2"].textContent = text("faqQ2");
+    els["user-faq-a2"].textContent = text("faqA2");
+    els["user-faq-q3"].textContent = text("faqQ3");
+    els["user-faq-a3"].textContent = text("faqA3");
+    els["user-faq-q4"].textContent = text("faqQ4");
+    els["user-faq-a4"].textContent = text("faqA4");
+    els["user-faq-q5"].textContent = text("faqQ5");
+    els["user-faq-a5"].textContent = text("faqA5");
+    els["user-faq-q6"].textContent = text("faqQ6");
+    els["user-faq-a6"].textContent = text("faqA6");
     els["user-support-sub"].textContent = text("helpSupportSub");
     els["user-report-title"].textContent = text("reportProblem");
     els["user-report-lead"].textContent = text("reportProblemLead");
