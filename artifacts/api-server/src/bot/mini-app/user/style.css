@@ -2114,27 +2114,99 @@ html[data-compact="on"] .connect-select{min-height:44px}
 @media(prefers-reduced-motion:reduce){.tools-card,.connect-field,.connect-link-node,.tools-live-badge i,.connect-status-icon.is-connected span{animation:none!important}}
 
 
-/* Connect action states: ready-to-submit and post-success Change Group. */
+/* Connect Group interaction states. Scoped only to the user Tools connection flow. */
 .connect-change:disabled{
-  opacity:.42;
+  opacity:.5;
   cursor:not-allowed;
   transform:none!important;
   box-shadow:none;
 }
 .connect-change:not(:disabled){
-  border-color:rgba(72,168,255,.24);
+  opacity:1;
+  color:#e9f7ff;
+  border-color:rgba(96,187,255,.34);
+  background:linear-gradient(135deg,rgba(17,40,68,.92),rgba(13,29,49,.92));
+  box-shadow:0 8px 22px rgba(33,129,211,.12);
+}
+.connect-change.is-connect-ready:not(:disabled){
+  animation:connectChangeReady 2.2s ease-in-out infinite;
+}
+.connect-change.is-connect-editing{
+  border-color:rgba(114,200,255,.42);
+  box-shadow:0 0 0 1px rgba(114,200,255,.08),0 10px 24px rgba(33,129,211,.14);
 }
 .connect-change:not(:disabled):hover{
-  border-color:rgba(72,168,255,.36);
-  background:rgba(13,29,49,.72);
+  transform:translateY(-1px);
+  border-color:rgba(114,200,255,.52);
+  background:linear-gradient(135deg,rgba(20,47,78,.96),rgba(14,31,54,.96));
 }
+.connect-change:not(:disabled):active{
+  transform:translateY(1px) scale(.985);
+}
+
 #user-connect-submit:not(:disabled){
-  animation:connectButtonReady 1.8s ease-in-out infinite;
+  opacity:1;
+  filter:none;
+}
+#user-connect-submit.is-connect-ready{
+  background:linear-gradient(135deg,#8ee0ff 0%,#62a9ff 52%,#7a70ff 100%);
+  border-color:rgba(177,231,255,.44);
+  box-shadow:0 12px 28px rgba(51,133,230,.25),0 0 0 1px rgba(161,226,255,.08);
+  animation:connectButtonReady 1.55s ease-in-out infinite;
+}
+#user-connect-submit.is-connect-ready:hover{
+  transform:translateY(-1px);
+  box-shadow:0 17px 34px rgba(51,133,230,.32),0 0 0 1px rgba(161,226,255,.12);
+}
+#user-connect-submit.is-connect-ready:active,
+#user-connect-submit.is-connect-pressing{
+  transform:translateY(1px) scale(.985);
+  box-shadow:0 7px 17px rgba(51,133,230,.18);
+}
+#user-connect-submit.is-loading{
+  opacity:1;
+  filter:none;
+  cursor:wait;
+  animation:connectButtonLoading 1.15s ease-in-out infinite;
+}
+#user-connect-submit.is-connect-error{
+  animation:connectButtonError .42s ease-in-out 2;
+}
+.connect-status-card.is-connect-success{
+  border-color:rgba(93,220,180,.34);
+  box-shadow:0 0 0 1px rgba(93,220,180,.06),0 16px 34px rgba(23,147,109,.13);
+  animation:connectStatusSuccess .85s ease-out;
+}
+#user-connect-status-value.is-connect-success{
+  color:#dffff2;
 }
 @keyframes connectButtonReady{
-  0%,100%{box-shadow:0 10px 26px rgba(72,168,255,.12)}
-  50%{box-shadow:0 10px 30px rgba(72,168,255,.25),0 0 0 1px rgba(114,200,255,.08)}
+  0%,100%{box-shadow:0 12px 28px rgba(51,133,230,.21),0 0 0 1px rgba(161,226,255,.06)}
+  50%{box-shadow:0 15px 34px rgba(51,133,230,.32),0 0 0 1px rgba(161,226,255,.13)}
+}
+@keyframes connectButtonLoading{
+  0%,100%{filter:brightness(1)}
+  50%{filter:brightness(1.08)}
+}
+@keyframes connectButtonError{
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-3px)}
+  75%{transform:translateX(3px)}
+}
+@keyframes connectChangeReady{
+  0%,100%{box-shadow:0 8px 22px rgba(33,129,211,.10)}
+  50%{box-shadow:0 11px 28px rgba(33,129,211,.21),0 0 0 1px rgba(114,200,255,.07)}
+}
+@keyframes connectStatusSuccess{
+  0%{transform:translateY(2px);opacity:.82}
+  100%{transform:translateY(0);opacity:1}
 }
 @media(prefers-reduced-motion:reduce){
-  #user-connect-submit:not(:disabled){animation:none!important}
+  #user-connect-submit.is-connect-ready,
+  #user-connect-submit.is-loading,
+  #user-connect-submit.is-connect-error,
+  .connect-change.is-connect-ready,
+  .connect-status-card.is-connect-success{
+    animation:none!important;
+  }
 }
