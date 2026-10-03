@@ -263,7 +263,71 @@ adminApiRouter.post("/broadcast", async (req, res) => {
     return;
   }
 
+  const mode = req.body?.mode === "direct" ? "direct" : "broadcast";
   const snapshot = await auth.context.attendance.snapshot();
+
+  const escapeHtml = (value: string) =>
+    value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+  const safeMessage = escapeHtml(message).replace(/\r?\n/g, "<br>");
+
+  if (mode === "direct") {
+    const rawUserId = req.body?.userId;
+    const targetUserId = typeof rawUserId === "number" ? rawUserId : Number(rawUserId);
+    if (!Number.isSafeInteger(targetUserId) || targetUserId <= 0) {
+      res.status(400).json({ error: "A valid Telegram User ID is required for a direct reply." });
+      return;
+    }
+
+    const profile = Object.values(snapshot.users).find(
+      (candidate) =>
+        candidate.userId === targetUserId &&
+        candidate.chatId === targetUserId &&
+        candidate.chatId > 0,
+    );
+    if (!profile) {
+      res.status(404).json({
+        error: "Private user not found. The user must have an existing private chat with the bot.",
+      });
+      return;
+    }
+
+    try {
+      await auth.context.telegram.sendMessage(profile.chatId, safeMessage);
+    } catch (error: unknown) {
+      await recordAdminAudit(
+        auth,
+        "direct_message.failed",
+        String(targetUserId),
+        "Direct reply delivery failed.",
+      );
+      res.status(502).json({ error: "Telegram could not deliver the direct reply." });
+      return;
+    }
+
+    const recipient = {
+      userId: profile.userId,
+      displayName: profile.displayName,
+      username: profile.username || null,
+    };
+    await recordAdminAudit(
+      auth,
+      "direct_message.sent",
+      String(targetUserId),
+      "Direct reply sent to " + (profile.username ? "@" + profile.username : profile.displayName) + ".",
+    );
+
+    res.setHeader("Cache-Control", "no-store");
+    res.json({
+      mode: "direct",
+      total: 1,
+      sent: 1,
+      failed: 0,
+      recipient,
+    });
+    return;
+  }
+
   const chatIds = Array.from(
     new Set(
       Object.values(snapshot.users)
@@ -272,10 +336,6 @@ adminApiRouter.post("/broadcast", async (req, res) => {
     ),
   );
 
-  const escapeHtml = (value: string) =>
-    value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-
-  const safeMessage = escapeHtml(message).replace(/\r?\n/g, "<br>");
   let sent = 0;
   let failed = 0;
   const failures: Array<{ chatId: number; error: string }> = [];
@@ -305,6 +365,7 @@ adminApiRouter.post("/broadcast", async (req, res) => {
 
   res.setHeader("Cache-Control", "no-store");
   res.json({
+    mode: "broadcast",
     total: chatIds.length,
     sent,
     failed,
