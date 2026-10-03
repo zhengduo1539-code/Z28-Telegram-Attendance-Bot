@@ -40,6 +40,7 @@
           <div class="eyebrow">Z28 ATTENDANCE</div>
           <h1 id="title" class="app-page-title">User Dashboard</h1>
           <p id="identity">Checking your Telegram account…</p>
+          <div id="workspace-identity" class="workspace-identity" aria-label="Workspace">My Workspace</div>
         </div>
       </div>
       <button class="icon-button language-button" id="user-language-button" type="button" aria-label="Change language" aria-controls="user-language-menu" aria-haspopup="true" aria-expanded="false">
@@ -226,6 +227,56 @@
               <p id="user-appearance-theme-sub">Choose the interface style for this device.</p>
             </div>
           </div>
+
+          <section class="workspace-name-section" aria-labelledby="workspace-name-title">
+            <div class="workspace-name-head">
+              <div class="workspace-name-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M4.5 6.5A2.5 2.5 0 0 1 7 4h10a2.5 2.5 0 0 1 2.5 2.5v9A2.5 2.5 0 0 1 17 18h-6l-3.5 2.5V18H7a2.5 2.5 0 0 1-2.5-2.5Z"></path><path d="M8 9h8"></path><path d="M8 12h5"></path></svg>
+              </div>
+              <div class="workspace-name-copy">
+                <div class="appearance-kicker" id="workspace-name-kicker">WORKSPACE IDENTITY</div>
+                <h3 id="workspace-name-title">Personal Workspace Name</h3>
+                <p id="workspace-name-sub">Give your Z28 workspace a name. It is saved only on this device.</p>
+              </div>
+              <span class="workspace-name-badge" id="workspace-name-badge">DEVICE ONLY</span>
+            </div>
+
+            <div class="workspace-name-editor">
+              <div class="workspace-name-input-wrap">
+                <input
+                  id="workspace-name-input"
+                  class="workspace-name-input"
+                  type="text"
+                  maxlength="32"
+                  autocomplete="off"
+                  spellcheck="false"
+                  placeholder="My Workspace"
+                  aria-describedby="workspace-name-hint workspace-name-count"
+                >
+                <span class="workspace-name-input-glow" aria-hidden="true"></span>
+              </div>
+              <div class="workspace-name-meta">
+                <span id="workspace-name-hint">1–32 characters</span>
+                <span id="workspace-name-count">0 / 32</span>
+              </div>
+            </div>
+
+            <div class="workspace-name-actions">
+              <button id="workspace-name-save" class="primary-button workspace-name-save" type="button">
+                <span class="button-label" id="workspace-name-save-label">Save Workspace Name</span>
+              </button>
+              <button id="workspace-name-reset" class="secondary-button workspace-name-reset" type="button">
+                <span class="button-label" id="workspace-name-reset-label">Reset</span>
+              </button>
+            </div>
+
+            <div class="workspace-name-status" id="workspace-name-status" aria-live="polite">
+              <span class="workspace-name-status-dot" id="workspace-name-status-dot" aria-hidden="true"></span>
+              <span id="workspace-name-status-text">Saved on this device.</span>
+            </div>
+          </section>
+
+
 
           <fieldset class="appearance-theme-fieldset">
             <legend class="sr-only" id="user-appearance-theme-legend">Theme</legend>
