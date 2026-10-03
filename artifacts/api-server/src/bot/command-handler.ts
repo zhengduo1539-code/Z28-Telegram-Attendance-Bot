@@ -250,8 +250,32 @@ export class CommandHandler {
         markup = keyboard(locale);
         if (message.chat.type === "private") {
           const botUsername = await this.telegram.getBotUsername();
-          if (botUsername) {
+          const isConfiguredAdmin =
+            this.config.botOwnerId === profile.userId ||
+            this.config.adminIds.includes(profile.userId);
+
+          if (this.config.adminMiniAppUrl) {
             addGroupMarkup = {
+              inline_keyboard: [
+                [
+                  {
+                    text: isConfiguredAdmin
+                      ? locale === "en"
+                        ? "⚙️ Open Admin Panel"
+                        : "⚙️ 打开管理面板"
+                      : locale === "en"
+                        ? "📊 Open My Dashboard"
+                        : "📊 打开我的面板",
+                    style: "primary",
+                    web_app: { url: this.config.adminMiniAppUrl },
+                  },
+                ],
+              ],
+            };
+          }
+
+          if (botUsername) {
+            const addBotMarkup = {
               inline_keyboard: [
                 [
                   {
@@ -259,12 +283,23 @@ export class CommandHandler {
                       locale === "en"
                         ? "➕ Add Bot to Your Group"
                         : "➕ 将 Bot 添加到群组",
-                    style: "primary",
+                    style: "primary" as const,
                     url: `https://t.me/${botUsername}?startgroup=attendance`,
                   },
                 ],
               ],
             };
+            if (addGroupMarkup) {
+              await this.telegram.sendMessage(
+                message.chat.id,
+                locale === "en"
+                  ? "Add the bot to a group:"
+                  : "将 Bot 添加到群组：",
+                addBotMarkup,
+              );
+            } else {
+              addGroupMarkup = addBotMarkup;
+            }
           }
         }
         break;
@@ -545,10 +580,16 @@ export class CommandHandler {
     if (this.privateMenuButtonScopes.has(scopeKey)) return;
 
     try {
-      if (isConfiguredAdmin && miniAppUrl) {
+      if (miniAppUrl) {
         await this.telegram.setChatMenuButton(chatId, {
           type: "web_app",
-          text: locale === "en" ? "⚙️ Admin Panel" : "⚙️ 打开管理面板",
+          text: isConfiguredAdmin
+            ? locale === "en"
+              ? "⚙️ Admin Panel"
+              : "⚙️ 打开管理面板"
+            : locale === "en"
+              ? "📊 My Dashboard"
+              : "📊 我的面板",
           web_app: { url: miniAppUrl },
         });
       } else {
