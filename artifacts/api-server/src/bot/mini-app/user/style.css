@@ -619,3 +619,310 @@ button:focus-visible,input:focus-visible,summary:focus-visible{
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}
 }
+
+
+
+/* ─────────────────────────────────────────────────────────────
+   Motion system
+   Purpose: add depth and polish without changing dashboard logic.
+   ───────────────────────────────────────────────────────────── */
+
+:root{
+  --motion-fast:180ms;
+  --motion-base:420ms;
+  --motion-slow:700ms;
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  --ease-smooth:cubic-bezier(.22,.61,.36,1);
+}
+
+body::before,
+body::after{
+  content:"";
+  position:fixed;
+  z-index:-1;
+  pointer-events:none;
+  width:34vw;
+  height:34vw;
+  max-width:430px;
+  max-height:430px;
+  border-radius:50%;
+  filter:blur(70px);
+  opacity:.14;
+  transform:translate3d(0,0,0);
+}
+body::before{
+  left:-10vw;
+  top:8vh;
+  background:#278bff;
+  animation:ambientFloatA 12s ease-in-out infinite alternate;
+}
+body::after{
+  right:-12vw;
+  bottom:8vh;
+  background:#6858ff;
+  animation:ambientFloatB 15s ease-in-out infinite alternate;
+}
+
+@keyframes ambientFloatA{
+  0%{transform:translate3d(0,0,0) scale(.92)}
+  50%{transform:translate3d(7vw,5vh,0) scale(1.06)}
+  100%{transform:translate3d(12vw,-3vh,0) scale(.98)}
+}
+@keyframes ambientFloatB{
+  0%{transform:translate3d(0,0,0) scale(1)}
+  50%{transform:translate3d(-8vw,-5vh,0) scale(.9)}
+  100%{transform:translate3d(-3vw,4vh,0) scale(1.08)}
+}
+
+.app-header{
+  animation:fadeSlideDown var(--motion-slow) var(--ease-out) both;
+}
+.notice.show{
+  animation:noticeIn 320ms var(--ease-out) both;
+}
+
+@keyframes fadeSlideDown{
+  from{opacity:0;transform:translate3d(0,-14px,0)}
+  to{opacity:1;transform:translate3d(0,0,0)}
+}
+@keyframes noticeIn{
+  from{opacity:0;transform:translate3d(0,-6px,0)}
+  to{opacity:1;transform:translate3d(0,0,0)}
+}
+
+.verify-screen{
+  animation:surfaceReveal 650ms var(--ease-out) 90ms both;
+}
+.group-picker{
+  animation:surfaceReveal 600ms var(--ease-out) 80ms both;
+}
+.dashboard-head{
+  animation:fadeSlideUp 560ms var(--ease-out) 40ms both;
+}
+.metrics-grid .metric-card{
+  opacity:0;
+  animation:cardReveal 620ms var(--ease-out) both;
+}
+.metrics-grid .metric-card:nth-child(1){animation-delay:90ms}
+.metrics-grid .metric-card:nth-child(2){animation-delay:170ms}
+
+.settings-heading{
+  animation:fadeSlideUp 560ms var(--ease-out) 190ms both;
+}
+.settings-card{
+  opacity:0;
+  animation:cardReveal 620ms var(--ease-out) both;
+}
+.settings-card:nth-of-type(1){animation-delay:250ms}
+.settings-card:nth-of-type(2){animation-delay:330ms}
+
+.group-option{
+  opacity:0;
+  animation:cardReveal 520ms var(--ease-out) both;
+}
+.group-option:nth-child(1){animation-delay:100ms}
+.group-option:nth-child(2){animation-delay:150ms}
+.group-option:nth-child(3){animation-delay:200ms}
+.group-option:nth-child(4){animation-delay:250ms}
+.group-option:nth-child(5){animation-delay:300ms}
+.group-option:nth-child(6){animation-delay:350ms}
+.group-option:nth-child(7){animation-delay:400ms}
+.group-option:nth-child(8){animation-delay:450ms}
+
+.about-head{
+  animation:fadeSlideUp 560ms var(--ease-out) 40ms both;
+}
+.about-card{
+  opacity:0;
+  animation:cardReveal 560ms var(--ease-out) both;
+}
+.about-card:nth-child(1){animation-delay:100ms}
+.about-card:nth-child(2){animation-delay:160ms}
+.about-card:nth-child(3){animation-delay:220ms}
+.about-details{
+  animation:fadeSlideUp 500ms var(--ease-out) 280ms both;
+}
+.about-details:nth-of-type(2){animation-delay:340ms}
+.credit-card{
+  animation:fadeSlideUp 560ms var(--ease-out) 400ms both;
+}
+
+@keyframes surfaceReveal{
+  from{opacity:0;transform:translate3d(0,18px,0) scale(.985);filter:blur(4px)}
+  to{opacity:1;transform:translate3d(0,0,0) scale(1);filter:blur(0)}
+}
+@keyframes fadeSlideUp{
+  from{opacity:0;transform:translate3d(0,15px,0)}
+  to{opacity:1;transform:translate3d(0,0,0)}
+}
+@keyframes cardReveal{
+  from{opacity:0;transform:translate3d(0,20px,0) scale(.975)}
+  70%{opacity:1}
+  to{opacity:1;transform:translate3d(0,0,0) scale(1)}
+}
+
+.metric-card,
+.settings-card,
+.group-option,
+.about-card,
+.about-details,
+.credit-card{
+  transition:
+    transform var(--motion-fast) var(--ease-out),
+    border-color var(--motion-fast) ease,
+    box-shadow var(--motion-base) ease,
+    background var(--motion-fast) ease;
+}
+.metric-card:hover{
+  transform:translate3d(0,-3px,0);
+  border-color:rgba(72,168,255,.24);
+  box-shadow:0 20px 46px rgba(0,0,0,.24),0 0 24px rgba(72,168,255,.06);
+}
+.settings-card:hover{
+  transform:translate3d(0,-2px,0);
+  border-color:rgba(112,167,225,.22);
+  box-shadow:0 19px 44px rgba(0,0,0,.2);
+}
+.about-card:hover,
+.about-details:hover,
+.credit-card:hover{
+  transform:translate3d(0,-2px,0);
+  border-color:rgba(112,167,225,.22);
+}
+.group-option:hover{
+  box-shadow:0 14px 34px rgba(0,0,0,.2),0 0 22px rgba(72,168,255,.05);
+}
+
+.brand-mark{
+  animation:brandBreath 4.5s ease-in-out infinite;
+}
+.brand-mark span{
+  transform-origin:center bottom;
+  animation:barPulse 2.7s ease-in-out infinite;
+}
+.brand-mark span:nth-child(2){animation-delay:.22s}
+.brand-mark span:nth-child(3){animation-delay:.44s}
+
+@keyframes brandBreath{
+  0%,100%{box-shadow:0 12px 28px rgba(41,111,206,.18),inset 0 1px rgba(255,255,255,.05)}
+  50%{box-shadow:0 16px 34px rgba(41,111,206,.28),0 0 24px rgba(72,168,255,.08),inset 0 1px rgba(255,255,255,.06)}
+}
+@keyframes barPulse{
+  0%,100%{transform:scaleY(1);opacity:1}
+  50%{transform:scaleY(.82);opacity:.78}
+}
+
+.live-dot{
+  animation:livePulse 1.8s ease-in-out infinite;
+}
+@keyframes livePulse{
+  0%,100%{transform:scale(1);box-shadow:0 0 0 6px rgba(71,215,162,.08),0 0 18px rgba(71,215,162,.34)}
+  50%{transform:scale(1.08);box-shadow:0 0 0 9px rgba(71,215,162,.035),0 0 24px rgba(71,215,162,.48)}
+}
+
+.primary-button,
+.secondary-button,
+.setting-edit,
+.icon-button,
+.tab-button{
+  position:relative;
+  overflow:hidden;
+}
+.primary-button::after,
+.secondary-button::after,
+.setting-edit::after,
+.icon-button::after,
+.tab-button::after{
+  content:"";
+  position:absolute;
+  inset:-40% auto -40% -35%;
+  width:35%;
+  transform:translateX(-160%) skewX(-18deg);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.16),transparent);
+  pointer-events:none;
+}
+.primary-button:hover::after,
+.secondary-button:hover::after,
+.setting-edit:hover::after,
+.icon-button:hover::after,
+.tab-button:hover::after{
+  animation:buttonSheen 700ms var(--ease-out);
+}
+@keyframes buttonSheen{
+  to{transform:translateX(520%) skewX(-18deg)}
+}
+
+.primary-button:not(:disabled):active,
+.secondary-button:not(:disabled):active,
+.setting-edit:not(:disabled):active,
+.icon-button:not(:disabled):active,
+.tab-button:not(:disabled):active{
+  transform:scale(.975);
+}
+
+.user-loading .loading-panel{
+  animation:loadingPanelIn 500ms var(--ease-out) both;
+}
+.loading-spinner{
+  animation:spin .72s linear infinite,spinnerGlow 1.8s ease-in-out infinite;
+}
+@keyframes loadingPanelIn{
+  from{opacity:0;transform:translate3d(0,12px,0) scale(.97)}
+  to{opacity:1;transform:translate3d(0,0,0) scale(1)}
+}
+@keyframes spinnerGlow{
+  50%{filter:drop-shadow(0 0 8px rgba(116,199,255,.24))}
+}
+
+.state-icon-error{
+  animation:errorFloat 2.4s ease-in-out infinite;
+}
+@keyframes errorFloat{
+  50%{transform:translate3d(0,-3px,0)}
+}
+
+.splash-content{
+  animation:splashContentIn 900ms var(--ease-out) both;
+}
+.splash-kicker{
+  animation:fadeSlideUp 600ms var(--ease-out) 180ms both;
+}
+.splash h1{
+  animation:fadeSlideUp 700ms var(--ease-out) 250ms both;
+}
+.splash p{
+  animation:fadeSlideUp 600ms var(--ease-out) 340ms both;
+}
+@keyframes splashContentIn{
+  from{opacity:0;transform:translate3d(0,12px,0) scale(.96)}
+  to{opacity:1;transform:translate3d(0,0,0) scale(1)}
+}
+
+.tab-bar{
+  animation:tabBarIn 560ms var(--ease-out) 80ms both;
+}
+@keyframes tabBarIn{
+  from{opacity:0;transform:translate3d(0,12px,0)}
+  to{opacity:1;transform:translate3d(0,0,0)}
+}
+.tab-button.active{
+  animation:tabActive 500ms var(--ease-out) both;
+}
+@keyframes tabActive{
+  from{opacity:.65}
+  to{opacity:1}
+}
+
+@media(prefers-reduced-motion:reduce){
+  body::before,body::after,
+  .app-header,.verify-screen,.group-picker,.dashboard-head,
+  .metrics-grid .metric-card,.settings-heading,.settings-card,
+  .group-option,.about-head,.about-card,.about-details,.credit-card,
+  .brand-mark,.brand-mark span,.live-dot,.user-loading .loading-panel,
+  .state-icon-error,.splash-content,.splash-kicker,.splash h1,.splash p,.tab-bar,.tab-button.active{
+    animation:none!important;
+  }
+  .metric-card,.settings-card,.group-option,.about-card,.about-details,.credit-card{
+    transition:none!important;
+  }
+}
