@@ -28,6 +28,14 @@ export class TelegramPollingBot {
         text: "Open Mini App",
         web_app: { url: this.config.adminMiniAppUrl },
       });
+      this.logger.info(
+        { miniAppUrl: this.config.adminMiniAppUrl },
+        "Telegram Mini App menu button configured for all private chats",
+      );
+    } else {
+      this.logger.warn(
+        "Telegram Mini App menu button was not configured because no Mini App URL is available",
+      );
     }
 
     const adminIds = new Set<number>([
