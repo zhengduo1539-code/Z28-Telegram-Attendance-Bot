@@ -1882,16 +1882,25 @@
       !state.connectSaving
     );
 
+    var canChange = Boolean(
+      connection &&
+      !state.connectEditMode &&
+      !state.connectLoading &&
+      !state.connectSaving
+    );
+
     els["user-connect-submit"].disabled = !canSubmit;
     els["user-connect-submit"].setAttribute("aria-disabled", String(!canSubmit));
+    els["user-connect-submit"].classList.toggle("is-connect-ready", canSubmit);
     els["user-connect-source"].setAttribute("aria-invalid", String(sameGroup));
     els["user-connect-target"].setAttribute("aria-invalid", String(sameGroup));
 
     var locked = Boolean(connection && !state.connectEditMode);
     els["user-connect-source"].disabled = locked || state.connectLoading || state.connectSaving;
     els["user-connect-target"].disabled = locked || state.connectLoading || state.connectSaving;
-    els["user-connect-change"].disabled =
-      !connection || state.connectEditMode || state.connectLoading || state.connectSaving;
+    els["user-connect-change"].disabled = !canChange;
+    els["user-connect-change"].classList.toggle("is-connect-ready", canChange);
+    els["user-connect-change"].classList.toggle("is-connect-editing", state.connectEditMode);
   }
 
   function applyExistingConnectionState() {
@@ -2009,6 +2018,7 @@
   function beginConnectEdit() {
     if (state.connectSaving || state.connectLoading) return;
     state.connectEditMode = true;
+    els["user-connect-change"].classList.add("is-connect-editing");
     els["user-connect-source"].disabled = false;
     els["user-connect-target"].disabled = false;
     els["user-connect-change"].disabled = true;
@@ -2038,6 +2048,10 @@
     }
 
     state.connectSaving = true;
+    els["user-connect-submit"].classList.add("is-connect-pressing");
+    window.setTimeout(function () {
+      els["user-connect-submit"].classList.remove("is-connect-pressing");
+    }, 220);
     setButton(els["user-connect-submit"], "loading", text("connectConnecting"));
     els["user-connect-source"].disabled = true;
     els["user-connect-target"].disabled = true;
@@ -2058,7 +2072,14 @@
       els["user-connect-target"].value = String(targetId);
 
       showNotice(text("connectSuccess"), "ok");
+      els["user-connect-status-value"].classList.add("is-connect-success");
+      var statusCard = els["user-connect-status-value"].closest(".connect-status-card");
+      if (statusCard) statusCard.classList.add("is-connect-success");
     } catch (error) {
+      els["user-connect-submit"].classList.add("is-connect-error");
+      window.setTimeout(function () {
+        els["user-connect-submit"].classList.remove("is-connect-error");
+      }, 1200);
       showNotice(
         error && error.message ? error.message : text("connectFailed"),
         "error"
@@ -2067,6 +2088,14 @@
       state.connectSaving = false;
       setButton(els["user-connect-submit"], "idle", text("connectButton"));
       applyExistingConnectionState();
+
+      if (els["user-connect-status-value"].classList.contains("is-connect-success")) {
+        var successCard = els["user-connect-status-value"].closest(".connect-status-card");
+        window.setTimeout(function () {
+          els["user-connect-status-value"].classList.remove("is-connect-success");
+          if (successCard) successCard.classList.remove("is-connect-success");
+        }, 1800);
+      }
     }
   }
 
