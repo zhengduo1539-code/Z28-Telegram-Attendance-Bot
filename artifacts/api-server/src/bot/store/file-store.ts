@@ -10,7 +10,6 @@ export const emptyState = (): BotState => ({
   activityLimits: {},
   connectedGroups: {},
   pendingConnects: {},
-  supportTickets: {},
 });
 
 const isObjectRecord = (value: unknown): value is Record<string, unknown> =>
@@ -41,9 +40,7 @@ export const isBotState = (value: unknown): value is BotState => {
     (candidate.reminderEnabled === undefined ||
       typeof candidate.reminderEnabled === "boolean") &&
     (candidate.managedGroups === undefined ||
-      isObjectRecord(candidate.managedGroups)) &&
-    (candidate.supportTickets === undefined ||
-      isObjectRecord(candidate.supportTickets))
+      isObjectRecord(candidate.managedGroups))
   );
 };
 

@@ -175,43 +175,6 @@ export class AttendanceService {
     return this.store.listAuditLogs(options);
   }
 
-  async createSupportTicket(ticket: import("./types").SupportTicket): Promise<void> {
-    await this.store.update((state) => {
-      if (!state.supportTickets) state.supportTickets = {};
-      state.supportTickets[ticket.id] = structuredClone(ticket);
-    });
-  }
-
-  async deleteSupportTicket(ticketId: string): Promise<void> {
-    await this.store.update((state) => {
-      if (state.supportTickets?.[ticketId]) delete state.supportTickets[ticketId];
-    });
-  }
-
-  async listSupportTickets(userId?: number): Promise<import("./types").SupportTicket[]> {
-    const state = await this.store.load();
-    return Object.values(state.supportTickets || {})
-      .filter((ticket) => userId === undefined || ticket.userId === userId)
-      .map((ticket) => structuredClone(ticket))
-      .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
-  }
-
-  async addSupportReply(ticketId: string, reply: import("./types").SupportReply): Promise<import("./types").SupportTicket> {
-    let updated: import("./types").SupportTicket | undefined;
-    await this.store.update((state) => {
-      const ticket = state.supportTickets?.[ticketId];
-      if (!ticket) return;
-      ticket.replies = Array.isArray(ticket.replies) ? ticket.replies : [];
-      ticket.replies.push(structuredClone(reply));
-      if (ticket.replies.length > 50) ticket.replies.splice(0, ticket.replies.length - 50);
-      ticket.status = "answered";
-      ticket.updatedAt = reply.createdAt;
-      updated = structuredClone(ticket);
-    });
-    if (!updated) throw new Error("Support ticket not found.");
-    return updated;
-  }
-
   getHistoryRetentionDays(): number {
     return this.config.historyRetentionDays;
   }
