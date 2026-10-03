@@ -29,6 +29,7 @@
     wallpaper: "default",
     animationsEnabled: true,
     compactMode: false,
+    workspaceName: "My Workspace",
     themeCreator: {
       enabled: false,
       primary: "#48a8ff",
@@ -53,6 +54,7 @@
     wallpaper: "z28_appearance_wallpaper",
     animations: "z28_appearance_animations",
     compactMode: "z28_appearance_compact",
+    workspaceName: "z28_workspace_name",
     themeCreator: "z28_appearance_theme_creator"
   };
 
@@ -177,6 +179,18 @@
       themeCreatorActive: "Custom theme is active • saved on this device.",
       themeCreatorInactive: "Custom theme is not active.",
       themeCreatorReset: "Reset",
+      workspaceIdentity: "WORKSPACE IDENTITY",
+      workspaceNameTitle: "Personal Workspace Name",
+      workspaceNameSub: "Give your Z28 workspace a name. It is saved only on this device.",
+      workspaceNamePlaceholder: "My Workspace",
+      workspaceNameHint: "1–32 characters",
+      workspaceNameSave: "Save Workspace Name",
+      workspaceNameSaved: "Workspace name saved on this device.",
+      workspaceNameReset: "Reset",
+      workspaceNameDeviceOnly: "DEVICE ONLY",
+      workspaceNameInvalid: "Enter a workspace name from 1 to 32 characters.",
+      workspaceNameDefault: "My Workspace",
+
       tools: "Tools",
       toolsSub: "Connect bot-installed groups with a secure, guided flow.",
       connectTitle: "Group Connection",
@@ -372,6 +386,18 @@
       themeCreatorActive: "Custom theme ကို ဖွင့်ထားပြီး ဤစက်ပေါ်တွင် သိမ်းထားပါသည်။",
       themeCreatorInactive: "Custom theme ကို မဖွင့်ရသေးပါ။",
       themeCreatorReset: "မူလသို့ ပြန်ထားမည်",
+      workspaceIdentity: "WORKSPACE IDENTITY",
+      workspaceNameTitle: "Personal Workspace Name",
+      workspaceNameSub: "သင့် Z28 workspace အတွက် နာမည်ပေးပါ။ ဤ device ပေါ်တွင်သာ သိမ်းထားပါမည်။",
+      workspaceNamePlaceholder: "My Workspace",
+      workspaceNameHint: "စာလုံး ၁ မှ ၃၂ လုံး",
+      workspaceNameSave: "Workspace Name သိမ်းမည်",
+      workspaceNameSaved: "Workspace name ကို ဤ device ပေါ်တွင် သိမ်းထားပါသည်။",
+      workspaceNameReset: "မူလသို့ ပြန်ထားမည်",
+      workspaceNameDeviceOnly: "ဤစက်တွင်သာ",
+      workspaceNameInvalid: "Workspace Name ကို စာလုံး ၁ မှ ၃၂ လုံးအတွင်း ထည့်ပါ။",
+      workspaceNameDefault: "My Workspace",
+
       tools: "Tools",
       toolsSub: "Group tools and connection controls.",
       connectTitle: "Group Connection",
@@ -566,6 +592,18 @@
       themeCreatorActive: "自定义主题已启用 • 已保存在此设备。",
       themeCreatorInactive: "自定义主题未启用。",
       themeCreatorReset: "重置",
+      workspaceIdentity: "工作区身份",
+      workspaceNameTitle: "个人工作区名称",
+      workspaceNameSub: "为您的 Z28 工作区设置名称，仅保存在此设备上。",
+      workspaceNamePlaceholder: "我的工作区",
+      workspaceNameHint: "1–32 个字符",
+      workspaceNameSave: "保存工作区名称",
+      workspaceNameSaved: "工作区名称已保存在此设备上。",
+      workspaceNameReset: "重置",
+      workspaceNameDeviceOnly: "仅此设备",
+      workspaceNameInvalid: "请输入 1–32 个字符的工作区名称。",
+      workspaceNameDefault: "我的工作区",
+
       tools: "工具",
       toolsSub: "用于群组连接与常用管理操作。",
       connectTitle: "群组连接",
@@ -718,6 +756,10 @@
       "appearance-animations-toggle","user-appearance-animations-title","user-appearance-animations-sub",
       "user-appearance-animations-state","appearance-compact-toggle","user-appearance-compact-title",
       "user-appearance-compact-sub","user-appearance-compact-state",
+      "workspace-identity","workspace-name-kicker","workspace-name-title","workspace-name-sub",
+      "workspace-name-badge","workspace-name-input","workspace-name-hint","workspace-name-count",
+      "workspace-name-save","workspace-name-save-label","workspace-name-reset","workspace-name-reset-label",
+      "workspace-name-status","workspace-name-status-dot","workspace-name-status-text",
       "theme-creator-title","theme-creator-sub","theme-creator-badge",
       "theme-creator-preview","theme-creator-preview-title","theme-creator-preview-status",
       "theme-creator-preview-label","theme-creator-preview-value","theme-creator-preview-chip",
@@ -750,6 +792,76 @@
         "'": "&#39;"
       }[char];
     });
+  }
+
+  function normalizeWorkspaceName(value) {
+    var raw = String(value == null ? "" : value)
+      .replace(/[\u0000-\u001F\u007F]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+    return Array.from(raw).slice(0, 32).join("");
+  }
+
+  function getStoredWorkspaceName() {
+    var raw = readStorage(STORAGE_KEYS.workspaceName);
+    if (raw == null) return null;
+    var normalized = normalizeWorkspaceName(raw);
+    return normalized ? normalized : null;
+  }
+
+  function applyWorkspaceIdentity() {
+    if (!els["workspace-identity"]) return;
+    var name = normalizeWorkspaceName(state.workspaceName) || text("workspaceNameDefault");
+    state.workspaceName = name;
+    els["workspace-identity"].textContent = name;
+    els["workspace-identity"].title = name;
+    els["workspace-identity"].setAttribute("aria-label", text("workspaceNameTitle") + ": " + name);
+  }
+
+  function updateWorkspaceNameControls() {
+    if (!els["workspace-name-input"]) return;
+    var value = normalizeWorkspaceName(els["workspace-name-input"].value);
+    var saved = normalizeWorkspaceName(state.workspaceName);
+    var length = Array.from(value).length;
+    var valid = length >= 1 && length <= 32;
+    els["workspace-name-input"].value = value;
+    els["workspace-name-count"].textContent = length + " / 32";
+    els["workspace-name-input"].setAttribute("aria-invalid", String(!valid));
+    els["workspace-name-save"].disabled = !valid || value === saved;
+    els["workspace-name-save"].setAttribute("aria-disabled", String(!valid || value === saved));
+    els["workspace-name-status-dot"].classList.toggle("is-active", valid && value === saved);
+    if (!valid) {
+      els["workspace-name-status-text"].textContent = text("workspaceNameInvalid");
+    } else if (value !== saved) {
+      els["workspace-name-status-text"].textContent = text("workspaceNameSave");
+    } else {
+      els["workspace-name-status-text"].textContent = text("workspaceNameSaved");
+    }
+  }
+
+  function saveWorkspaceName() {
+    var value = normalizeWorkspaceName(els["workspace-name-input"].value);
+    var length = Array.from(value).length;
+    if (length < 1 || length > 32) {
+      showNotice(text("workspaceNameInvalid"), "error");
+      updateWorkspaceNameControls();
+      els["workspace-name-input"].focus({ preventScroll: true });
+      return;
+    }
+    state.workspaceName = value;
+    writeStorage(STORAGE_KEYS.workspaceName, value);
+    applyWorkspaceIdentity();
+    updateWorkspaceNameControls();
+    showNotice(text("workspaceNameSaved"), "ok");
+  }
+
+  function resetWorkspaceName() {
+    state.workspaceName = text("workspaceNameDefault");
+    removeStorage(STORAGE_KEYS.workspaceName);
+    els["workspace-name-input"].value = state.workspaceName;
+    applyWorkspaceIdentity();
+    updateWorkspaceNameControls();
+    showNotice(text("workspaceNameSaved"), "ok");
   }
 
   function displayName() {
@@ -1213,6 +1325,7 @@
     document.documentElement.lang = state.language === "my" ? "my" : state.language;
     els.title.textContent = text("title");
     els.identity.textContent = state.verifiedUserId ? "ID " + state.verifiedUserId : text("startup");
+    applyWorkspaceIdentity();
     if (els["user-selected-group-title"]) {
       var dashboardName = state.dashboard && state.dashboard.selectedGroup
         ? (state.dashboard.selectedGroup.title || String(state.dashboard.selectedGroup.id))
@@ -1298,6 +1411,14 @@
     els["user-appearance-animations-sub"].textContent = text("animationsSub");
     els["user-appearance-compact-title"].textContent = text("compactMode");
     els["user-appearance-compact-sub"].textContent = text("compactModeSub");
+    els["workspace-name-kicker"].textContent = text("workspaceIdentity");
+    els["workspace-name-title"].textContent = text("workspaceNameTitle");
+    els["workspace-name-sub"].textContent = text("workspaceNameSub");
+    els["workspace-name-input"].placeholder = text("workspaceNamePlaceholder");
+    els["workspace-name-hint"].textContent = text("workspaceNameHint");
+    els["workspace-name-save-label"].textContent = text("workspaceNameSave");
+    els["workspace-name-reset-label"].textContent = text("workspaceNameReset");
+    els["workspace-name-badge"].textContent = text("workspaceNameDeviceOnly");
     els["theme-creator-title"].textContent = text("themeCreator");
     els["theme-creator-sub"].textContent = text("themeCreatorSub");
     els["theme-creator-presets-title"].textContent = text("themeCreatorPresets");
@@ -2728,6 +2849,19 @@
 
     els["appearance-animations-toggle"].onclick = toggleAnimations;
     els["appearance-compact-toggle"].onclick = toggleCompactMode;
+    els["workspace-name-input"].oninput = function () {
+      updateWorkspaceNameControls();
+    };
+    els["workspace-name-input"].onkeydown = function (event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        if (!els["workspace-name-save"].disabled) saveWorkspaceName();
+      }
+    };
+    els["workspace-name-save"].onclick = saveWorkspaceName;
+    els["workspace-name-reset"].onclick = resetWorkspaceName;
+
+
 
     if (els["theme-creator-primary"]) {
       els["theme-creator-primary"].oninput = function () {
@@ -2875,6 +3009,9 @@
     var storedCompact = readStorage(STORAGE_KEYS.compactMode);
     state.compactMode = storedCompact === "1";
 
+    var storedWorkspaceName = getStoredWorkspaceName();
+    state.workspaceName = storedWorkspaceName || text("workspaceNameDefault");
+
     var storedThemeCreator = getThemeCreatorStorage();
     if (storedThemeCreator) {
       state.themeCreator = storedThemeCreator;
@@ -2887,6 +3024,11 @@
     }
 
     applyAppearancePreferences();
+    applyWorkspaceIdentity();
+    if (els["workspace-name-input"]) {
+      els["workspace-name-input"].value = state.workspaceName;
+      updateWorkspaceNameControls();
+    }
   }
 
   function hideSplash() {
