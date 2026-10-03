@@ -118,8 +118,18 @@
       privacyCopy: "The Mini App uses Telegram WebApp account information to verify access and show the groups available to you. Information shown in this dashboard is used only for the bot features provided to your account and groups.",
       credits: "Credits",
       creator: "Creator",
-      noGroup: "No eligible group found",
-      noGroupCopy: "Add this bot to a group, then make sure your Telegram account is a group owner or administrator. Groups where the bot is no longer available are not shown.",
+      noGroupEyebrow: "GROUP ACCESS",
+      noGroup: "No eligible groups yet",
+      noGroupCopy: "This Mini App could not find a group that your Telegram account can manage.",
+      noGroupHelpTitle: "Getting started",
+      noGroupHelpCaption: "Complete these checks, then reopen the Mini App.",
+      noGroupStep1Title: "Add the bot to your group",
+      noGroupStep1Copy: "Make sure Z28 is still a member of the group you want to manage.",
+      noGroupStep2Title: "Check your group role",
+      noGroupStep2Copy: "Your Telegram account must be the group owner or an administrator.",
+      noGroupStep3Title: "Reopen the Mini App",
+      noGroupStep3Copy: "Open the Mini App again after the access changes are complete.",
+      noGroupNote: "Groups that are no longer available to the bot are not shown in your dashboard.",
       dashboardError: "Unable to load your dashboard right now.",
       dashboardErrorCopy: "Something went wrong while loading your dashboard. Your saved settings were not changed.",
       tryAgain: "Try Again",
@@ -235,8 +245,18 @@
       privacyCopy: "Mini App သည် access အတည်ပြုရန်နှင့် သင့်အတွက် အသုံးပြုနိုင်သော Group များကို ပြသရန် Telegram WebApp account information ကို အသုံးပြုပါသည်။",
       credits: "Credits",
       creator: "ဖန်တီးသူ",
-      noGroup: "အသုံးပြုနိုင်သော Group မတွေ့ပါ",
-      noGroupCopy: "Bot ကို Group တစ်ခုထဲသို့ ထည့်ပြီး သင့် Telegram account ကို Group owner သို့မဟုတ် administrator ဖြစ်ကြောင်း သေချာပါစေ။ Bot မရှိတော့သော Group များကို မပြပါ။",
+      noGroupEyebrow: "GROUP ACCESS",
+      noGroup: "အသုံးပြုနိုင်သော Group မတွေ့သေးပါ",
+      noGroupCopy: "ဤ Mini App မှ သင့် Telegram account အနေဖြင့် စီမံနိုင်သော Group ကို မတွေ့ပါ။",
+      noGroupHelpTitle: "စတင်ရန် စစ်ဆေးရန်များ",
+      noGroupHelpCaption: "အောက်ပါအချက်များကို စစ်ဆေးပြီး Mini App ကို ပြန်ဖွင့်ပါ။",
+      noGroupStep1Title: "Bot ကို Group ထဲသို့ ထည့်ထားပါ",
+      noGroupStep1Copy: "စီမံလိုသော Group ထဲတွင် Z28 Bot ရှိနေဆဲဖြစ်ကြောင်း သေချာပါစေ။",
+      noGroupStep2Title: "သင့် Group role ကို စစ်ဆေးပါ",
+      noGroupStep2Copy: "သင့် Telegram account သည် Group owner သို့မဟုတ် administrator ဖြစ်ရပါမည်။",
+      noGroupStep3Title: "Mini App ကို ပြန်ဖွင့်ပါ",
+      noGroupStep3Copy: "Access ပြောင်းလဲမှုများ ပြီးစီးပြီးနောက် Mini App ကို ပြန်ဖွင့်ပါ။",
+      noGroupNote: "Bot မှ အသုံးပြုခွင့်မရှိတော့သော Group များကို Dashboard တွင် မပြပါ။"
       dashboardError: "Dashboard ကို ယခုဖွင့်၍ မရသေးပါ။",
       dashboardErrorCopy: "Dashboard ကိုဖွင့်နေစဉ် ပြဿနာတစ်ခု ဖြစ်ပေါ်ခဲ့ပါသည်။ သိမ်းထားပြီးသော setting များကို မပြောင်းလဲထားပါ။",
       tryAgain: "ထပ်ကြိုးစားမည်",
@@ -352,8 +372,18 @@
       privacyCopy: "Mini App 使用 Telegram WebApp 账号信息验证访问权限，并显示您可以使用的群组。Dashboard 中的信息仅用于机器人为您的账号和群组提供的功能。",
       credits: "鸣谢",
       creator: "创作者",
-      noGroup: "没有找到可用的群组",
-      noGroupCopy: "请将 Bot 添加到群组，并确保您的 Telegram 账号是群主或管理员。Bot 已不在的群组不会显示。",
+      noGroupEyebrow: "群组访问",
+      noGroup: "暂时没有找到可用群组",
+      noGroupCopy: "此 Mini App 没有找到您的 Telegram 账号可以管理的群组。",
+      noGroupHelpTitle: "开始前请检查",
+      noGroupHelpCaption: "完成以下检查后，请重新打开 Mini App。",
+      noGroupStep1Title: "将 Bot 添加到群组",
+      noGroupStep1Copy: "请确认您要管理的群组中仍然有 Z28 Bot。",
+      noGroupStep2Title: "检查您的群组身份",
+      noGroupStep2Copy: "您的 Telegram 账号必须是群主或管理员。",
+      noGroupStep3Title: "重新打开 Mini App",
+      noGroupStep3Copy: "完成访问权限调整后，再次打开 Mini App。",
+      noGroupNote: "Bot 已无法使用的群组不会显示在您的 Dashboard 中。"
       dashboardError: "暂时无法加载您的控制面板。",
       dashboardErrorCopy: "加载控制面板时出现问题。您已保存的设置没有被更改。",
       tryAgain: "再试一次",
@@ -396,7 +426,11 @@
       "title","identity","notice","user-language-button","user-language-menu",
       "user-verify-card","user-verify-title","user-verify-subtitle","user-verify-lead",
       "user-id-label","user-id-input","user-id-hint","user-confirm",
-      "user-no-group-screen","user-no-group-title","user-no-group-message",
+      "user-no-group-screen","user-no-group-eyebrow","user-no-group-title","user-no-group-message",
+      "user-no-group-help-title","user-no-group-help-caption",
+      "user-no-group-step1-title","user-no-group-step1-copy",
+      "user-no-group-step2-title","user-no-group-step2-copy",
+      "user-no-group-step3-title","user-no-group-step3-copy","user-no-group-note",
       "user-dashboard-error-screen","user-dashboard-error-title","user-dashboard-error-lead",
       "user-dashboard-error-retry","user-dashboard","user-group-options",
       "group-options-title","group-options-subtitle","user-group-options-list",
@@ -628,6 +662,18 @@
     els["user-verify-title"].textContent = text("verifyTitle");
     els["user-verify-subtitle"].textContent = text("verifySubtitle");
     els["user-verify-lead"].textContent = text("verifyLead");
+    els["user-no-group-eyebrow"].textContent = text("noGroupEyebrow");
+    els["user-no-group-title"].textContent = text("noGroup");
+    els["user-no-group-message"].textContent = text("noGroupCopy");
+    els["user-no-group-help-title"].textContent = text("noGroupHelpTitle");
+    els["user-no-group-help-caption"].textContent = text("noGroupHelpCaption");
+    els["user-no-group-step1-title"].textContent = text("noGroupStep1Title");
+    els["user-no-group-step1-copy"].textContent = text("noGroupStep1Copy");
+    els["user-no-group-step2-title"].textContent = text("noGroupStep2Title");
+    els["user-no-group-step2-copy"].textContent = text("noGroupStep2Copy");
+    els["user-no-group-step3-title"].textContent = text("noGroupStep3Title");
+    els["user-no-group-step3-copy"].textContent = text("noGroupStep3Copy");
+    els["user-no-group-note"].textContent = text("noGroupNote");
     els["user-id-label"].textContent = text("idLabel");
     els["user-id-input"].placeholder = text("idPlaceholder");
     els["user-id-hint"].textContent = text("idHint");
@@ -762,7 +808,7 @@
       state.selectedGroupId = null;
       removeStorage(STORAGE_KEYS.verifiedUser);
       showVerification();
-    }, 2850);
+    }, 5000);
   }
 
   function showDashboardError(error, groupId) {
