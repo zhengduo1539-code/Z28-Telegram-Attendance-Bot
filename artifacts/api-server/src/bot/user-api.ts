@@ -5,7 +5,7 @@ import {
   isConfiguredAdmin,
 } from "./admin-auth";
 import { getAdminApiContext } from "./admin-runtime";
-import type { ActiveActivity, ActivityKind, BotState } from "./types";
+import type { ActiveActivity, ActivityKind, BotState, SupportTicket } from "./types";
 
 const activityKinds: ActivityKind[] = ["eat", "wc", "smoke", "wcd"];
 const defaultActivityLimits = { eat: 30, wc: 7, smoke: 7, wcd: 15 };
@@ -13,7 +13,11 @@ const defaultCountLimits = { eat: Number.POSITIVE_INFINITY, wc: 7, smoke: 7, wcd
 const REPORT_MAX_LENGTH = 1200;
 const REPORT_MIN_LENGTH = 10;
 const REPORT_COOLDOWN_MS = 30_000;
+const SUPPORT_TICKET_LIST_LIMIT = 25;
 const reportCooldowns = new Map<number, number>();
+
+const createSupportTicketId = () =>
+  "SUP-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
 const reportCategoryLabels = {
   bug: "Bug / Unexpected behavior",
   access: "Access / Verification",
@@ -68,6 +72,26 @@ const notifyConfiguredAdminsOfDashboardFailure = async (
 const sendError = (res: Response, status: number, error: string) => {
   res.status(status).json({ error });
 };
+
+const serializeSupportTicket = (ticket: SupportTicket) => ({
+  id: ticket.id,
+  displayName: ticket.displayName,
+  username: ticket.username || null,
+  groupId: ticket.groupId,
+  groupTitle: ticket.groupTitle,
+  category: ticket.category,
+  categoryLabel: reportCategoryLabels[ticket.category as keyof typeof reportCategoryLabels] || ticket.category,
+  message: ticket.message,
+  status: ticket.status,
+  createdAt: ticket.createdAt,
+  updatedAt: ticket.updatedAt,
+  replies: ticket.replies.map((reply) => ({
+    adminName: reply.adminName,
+    role: reply.role,
+    message: reply.message,
+    createdAt: reply.createdAt,
+  })),
+});
 
 const requireTelegramUser = (req: Request, res: Response) => {
   const context = getAdminApiContext();
@@ -414,6 +438,24 @@ userApiRouter.put("/settings", async (req, res) => {
 });
 
  
+userApiRouter.get("/support/tickets", async (req, res) => {
+  const auth = requireTelegramUser(req, res);
+  if (!auth) return;
+
+  try {
+    const tickets = await auth.context.attendance.listSupportTickets(auth.user.id);
+    res.setHeader("Cache-Control", "no-store");
+    res.json({
+      tickets: tickets.slice(0, SUPPORT_TICKET_LIST_LIMIT).map(serializeSupportTicket),
+    });
+  } catch (error) {
+    console.error("[user-support] failed to load support tickets", {
+      message: error instanceof Error ? error.message : String(error),
+    });
+    sendError(res, 500, "Unable to load your support requests.");
+  }
+});
+
 userApiRouter.post("/report", async (req, res) => {
   const auth = requireTelegramUser(req, res);
   if (!auth) return;
@@ -487,8 +529,28 @@ userApiRouter.post("/report", async (req, res) => {
     hour12: false,
   }).format(new Date(now));
 
+  const ticketId = createSupportTicketId();
+  const ticketCreatedAt = new Date(now).toISOString();
+  const ticket: SupportTicket = {
+    id: ticketId,
+    userId: auth.user.id,
+    displayName,
+    ...(auth.user.username ? { username: auth.user.username } : {}),
+    groupId,
+    groupTitle,
+    category,
+    message,
+    status: "open",
+    createdAt: ticketCreatedAt,
+    updatedAt: ticketCreatedAt,
+    replies: [],
+  };
+
+  await auth.context.attendance.createSupportTicket(ticket);
+
   const reportText = [
     "🛠️ <b>User Support Report</b>",
+    "Ticket: <code>" + escapeTelegramHtml(ticketId) + "</code>",
     `Category: <b>${escapeTelegramHtml(reportCategoryLabels[category as keyof typeof reportCategoryLabels])}</b>`,
     `User: <b>${escapeTelegramHtml(displayName)}</b>`,
     `Username: <code>${escapeTelegramHtml(username)}</code>`,
@@ -507,10 +569,15 @@ userApiRouter.post("/report", async (req, res) => {
   const delivered = results.some((result) => result.status === "fulfilled");
   if (!delivered) {
     reportCooldowns.delete(auth.user.id);
+    try {
+      await auth.context.attendance.deleteSupportTicket(ticketId);
+    } catch {
+      // Best-effort rollback: do not block the error response on cleanup failure.
+    }
     sendError(res, 502, "Unable to deliver the report to support.");
     return;
   }
 
   res.setHeader("Cache-Control", "no-store");
-  res.json({ ok: true });
+  res.json({ ok: true, ticketId });
 });

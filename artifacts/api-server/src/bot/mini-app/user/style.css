@@ -1283,3 +1283,192 @@ body::after{
     animation:none!important;
   }
 }
+
+
+/* Support request history. Scoped to Help & Support only. */
+.support-history{
+  margin-top:16px;
+  padding:16px;
+  border:1px solid rgba(123,165,216,.12);
+  border-radius:18px;
+  background:linear-gradient(145deg,rgba(13,28,49,.64),rgba(7,17,31,.78));
+  box-shadow:0 14px 34px rgba(0,0,0,.14);
+}
+.support-history-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+}
+.support-history-title{
+  color:#eaf4ff;
+  font-size:14px;
+  font-weight:850;
+  letter-spacing:-.01em;
+}
+.support-history-sub{
+  margin:4px 0 0;
+  color:#7088a4;
+  font-size:10px;
+  line-height:1.55;
+}
+.support-history-refresh{
+  flex:0 0 auto;
+  min-height:34px;
+  padding:0 11px;
+  border:1px solid rgba(72,168,255,.18);
+  border-radius:10px;
+  color:#a9dcff;
+  background:rgba(72,168,255,.07);
+  font:inherit;
+  font-size:10px;
+  font-weight:800;
+  cursor:pointer;
+  transition:transform .18s ease,border-color .18s ease,background .18s ease;
+}
+.support-history-refresh:hover:not(:disabled){
+  transform:translateY(-1px);
+  border-color:rgba(72,168,255,.32);
+  background:rgba(72,168,255,.11);
+}
+.support-history-refresh:disabled{opacity:.55;cursor:default;}
+.support-history-meta{
+  margin-top:10px;
+  color:#637b96;
+  font-size:9px;
+  font-weight:750;
+}
+.support-ticket-list{
+  display:grid;
+  gap:10px;
+  margin-top:10px;
+}
+.support-ticket{
+  overflow:hidden;
+  border:1px solid rgba(123,165,216,.10);
+  border-radius:14px;
+  background:rgba(2,9,18,.30);
+}
+.support-ticket-head{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  padding:12px 13px 8px;
+}
+.support-ticket-title-wrap{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:7px;
+}
+.support-ticket-id{
+  color:#a9dfff;
+  font-size:10px;
+  font-weight:850;
+}
+.support-ticket-status{
+  padding:3px 7px;
+  border-radius:999px;
+  font-size:8px;
+  font-weight:850;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+.support-ticket-status.open{
+  color:#f7d89b;
+  background:rgba(245,185,78,.10);
+  border:1px solid rgba(245,185,78,.14);
+}
+.support-ticket-status.answered{
+  color:#9af0c0;
+  background:rgba(62,201,129,.10);
+  border:1px solid rgba(62,201,129,.14);
+}
+.support-ticket-date{
+  flex:0 0 auto;
+  color:#5e7693;
+  font-size:9px;
+}
+.support-ticket-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  padding:0 13px 8px;
+  color:#7189a5;
+  font-size:9px;
+}
+.support-ticket-meta span{
+  padding:3px 7px;
+  border-radius:8px;
+  background:rgba(106,148,194,.055);
+}
+.support-ticket-message{
+  margin:0 13px;
+  padding:11px;
+  border-left:2px solid rgba(72,168,255,.28);
+  border-radius:0 10px 10px 0;
+  background:rgba(72,168,255,.035);
+  color:#b9cce0;
+  font-size:10px;
+  line-height:1.6;
+  overflow-wrap:anywhere;
+}
+.support-ticket-conversation{
+  display:grid;
+  gap:8px;
+  padding:10px 13px 13px;
+}
+.support-ticket-reply{
+  padding:10px 11px;
+  border:1px solid rgba(88,223,159,.12);
+  border-radius:11px;
+  background:rgba(55,159,112,.035);
+}
+.support-ticket-reply-head{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  color:#7d9a90;
+  font-size:9px;
+}
+.support-ticket-reply-head strong{
+  color:#b8e9d0;
+  font-size:10px;
+}
+.support-ticket-reply-label{
+  margin-top:7px;
+  color:#6da889;
+  font-size:8px;
+  font-weight:850;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+.support-ticket-reply p{
+  margin:4px 0 0;
+  color:#c4d9cf;
+  font-size:10px;
+  line-height:1.6;
+  overflow-wrap:anywhere;
+}
+.support-ticket-no-reply{
+  color:#617995;
+  font-size:9px;
+  font-style:italic;
+}
+.support-ticket-empty{
+  padding:18px 12px;
+  text-align:center;
+  color:#617995;
+  font-size:10px;
+}
+@media(max-width:430px){
+  .support-history{padding:13px;}
+  .support-history-head{align-items:stretch;}
+  .support-history-refresh{min-height:32px;}
+  .support-ticket-head{display:grid;gap:5px;}
+  .support-ticket-date{font-size:8px;}
+}
+@media(prefers-reduced-motion:reduce){
+  .support-history-refresh{transition:none;}
+}

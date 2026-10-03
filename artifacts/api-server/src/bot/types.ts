@@ -92,6 +92,30 @@ export type MiniAppGroupAccess = {
   expiresAt: string;
 };
 
+export type SupportReply = {
+  id: string;
+  adminUserId: number;
+  adminName: string;
+  role: "owner" | "administrator";
+  message: string;
+  createdAt: string;
+};
+
+export type SupportTicket = {
+  id: string;
+  userId: number;
+  displayName: string;
+  username?: string;
+  groupId: number;
+  groupTitle: string;
+  category: string;
+  message: string;
+  status: "open" | "answered";
+  createdAt: string;
+  updatedAt: string;
+  replies: SupportReply[];
+};
+
 export type BotState = {
   users: Record<string, UserProfile>;
   activeActivities: Record<string, ActiveActivity>;
@@ -105,6 +129,7 @@ export type BotState = {
   connectedGroups?: Record<string, ConnectedGroup>;
   pendingConnects?: Record<string, PendingConnect>;
   managedGroups?: Record<string, ManagedGroup>;
+  supportTickets?: Record<string, SupportTicket>;
 };
 
 export type TelegramUser = {
