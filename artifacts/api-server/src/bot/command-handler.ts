@@ -253,53 +253,39 @@ export class CommandHandler {
           const isConfiguredAdmin =
             this.config.botOwnerId === profile.userId ||
             this.config.adminIds.includes(profile.userId);
+          const rows: import("./types").InlineKeyboardButton[][] = [];
 
           if (this.config.adminMiniAppUrl) {
-            addGroupMarkup = {
-              inline_keyboard: [
-                [
-                  {
-                    text: isConfiguredAdmin
-                      ? locale === "en"
-                        ? "⚙️ Open Admin Panel"
-                        : "⚙️ 打开管理面板"
-                      : locale === "en"
-                        ? "📊 Open My Dashboard"
-                        : "📊 打开我的面板",
-                    style: "primary",
-                    web_app: { url: this.config.adminMiniAppUrl },
-                  },
-                ],
-              ],
-            };
+            rows.push([
+              {
+                text: isConfiguredAdmin
+                  ? locale === "en"
+                    ? "⚙️ Open Admin Panel"
+                    : "⚙️ 打开管理面板"
+                  : locale === "en"
+                    ? "📊 Open My Dashboard"
+                    : "📊 打开我的面板",
+                style: "primary",
+                web_app: { url: this.config.adminMiniAppUrl },
+              },
+            ]);
           }
 
           if (botUsername) {
-            const addBotMarkup = {
-              inline_keyboard: [
-                [
-                  {
-                    text:
-                      locale === "en"
-                        ? "➕ Add Bot to Your Group"
-                        : "➕ 将 Bot 添加到群组",
-                    style: "primary" as const,
-                    url: `https://t.me/${botUsername}?startgroup=attendance`,
-                  },
-                ],
-              ],
-            };
-            if (addGroupMarkup) {
-              await this.telegram.sendMessage(
-                message.chat.id,
-                locale === "en"
-                  ? "Add the bot to a group:"
-                  : "将 Bot 添加到群组：",
-                addBotMarkup,
-              );
-            } else {
-              addGroupMarkup = addBotMarkup;
-            }
+            rows.push([
+              {
+                text:
+                  locale === "en"
+                    ? "➕ Add Bot to Your Group"
+                    : "➕ 将 Bot 添加到群组",
+                style: "primary",
+                url: `https://t.me/${botUsername}?startgroup=attendance`,
+              },
+            ]);
+          }
+
+          if (rows.length) {
+            addGroupMarkup = { inline_keyboard: rows };
           }
         }
         break;
