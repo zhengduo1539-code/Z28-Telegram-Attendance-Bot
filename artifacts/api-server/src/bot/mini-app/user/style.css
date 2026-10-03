@@ -129,6 +129,22 @@ button:focus-visible,input:focus-visible,summary:focus-visible{
   transition:transform .18s ease,border-color .18s ease,background .18s ease;
 }
 .icon-button:hover{transform:translateY(-1px);border-color:var(--line-strong);background:rgba(18,38,65,.92)}
+.icon-button.is-loading{
+  cursor:wait;
+  border-color:rgba(72,168,255,.38);
+  background:rgba(26,55,91,.92);
+  box-shadow:0 12px 30px rgba(48,127,216,.2),0 0 24px rgba(72,168,255,.08);
+}
+.icon-button.is-loading svg{
+  animation:refreshRotate .8s linear infinite;
+}
+.icon-button.is-loading::after{
+  animation:none!important;
+}
+.icon-button[aria-busy="true"]{pointer-events:none}
+@keyframes refreshRotate{
+  to{transform:rotate(360deg)}
+}
 .icon-button svg,.dashboard-actions svg,.tab-button svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .language-button{position:relative}
 .language-menu{
