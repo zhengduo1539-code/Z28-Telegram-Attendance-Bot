@@ -737,6 +737,45 @@
     return text("hello") + ", " + displayName();
   }
 
+  function updateReportContext() {
+    if (!els["user-report-context-value"]) return;
+    var group = state.dashboard && state.dashboard.selectedGroup;
+    els["user-report-context-value"].textContent =
+      group && group.title ? group.title : text("reportContext");
+  }
+
+  function updateReportCharacterCount() {
+    if (!els["user-report-message"] || !els["user-report-count"]) return;
+    var length = els["user-report-message"].value.length;
+    els["user-report-count"].textContent = length + " / 1200";
+    els["user-report-count"].classList.toggle("is-near-limit", length >= 1050);
+  }
+
+  async function submitProblemReport(event) {
+    event.preventDefault();
+    if (!state.dashboard || !state.dashboard.selectedGroup || !els["user-report-submit"] || els["user-report-submit"].disabled) return;
+
+    var message = els["user-report-message"].value.trim();
+    if (message.length < 10) {
+      showNotice(text("reportMinLength"), "error");
+      els["user-report-message"].focus();
+      return;
+    }
+
+    var category = els["user-report-category"].value;
+    setButton(els["user-report-submit"], "loading", text("reportSending") + "…");
+    try {
+      await apiUserReport(category, message, state.selectedGroupId);
+      els["user-report-message"].value = "";
+      updateReportCharacterCount();
+      showNotice(text("reportSent"), "ok");
+    } catch (error) {
+      showNotice(error && error.message ? error.message : text("reportFailed"), "error");
+    } finally {
+      setButton(els["user-report-submit"], "idle", text("reportSend"));
+    }
+  }
+
   function formatSettingValue(type, value) {
     var numeric = Number(value);
     if (type === "count" && !Number.isFinite(numeric)) return text("unlimited");
@@ -1030,6 +1069,27 @@
     );
   }
 
+  async function apiUserReport(category, message, groupId) {
+    if (!initData) throw new Error("Telegram session data is missing.");
+    return fetchJson(
+      "/api/user/report",
+      {
+        method: "POST",
+        headers: {
+          "X-Telegram-Init-Data": initData,
+          "Accept": "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          category: category,
+          message: message,
+          groupId: Number(groupId)
+        })
+      },
+      "Report"
+    );
+  }
+
   async function apiUserSettings(groupId, type, kind, value) {
     if (!initData) throw new Error("Telegram session data is missing.");
     return fetchJson(
@@ -1230,7 +1290,9 @@
     if (!state.dashboard || !els["user-tabbar"] || els["user-tabbar"].hidden) return;
     if (state.groupPickerOpen) return;
 
+    tab = tab === "about" || tab === "support" ? tab : "dashboard";
     state.aboutOpen = tab === "about";
+    state.supportOpen = tab === "support";
     saveDashboardState({ tab: tab });
 
     ++state.requestId;
@@ -1238,11 +1300,21 @@
     if (state.aboutOpen) {
       els["user-selected-dashboard"].hidden = true;
       els["user-about-page"].hidden = false;
+      els["user-support-page"].hidden = true;
       els.title.textContent = text("about");
       els.identity.textContent = userGreeting();
       setDashboardControls(false);
+    } else if (state.supportOpen) {
+      els["user-selected-dashboard"].hidden = true;
+      els["user-about-page"].hidden = true;
+      els["user-support-page"].hidden = false;
+      els.title.textContent = text("helpSupport");
+      els.identity.textContent = userGreeting();
+      updateReportContext();
+      setDashboardControls(false);
     } else {
       els["user-about-page"].hidden = true;
+      els["user-support-page"].hidden = true;
       els["user-selected-dashboard"].hidden = false;
       els.title.textContent = text("title");
       els.identity.textContent = userGreeting();
@@ -1260,7 +1332,7 @@
   }
 
   async function openGroupPicker() {
-    if (!state.dashboard || state.aboutOpen || state.groupPickerOpen || state.settingsSaving || state.refreshInProgress) return;
+    if (!state.dashboard || state.aboutOpen || state.supportOpen || state.groupPickerOpen || state.settingsSaving || state.refreshInProgress) return;
     var hasUnsaved = false;
     document.querySelectorAll(".editor-input[data-original-value]").forEach(function (input) {
       if (input.value !== input.getAttribute("data-original-value")) hasUnsaved = true;
@@ -1278,10 +1350,13 @@
     }
 
     state.groupPickerOpen = true;
+    state.aboutOpen = false;
+    state.supportOpen = false;
     ++state.requestId;
     els["user-group-options"].hidden = false;
     els["user-selected-dashboard"].hidden = true;
     els["user-about-page"].hidden = true;
+    els["user-support-page"].hidden = true;
     els["user-tabbar"].hidden = true;
     els.title.textContent = text("groupOptions");
     els.identity.textContent = userGreeting();
@@ -1312,7 +1387,7 @@
     if (!tg || !tg.BackButton) return;
     var shouldShow =
       Boolean(state.dashboard) &&
-      (state.groupPickerOpen || state.aboutOpen);
+      (state.groupPickerOpen || state.aboutOpen || state.supportOpen);
     if (shouldShow) tg.BackButton.show();
     else tg.BackButton.hide();
   }
@@ -1326,7 +1401,7 @@
       }
       return;
     }
-    if (state.aboutOpen) setDashboardTab("dashboard");
+    if (state.aboutOpen || state.supportOpen) setDashboardTab("dashboard");
   }
 
   function bindStaticEvents() {
@@ -1381,6 +1456,9 @@
           scheduleAutoRefresh();
         });
     };
+
+    els["user-report-message"].oninput = updateReportCharacterCount;
+    els["user-report-form"].onsubmit = submitProblemReport;
 
     els["auto-refresh-toggle"].onclick = function () {
       if (state.aboutOpen || state.groupPickerOpen || !state.dashboard || !state.dashboard.selectedGroup) return;
