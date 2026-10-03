@@ -333,7 +333,7 @@ export class TelegramClient {
   }
 
   setChatMenuButton(
-    chatId: number,
+    chatId?: number,
     menuButton?: {
       type: "default" | "commands" | "web_app";
       text?: string;
@@ -341,7 +341,7 @@ export class TelegramClient {
     },
   ) {
     return this.call("setChatMenuButton", {
-      chat_id: chatId,
+      ...(chatId !== undefined ? { chat_id: chatId } : {}),
       ...(menuButton ? { menu_button: menuButton } : {}),
     });
   }
