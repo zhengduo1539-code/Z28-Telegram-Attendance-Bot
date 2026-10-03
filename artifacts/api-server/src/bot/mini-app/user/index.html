@@ -268,6 +268,119 @@
             </div>
           </fieldset>
 
+          <section class="theme-creator-section" aria-labelledby="theme-creator-title">
+            <div class="theme-creator-head">
+              <div class="theme-creator-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M12 3.8c4.7 0 8.2 3.2 8.2 7.7 0 2.2-1.3 3.5-3.3 3.5h-1.4a1.7 1.7 0 0 0-1.7 1.7c0 .8-.2 1.4-.7 2-.7.9-1.8 1.4-3 1.4-3.8 0-6.9-3.2-6.9-7.2 0-5.1 3.8-9.1 8.8-9.1Z"></path><circle cx="7.8" cy="10.2" r="1"></circle><circle cx="11.6" cy="7.9" r="1"></circle><circle cx="15.6" cy="8.3" r="1"></circle></svg>
+              </div>
+              <div class="theme-creator-copy">
+                <div class="appearance-kicker">CUSTOMIZATION</div>
+                <h3 id="theme-creator-title">Theme Creator</h3>
+                <p id="theme-creator-sub">Create your own look and keep it saved on this device.</p>
+              </div>
+              <span class="theme-creator-badge" id="theme-creator-badge">DEVICE ONLY</span>
+            </div>
+
+            <div class="theme-creator-preview" id="theme-creator-preview" aria-live="polite">
+              <div class="theme-creator-preview-glow"></div>
+              <div class="theme-creator-preview-window">
+                <div class="theme-creator-preview-top">
+                  <span class="theme-creator-preview-dot"></span>
+                  <span class="theme-creator-preview-title" id="theme-creator-preview-title">Z28 Preview</span>
+                  <span class="theme-creator-preview-status" id="theme-creator-preview-status">CUSTOM</span>
+                </div>
+                <div class="theme-creator-preview-card">
+                  <div>
+                    <small id="theme-creator-preview-label">Your Style</small>
+                    <strong id="theme-creator-preview-value">Personal Theme</strong>
+                  </div>
+                  <span class="theme-creator-preview-chip" id="theme-creator-preview-chip">LIVE</span>
+                </div>
+                <div class="theme-creator-preview-bars" aria-hidden="true"><span></span><span></span><span></span></div>
+              </div>
+            </div>
+
+            <div class="theme-creator-presets" aria-label="Theme presets">
+              <div class="theme-creator-subhead">
+                <strong id="theme-creator-presets-title">Quick palettes</strong>
+                <span id="theme-creator-presets-sub">Start with a preset, then fine-tune it.</span>
+              </div>
+              <div class="theme-palette-grid">
+                <button class="theme-palette-option theme-palette-ocean" type="button" data-theme-palette="ocean" aria-label="Ocean palette">
+                  <span></span><strong id="theme-palette-ocean-label">Ocean</strong>
+                </button>
+                <button class="theme-palette-option theme-palette-violet" type="button" data-theme-palette="violet" aria-label="Violet palette">
+                  <span></span><strong id="theme-palette-violet-label">Violet</strong>
+                </button>
+                <button class="theme-palette-option theme-palette-mint" type="button" data-theme-palette="mint" aria-label="Mint palette">
+                  <span></span><strong id="theme-palette-mint-label">Mint</strong>
+                </button>
+                <button class="theme-palette-option theme-palette-sunset" type="button" data-theme-palette="sunset" aria-label="Sunset palette">
+                  <span></span><strong id="theme-palette-sunset-label">Sunset</strong>
+                </button>
+              </div>
+            </div>
+
+            <div class="theme-creator-controls">
+              <div class="theme-creator-control">
+                <div class="theme-creator-control-head">
+                  <label for="theme-creator-primary" id="theme-creator-primary-label">Primary color</label>
+                  <output id="theme-creator-primary-value">#48A8FF</output>
+                </div>
+                <div class="theme-color-field">
+                  <input id="theme-creator-primary" type="color" value="#48a8ff" aria-describedby="theme-creator-primary-label">
+                  <span id="theme-creator-primary-swatch" class="theme-color-swatch" aria-hidden="true"></span>
+                </div>
+              </div>
+
+              <div class="theme-creator-control">
+                <div class="theme-creator-control-head">
+                  <label for="theme-creator-secondary" id="theme-creator-secondary-label">Secondary color</label>
+                  <output id="theme-creator-secondary-value">#7A68FF</output>
+                </div>
+                <div class="theme-color-field">
+                  <input id="theme-creator-secondary" type="color" value="#7a68ff" aria-describedby="theme-creator-secondary-label">
+                  <span id="theme-creator-secondary-swatch" class="theme-color-swatch" aria-hidden="true"></span>
+                </div>
+              </div>
+
+              <div class="theme-creator-range">
+                <div class="theme-creator-control-head">
+                  <label for="theme-creator-glow" id="theme-creator-glow-label">Glow intensity</label>
+                  <output id="theme-creator-glow-value">60%</output>
+                </div>
+                <input id="theme-creator-glow" type="range" min="0" max="100" step="1" value="60" aria-describedby="theme-creator-glow-label">
+              </div>
+
+              <div class="theme-creator-range">
+                <div class="theme-creator-control-head">
+                  <label for="theme-creator-radius" id="theme-creator-radius-label">Corner radius</label>
+                  <output id="theme-creator-radius-value">18px</output>
+                </div>
+                <input id="theme-creator-radius" type="range" min="10" max="28" step="1" value="18" aria-describedby="theme-creator-radius-label">
+              </div>
+
+              <div class="theme-creator-range theme-creator-range-wide">
+                <div class="theme-creator-control-head">
+                  <label for="theme-creator-background" id="theme-creator-background-label">Background intensity</label>
+                  <output id="theme-creator-background-value">70%</output>
+                </div>
+                <input id="theme-creator-background" type="range" min="0" max="100" step="1" value="70" aria-describedby="theme-creator-background-label">
+              </div>
+            </div>
+
+            <div class="theme-creator-footer">
+              <div class="theme-creator-save-state">
+                <span class="theme-creator-save-dot" id="theme-creator-save-dot" aria-hidden="true"></span>
+                <span id="theme-creator-save-state">Custom theme is not active.</span>
+              </div>
+              <button id="theme-creator-reset" class="secondary-button theme-creator-reset" type="button">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12a7 7 0 0 0 12.3 4.6"></path><path d="M19 12a7 7 0 0 0-12.3-4.6"></path><path d="M17.2 18.4h.1"></path><path d="M6.7 5.6h.1"></path></svg>
+                <span id="theme-creator-reset-label">Reset</span>
+              </button>
+            </div>
+          </section>
+
           <div class="appearance-wallpaper-section">
             <div class="appearance-section-mini-head">
               <span class="appearance-mini-icon" aria-hidden="true">
