@@ -154,6 +154,7 @@
       connectSuccess: "Group connection saved successfully.",
       connectFailed: "Unable to connect these groups. Please try again.",
       connectReady: "Ready to connect",
+      connectSelectBoth: "Select a Source Group and a Target Group first.",
       appearance: "Appearance",
       appearanceSub: "Personalize the Mini App interface.",
       appearanceKicker: "INTERFACE SETTINGS",
@@ -330,6 +331,7 @@
       connectSuccess: "Group ချိတ်ဆက်မှုကို အောင်မြင်စွာ သိမ်းပြီးပါပြီ။",
       connectFailed: "Group ချိတ်ဆက်၍ မရပါ။ ထပ်စမ်းကြည့်ပါ။",
       connectReady: "ချိတ်ဆက်ရန် အဆင်သင့်ဖြစ်ပါပြီ",
+      connectSelectBoth: "အရင်ဆုံး Source Group နဲ့ Target Group နှစ်ခုလုံးကို ရွေးပါ။",
       appearance: "Appearance",
       appearanceSub: "Mini App ရဲ့ အပြင်အဆင်ကို စိတ်ကြိုက်ပြင်ဆင်ပါ။",
       appearanceKicker: "INTERFACE SETTINGS",
@@ -502,6 +504,7 @@
       connectNone: "此来源群组尚未配置连接。",
       connectSourceAdmin: "您必须是来源群组的创建者或管理员。",
       connectSame: "请选择两个不同的群组。",
+      connectSelectBoth: "请先选择来源群组和目标群组。",
       connectLoadFailed: "无法加载已安装 Bot 的群组，请重试。",
       connectSuccess: "群组连接已成功保存。",
       connectFailed: "无法连接所选群组，请重试。",
@@ -1895,10 +1898,19 @@
     );
 
     var hasEditableConnection = Boolean(connection || state.connectEditSnapshot);
+    var canInteract = Boolean(
+      state.connectEditMode &&
+      !state.connectLoading &&
+      !state.connectSaving
+    );
 
-    els["user-connect-submit"].disabled = !canSubmit;
-    els["user-connect-submit"].setAttribute("aria-disabled", String(!canSubmit));
+    els["user-connect-submit"].disabled = !canInteract;
+    els["user-connect-submit"].setAttribute("aria-disabled", String(!canInteract));
     els["user-connect-submit"].classList.toggle("is-ready", canSubmit);
+    els["user-connect-submit"].classList.toggle(
+      "needs-selection",
+      canInteract && !canSubmit
+    );
     els["user-connect-source"].setAttribute("aria-invalid", String(sameGroup));
     els["user-connect-target"].setAttribute("aria-invalid", String(sameGroup));
 
@@ -2070,10 +2082,26 @@
   async function submitGroupConnection() {
     if (state.connectSaving || state.connectLoading) return;
 
-    var sourceId = Number(els["user-connect-source"].value);
-    var targetId = Number(els["user-connect-target"].value);
+    var sourceValue = String(els["user-connect-source"].value || "");
+    var targetValue = String(els["user-connect-target"].value || "");
 
-    if (!Number.isSafeInteger(sourceId) || sourceId >= 0 || !Number.isSafeInteger(targetId) || targetId >= 0) return;
+    if (!sourceValue || !targetValue) {
+      showNotice(text("connectSelectBoth"), "error");
+      if (!sourceValue) {
+        els["user-connect-source"].focus({ preventScroll: true });
+      } else {
+        els["user-connect-target"].focus({ preventScroll: true });
+      }
+      return;
+    }
+
+    var sourceId = Number(sourceValue);
+    var targetId = Number(targetValue);
+
+    if (!Number.isSafeInteger(sourceId) || sourceId >= 0 || !Number.isSafeInteger(targetId) || targetId >= 0) {
+      showNotice(text("connectFailed"), "error");
+      return;
+    }
 
     if (sourceId === targetId) {
       showNotice(text("connectSame"), "error");
