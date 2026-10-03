@@ -1004,6 +1004,8 @@
     els["appearance-compact-toggle"].classList.toggle("is-enabled", state.compactMode);
     els["user-appearance-compact-state"].textContent =
       state.compactMode ? text("appearanceOn") : text("appearanceOff");
+
+    updateThemeCreatorControls();
   }
 
   function setAppearanceTheme(theme) {
