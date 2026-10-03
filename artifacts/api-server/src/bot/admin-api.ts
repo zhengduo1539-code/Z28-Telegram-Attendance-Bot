@@ -4,18 +4,10 @@ import { isConfiguredAdmin, getTelegramInitData, validateTelegramInitData, creat
 import { getAdminApiContext } from "./admin-runtime";
 import { adminMiniAppHtml } from "./admin-mini-app";
 import { userMiniAppHtml } from "./user-mini-app";
-import type { ActivityKind, AuditLogEntry, SupportReply } from "./types";
+import type { ActivityKind, AuditLogEntry } from "./types";
 
 const activityKinds: ActivityKind[] = ["eat", "wc", "smoke", "wcd"];
 const defaultCountLimits = { eat: null, wc: 7, smoke: 7, wcd: 2 } as const;
-const supportTicketIdPattern = /^SUP-[a-z0-9-]{6,40}$/i;
-const supportCategoryLabels: Record<string, string> = {
-  bug: "Bug / Unexpected behavior",
-  access: "Access / Verification",
-  group: "Group / Permissions",
-  settings: "Settings",
-  other: "Other",
-};
 
 const isPositiveInteger = (value: unknown): value is number =>
   typeof value === "number" && Number.isSafeInteger(value) && value > 0;
@@ -23,9 +15,6 @@ const isPositiveInteger = (value: unknown): value is number =>
 const sendUnauthorized = (res: Response, status: number, error: string) => {
   res.status(status).json({ error });
 };
-
-const escapeHtmlAdmin = (value: string) =>
-  value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 const requireAdmin = (req: Request, res: Response) => {
   const context = getAdminApiContext();
@@ -262,135 +251,6 @@ adminApiRouter.post("/maintenance/history-retention", async (req, res) => {
 
   res.setHeader("Cache-Control", "no-store");
   res.json({ retentionDays: days, cutoff: cutoff.toISOString(), removed });
-});
-
-adminApiRouter.get("/support/tickets", async (req, res) => {
-  const auth = requireAdmin(req, res);
-  if (!auth) return;
-
-  const search = typeof req.query.search === "string"
-    ? req.query.search.trim().toLowerCase().slice(0, 100)
-    : "";
-  const status =
-    req.query.status === "open" || req.query.status === "answered"
-      ? req.query.status
-      : "all";
-  const requestedPage = Number(req.query.page);
-  const requestedPageSize = Number(req.query.pageSize);
-  const page = Number.isSafeInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
-  const pageSize =
-    Number.isSafeInteger(requestedPageSize) && requestedPageSize > 0
-      ? Math.min(requestedPageSize, 20)
-      : 10;
-
-  const tickets = (await auth.context.attendance.listSupportTickets())
-    .filter((ticket) => status === "all" || ticket.status === status)
-    .filter((ticket) => {
-      if (!search) return true;
-      return [
-        ticket.id,
-        String(ticket.userId),
-        ticket.displayName,
-        ticket.username || "",
-        ticket.groupTitle,
-        ticket.category,
-        ticket.message,
-      ].some((value) => value.toLowerCase().includes(search));
-    });
-
-  const total = tickets.length;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
-  const safePage = Math.min(page, totalPages);
-  const offset = (safePage - 1) * pageSize;
-
-  res.setHeader("Cache-Control", "no-store");
-  res.json({
-    tickets: tickets.slice(offset, offset + pageSize).map((ticket) => ({
-      ...ticket,
-      categoryLabel: supportCategoryLabels[ticket.category] || ticket.category,
-    })),
-    pagination: { page: safePage, pageSize, total, totalPages },
-  });
-});
-
-adminApiRouter.post("/support/tickets/:ticketId/reply", async (req, res) => {
-  const auth = requireAdmin(req, res);
-  if (!auth) return;
-
-  const ticketId = typeof req.params.ticketId === "string" ? req.params.ticketId.trim() : "";
-  if (!supportTicketIdPattern.test(ticketId)) {
-    res.status(400).json({ error: "Invalid support ticket ID." });
-    return;
-  }
-
-  const message = typeof req.body?.message === "string" ? req.body.message.trim() : "";
-  if (!message || message.length > 1200) {
-    res.status(400).json({ error: "Reply must be between 1 and 1200 characters." });
-    return;
-  }
-
-  const ticket = (await auth.context.attendance.listSupportTickets())
-    .find((candidate) => candidate.id === ticketId);
-  if (!ticket) {
-    res.status(404).json({ error: "Support ticket not found." });
-    return;
-  }
-
-  const adminName =
-    [auth.user.first_name, auth.user.last_name].filter(Boolean).join(" ").trim() ||
-    auth.user.username ||
-    String(auth.user.id);
-  const role =
-    auth.user.id === auth.context.config.botOwnerId ? "owner" : "administrator";
-  const reply: SupportReply = {
-    id: Date.now().toString(36) + "-" + auth.user.id + "-" + Math.random().toString(36).slice(2, 8),
-    adminUserId: auth.user.id,
-    adminName,
-    role,
-    message,
-    createdAt: new Date().toISOString(),
-  };
-
-  const updated = await auth.context.attendance.addSupportReply(ticketId, reply);
-
-  let telegramDelivered = true;
-  const safeMessage = escapeHtmlAdmin(message).replace(/\r?\n/g, "<br>");
-  try {
-    await auth.context.telegram.sendMessage(
-      ticket.userId,
-      [
-        "💬 <b>Support Reply</b>",
-        "Ticket: <code>" + escapeHtmlAdmin(ticketId) + "</code>",
-        "From: <b>" + escapeHtmlAdmin(adminName) + "</b>",
-        "",
-        safeMessage,
-      ].join("\n"),
-    );
-  } catch {
-    telegramDelivered = false;
-  }
-
-  await recordAdminAudit(
-    auth,
-    telegramDelivered ? "support_reply.sent" : "support_reply.saved",
-    ticketId,
-    "Support reply added by " + adminName +
-      (telegramDelivered ? " and Telegram notification delivered." : "; Telegram notification could not be delivered."),
-  );
-
-  res.setHeader("Cache-Control", "no-store");
-  res.json({
-    ok: true,
-    ticketId,
-    status: updated.status,
-    telegramDelivered,
-    reply: {
-      adminName: reply.adminName,
-      role: reply.role,
-      message: reply.message,
-      createdAt: reply.createdAt,
-    },
-  });
 });
 
 adminApiRouter.post("/broadcast", async (req, res) => {

@@ -934,188 +934,6 @@
         }
       }
 
-      
-      function renderAdminSupportDetail(ticket) {
-        var detail = document.getElementById("admin-support-detail");
-        if (!detail) return;
-        if (!ticket) {
-          detail.hidden = true;
-          return;
-        }
-
-        detail.hidden = false;
-        document.getElementById("admin-support-detail-title").textContent =
-          (ticket.displayName || "User") + " · " + (ticket.id || "Ticket");
-        document.getElementById("admin-support-detail-sub").textContent =
-          "User ID " + String(ticket.userId || "—") + " · " +
-          (ticket.groupTitle || "—") + " · " +
-          (ticket.categoryLabel || ticket.category || "Other") + " · " +
-          formatAdminDate(ticket.createdAt);
-
-        var status = document.getElementById("admin-support-detail-status");
-        var answered = ticket.status === "answered";
-        status.textContent = answered ? "Answered" : "Open";
-        status.className = "admin-support-detail-status " + (answered ? "answered" : "open");
-
-        document.getElementById("admin-support-original").innerHTML =
-          '<div class="admin-support-original-label">Original report</div>' +
-          '<div class="admin-support-original-message">' +
-          escapeHtml(ticket.message || "").replace(/\r?\n/g, "<br>") +
-          '</div>';
-
-        var replies = Array.isArray(ticket.replies) ? ticket.replies : [];
-        document.getElementById("admin-support-thread").innerHTML = replies.length
-          ? replies.map(function(reply) {
-              return '<div class="admin-support-thread-item">' +
-                '<div class="admin-support-thread-head"><strong>' +
-                escapeHtml(reply.adminName || "Administrator") +
-                '</strong><span>' + escapeHtml(formatAdminDate(reply.createdAt)) + '</span></div>' +
-                '<div class="admin-support-thread-role">' +
-                escapeHtml(reply.role === "owner" ? "Owner" : "Administrator") +
-                '</div><div class="admin-support-thread-message">' +
-                escapeHtml(reply.message || "").replace(/\r?\n/g, "<br>") +
-                '</div></div>';
-            }).join("")
-          : '<div class="admin-support-thread-empty">No replies yet. Send the first reply below.</div>';
-      }
-
-      function renderAdminSupport(data) {
-        var tickets = data.tickets || [];
-        var pagination = data.pagination || {};
-        var list = document.getElementById("admin-support-list");
-        var meta = document.getElementById("admin-support-meta");
-        var pageMeta = document.getElementById("admin-support-page-meta");
-        var prev = document.getElementById("admin-support-prev");
-        var next = document.getElementById("admin-support-next");
-        if (!list || !meta || !pageMeta || !prev || !next) return;
-
-        adminSupportState.page = pagination.page || 1;
-        adminSupportState.totalPages = pagination.totalPages || 1;
-
-        if (!tickets.length) {
-          adminSupportState.selectedTicketId = "";
-          list.innerHTML = '<div class="admin-users-empty">No support tickets match the current filter.</div>';
-          renderAdminSupportDetail(null);
-        } else {
-          list.innerHTML = tickets.map(function(ticket) {
-            var active = ticket.id === adminSupportState.selectedTicketId;
-            var answered = ticket.status === "answered";
-            return '<button type="button" class="admin-support-ticket ' +
-              (active ? "selected " : "") + (answered ? "answered" : "open") +
-              '" data-support-ticket="' + escapeHtml(ticket.id) + '">' +
-              '<div class="admin-support-ticket-top"><span class="admin-support-ticket-id">' +
-              escapeHtml(ticket.id) + '</span><span class="admin-support-ticket-status ' +
-              (answered ? "answered" : "open") + '">' +
-              (answered ? "Answered" : "Open") + '</span></div>' +
-              '<div class="admin-support-ticket-user">' + escapeHtml(ticket.displayName || "User") + '</div>' +
-              '<div class="admin-support-ticket-sub">' + escapeHtml(ticket.groupTitle || "—") +
-              ' · ' + escapeHtml(ticket.categoryLabel || ticket.category || "Other") + '</div>' +
-              '<div class="admin-support-ticket-preview">' +
-              escapeHtml(ticket.message || "").replace(/\r?\n/g, " ") + '</div>' +
-              '<div class="admin-support-ticket-time">' +
-              escapeHtml(formatAdminDate(ticket.updatedAt || ticket.createdAt)) + '</div>' +
-              '</button>';
-          }).join("");
-
-          var selected = tickets.find(function(ticket) {
-            return ticket.id === adminSupportState.selectedTicketId;
-          }) || tickets[0];
-          adminSupportState.selectedTicketId = selected.id;
-          renderAdminSupportDetail(selected);
-
-          list.querySelectorAll("[data-support-ticket]").forEach(function(button) {
-            button.classList.toggle(
-              "selected",
-              button.getAttribute("data-support-ticket") === adminSupportState.selectedTicketId
-            );
-            button.addEventListener("click", function() {
-              adminSupportState.selectedTicketId =
-                button.getAttribute("data-support-ticket") || "";
-              var ticket = tickets.find(function(item) {
-                return item.id === adminSupportState.selectedTicketId;
-              });
-              renderAdminSupportDetail(ticket);
-              list.querySelectorAll("[data-support-ticket]").forEach(function(item) {
-                item.classList.toggle(
-                  "selected",
-                  item.getAttribute("data-support-ticket") === adminSupportState.selectedTicketId
-                );
-              });
-            });
-          });
-        }
-
-        var total = Number(pagination.total || 0);
-        meta.textContent = String(total) + (total === 1 ? " ticket" : " tickets");
-        pageMeta.textContent =
-          "Page " + String(adminSupportState.page) + " of " +
-          String(adminSupportState.totalPages);
-        prev.disabled = adminSupportState.page <= 1;
-        next.disabled = adminSupportState.page >= adminSupportState.totalPages;
-      }
-
-      async function loadAdminSupport(resetPage) {
-        if (resetPage) {
-          adminSupportState.page = 1;
-          adminSupportState.selectedTicketId = "";
-        }
-
-        var query = new URLSearchParams();
-        query.set("page", String(adminSupportState.page));
-        query.set("pageSize", String(adminSupportState.pageSize));
-        if (adminSupportState.search) query.set("search", adminSupportState.search);
-        if (adminSupportState.status !== "all") {
-          query.set("status", adminSupportState.status);
-        }
-
-        var data = await api("/support/tickets?" + query.toString());
-        renderAdminSupport(data);
-        return data;
-      }
-
-      async function sendAdminSupportReply() {
-        var ticketId = adminSupportState.selectedTicketId;
-        var messageBox = document.getElementById("admin-support-reply-message");
-        var button = document.getElementById("admin-support-reply-send");
-        var resultBox = document.getElementById("admin-support-reply-result");
-        if (!ticketId || !messageBox || !button || !resultBox) return;
-
-        var message = messageBox.value.trim();
-        if (!message) throw new Error("Please enter a reply.");
-
-        button.disabled = true;
-        button.textContent = "Sending Reply…";
-        resultBox.style.display = "none";
-
-        try {
-          var data = await api(
-            "/support/tickets/" + encodeURIComponent(ticketId) + "/reply",
-            {
-              method: "POST",
-              body: JSON.stringify({ message: message })
-            }
-          );
-
-          messageBox.value = "";
-          document.getElementById("admin-support-reply-count").textContent = "0 / 1200";
-          resultBox.textContent = data.telegramDelivered
-            ? "Reply saved and Telegram notification delivered."
-            : "Reply saved. Telegram notification could not be delivered; the user can still see it in Support.";
-          resultBox.style.display = "block";
-
-          await loadAdminSupport(false);
-          showNotice(
-            data.telegramDelivered
-              ? "Support reply sent."
-              : "Support reply saved; Telegram notification was not delivered.",
-            data.telegramDelivered ? "ok" : "error"
-          );
-        } finally {
-          button.disabled = false;
-          button.textContent = "Send Reply";
-        }
-      }
-
       async function loadAdminHealth() {
         var results = await Promise.all([
           api("/health"),
@@ -1128,7 +946,6 @@
       }
 
       var adminAnalyticsDays = 30;
-      var adminSupportState = { search:"", status:"all", page:1, pageSize:10, totalPages:1, selectedTicketId:"" };
 
       async function exportAdminCsv() {
         var button = document.getElementById("admin-export-csv");
@@ -2271,7 +2088,7 @@
         management: ["admin-users-management", "admin-groups-management"],
         analytics: ["admin-analytics"],
         configuration: ["admin-duration", "admin-counts", "admin-automation"],
-        operations: ["admin-broadcast", "admin-support-inbox", "admin-backup", "admin-maintenance"],
+        operations: ["admin-broadcast", "admin-backup", "admin-maintenance"],
         security: ["admin-audit"]
       };
 
@@ -2295,7 +2112,6 @@
         }
         if (folder === "analytics") return loadAdminAnalytics();
         if (folder === "security") return loadAdminAudit(true);
-        if (folder === "operations") return Promise.all([load(), loadAdminSupport(true)]);
         return load();
       }
 
@@ -2321,7 +2137,7 @@
           management: "Manage users and groups from one protected workspace.",
           analytics: "Review activity trends and export attendance reports.",
           configuration: "Configure global activity limits and automation.",
-          operations: "Run announcements, manage support replies, backups, and maintenance tasks.",
+          operations: "Run announcements, backups, and maintenance tasks.",
           security: "Review protected administrative history and controls."
         };
         if (heading) heading.textContent = adminFolderLabels[folder];
@@ -2399,45 +2215,6 @@
       document.getElementById("admin-broadcast-send").addEventListener("click", function() {
         sendAdminBroadcast().catch(function(error) {
           showNotice(error && error.message ? error.message : "Broadcast failed.", "error");
-        });
-      });
-
-      var adminSupportSearchTimer = null;
-      document.getElementById("admin-support-search").addEventListener("input", function(){
-        adminSupportState.search = this.value.trim();
-        window.clearTimeout(adminSupportSearchTimer);
-        adminSupportSearchTimer = window.setTimeout(function(){
-          loadAdminSupport(true).catch(function(error){
-            showNotice(error && error.message ? error.message : "Unable to load support tickets.", "error");
-          });
-        },250);
-      });
-      document.getElementById("admin-support-status").addEventListener("change", function(){
-        adminSupportState.status = this.value;
-        loadAdminSupport(true).catch(function(error){
-          showNotice(error && error.message ? error.message : "Unable to load support tickets.", "error");
-        });
-      });
-      document.getElementById("admin-support-prev").addEventListener("click", function(){
-        if(adminSupportState.page<=1)return;
-        adminSupportState.page-=1;
-        loadAdminSupport(false).catch(function(error){
-          showNotice(error && error.message ? error.message : "Unable to load support tickets.", "error");
-        });
-      });
-      document.getElementById("admin-support-next").addEventListener("click", function(){
-        if(adminSupportState.page>=adminSupportState.totalPages)return;
-        adminSupportState.page+=1;
-        loadAdminSupport(false).catch(function(error){
-          showNotice(error && error.message ? error.message : "Unable to load support tickets.", "error");
-        });
-      });
-      document.getElementById("admin-support-reply-message").addEventListener("input", function(){
-        document.getElementById("admin-support-reply-count").textContent = this.value.length + " / 1200";
-      });
-      document.getElementById("admin-support-reply-send").addEventListener("click", function(){
-        sendAdminSupportReply().catch(function(error){
-          showNotice(error && error.message ? error.message : "Unable to send support reply.", "error");
         });
       });
 

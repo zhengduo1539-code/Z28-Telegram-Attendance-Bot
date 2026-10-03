@@ -19,8 +19,6 @@
     groupPickerOpen: false,
     aboutOpen: false,
     supportOpen: false,
-    supportTickets: [],
-    supportLoading: false,
     autoRefreshEnabled: false,
     autoRefreshTimer: null,
     refreshInProgress: false
@@ -139,19 +137,7 @@
       reportSending: "Sending",
       reportSent: "Report sent successfully. Thank you.",
       reportMinLength: "Please enter at least 10 characters.",
-      reportFailed: "Unable to send the report. Please try again.",
-      supportRequests: "My Support Requests",
-      supportRequestsSub: "Track your reports and replies from administrators.",
-      supportRefresh: "Refresh",
-      supportLoading: "Loading support requests…",
-      supportEmpty: "No support requests yet.",
-      supportTicket: "Ticket",
-      supportOpenStatus: "Open",
-      supportAnswered: "Admin replied",
-      supportRequestSingular: "request",
-      supportRequestPlural: "requests",
-      supportAdminReply: "Administrator reply",
-      supportNoReplies: "No replies yet."
+      reportFailed: "Unable to send the report. Please try again."
     },
     my: {
       title: "User Dashboard",
@@ -253,19 +239,7 @@
       reportSending: "ပို့နေသည်",
       reportSent: "Report ကို အောင်မြင်စွာ ပို့ပြီးပါပြီ။ ကျေးဇူးတင်ပါသည်။",
       reportMinLength: "အနည်းဆုံး စာလုံး ၁၀ လုံး ရေးပေးပါ။",
-      reportFailed: "Report ပို့၍ မရပါ။ ထပ်မံကြိုးစားပါ။",
-      supportRequests: "တင်ပြထားသော Support များ",
-      supportRequestsSub: "တင်ပြထားသော Report များနှင့် Administrator reply များကို ကြည့်ရှုပါ။",
-      supportRefresh: "Refresh",
-      supportLoading: "Support requests များကို ဖွင့်နေသည်…",
-      supportEmpty: "Support request မရှိသေးပါ။",
-      supportTicket: "Ticket",
-      supportOpenStatus: "ဖွင့်ထားသည်",
-      supportAnswered: "Admin reply ရရှိပြီး",
-      supportRequestSingular: "တင်ပြချက်",
-      supportRequestPlural: "တင်ပြချက်များ",
-      supportAdminReply: "Administrator reply",
-      supportNoReplies: "Reply မရှိသေးပါ။"
+      reportFailed: "Report ပို့၍ မရပါ။ ထပ်မံကြိုးစားပါ။"
     },
     zh: {
       title: "用户仪表板",
@@ -367,19 +341,7 @@
       reportSending: "发送中",
       reportSent: "报告已成功发送，谢谢。",
       reportMinLength: "请至少输入 10 个字符。",
-      reportFailed: "报告发送失败，请重试。",
-      supportRequests: "我的支持请求",
-      supportRequestsSub: "查看您提交的问题以及管理员回复。",
-      supportRefresh: "刷新",
-      supportLoading: "正在加载支持请求…",
-      supportEmpty: "暂无支持请求。",
-      supportTicket: "工单",
-      supportOpenStatus: "处理中",
-      supportAnswered: "管理员已回复",
-      supportRequestSingular: "请求",
-      supportRequestPlural: "请求",
-      supportAdminReply: "管理员回复",
-      supportNoReplies: "暂无回复。"
+      reportFailed: "报告发送失败，请重试。"
     }
   };
 
@@ -409,8 +371,7 @@
       "user-report-category-settings","user-report-category-other","user-report-message-label","user-report-message",
       "user-report-hint","user-report-count","user-report-context-label","user-report-context-value",
       "user-report-submit","user-tabbar","user-dashboard-tab-label","user-about-tab-label",
-      "user-support-tab-label","user-report-form","user-support-history-title","user-support-history-sub",
-      "user-support-history-refresh","user-support-history-meta","user-support-ticket-list","user-support-ticket-empty"
+      "user-support-tab-label","user-report-form"
     ].forEach(function (id) { els[id] = document.getElementById(id); });
   }
 
@@ -650,12 +611,6 @@
     els["user-about-creator-label"].textContent = text("creator");
     els["user-support-title"].textContent = text("helpSupport");
     els["user-support-sub"].textContent = text("helpSupportSub");
-    els["user-support-history-title"].textContent = text("supportRequests");
-    els["user-support-history-sub"].textContent = text("supportRequestsSub");
-    if (!state.supportLoading) {
-      els["user-support-history-refresh"].textContent = text("supportRefresh");
-    }
-    els["user-support-history-refresh"].setAttribute("aria-label", text("supportRefresh"));
     els["user-report-title"].textContent = text("reportProblem");
     els["user-report-lead"].textContent = text("reportProblemLead");
     els["user-report-category-label"].textContent = text("reportCategory");
@@ -796,104 +751,6 @@
     els["user-report-count"].classList.toggle("is-near-limit", length >= 1050);
   }
 
-
-  function formatSupportDate(value) {
-    var date = new Date(value);
-    if (!Number.isFinite(date.getTime())) return "—";
-    return new Intl.DateTimeFormat("en-GB", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false
-    }).format(date);
-  }
-
-  function supportCountLabel(count) {
-    return String(count) + " " +
-      (count === 1 ? text("supportRequestSingular") : text("supportRequestPlural"));
-  }
-
-  function renderSupportTickets(tickets) {
-    state.supportTickets = Array.isArray(tickets) ? tickets : [];
-    if (!els["user-support-ticket-list"]) return;
-
-    if (!state.supportTickets.length) {
-      els["user-support-ticket-list"].innerHTML =
-        '<div class="support-ticket-empty">' + escapeHtml(text("supportEmpty")) + "</div>";
-    } else {
-      els["user-support-ticket-list"].innerHTML = state.supportTickets.map(function(ticket) {
-        var answered = ticket.status === "answered";
-        var statusLabel = answered ? text("supportAnswered") : text("supportOpenStatus");
-        var replies = Array.isArray(ticket.replies) ? ticket.replies : [];
-        var replyHtml = replies.length
-          ? replies.map(function(reply) {
-              return '<div class="support-ticket-reply">' +
-                '<div class="support-ticket-reply-head">' +
-                '<strong>' + escapeHtml(reply.adminName || "Administrator") + '</strong>' +
-                '<span>' + escapeHtml(formatSupportDate(reply.createdAt)) + '</span>' +
-                '</div>' +
-                '<div class="support-ticket-reply-label">' + escapeHtml(text("supportAdminReply")) + '</div>' +
-                '<p>' + escapeHtml(reply.message || "").replace(/\r?\n/g, "<br>") + '</p>' +
-                '</div>';
-            }).join("")
-          : '<div class="support-ticket-no-reply">' + escapeHtml(text("supportNoReplies")) + "</div>";
-
-        return '<article class="support-ticket">' +
-          '<div class="support-ticket-head">' +
-            '<div class="support-ticket-title-wrap">' +
-              '<span class="support-ticket-id">' + escapeHtml(text("supportTicket")) + " " + escapeHtml(ticket.id || "—") + '</span>' +
-              '<span class="support-ticket-status ' + (answered ? "answered" : "open") + '">' + escapeHtml(statusLabel) + '</span>' +
-            '</div>' +
-            '<span class="support-ticket-date">' + escapeHtml(formatSupportDate(ticket.updatedAt || ticket.createdAt)) + '</span>' +
-          '</div>' +
-          '<div class="support-ticket-meta">' +
-            '<span>' + escapeHtml(ticket.categoryLabel || ticket.category || "Other") + '</span>' +
-            '<span>' + escapeHtml(ticket.groupTitle || "—") + '</span>' +
-          '</div>' +
-          '<div class="support-ticket-message">' + escapeHtml(ticket.message || "").replace(/\r?\n/g, "<br>") + '</div>' +
-          '<div class="support-ticket-conversation">' + replyHtml + '</div>' +
-        '</article>';
-      }).join("");
-    }
-
-    if (els["user-support-history-meta"]) {
-      els["user-support-history-meta"].textContent = supportCountLabel(state.supportTickets.length);
-    }
-  }
-
-  async function loadSupportTickets() {
-    if (state.supportLoading) return;
-    state.supportLoading = true;
-    if (els["user-support-history-meta"]) {
-      els["user-support-history-meta"].textContent = text("supportLoading");
-    }
-    if (els["user-support-history-refresh"]) {
-      els["user-support-history-refresh"].disabled = true;
-      els["user-support-history-refresh"].textContent = "…";
-    }
-
-    try {
-      var data = await apiUserSupportTickets();
-      renderSupportTickets(data && Array.isArray(data.tickets) ? data.tickets : []);
-    } catch (error) {
-      showNotice(
-        error && error.message ? error.message : "Unable to load support requests.",
-        "error"
-      );
-    } finally {
-      state.supportLoading = false;
-      if (els["user-support-history-refresh"]) {
-        els["user-support-history-refresh"].disabled = false;
-        els["user-support-history-refresh"].textContent = text("supportRefresh");
-      }
-      if (els["user-support-history-meta"] && !state.supportLoading) {
-        els["user-support-history-meta"].textContent = supportCountLabel(state.supportTickets.length);
-      }
-    }
-  }
-
   async function submitProblemReport(event) {
     event.preventDefault();
     if (!state.dashboard || !state.dashboard.selectedGroup || !els["user-report-submit"] || els["user-report-submit"].disabled) return;
@@ -912,7 +769,6 @@
       els["user-report-message"].value = "";
       updateReportCharacterCount();
       showNotice(text("reportSent"), "ok");
-      await loadSupportTickets();
     } catch (error) {
       showNotice(error && error.message ? error.message : text("reportFailed"), "error");
     } finally {
@@ -1213,21 +1069,6 @@
     );
   }
 
-  async function apiUserSupportTickets() {
-    if (!initData) throw new Error("Telegram session data is missing.");
-    return fetchJson(
-      "/api/user/support/tickets",
-      {
-        method: "GET",
-        headers: {
-          "X-Telegram-Init-Data": initData,
-          "Accept": "application/json"
-        }
-      },
-      "Support requests"
-    );
-  }
-
   async function apiUserReport(category, message, groupId) {
     if (!initData) throw new Error("Telegram session data is missing.");
     return fetchJson(
@@ -1471,7 +1312,6 @@
       els.identity.textContent = userGreeting();
       updateReportContext();
       setDashboardControls(false);
-      loadSupportTickets();
     } else {
       els["user-about-page"].hidden = true;
       els["user-support-page"].hidden = true;
@@ -1619,7 +1459,6 @@
 
     els["user-report-message"].oninput = updateReportCharacterCount;
     els["user-report-form"].onsubmit = submitProblemReport;
-    els["user-support-history-refresh"].onclick = loadSupportTickets;
 
     els["auto-refresh-toggle"].onclick = function () {
       if (state.aboutOpen || state.groupPickerOpen || !state.dashboard || !state.dashboard.selectedGroup) return;
