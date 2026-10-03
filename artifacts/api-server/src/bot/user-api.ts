@@ -236,6 +236,30 @@ const buildGroup = async (
 
 export const userApiRouter: IRouter = Router();
 
+type ConnectGroupOption = {
+  id: number;
+  title: string;
+  username?: string;
+};
+
+type ConnectConnection = {
+  sourceChatId: number;
+  targetChatId: number;
+  targetGroupName: string;
+  targetUsername?: string;
+  connectedAt: string;
+};
+
+const getInstalledConnectGroups = (snapshot: BotState): ConnectGroupOption[] =>
+  Object.values(snapshot.managedGroups || {})
+    .filter((group) => Number.isSafeInteger(group.chatId) && group.chatId < 0)
+    .map((group) => ({
+      id: group.chatId,
+      title: group.title || String(group.chatId),
+      ...(group.username ? { username: group.username } : {}),
+    }))
+    .sort((left, right) => left.title.localeCompare(right.title));
+
 userApiRouter.get("/mode", (req, res) => {
   const auth = requireTelegramUser(req, res);
   if (!auth) return;
@@ -249,6 +273,130 @@ userApiRouter.get("/mode", (req, res) => {
       auth.context.config.adminIds,
     ),
   });
+});
+
+userApiRouter.get("/connect/groups", async (req, res) => {
+  const auth = requireTelegramUser(req, res);
+  if (!auth) return;
+
+  try {
+    const snapshot = await auth.context.attendance.snapshot();
+    const groups = getInstalledConnectGroups(snapshot);
+    const connections: Record<string, ConnectConnection> = {};
+
+    for (const group of groups) {
+      const connection = snapshot.connectedGroups?.[String(group.id)];
+      if (!connection) continue;
+      connections[String(group.id)] = {
+        sourceChatId: connection.sourceChatId,
+        targetChatId: connection.targetChatId,
+        targetGroupName: connection.targetGroupName,
+        ...(connection.targetUsername ? { targetUsername: connection.targetUsername } : {}),
+        connectedAt: connection.connectedAt,
+      };
+    }
+
+    res.setHeader("Cache-Control", "no-store");
+    res.json({ groups, connections });
+  } catch (error) {
+    console.error("[user-connect] failed to load group options", {
+      message: error instanceof Error ? error.message : String(error),
+    });
+    sendError(res, 500, "Unable to load group connection options.");
+  }
+});
+
+userApiRouter.post("/connect", async (req, res) => {
+  const auth = requireTelegramUser(req, res);
+  if (!auth) return;
+
+  const sourceGroupId = req.body?.sourceGroupId;
+  const targetGroupId = req.body?.targetGroupId;
+  if (
+    !Number.isSafeInteger(sourceGroupId) ||
+    sourceGroupId >= 0 ||
+    !Number.isSafeInteger(targetGroupId) ||
+    targetGroupId >= 0
+  ) {
+    sendError(res, 400, "Select two valid groups.");
+    return;
+  }
+
+  if (sourceGroupId === targetGroupId) {
+    sendError(res, 400, "Source and target groups must be different.");
+    return;
+  }
+
+  const snapshot = await auth.context.attendance.snapshot();
+  const installedGroups = getInstalledConnectGroups(snapshot);
+  const installedIds = new Set(installedGroups.map((group) => group.id));
+  if (!installedIds.has(sourceGroupId) || !installedIds.has(targetGroupId)) {
+    sendError(res, 403, "Both groups must currently have the bot installed.");
+    return;
+  }
+
+  const sourceGroup = snapshot.managedGroups?.[String(sourceGroupId)];
+  const targetGroup = snapshot.managedGroups?.[String(targetGroupId)];
+  if (!sourceGroup || !targetGroup) {
+    sendError(res, 403, "Both groups must currently have the bot installed.");
+    return;
+  }
+
+  if (!(await isGroupAdmin(auth.context, sourceGroupId, auth.user.id))) {
+    sendError(res, 403, "You must be a group owner or administrator of the source group.");
+    return;
+  }
+
+  try {
+    const [sourceChat, targetChat] = await Promise.all([
+      auth.context.telegram.getChat(sourceGroupId),
+      auth.context.telegram.getChat(targetGroupId),
+    ]);
+
+    if (
+      (sourceChat.type !== "group" && sourceChat.type !== "supergroup") ||
+      (targetChat.type !== "group" && targetChat.type !== "supergroup")
+    ) {
+      sendError(res, 403, "Only Telegram groups can be connected.");
+      return;
+    }
+
+    await auth.context.attendance.setConnectedGroup(
+      sourceGroupId,
+      sourceChat.title || sourceGroup.title || String(sourceGroupId),
+      sourceChat.username || sourceGroup.username,
+      targetGroupId,
+      targetChat.title || targetGroup.title || String(targetGroupId),
+      targetChat.username || targetGroup.username,
+    );
+    await auth.context.attendance.clearPendingConnect(sourceGroupId, auth.user.id);
+
+    const connection = await auth.context.attendance.getConnectedGroup(sourceGroupId);
+    if (!connection) {
+      sendError(res, 500, "The group connection could not be saved.");
+      return;
+    }
+
+    res.setHeader("Cache-Control", "no-store");
+    res.json({
+      success: true,
+      connection: {
+        sourceChatId: connection.sourceChatId,
+        targetChatId: connection.targetChatId,
+        targetGroupName: connection.targetGroupName,
+        ...(connection.targetUsername ? { targetUsername: connection.targetUsername } : {}),
+        connectedAt: connection.connectedAt,
+      },
+    });
+  } catch (error) {
+    console.error("[user-connect] failed to connect groups", {
+      sourceGroupId,
+      targetGroupId,
+      userId: auth.user.id,
+      message: error instanceof Error ? error.message : String(error),
+    });
+    sendError(res, 502, "Unable to verify the selected Telegram groups.");
+  }
 });
 
 userApiRouter.post("/dashboard", async (req, res) => {
