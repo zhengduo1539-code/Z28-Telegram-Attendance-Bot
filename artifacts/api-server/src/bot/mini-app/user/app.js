@@ -662,6 +662,15 @@
     document.documentElement.lang = state.language === "my" ? "my" : state.language;
     els.title.textContent = text("title");
     els.identity.textContent = state.verifiedUserId ? "ID " + state.verifiedUserId : text("startup");
+    if (els["user-selected-group-title"]) {
+      var dashboardName = state.dashboard && state.dashboard.selectedGroup
+        ? (state.dashboard.selectedGroup.title || String(state.dashboard.selectedGroup.id))
+        : null;
+      var dashboardNameEl = els["user-selected-group-title"].querySelector(".group-dashboard-name");
+      var dashboardSuffixEl = els["user-selected-group-title"].querySelector(".group-dashboard-suffix");
+      if (dashboardNameEl && dashboardName) dashboardNameEl.textContent = dashboardName;
+      if (dashboardSuffixEl) dashboardSuffixEl.textContent = text("title");
+    }
 
     els["user-verify-title"].textContent = text("verifyTitle");
     els["user-verify-subtitle"].textContent = text("verifySubtitle");
@@ -1303,7 +1312,10 @@
     els.title.textContent = text("title");
     els.identity.textContent = userGreeting();
     els["user-dashboard-sub"].textContent = text("dashboardEyebrow");
-    els["user-selected-group-title"].textContent = (group.title || String(group.id)) + " " + text("title");
+    els["user-selected-group-title"].querySelector(".group-dashboard-name").textContent =
+      group.title || String(group.id);
+    els["user-selected-group-title"].querySelector(".group-dashboard-suffix").textContent =
+      text("title");
     updateMetrics(group);
 
     els["user-settings-limits-card"].innerHTML =
