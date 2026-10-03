@@ -260,6 +260,23 @@ const getInstalledConnectGroups = (snapshot: BotState): ConnectGroupOption[] =>
     }))
     .sort((left, right) => left.title.localeCompare(right.title));
 
+const getEligibleConnectGroups = async (
+  context: NonNullable<ReturnType<typeof getAdminApiContext>>,
+  snapshot: BotState,
+  userId: number,
+): Promise<ConnectGroupOption[]> => {
+  const installedGroups = getInstalledConnectGroups(snapshot);
+  const results = await Promise.all(
+    installedGroups.map(async (group) => {
+      const role = await getVerifiedGroupRole(context, group.id, userId);
+      return role ? group : undefined;
+    }),
+  );
+  return results
+    .filter((group): group is ConnectGroupOption => Boolean(group))
+    .sort((left, right) => left.title.localeCompare(right.title));
+};
+
 userApiRouter.get("/mode", (req, res) => {
   const auth = requireTelegramUser(req, res);
   if (!auth) return;
@@ -281,7 +298,7 @@ userApiRouter.get("/connect/groups", async (req, res) => {
 
   try {
     const snapshot = await auth.context.attendance.snapshot();
-    const groups = getInstalledConnectGroups(snapshot);
+    const groups = await getEligibleConnectGroups(auth.context, snapshot, auth.user.id);
     const connections: Record<string, ConnectConnection> = {};
 
     for (const group of groups) {
@@ -328,7 +345,7 @@ userApiRouter.post("/connect", async (req, res) => {
   }
 
   const snapshot = await auth.context.attendance.snapshot();
-  const installedGroups = getInstalledConnectGroups(snapshot);
+  const installedGroups = await getEligibleConnectGroups(auth.context, snapshot, auth.user.id);
   const installedIds = new Set(installedGroups.map((group) => group.id));
   if (!installedIds.has(sourceGroupId) || !installedIds.has(targetGroupId)) {
     sendError(res, 403, "Both groups must currently have the bot installed.");
