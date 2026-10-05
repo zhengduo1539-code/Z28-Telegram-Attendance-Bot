@@ -4685,6 +4685,29 @@ html[data-custom-theme="on"] .appearance-module-card{
 }
 
 /* ==========================================================================
+   Z28 Mobile Navigation Clearance — content must never sit underneath tabs
+   ========================================================================== */
+@media (max-width:680px){
+  :root{--z28-mobile-tabbar-height:62px;--z28-mobile-tabbar-gap:14px}
+  .app-shell{
+    padding-bottom:calc(var(--z28-mobile-tabbar-height) + var(--z28-mobile-tabbar-gap) + env(safe-area-inset-bottom));
+  }
+  #app > .content,#app > section,.user-page,.page-content{
+    scroll-margin-bottom:calc(var(--z28-mobile-tabbar-height) + var(--z28-mobile-tabbar-gap) + env(safe-area-inset-bottom));
+  }
+  .tab-bar{
+    min-height:var(--z28-mobile-tabbar-height);
+    bottom:max(8px,env(safe-area-inset-bottom));
+  }
+  .tab-bar .tab-button{position:relative;z-index:1}
+  .support-submit,.connect-button,.connection-change-button,.editor-actions,.appearance-wallpaper-actions{
+    scroll-margin-bottom:calc(var(--z28-mobile-tabbar-height) + var(--z28-mobile-tabbar-gap) + env(safe-area-inset-bottom));
+  }
+}
+@media(max-width:390px){
+  :root{--z28-mobile-tabbar-height:60px;--z28-mobile-tabbar-gap:13px}
+}
+/* ==========================================================================
    Z28 Mobile User UI — production mobile refinement
    Scope: User Mini App stylesheet only.
    ========================================================================== */
