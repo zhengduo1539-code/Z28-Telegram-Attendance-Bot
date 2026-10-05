@@ -8,7 +8,6 @@ import { getAdminApiContext } from "./admin-runtime";
 import {
   ACTIVITY_REPLY_KEYS,
   ACTIVITY_REPLY_MAX_LENGTH,
-  buildActivityReplyEditorLocale,
   normalizeActivityReplyTemplate,
 } from "./activity-reply-messages";
 import type {
@@ -563,18 +562,15 @@ userApiRouter.get("/activity-replies", async (req, res) => {
       return;
     }
 
-    const customMessages =
-      await auth.context.attendance.getActivityReplyMessages(groupId);
+    const messages =
+      await auth.context.attendance.getActivityReplyEditor(groupId);
 
     res.setHeader("Cache-Control", "no-store");
     res.json({
       groupId,
       groupTitle: chat.title || String(groupId),
       role: groupRole,
-      messages: {
-        en: buildActivityReplyEditorLocale("en", customMessages?.en),
-        zh: buildActivityReplyEditorLocale("zh", customMessages?.zh),
-      },
+      messages,
     });
   } catch (error) {
     console.error("[user-activity-replies] failed to load", {
@@ -673,17 +669,14 @@ userApiRouter.put("/activity-replies", async (req, res) => {
       normalizedInput,
     );
 
-    const customMessages =
-      await auth.context.attendance.getActivityReplyMessages(groupId);
+    const messages =
+      await auth.context.attendance.getActivityReplyEditor(groupId);
 
     res.setHeader("Cache-Control", "no-store");
     res.json({
       ok: true,
       groupId,
-      messages: {
-        en: buildActivityReplyEditorLocale("en", customMessages?.en),
-        zh: buildActivityReplyEditorLocale("zh", customMessages?.zh),
-      },
+      messages,
     });
   } catch (error) {
     console.error("[user-activity-replies] failed to save", {
