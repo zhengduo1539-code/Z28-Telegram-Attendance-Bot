@@ -103,6 +103,8 @@ export class TelegramPollingBot {
           }
         }
       } catch (error: unknown) {
+        if (this.stopped) break;
+
         const message = error instanceof Error ? error.message : String(error);
         this.consecutiveErrors += 1;
         const retryDelayMs = Math.min(

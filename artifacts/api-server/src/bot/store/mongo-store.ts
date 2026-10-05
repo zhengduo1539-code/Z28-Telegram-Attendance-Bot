@@ -176,6 +176,12 @@ export class MongoBotStore implements BotStore {
     return collection;
   }
 
+  async close(): Promise<void> {
+    if (!this.connected) return;
+    await this.client.close();
+    this.connected = false;
+  }
+
   async getStorageStats(): Promise<StorageStats> {
     const db = await this.database();
     const stats = await db.command({ dbStats: 1 });
