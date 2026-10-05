@@ -952,11 +952,13 @@ export class AttendanceService {
     chatId: number,
   ): Promise<{
     en: ActivityReplyEditorLocale;
+    mm: ActivityReplyEditorLocale;
     zh: ActivityReplyEditorLocale;
   }> {
     const messages = await this.getActivityReplyMessages(chatId);
     return {
       en: buildActivityReplyEditorLocale("en", messages?.en),
+      mm: buildActivityReplyEditorLocale("mm", messages?.mm),
       zh: buildActivityReplyEditorLocale("zh", messages?.zh),
     };
   }
@@ -974,10 +976,11 @@ export class AttendanceService {
       const next: NonNullable<BotState["groupActivityReplyMessages"]>[string] =
         {
           ...(existing.en ? { en: { ...existing.en } } : {}),
+          ...(existing.mm ? { mm: { ...existing.mm } } : {}),
           ...(existing.zh ? { zh: { ...existing.zh } } : {}),
         };
 
-      for (const locale of ["en", "zh"] as const) {
+      for (const locale of ["en", "mm", "zh"] as const) {
         const incoming = input[locale] || {};
         const current = { ...(next[locale] || {}) };
 
