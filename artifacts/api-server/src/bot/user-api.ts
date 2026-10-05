@@ -607,9 +607,9 @@ userApiRouter.put("/activity-replies", async (req, res) => {
   const normalizedInput: Record<
     Locale,
     Partial<Record<ActivityReplyKey, string | undefined>>
-  > = { en: {}, zh: {} };
+  > = { en: {}, mm: {}, zh: {} };
 
-  for (const locale of ["en", "zh"] as const) {
+  for (const locale of ["en", "mm", "zh"] as const) {
     const localePayload = rawMessages[locale];
     if (
       localePayload !== undefined &&
