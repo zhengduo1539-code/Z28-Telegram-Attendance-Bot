@@ -215,6 +215,20 @@
       connectFailed: "Unable to connect these groups. Please try again.",
       connectReady: "Ready to connect",
       connectSelectBoth: "Select a Source Group and a Target Group first.",
+      connectGuideKicker: "HOW IT WORKS",
+      connectGuideTitle: "How to connect groups",
+      connectGuideSub: "Follow these steps to route timeout notifications from one group to another.",
+      connectGuideStep1Title: "Choose a Source Group",
+      connectGuideStep1Copy: "Select the group where Z28 detects activity timeouts. This is the group whose timeout notifications you want to send somewhere else.",
+      connectGuideStep2Title: "Choose a Target Group",
+      connectGuideStep2Copy: "Select the group where Z28 should send the timeout notifications. Both groups must be available to you and the bot.",
+      connectGuideStep3Title: "Review the route",
+      connectGuideStep3Copy: "Make sure the Source and Target are different groups. The status area above will show that the route is ready before you connect it.",
+      connectGuideStep4Title: "Connect and verify",
+      connectGuideStep4Copy: "Press Connect Group. After a successful save, the current connection is shown above and the action changes to Edit Connection when you need to change the target later.",
+      connectGuideRule1: "Only groups that are available to your Telegram account and have the required bot access can be selected.",
+      connectGuideRule2: "One Source Group can have one active Target Group. Saving a new target updates that source connection.",
+      connectGuideRule3: "If you only want to change the target, use Edit Connection instead of starting over.",
       appearance: "Appearance",
       appearanceSub: "Personalize the Mini App interface.",
       appearanceKicker: "INTERFACE SETTINGS",
@@ -422,6 +436,20 @@
       connectFailed: "Group ချိတ်ဆက်၍ မရပါ။ ထပ်စမ်းကြည့်ပါ။",
       connectReady: "ချိတ်ဆက်ရန် အဆင်သင့်ဖြစ်ပါပြီ",
       connectSelectBoth: "အရင်ဆုံး Source Group နဲ့ Target Group နှစ်ခုလုံးကို ရွေးပါ။",
+      connectGuideKicker: "အသုံးပြုပုံ",
+      connectGuideTitle: "Group ချိတ်ဆက်နည်း",
+      connectGuideSub: "Timeout notification ကို Group တစ်ခုမှ အခြား Group တစ်ခုသို့ ပို့ရန် အောက်ပါအဆင့်များအတိုင်း လုပ်ဆောင်ပါ။",
+      connectGuideStep1Title: "Source Group ကိုရွေးပါ",
+      connectGuideStep1Copy: "Z28 က activity timeout ကို စောင့်ကြည့်မည့် Group ကို ရွေးပါ။ ဒီ Group ရဲ့ timeout notification တွေကို အခြား Group သို့ ပို့မည်ဖြစ်ပါတယ်။",
+      connectGuideStep2Title: "Target Group ကိုရွေးပါ",
+      connectGuideStep2Copy: "Timeout notification တွေကို လက်ခံမည့် Group ကို ရွေးပါ။ Group နှစ်ခုလုံးကို သင့် account နဲ့ Bot က အသုံးပြုနိုင်ရပါမည်။",
+      connectGuideStep3Title: "ချိတ်ဆက်မှုကို စစ်ပါ",
+      connectGuideStep3Copy: "Source Group နဲ့ Target Group မတူကြောင်း စစ်ပါ။ အပေါ်ဘက် status မှာ ချိတ်ဆက်ရန် အဆင်သင့်ဖြစ်ကြောင်း ပြပါမည်။",
+      connectGuideStep4Title: "Connect လုပ်ပြီး အတည်ပြုပါ",
+      connectGuideStep4Copy: "Group ချိတ်ဆက်မည် ကိုနှိပ်ပါ။ အောင်မြင်ပြီးပါက အပေါ်ဘက်မှာ လက်ရှိ connection ကို ပြပြီး နောက်ပိုင်းပြင်လိုပါက ချိတ်ဆက်မှု ပြင်မည် ကို အသုံးပြုနိုင်ပါသည်။",
+      connectGuideRule1: "သင့် Telegram account နဲ့ Bot နှစ်ခုလုံး အသုံးပြုနိုင်သော Group များကိုသာ ရွေးချယ်နိုင်ပါသည်။",
+      connectGuideRule2: "Source Group တစ်ခုမှာ active Target Group တစ်ခု ရှိနိုင်ပါသည်။ Target အသစ်ကို Save လုပ်ပါက အဲဒီ Source connection ကို update လုပ်ပါမည်။",
+      connectGuideRule3: "Target Group ကိုသာ ပြောင်းလိုပါက အစမှ ပြန်လုပ်စရာမလိုဘဲ ချိတ်ဆက်မှု ပြင်မည် ကို အသုံးပြုပါ။",
       appearance: "Appearance",
       appearanceSub: "Mini App ရဲ့ အပြင်အဆင်ကို စိတ်ကြိုက်ပြင်ဆင်ပါ။",
       appearanceKicker: "INTERFACE SETTINGS",
@@ -624,6 +652,20 @@
       connectSourceAdmin: "您必须是来源群组的创建者或管理员。",
       connectSame: "请选择两个不同的群组。",
       connectSelectBoth: "请先选择来源群组和目标群组。",
+      connectGuideKicker: "使用说明",
+      connectGuideTitle: "如何连接群组",
+      connectGuideSub: "按照以下步骤，将超时通知从一个群组发送到另一个群组。",
+      connectGuideStep1Title: "选择来源群组",
+      connectGuideStep1Copy: "选择 Z28 检测活动超时的群组。该群组的超时通知会被发送到您指定的目标群组。",
+      connectGuideStep2Title: "选择目标群组",
+      connectGuideStep2Copy: "选择接收超时通知的群组。两个群组都必须对您的账号和 Bot 可用。",
+      connectGuideStep3Title: "检查连接路径",
+      connectGuideStep3Copy: "确认来源群组和目标群组不是同一个群组。上方状态区域会显示连接是否已经准备就绪。",
+      connectGuideStep4Title: "连接并确认",
+      connectGuideStep4Copy: "点击连接群组。保存成功后，上方会显示当前连接；以后需要更换目标时可以使用更换群组。",
+      connectGuideRule1: "只能选择您的 Telegram 账号和 Bot 都可以使用，并具备所需权限的群组。",
+      connectGuideRule2: "每个来源群组只能有一个有效目标群组。保存新的目标后，该来源群组的连接会被更新。",
+      connectGuideRule3: "如果只想更换目标群组，无需重新开始，请直接使用更换群组。",
       connectLoadFailed: "无法加载已安装 Bot 的群组，请重试。",
       connectSuccess: "群组连接已成功保存。",
       connectFailed: "无法连接所选群组，请重试。",
@@ -730,6 +772,12 @@
       "user-connect-target-label","user-connect-target-sub","user-connect-target",
       "user-connect-note","user-connect-submit","user-connect-status-title","user-connect-status-value",
       "user-connect-status-meta","user-connect-change",
+      "user-connect-guide-kicker","user-connect-guide-title","user-connect-guide-sub",
+      "user-connect-guide-step1-title","user-connect-guide-step1-copy",
+      "user-connect-guide-step2-title","user-connect-guide-step2-copy",
+      "user-connect-guide-step3-title","user-connect-guide-step3-copy",
+      "user-connect-guide-step4-title","user-connect-guide-step4-copy",
+      "user-connect-guide-rule1","user-connect-guide-rule2","user-connect-guide-rule3",
       "user-about-page","user-about-title","user-about-sub","user-about-bot-name-label",
       "user-about-bot-version-label","user-about-mini-version-label",
       "user-about-terms-label","user-about-terms-copy","user-about-privacy-label",
@@ -1382,6 +1430,20 @@
     els["user-connect-target-label"].textContent = text("connectTarget");
     els["user-connect-target-sub"].textContent = text("connectTargetSub");
     els["user-connect-note"].textContent = text("connectInstalledOnly");
+    els["user-connect-guide-kicker"].textContent = text("connectGuideKicker");
+    els["user-connect-guide-title"].textContent = text("connectGuideTitle");
+    els["user-connect-guide-sub"].textContent = text("connectGuideSub");
+    els["user-connect-guide-step1-title"].textContent = text("connectGuideStep1Title");
+    els["user-connect-guide-step1-copy"].textContent = text("connectGuideStep1Copy");
+    els["user-connect-guide-step2-title"].textContent = text("connectGuideStep2Title");
+    els["user-connect-guide-step2-copy"].textContent = text("connectGuideStep2Copy");
+    els["user-connect-guide-step3-title"].textContent = text("connectGuideStep3Title");
+    els["user-connect-guide-step3-copy"].textContent = text("connectGuideStep3Copy");
+    els["user-connect-guide-step4-title"].textContent = text("connectGuideStep4Title");
+    els["user-connect-guide-step4-copy"].textContent = text("connectGuideStep4Copy");
+    els["user-connect-guide-rule1"].textContent = text("connectGuideRule1");
+    els["user-connect-guide-rule2"].textContent = text("connectGuideRule2");
+    els["user-connect-guide-rule3"].textContent = text("connectGuideRule3");
     els["user-connect-status-title"].textContent = text("connectStatus");
     var connectChangeLabel = els["user-connect-change"] && els["user-connect-change"].querySelector(".button-label");
     if (connectChangeLabel) connectChangeLabel.textContent = state.connectEditMode ? text("cancel") : text("connectChange");
