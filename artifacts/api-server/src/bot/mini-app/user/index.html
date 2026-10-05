@@ -22,6 +22,31 @@
     </div>
   </div>
 
+  <div id="appearance-effects" class="appearance-effects-layer" aria-hidden="true">
+    <canvas id="appearance-effects-canvas"></canvas>
+    <div id="appearance-dragon" class="appearance-dragon" hidden>
+      <svg viewBox="0 0 320 190" role="presentation">
+        <defs>
+          <linearGradient id="z28-dragon-body" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ff6879"/><stop offset="48%" stop-color="#d62f48"/><stop offset="100%" stop-color="#7d1028"/></linearGradient>
+          <linearGradient id="z28-dragon-gold" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#ffd978"/><stop offset="52%" stop-color="#ffb52f"/><stop offset="100%" stop-color="#c66b13"/></linearGradient>
+          <filter id="z28-dragon-glow" x="-35%" y="-35%" width="170%" height="170%"><feGaussianBlur stdDeviation="3.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <g filter="url(#z28-dragon-glow)">
+          <path d="M36 142C70 108 75 72 111 71c36-2 31 45 67 46 36 1 39-43 77-44 18 0 28 10 31 25" fill="none" stroke="url(#z28-dragon-body)" stroke-width="31" stroke-linecap="round"/>
+          <path d="M36 142C70 108 75 72 111 71c36-2 31 45 67 46 36 1 39-43 77-44" fill="none" stroke="url(#z28-dragon-gold)" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="6 10" opacity=".8"/>
+          <path d="M278 52c11 7 18 19 17 31-1 13-9 23-21 28l-14 5-5-14 8-18-7-9 8-13Z" fill="url(#z28-dragon-body)" stroke="#ffc95f" stroke-width="2"/>
+          <path d="M285 45 294 33l-2 15M274 45l-6-14 11 9M300 59l14-5-10 13" fill="none" stroke="#ffc95f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="289" cy="61" r="2.8" fill="#fff3bf"/>
+          <path d="M298 77c8 4 13 10 18 17M296 80c11-1 18 1 25 5" fill="none" stroke="#ffd978" stroke-width="2" stroke-linecap="round"/>
+          <path d="M260 99c-9 13-17 22-30 31M231 129l-8 11M232 128l4 12M183 109c-7 14-12 24-22 36M160 145l-4 12M161 144l9 8" fill="none" stroke="url(#z28-dragon-body)" stroke-width="8" stroke-linecap="round"/>
+          <path d="M69 129c-13-11-27-19-43-20M61 135c-14-2-25 0-37 5" fill="none" stroke="#e94b5e" stroke-width="5" stroke-linecap="round"/>
+          <path d="M35 135l-11 10M36 131l-13-2M40 125l-8-11" fill="none" stroke="#ffc95f" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M308 84c6 4 8 9 7 14-2 7-8 12-15 13 5-5 7-11 6-17-1-4-1-7 2-10Z" fill="#ff9d3b" opacity=".75"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+
   <div id="user-loading" class="loading-layer" hidden aria-live="polite">
     <div class="loading-panel" role="status" aria-label="Loading dashboard">
       <div class="loading-spinner" aria-hidden="true"></div>
@@ -566,7 +591,38 @@
             <p id="appearance-wallpaper-status" class="appearance-wallpaper-status" aria-live="polite">No device image selected.</p>
           </div>
 
+          <div class="appearance-effects-section">
+            <div class="appearance-section-mini-head">
+              <span class="appearance-mini-icon appearance-effect-mini-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M12 3.8 13.8 9l5.2 1.9-5.2 1.8-1.8 5.3-1.8-5.3L5 10.9 10.2 9 12 3.8Z"></path><path d="m18.5 4.5.7 2.1 2.1.7-2.1.7-.7 2.1-.7-2.1-2.1-.7 2.1-.7.7-2.1Z"></path></svg>
+              </span>
+              <span><strong id="user-appearance-effects-title">Background Effects</strong><small id="user-appearance-effects-sub">Add a lightweight animated layer to your wallpaper. Saved only on this device.</small></span>
+            </div>
+            <fieldset class="appearance-effects-fieldset">
+              <legend class="sr-only">Background Effects</legend>
+              <div class="appearance-effect-grid">
+                <label class="appearance-effect-option is-selected" data-background-effect-option="none"><input id="appearance-background-effect-none" type="radio" name="background-effect" value="none" checked><span class="appearance-effect-preview appearance-effect-preview-none" aria-hidden="true"><span>OFF</span></span><span class="appearance-effect-copy"><strong id="user-background-effect-none">None</strong><small id="user-background-effect-none-sub">Clean background</small></span><span class="appearance-effect-check" aria-hidden="true">✓</span></label>
+                <label class="appearance-effect-option" data-background-effect-option="dollar"><input id="appearance-background-effect-dollar" type="radio" name="background-effect" value="dollar"><span class="appearance-effect-preview appearance-effect-preview-dollar" aria-hidden="true"><span>$</span><span>$</span><span>$</span><span>$</span></span><span class="appearance-effect-copy"><strong id="user-background-effect-dollar">Dollar Rain</strong><small id="user-background-effect-dollar-sub">Falling currency</small></span><span class="appearance-effect-check" aria-hidden="true">✓</span></label>
+                <label class="appearance-effect-option" data-background-effect-option="coins"><input id="appearance-background-effect-coins" type="radio" name="background-effect" value="coins"><span class="appearance-effect-preview appearance-effect-preview-coins" aria-hidden="true"><span>Z</span><span>●</span><span>Z</span><span>●</span></span><span class="appearance-effect-copy"><strong id="user-background-effect-coins">Gold Coins</strong><small id="user-background-effect-coins-sub">Falling gold coins</small></span><span class="appearance-effect-check" aria-hidden="true">✓</span></label>
+                <label class="appearance-effect-option" data-background-effect-option="dragon"><input id="appearance-background-effect-dragon" type="radio" name="background-effect" value="dragon"><span class="appearance-effect-preview appearance-effect-preview-dragon" aria-hidden="true"><span>龍</span></span><span class="appearance-effect-copy"><strong id="user-background-effect-dragon">Chinese Dragon</strong><small id="user-background-effect-dragon-sub">Floating dragon</small></span><span class="appearance-effect-check" aria-hidden="true">✓</span></label>
+                <label class="appearance-effect-option" data-background-effect-option="hacker"><input id="appearance-background-effect-hacker" type="radio" name="background-effect" value="hacker"><span class="appearance-effect-preview appearance-effect-preview-hacker" aria-hidden="true"><span>0101</span><span>&gt;_ Z28</span><span>0011</span></span><span class="appearance-effect-copy"><strong id="user-background-effect-hacker">Hacker Stream</strong><small id="user-background-effect-hacker-sub">Falling terminal code</small></span><span class="appearance-effect-check" aria-hidden="true">✓</span></label>
+              </div>
+            </fieldset>
+            <div class="appearance-effects-intensity">
+              <div class="appearance-effects-intensity-copy"><strong id="user-appearance-effects-intensity">Effect Intensity</strong><small id="user-appearance-effects-intensity-sub">Control how visible and active the effect feels.</small></div>
+              <fieldset class="appearance-intensity-fieldset">
+                <legend class="sr-only">Effect intensity</legend>
+                <div class="appearance-intensity-grid">
+                  <label class="appearance-intensity-option" data-background-intensity-option="low"><input id="appearance-background-intensity-low" type="radio" name="background-effect-intensity" value="low"><span id="user-background-intensity-low">Low</span></label>
+                  <label class="appearance-intensity-option is-selected" data-background-intensity-option="medium"><input id="appearance-background-intensity-medium" type="radio" name="background-effect-intensity" value="medium" checked><span id="user-background-intensity-medium">Medium</span></label>
+                  <label class="appearance-intensity-option" data-background-intensity-option="high"><input id="appearance-background-intensity-high" type="radio" name="background-effect-intensity" value="high"><span id="user-background-intensity-high">High</span></label>
+                </div>
+              </fieldset>
+            </div>
+            <p id="appearance-background-effect-status" class="appearance-effects-status" aria-live="polite">No background effect is active.</p>
+          </div>
           <div class="appearance-divider"></div>
+
 
           <div class="appearance-controls" aria-label="Interface behavior settings">
             <button id="appearance-animations-toggle" class="appearance-control" type="button" role="switch" aria-checked="true" aria-labelledby="user-appearance-animations-title" aria-describedby="user-appearance-animations-sub">
