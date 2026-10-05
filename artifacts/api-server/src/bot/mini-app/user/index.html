@@ -666,6 +666,42 @@
             </div>
           </div>
 
+          <section class="connection-guide" aria-labelledby="user-connect-guide-title">
+            <div class="connection-guide-header">
+              <div class="connection-guide-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M12 3.5a8.5 8.5 0 1 0 8.5 8.5A8.5 8.5 0 0 0 12 3.5Z"></path><path d="M12 10.5v5"></path><path d="M12 7.4h.01"></path></svg>
+              </div>
+              <div>
+                <div class="connection-guide-kicker" id="user-connect-guide-kicker">HOW IT WORKS</div>
+                <h3 id="user-connect-guide-title">How to connect groups</h3>
+                <p id="user-connect-guide-sub">Follow these steps to route timeout notifications from one group to another.</p>
+              </div>
+            </div>
+            <div class="connection-guide-steps">
+              <article class="connection-guide-step">
+                <span class="connection-guide-number">01</span>
+                <div><strong id="user-connect-guide-step1-title">Choose a Source Group</strong><p id="user-connect-guide-step1-copy">Select the group where Z28 detects activity timeouts. This is the group whose timeout notifications you want to send somewhere else.</p></div>
+              </article>
+              <article class="connection-guide-step">
+                <span class="connection-guide-number">02</span>
+                <div><strong id="user-connect-guide-step2-title">Choose a Target Group</strong><p id="user-connect-guide-step2-copy">Select the group where Z28 should send the timeout notifications. Both groups must be available to you and the bot.</p></div>
+              </article>
+              <article class="connection-guide-step">
+                <span class="connection-guide-number">03</span>
+                <div><strong id="user-connect-guide-step3-title">Review the route</strong><p id="user-connect-guide-step3-copy">Make sure the Source and Target are different groups. The status area above will show that the route is ready before you connect it.</p></div>
+              </article>
+              <article class="connection-guide-step">
+                <span class="connection-guide-number">04</span>
+                <div><strong id="user-connect-guide-step4-title">Connect and verify</strong><p id="user-connect-guide-step4-copy">Press Connect Group. After a successful save, the current connection is shown above and the action changes to Edit Connection when you need to change the target later.</p></div>
+              </article>
+            </div>
+            <div class="connection-guide-rules">
+              <div class="connection-guide-rule"><span class="connection-guide-rule-dot" aria-hidden="true"></span><span id="user-connect-guide-rule1">Only groups that are available to your Telegram account and have the required bot access can be selected.</span></div>
+              <div class="connection-guide-rule"><span class="connection-guide-rule-dot" aria-hidden="true"></span><span id="user-connect-guide-rule2">One Source Group can have one active Target Group. Saving a new target updates that source connection.</span></div>
+              <div class="connection-guide-rule"><span class="connection-guide-rule-dot" aria-hidden="true"></span><span id="user-connect-guide-rule3">If you only want to change the target, use Edit Connection instead of starting over.</span></div>
+            </div>
+          </section>
+
           <div class="connection-actions">
             <button id="user-connect-submit" class="primary-button connection-save" type="button" disabled>
               <span class="button-label">Connect Group</span>
