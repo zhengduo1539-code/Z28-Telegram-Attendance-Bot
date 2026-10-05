@@ -44,21 +44,28 @@ export const startTelegramBot = async (logger: Logger): Promise<TelegramBotRunti
 
   while (true) {
     try {
-      store = new MongoBotStore(config.mongodbUri, config.dataPath);
-      await store.load();
-      const attendance = new AttendanceService(store, config);
-      telegram = new TelegramClient(
+      const currentStore = new MongoBotStore(config.mongodbUri, config.dataPath);
+      store = currentStore;
+      await currentStore.load();
+      const attendance = new AttendanceService(currentStore, config);
+      const telegramClient = new TelegramClient(
         config.token,
         config.telegramRequestTimeoutMs,
       );
-      setAdminApiContext({ attendance, config, telegram });
-      const handler = new CommandHandler(telegram, attendance, config);
-      pollingBot = new TelegramPollingBot(config, logger, handler, telegram);
+      telegram = telegramClient;
+      setAdminApiContext({ attendance, config, telegram: telegramClient });
+      const handler = new CommandHandler(telegramClient, attendance, config);
+      pollingBot = new TelegramPollingBot(
+        config,
+        logger,
+        handler,
+        telegramClient,
+      );
       await pollingBot.start();
 
       const reminders = new ActivityReminderScheduler(
         attendance,
-        telegram,
+        telegramClient,
         logger,
       );
       reminders.start();
