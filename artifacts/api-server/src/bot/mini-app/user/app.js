@@ -2868,7 +2868,310 @@
     }) || null;
   }
 
-  function populateConnectSelect(select, groups, preferredId) {
+  function activityReplyKeys() {
+    return [
+      "noActive",
+      "alreadyActive",
+      "started",
+      "settled",
+      "dailyCountLimitReached",
+      "timeoutReminder",
+      "groupTimeoutNotification"
+    ];
+  }
+
+  function activityReplyLabelSet() {
+    return {
+      noActive: { title: text("replyNoActiveTitle"), sub: text("replyNoActiveSub") },
+      alreadyActive: { title: text("replyAlreadyActiveTitle"), sub: text("replyAlreadyActiveSub") },
+      started: { title: text("replyStartedTitle"), sub: text("replyStartedSub") },
+      settled: { title: text("replySettledTitle"), sub: text("replySettledSub") },
+      dailyCountLimitReached: { title: text("replyDailyCountTitle"), sub: text("replyDailyCountSub") },
+      timeoutReminder: { title: text("replyTimeoutReminderTitle"), sub: text("replyTimeoutReminderSub") },
+      groupTimeoutNotification: { title: text("replyTimeoutNotificationTitle"), sub: text("replyTimeoutNotificationSub") }
+    };
+  }
+
+  function replySnapshot(data) {
+    if (!data) return "";
+    var output = {};
+    ["en", "zh"].forEach(function (locale) {
+      output[locale] = {};
+      activityReplyKeys().forEach(function (key) {
+        var item = data[locale] && data[locale][key];
+        output[locale][key] = item ? String(item.value || "") : "";
+      });
+    });
+    return JSON.stringify(output);
+  }
+
+  function updateActivityReplyState() {
+    var clean = Boolean(
+      state.replyEditorData &&
+      state.replyOriginalSnapshot === replySnapshot(state.replyEditorData)
+    );
+    state.replyDirty = !clean;
+    if (els["user-reply-save"]) els["user-reply-save"].disabled =
+      !state.replyEditorData || state.replyLoading || state.replySaving || !state.replyDirty;
+    if (els["user-reply-discard"]) els["user-reply-discard"].disabled =
+      !state.replyEditorData || state.replyLoading || state.replySaving || !state.replyDirty;
+    if (els["user-reply-reset-language"]) els["user-reply-reset-language"].disabled =
+      !state.replyEditorData || state.replyLoading || state.replySaving;
+  }
+
+  function setActivityReplyStatus(kind, message) {
+    if (!els["user-reply-status-text"] || !els["user-reply-status-dot"]) return;
+    els["user-reply-status-text"].textContent = message;
+    els["user-reply-status-dot"].classList.toggle("is-dirty", kind === "dirty");
+    els["user-reply-status-dot"].classList.toggle("is-saved", kind === "saved");
+    els["user-reply-status-dot"].classList.toggle("is-error", kind === "error");
+  }
+
+  function renderActivityReplyEditor() {
+    if (!els["user-reply-messages-list"] || !state.replyEditorData) return;
+    var locale = state.replyLocale === "zh" ? "zh" : "en";
+    var labels = activityReplyLabelSet();
+    var localeData = state.replyEditorData[locale] || {};
+    var keys = activityReplyKeys();
+    var group = state.dashboard && state.dashboard.selectedGroup;
+
+    if (els["user-reply-messages-group"]) {
+      els["user-reply-messages-group"].textContent = group
+        ? (group.title || String(group.id))
+        : "—";
+    }
+    if (els["user-reply-messages-role"]) {
+      els["user-reply-messages-role"].textContent =
+        group && group.memberStatus === "creator" ? "OWNER" : "ADMIN";
+    }
+
+    [["user-reply-locale-en", "en"], ["user-reply-locale-zh", "zh"]].forEach(function (entry) {
+      var button = els[entry[0]];
+      if (!button) return;
+      var active = locale === entry[1];
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-selected", String(active));
+      button.disabled = state.replyLoading || state.replySaving;
+    });
+
+    els["user-reply-messages-list"].innerHTML = keys.map(function (key, index) {
+      var item = localeData[key];
+      if (!item) return "";
+      var variableHtml = (item.variables || []).map(function (variable) {
+        var token = "{" + variable + "}";
+        return '<button type="button" class="reply-variable-chip" data-reply-variable="' +
+          escapeHtml(token) + '" aria-label="' +
+          escapeHtml(text("replyInsertVariable") + " " + token) + '">' +
+          escapeHtml(token) + '</button>';
+      }).join("");
+      var customBadge = item.value !== item.defaultValue
+        ? '<span class="reply-custom-badge">' + escapeHtml(text("replyCustomBadge")) + '</span>'
+        : "";
+      return '<article class="reply-message-editor" data-reply-key="' + escapeHtml(key) + '">' +
+        '<div class="reply-message-editor-head">' +
+          '<div class="reply-message-editor-index">' + String(index + 1).padStart(2, "0") + '</div>' +
+          '<div class="reply-message-editor-copy">' +
+            '<div class="reply-message-editor-title-row"><h4>' + escapeHtml(labels[key].title) + '</h4>' +
+              customBadge + '</div>' +
+            '<p>' + escapeHtml(labels[key].sub) + '</p>' +
+          '</div>' +
+          '<button type="button" class="secondary-button reply-reset-button" data-reply-reset="' + escapeHtml(key) + '">' +
+            '<span class="button-label">' + escapeHtml(text("replyReset")) + '</span>' +
+          '</button>' +
+        '</div>' +
+        '<textarea class="reply-message-textarea" data-reply-input="' + escapeHtml(key) + '" maxlength="1200" spellcheck="false">' +
+          escapeHtml(item.value) +
+        '</textarea>' +
+        '<div class="reply-message-meta"><span>' + escapeHtml(text("replyPlainTextOnly")) + '</span>' +
+          '<span class="reply-character-count" data-reply-count="' + escapeHtml(key) + '">' +
+            String(item.value.length) + ' / 1200</span>' +
+        '</div>' +
+        '<div class="reply-variable-row"><span class="reply-variable-label">' +
+          escapeHtml(text("replyVariables")) + '</span><div class="reply-variable-chips">' +
+          variableHtml + '</div></div>' +
+      '</article>';
+    }).join("");
+
+    els["user-reply-messages-list"].querySelectorAll("[data-reply-input]").forEach(function (input) {
+      input.oninput = function () {
+        var key = input.getAttribute("data-reply-input");
+        var item = state.replyEditorData[locale] && state.replyEditorData[locale][key];
+        if (!key || !item) return;
+        item.value = input.value;
+        item.customized = input.value.trim() !== item.defaultValue.trim();
+
+        var count = els["user-reply-messages-list"].querySelector(
+          '[data-reply-count="' + key + '"]'
+        );
+        if (count) count.textContent = String(input.value.length) + " / 1200";
+
+        var card = input.closest(".reply-message-editor");
+        var titleRow = card && card.querySelector(".reply-message-editor-title-row");
+        var badge = card && card.querySelector(".reply-custom-badge");
+        if (badge) badge.hidden = !item.customized;
+        else if (item.customized && titleRow) {
+          titleRow.insertAdjacentHTML(
+            "beforeend",
+            '<span class="reply-custom-badge">' + escapeHtml(text("replyCustomBadge")) + '</span>'
+          );
+        }
+        updateActivityReplyState();
+        setActivityReplyStatus(
+          state.replyDirty ? "dirty" : "saved",
+          state.replyDirty ? text("replyUnsaved") : text("replyDefaultActive")
+        );
+      };
+    });
+
+    els["user-reply-messages-list"].querySelectorAll("[data-reply-reset]").forEach(function (button) {
+      button.onclick = function () {
+        var key = button.getAttribute("data-reply-reset");
+        var item = state.replyEditorData[locale] && state.replyEditorData[locale][key];
+        if (!item) return;
+        item.value = item.defaultValue;
+        item.customized = false;
+        renderActivityReplyEditor();
+        setActivityReplyStatus(
+          state.replyDirty ? "dirty" : "saved",
+          state.replyDirty ? text("replyUnsaved") : text("replyDefaultActive")
+        );
+      };
+    });
+
+    els["user-reply-messages-list"].querySelectorAll("[data-reply-variable]").forEach(function (button) {
+      button.onclick = function () {
+        var token = button.getAttribute("data-reply-variable");
+        var key = button.closest(".reply-message-editor")?.getAttribute("data-reply-key");
+        if (!token || !key) return;
+        var input = els["user-reply-messages-list"].querySelector(
+          '[data-reply-input="' + key + '"]'
+        );
+        var item = state.replyEditorData[locale] && state.replyEditorData[locale][key];
+        if (!input || !item) return;
+        var start = input.selectionStart || 0;
+        var end = input.selectionEnd || start;
+        var value = input.value;
+        input.value = value.slice(0, start) + token + value.slice(end);
+        input.focus();
+        input.selectionStart = input.selectionEnd = start + token.length;
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+      };
+    });
+
+    updateActivityReplyState();
+  }
+
+  async function loadActivityReplyMessages() {
+    if (!state.toolsOpen || !Number.isSafeInteger(state.selectedGroupId) || state.selectedGroupId >= 0) return;
+    var groupId = state.selectedGroupId;
+    var requestId = ++state.replyRequestId;
+    state.replyLoading = true;
+    updateActivityReplyState();
+
+    if (!state.replyEditorData) {
+      els["user-reply-messages-list"].innerHTML =
+        '<div class="reply-messages-loading">' + escapeHtml(text("refreshing")) + '</div>';
+    }
+
+    try {
+      var data = await apiUserActivityReplies(groupId);
+      if (requestId !== state.replyRequestId || !state.toolsOpen || state.selectedGroupId !== groupId) return;
+      if (!data || !data.messages || !data.messages.en || !data.messages.zh) {
+        throw new Error(text("replyLoadFailed"));
+      }
+      state.replyEditorData = data.messages;
+      state.replyLocale = state.replyLocale === "zh" ? "zh" : "en";
+      state.replyOriginalSnapshot = replySnapshot(state.replyEditorData);
+      state.replyDirty = false;
+      renderActivityReplyEditor();
+
+      var hasCustom = ["en", "zh"].some(function (locale) {
+        return state.replyEditorData[locale] &&
+          Object.values(state.replyEditorData[locale]).some(function (item) {
+            return item && item.customized;
+          });
+      });
+      setActivityReplyStatus("saved", hasCustom ? text("replyCustomActive") : text("replyDefaultActive"));
+    } catch (error) {
+      if (requestId !== state.replyRequestId || !state.toolsOpen) return;
+      setActivityReplyStatus("error", error && error.message ? error.message : text("replyLoadFailed"));
+    } finally {
+      if (requestId !== state.replyRequestId) return;
+      state.replyLoading = false;
+      updateActivityReplyState();
+      renderActivityReplyEditor();
+    }
+  }
+
+  async function saveActivityReplyMessages() {
+    if (
+      state.replySaving ||
+      state.replyLoading ||
+      !state.replyEditorData ||
+      !Number.isSafeInteger(state.selectedGroupId) ||
+      state.selectedGroupId >= 0 ||
+      !state.replyDirty
+    ) return;
+    var groupId = state.selectedGroupId;
+    var requestId = state.replyRequestId;
+    state.replySaving = true;
+    updateActivityReplyState();
+
+    var saveLabel = els["user-reply-save"]?.querySelector(".button-label");
+    if (saveLabel) saveLabel.textContent = text("replySaving");
+
+    var messages = { en: {}, zh: {} };
+    ["en", "zh"].forEach(function (locale) {
+      activityReplyKeys().forEach(function (key) {
+        var item = state.replyEditorData[locale] && state.replyEditorData[locale][key];
+        if (item) messages[locale][key] = item.value;
+      });
+    });
+
+    try {
+      var result = await apiUserActivityRepliesSave(groupId, messages);
+      if (requestId !== state.replyRequestId || !state.toolsOpen || state.selectedGroupId !== groupId) return;
+      if (!result || !result.messages) throw new Error(text("replySaveFailed"));
+      state.replyEditorData = result.messages;
+      state.replyOriginalSnapshot = replySnapshot(state.replyEditorData);
+      state.replyDirty = false;
+      renderActivityReplyEditor();
+      setActivityReplyStatus("saved", text("replySaved"));
+      showNotice(text("replySaved"), "ok");
+    } catch (error) {
+      if (requestId !== state.replyRequestId || !state.toolsOpen) return;
+      setActivityReplyStatus("error", error && error.message ? error.message : text("replySaveFailed"));
+      showNotice(error && error.message ? error.message : text("replySaveFailed"), "error");
+    } finally {
+      if (requestId !== state.replyRequestId) return;
+      state.replySaving = false;
+      updateActivityReplyState();
+      var label = els["user-reply-save"]?.querySelector(".button-label");
+      if (label) label.textContent = text("replySave");
+    }
+  }
+
+  function discardActivityReplyChanges() {
+    if (!state.replyDirty || state.replyLoading || state.replySaving) return;
+    if (!window.confirm(text("replyConfirmDiscard"))) return;
+    void loadActivityReplyMessages();
+  }
+
+  function resetActivityReplyLanguage() {
+    if (!state.replyEditorData || state.replyLoading || state.replySaving) return;
+    if (!window.confirm(text("replyResetConfirm"))) return;
+    var locale = state.replyLocale;
+    activityReplyKeys().forEach(function (key) {
+      var item = state.replyEditorData[locale] && state.replyEditorData[locale][key];
+      if (!item) return;
+      item.value = item.defaultValue;
+      item.customized = false;
+    });
+    renderActivityReplyEditor();
+    setActivityReplyStatus("dirty", text("replyUnsaved"));
+  }
+
+function populateConnectSelect(select, groups, preferredId) {
     if (!select) return;
     var current = String(preferredId || "");
     var safeGroups = Array.isArray(groups) ? groups : [];
