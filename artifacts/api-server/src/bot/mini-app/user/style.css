@@ -4808,3 +4808,39 @@ html[data-custom-theme="on"] .appearance-module-card{
 @media(prefers-reduced-motion:reduce){
   .tab-button,.normal-user-home-card,.metric-card,.tool-launch-card{transition:none!important;animation:none!important}
 }
+
+/* ==========================================================================
+   Z28 Mobile Tab Bar — final bottom reach clearance
+   Keep the last actionable content fully above the fixed five-tab navigation.
+   ========================================================================== */
+@media (max-width:680px){
+  :root{
+    --z28-mobile-bottom-clearance:156px;
+  }
+
+  html,
+  body{
+    scroll-padding-bottom:var(--z28-mobile-bottom-clearance);
+  }
+
+  #app{
+    padding-bottom:var(--z28-mobile-bottom-clearance)!important;
+  }
+
+  #app > section,
+  #app > .content,
+  .user-page,
+  .page-content{
+    scroll-margin-bottom:var(--z28-mobile-bottom-clearance);
+  }
+
+  .tab-bar{
+    z-index:200;
+  }
+}
+
+@media (max-width:390px){
+  :root{
+    --z28-mobile-bottom-clearance:148px;
+  }
+}
