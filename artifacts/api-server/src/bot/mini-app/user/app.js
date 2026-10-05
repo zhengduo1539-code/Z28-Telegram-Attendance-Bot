@@ -1425,7 +1425,7 @@
       "user-reply-messages-kicker","user-reply-messages-title","user-reply-messages-sub",
       "user-reply-messages-group-label","user-reply-messages-group","user-reply-messages-role",
       "user-reply-messages-note","user-reply-messages-language-title","user-reply-messages-language-sub",
-      "user-reply-locale-en","user-reply-locale-zh","user-reply-messages-list",
+      "user-reply-locale-en","user-reply-locale-mm","user-reply-locale-zh","user-reply-messages-list",
       "user-reply-save","user-reply-discard","user-reply-reset-language",
       "user-reply-messages-status","user-reply-status-dot","user-reply-status-text",
       "user-connect-guide-kicker","user-connect-guide-title","user-connect-guide-sub",
@@ -2382,6 +2382,7 @@
     els["user-reply-messages-language-title"].textContent = text("replyMessagesLanguageTitle");
     els["user-reply-messages-language-sub"].textContent = text("replyMessagesLanguageSub");
     els["user-reply-locale-en"].textContent = "English";
+    els["user-reply-locale-mm"].textContent = "Burmese";
     els["user-reply-locale-zh"].textContent = "中文";
     var replySaveLabel = els["user-reply-save"].querySelector(".button-label");
     var replyDiscardLabel = els["user-reply-discard"].querySelector(".button-label");
@@ -3363,7 +3364,7 @@
   function replySnapshot(data) {
     if (!data) return "";
     var output = {};
-    ["en", "zh"].forEach(function (locale) {
+    ["en", "mm", "zh"].forEach(function (locale) {
       output[locale] = {};
       activityReplyKeys().forEach(function (key) {
         var item = data[locale] && data[locale][key];
@@ -3395,7 +3396,7 @@
 
   function renderActivityReplyEditor() {
     if (!els["user-reply-messages-list"] || !state.replyEditorData) return;
-    var locale = state.replyLocale === "zh" ? "zh" : "en";
+    var locale = state.replyLocale === "zh" ? "zh" : (state.replyLocale === "mm" ? "mm" : "en");
     var labels = activityReplyLabelSet();
     var localeData = state.replyEditorData[locale] || {};
     var keys = activityReplyKeys();
@@ -3411,7 +3412,7 @@
         group && group.memberStatus === "creator" ? "OWNER" : "ADMIN";
     }
 
-    [["user-reply-locale-en", "en"], ["user-reply-locale-zh", "zh"]].forEach(function (entry) {
+    [["user-reply-locale-en", "en"], ["user-reply-locale-mm", "mm"], ["user-reply-locale-zh", "zh"]].forEach(function (entry) {
       var button = els[entry[0]];
       if (!button) return;
       var active = locale === entry[1];
@@ -3545,16 +3546,16 @@
     try {
       var data = await apiUserActivityReplies(groupId);
       if (requestId !== state.replyRequestId || !state.toolsOpen || state.selectedGroupId !== groupId) return;
-      if (!data || !data.messages || !data.messages.en || !data.messages.zh) {
+      if (!data || !data.messages || !data.messages.en || !data.messages.mm || !data.messages.zh) {
         throw new Error(text("replyLoadFailed"));
       }
       state.replyEditorData = data.messages;
-      state.replyLocale = state.replyLocale === "zh" ? "zh" : "en";
+      state.replyLocale = state.replyLocale === "zh" ? "zh" : (state.replyLocale === "mm" ? "mm" : "en");
       state.replyOriginalSnapshot = replySnapshot(state.replyEditorData);
       state.replyDirty = false;
       renderActivityReplyEditor();
 
-      var hasCustom = ["en", "zh"].some(function (locale) {
+      var hasCustom = ["en", "mm", "zh"].some(function (locale) {
         return state.replyEditorData[locale] &&
           Object.values(state.replyEditorData[locale]).some(function (item) {
             return item && item.customized;
@@ -3589,8 +3590,8 @@
     var saveLabel = els["user-reply-save"]?.querySelector(".button-label");
     if (saveLabel) saveLabel.textContent = text("replySaving");
 
-    var messages = { en: {}, zh: {} };
-    ["en", "zh"].forEach(function (locale) {
+    var messages = { en: {}, mm: {}, zh: {} };
+    ["en", "mm", "zh"].forEach(function (locale) {
       activityReplyKeys().forEach(function (key) {
         var item = state.replyEditorData[locale] && state.replyEditorData[locale][key];
         if (item) messages[locale][key] = item.value;
@@ -4376,10 +4377,15 @@ function populateConnectSelect(select, groups, preferredId) {
     });
     els["user-tool-detail-back"].onclick = closeUserTool;
 
-    if (els["user-reply-locale-en"] && els["user-reply-locale-zh"]) {
+    if (els["user-reply-locale-en"] && els["user-reply-locale-mm"] && els["user-reply-locale-zh"]) {
       els["user-reply-locale-en"].onclick = function () {
         if (state.replySaving || state.replyLoading) return;
         state.replyLocale = "en";
+        renderActivityReplyEditor();
+      };
+      els["user-reply-locale-mm"].onclick = function () {
+        if (state.replySaving || state.replyLoading) return;
+        state.replyLocale = "mm";
         renderActivityReplyEditor();
       };
       els["user-reply-locale-zh"].onclick = function () {
