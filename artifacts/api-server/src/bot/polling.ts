@@ -1,7 +1,8 @@
 import type { Logger } from "pino";
 import type { BotConfig } from "./config";
-import { ADMIN_MENU_COMMANDS, CommandHandler } from "./command-handler";
+import { ADMIN_MENU_COMMANDS, CommandHandler, DEFAULT_MENU_COMMANDS } from "./command-handler";
 import { setBotStatus } from "./runtime";
+import { getLocale } from "./locales";
 import { TelegramClient } from "./telegram-client";
 
 const MAX_RETRY_DELAY_MS = 30_000;
@@ -20,13 +21,13 @@ export class TelegramPollingBot {
 
   async start() {
     await this.telegram.deleteWebhook();
-    await this.telegram.setMyCommands();
+    await this.telegram.setMyCommands(DEFAULT_MENU_COMMANDS);
 
     const defaultMiniAppUrl = this.config.userMiniAppUrl || this.config.adminMiniAppUrl;
     if (defaultMiniAppUrl) {
       await this.telegram.setChatMenuButton(undefined, {
         type: "web_app",
-        text: "📊 My Dashboard",
+        text: getLocale("en").telegramUi.userMenuButton,
         web_app: { url: defaultMiniAppUrl },
       });
       this.logger.info(
@@ -56,7 +57,7 @@ export class TelegramPollingBot {
           operations.push(
             this.telegram.setChatMenuButton(userId, {
               type: "web_app",
-              text: "⚙️ Admin Panel",
+              text: getLocale("en").telegramUi.adminMenuButton,
               web_app: { url: this.config.adminMiniAppUrl },
             }),
           );
