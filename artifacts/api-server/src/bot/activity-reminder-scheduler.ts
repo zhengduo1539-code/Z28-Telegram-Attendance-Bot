@@ -10,6 +10,7 @@ const CLEANUP_INTERVAL_MS = 24 * 60 * 60 * 1_000;
 export class ActivityReminderScheduler {
   private timer?: ReturnType<typeof setInterval>;
   private checking = false;
+  private checkPromise?: Promise<void>;
   private lastCleanupAt = 0;
 
   constructor(
@@ -20,14 +21,28 @@ export class ActivityReminderScheduler {
 
   start(): void {
     if (this.timer) return;
-    void this.check();
-    this.timer = setInterval(() => void this.check(), CHECK_INTERVAL_MS);
+    this.runCheck();
+    this.timer = setInterval(() => this.runCheck(), CHECK_INTERVAL_MS);
   }
 
-  stop(): void {
-    if (!this.timer) return;
-    clearInterval(this.timer);
-    this.timer = undefined;
+  async stop(): Promise<void> {
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = undefined;
+    }
+    await this.checkPromise;
+  }
+
+  private runCheck(): void {
+    if (this.checking) return;
+
+    const promise = this.check();
+    this.checkPromise = promise;
+    void promise.finally(() => {
+      if (this.checkPromise === promise) {
+        this.checkPromise = undefined;
+      }
+    });
   }
 
   private async check(): Promise<void> {
