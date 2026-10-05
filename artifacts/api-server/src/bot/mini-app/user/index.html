@@ -24,114 +24,6 @@
 
   <div id="appearance-effects" class="appearance-effects-layer" aria-hidden="true">
     <canvas id="appearance-effects-canvas"></canvas>
-    <div id="appearance-dragon" class="appearance-dragon" hidden>
-      <svg viewBox="0 0 460 240" role="presentation">
-        <defs>
-          <linearGradient id="z28-dragon-body" x1="12%" y1="12%" x2="88%" y2="88%">
-            <stop offset="0%" stop-color="#ff6b74"/>
-            <stop offset="34%" stop-color="#e83d52"/>
-            <stop offset="72%" stop-color="#ad1837"/>
-            <stop offset="100%" stop-color="#5d0a22"/>
-          </linearGradient>
-          <linearGradient id="z28-dragon-highlight" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#fff0a6"/>
-            <stop offset="28%" stop-color="#ffc85c"/>
-            <stop offset="72%" stop-color="#ff9f2f"/>
-            <stop offset="100%" stop-color="#b95810"/>
-          </linearGradient>
-          <linearGradient id="z28-dragon-belly" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#f8d98b"/>
-            <stop offset="100%" stop-color="#a95c2c"/>
-          </linearGradient>
-          <radialGradient id="z28-dragon-eye" cx="40%" cy="35%">
-            <stop offset="0%" stop-color="#fff9cb"/>
-            <stop offset="46%" stop-color="#ffd96b"/>
-            <stop offset="100%" stop-color="#ff7f2b"/>
-          </radialGradient>
-          <pattern id="z28-dragon-scales" width="24" height="18" patternUnits="userSpaceOnUse">
-            <path d="M2 4Q12 15 22 4" fill="none" stroke="#ff9d43" stroke-width="1.15" opacity=".42"/>
-            <path d="M6 1Q12 7 18 1" fill="none" stroke="#ffd979" stroke-width=".8" opacity=".26"/>
-          </pattern>
-          <filter id="z28-dragon-glow" x="-35%" y="-35%" width="170%" height="170%">
-            <feGaussianBlur stdDeviation="5" result="b"/>
-            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-          </filter>
-          <filter id="z28-dragon-soft" x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur stdDeviation="1.5"/>
-          </filter>
-        </defs>
-
-        <g filter="url(#z28-dragon-soft)" opacity=".34" fill="none" stroke="#ffb348" stroke-linecap="round">
-          <path d="M74 184C121 168 130 126 171 124C211 122 223 166 267 157C313 147 317 103 357 88" stroke-width="18"/>
-          <path d="M60 196C111 180 134 143 173 141C214 139 226 178 270 168C318 156 329 110 374 97" stroke-width="5"/>
-        </g>
-
-        <g class="dragon-creature" filter="url(#z28-dragon-glow)">
-          <!-- long serpentine body -->
-          <path class="dragon-body" d="M53 188C95 164 103 129 146 127C187 125 194 162 232 166C276 170 288 131 312 103C327 86 347 77 370 81"
-            fill="none" stroke="url(#z28-dragon-body)" stroke-width="38" stroke-linecap="round"/>
-          <path class="dragon-body-highlight" d="M53 188C95 164 103 129 146 127C187 125 194 162 232 166C276 170 288 131 312 103C327 86 347 77 370 81"
-            fill="none" stroke="url(#z28-dragon-highlight)" stroke-width="4.2" stroke-linecap="round" stroke-dasharray="9 12" opacity=".88"/>
-          <path class="dragon-scales" d="M58 187C100 164 107 140 146 139C185 138 199 174 233 177C273 180 291 145 318 114"
-            fill="none" stroke="url(#z28-dragon-scales)" stroke-width="28" stroke-linecap="round" opacity=".8"/>
-
-          <!-- tail fins -->
-          <path class="dragon-tail dragon-tail-top" d="M55 188C38 180 25 166 17 151C37 157 51 161 68 166Z" fill="#9d1835" stroke="#ffbf4d" stroke-width="2"/>
-          <path class="dragon-tail dragon-tail-bottom" d="M60 184C40 190 25 199 15 213C36 210 52 203 70 195Z" fill="#c22842" stroke="#ff9f3c" stroke-width="2"/>
-
-          <!-- rear legs -->
-          <g class="dragon-legs" fill="none" stroke="url(#z28-dragon-body)" stroke-linecap="round">
-            <path class="dragon-leg dragon-leg-a" d="M220 161C213 180 207 193 196 207" stroke-width="12"/>
-            <path class="dragon-leg dragon-leg-b" d="M277 150C272 168 275 184 287 197" stroke-width="11"/>
-          </g>
-          <g class="dragon-claws" fill="none" stroke="#ffc85c" stroke-width="2.4" stroke-linecap="round">
-            <path d="M196 207l-8 10M198 205l3 12M202 202l10 6"/>
-            <path d="M287 197l-10 6M289 196l3 11M292 193l10 3"/>
-          </g>
-
-          <!-- head and neck -->
-          <path class="dragon-head" d="M343 88C337 66 350 47 374 43C399 39 423 50 434 67C443 81 439 99 422 108L406 117L382 113L364 103Z"
-            fill="url(#z28-dragon-body)" stroke="#ffbd4e" stroke-width="2.4"/>
-          <path class="dragon-neck" d="M406 113C399 120 389 130 378 139" fill="none" stroke="url(#z28-dragon-body)" stroke-width="18" stroke-linecap="round"/>
-
-          <!-- face -->
-          <path class="dragon-face-shadow" d="M385 80C395 72 406 70 417 75C411 85 403 92 391 95L375 91Z" fill="#8d1230" opacity=".9"/>
-          <path class="dragon-snout" d="M414 82L450 88L423 98L404 94Z" fill="#b51d38" stroke="#ffc55a" stroke-width="2"/>
-          <path d="M444 88l11 4-12 8" fill="none" stroke="#ffd56b" stroke-width="2.2" stroke-linecap="round"/>
-          <ellipse class="dragon-eye" cx="403" cy="66" rx="8" ry="10" fill="url(#z28-dragon-eye)" stroke="#ffe69a" stroke-width="1.4"/>
-          <ellipse class="dragon-eye-pupil" cx="404" cy="67" rx="2" ry="6" fill="#52101f"/>
-
-          <!-- antlers / horns -->
-          <g class="dragon-horns" fill="none" stroke="url(#z28-dragon-highlight)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M379 48C364 32 356 18 359 7M366 34l-16-9M374 44l2-17"/>
-            <path d="M400 45C399 27 406 14 421 5M406 29l16-6M401 37l-6-12"/>
-          </g>
-
-          <!-- beard, whiskers, mane -->
-          <g class="dragon-whiskers" fill="none" stroke="#ffcf69" stroke-linecap="round">
-            <path d="M389 99C376 111 362 121 346 124M391 102C379 119 365 134 350 142" stroke-width="2.5"/>
-            <path d="M421 103C442 111 450 124 453 139M418 106C438 120 450 136 458 151" stroke-width="2.5"/>
-            <path d="M370 51C351 58 341 67 333 79M372 53C354 70 346 86 342 101" stroke-width="5" opacity=".8"/>
-          </g>
-
-          <!-- chest whisker spikes -->
-          <path class="dragon-chest-spikes" d="M365 99L347 95L356 110L337 111L354 122" fill="#f1a440" opacity=".9"/>
-
-          <!-- belly scales -->
-          <path class="dragon-belly" d="M352 103C336 110 329 123 319 139" fill="none" stroke="url(#z28-dragon-belly)" stroke-width="8" stroke-dasharray="5 6" opacity=".8"/>
-
-          <!-- heat/fire accent -->
-          <path class="dragon-fire" d="M447 91C458 87 466 91 469 100C461 98 456 101 451 108C454 99 452 95 447 91Z" fill="#ff6b34"/>
-        </g>
-
-        <!-- drifting gold motes -->
-        <g class="dragon-motes" fill="#ffd66f">
-          <circle cx="323" cy="55" r="2.2"/><circle cx="337" cy="160" r="1.7"/><circle cx="122" cy="99" r="1.4"/>
-          <circle cx="96" cy="203" r="1.9"/><circle cx="404" cy="143" r="1.6"/>
-        </g>
-      </svg>
-    </div>
-
   </div>
 
   <div id="user-loading" class="loading-layer" hidden aria-live="polite">
@@ -691,7 +583,6 @@
                 <label class="appearance-effect-option is-selected" data-background-effect-option="none"><input id="appearance-background-effect-none" type="radio" name="background-effect" value="none" checked><span class="appearance-effect-preview appearance-effect-preview-none" aria-hidden="true"><span>OFF</span></span><span class="appearance-effect-copy"><strong id="user-background-effect-none">None</strong><small id="user-background-effect-none-sub">Clean background</small></span><span class="appearance-effect-check" aria-hidden="true">✓</span></label>
                 <label class="appearance-effect-option" data-background-effect-option="dollar"><input id="appearance-background-effect-dollar" type="radio" name="background-effect" value="dollar"><span class="appearance-effect-preview appearance-effect-preview-dollar" aria-hidden="true"><span>$</span><span>$</span><span>$</span><span>$</span></span><span class="appearance-effect-copy"><strong id="user-background-effect-dollar">Dollar Rain</strong><small id="user-background-effect-dollar-sub">Falling currency</small></span><span class="appearance-effect-check" aria-hidden="true">✓</span></label>
                 <label class="appearance-effect-option" data-background-effect-option="coins"><input id="appearance-background-effect-coins" type="radio" name="background-effect" value="coins"><span class="appearance-effect-preview appearance-effect-preview-coins" aria-hidden="true"><span>Z</span><span>●</span><span>Z</span><span>●</span></span><span class="appearance-effect-copy"><strong id="user-background-effect-coins">Gold Coins</strong><small id="user-background-effect-coins-sub">Falling gold coins</small></span><span class="appearance-effect-check" aria-hidden="true">✓</span></label>
-                <label class="appearance-effect-option" data-background-effect-option="dragon"><input id="appearance-background-effect-dragon" type="radio" name="background-effect" value="dragon"><span class="appearance-effect-preview appearance-effect-preview-dragon" aria-hidden="true"><span>龍</span></span><span class="appearance-effect-copy"><strong id="user-background-effect-dragon">Chinese Dragon</strong><small id="user-background-effect-dragon-sub">Floating dragon</small></span><span class="appearance-effect-check" aria-hidden="true">✓</span></label>
                 <label class="appearance-effect-option" data-background-effect-option="hacker"><input id="appearance-background-effect-hacker" type="radio" name="background-effect" value="hacker"><span class="appearance-effect-preview appearance-effect-preview-hacker" aria-hidden="true"><span>0101</span><span>&gt;_ Z28</span><span>0011</span></span><span class="appearance-effect-copy"><strong id="user-background-effect-hacker">Hacker Stream</strong><small id="user-background-effect-hacker-sub">Falling terminal code</small></span><span class="appearance-effect-check" aria-hidden="true">✓</span></label>
               </div>
             </fieldset>
