@@ -4683,3 +4683,105 @@ html[data-custom-theme="on"] .appearance-module-card{
     border-radius:17px;
   }
 }
+
+/* ==========================================================================
+   Z28 Mobile User UI — production mobile refinement
+   Scope: User Mini App stylesheet only.
+   ========================================================================== */
+@media (max-width:680px){
+  :root{--mobile-gutter:13px;--mobile-card-radius:18px;--mobile-control-height:44px}
+  html,body{width:100%;min-width:0;min-height:100%;overflow-x:hidden;overscroll-behavior-x:none}
+  body{min-height:100dvh;-webkit-text-size-adjust:100%;text-rendering:optimizeLegibility;-webkit-tap-highlight-color:transparent}
+  #app{min-height:100dvh}
+  .app-shell{width:100%;max-width:100%;margin:0;padding:max(10px,env(safe-area-inset-top)) var(--mobile-gutter) calc(108px + env(safe-area-inset-bottom))}
+  .app-header{min-height:52px;align-items:center;gap:9px;padding:2px 0 16px}
+  .brand-cluster{min-width:0;gap:9px;flex:1 1 auto}
+  .brand-mark{width:36px;height:36px;flex-basis:36px;border-radius:12px;grid-template-columns:repeat(3,4px);gap:3px}
+  .brand-mark span{width:4px}
+  .brand-mark span:nth-child(1){height:11px}.brand-mark span:nth-child(2){height:17px}.brand-mark span:nth-child(3){height:23px}
+  .brand-copy{min-width:0;overflow:hidden}
+  .brand-copy .eyebrow{font-size:8px;letter-spacing:.14em;white-space:nowrap}
+  .app-page-title{max-width:100%;margin:2px 0 1px;font-size:clamp(17px,5vw,21px);line-height:1.14;letter-spacing:-.035em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #identity{max-width:100%;margin:0;font-size:9.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .workspace-identity{max-width:100%;margin-top:2px;font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .language-button{width:42px;height:42px;flex:0 0 42px;border-radius:13px}
+  .language-button svg{width:18px;height:18px}
+  .language-menu{position:fixed;top:calc(max(10px,env(safe-area-inset-top)) + 54px);right:var(--mobile-gutter);width:min(190px,calc(100vw - 26px));max-width:calc(100vw - 26px);z-index:120}
+  .notice{margin-bottom:10px;max-width:100%;border-radius:14px}
+  .loading-panel{width:min(92vw,380px);max-width:calc(100vw - 26px);padding:15px;border-radius:17px}
+  .surface,.empty-state-card,.normal-user-home-card,.support-card,.faq-card,.about-card,.about-details,.credit-card,.connection-card,.tools-directory,.appearance-module-card,.appearance-theme-fieldset,.workspace-name-section,.theme-creator-section,.appearance-wallpaper-section,.appearance-effects-section,.appearance-controls,.settings-card,.metric-card{max-width:100%;min-width:0}
+  .dashboard-head,.support-head,.about-head,.appearance-head{padding-top:0;padding-bottom:13px}
+  .dashboard-title-wrap h2,.support-head h2,.about-head h2,.appearance-head h2{font-size:clamp(20px,6vw,25px);line-height:1.12;letter-spacing:-.035em}
+  .dashboard-title-wrap p,.support-head p,.about-head p,.appearance-head p{margin-top:4px;font-size:10.5px;line-height:1.5}
+  .dashboard-title-wrap{min-width:0;flex:1 1 auto}
+  .dashboard-actions{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;justify-content:stretch}
+  .dashboard-actions>*{width:100%;min-width:0;min-height:var(--mobile-control-height)}
+  .auto-refresh-control{min-height:var(--mobile-control-height);border-radius:12px;font-size:9px}
+  .group-dashboard-title{display:block;line-height:1.16}
+  .group-dashboard-name{display:inline-flex;max-width:100%;margin-bottom:5px;padding:.24em .52em;font-size:.62em}
+  .group-dashboard-suffix{display:block;font-size:.92em}
+  .metrics-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .metric-card{min-height:86px;padding:12px;gap:9px;border-radius:16px}
+  .metric-icon{width:35px;height:35px;flex-basis:35px;border-radius:11px}
+  .metric-icon svg{width:18px;height:18px}
+  .metric-label{font-size:9px;line-height:1.3}.metric-value{margin-top:3px;font-size:22px}
+  .settings-heading{padding:20px 1px 8px}.settings-heading h3{font-size:15px}.settings-heading p{font-size:9.5px}
+  .settings-card{margin-top:8px;padding:13px;border-radius:17px}
+  .setting-head{gap:9px}.setting-icon{width:36px;height:36px;flex-basis:36px;border-radius:11px}.setting-icon svg{width:18px;height:18px}
+  .setting-title{font-size:11.5px}.setting-sub{font-size:9px}
+  .setting-view{display:block;margin-top:11px}
+  .setting-grid,.setting-grid.counts{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+  .setting-value{padding:9px 7px;border-radius:11px}.setting-value-label{font-size:7.5px}.setting-value-number{font-size:13px}
+  .setting-edit{width:100%;min-height:42px;margin-top:8px;border-radius:11px;font-size:10px}
+  .editor-grid{grid-template-columns:1fr;gap:7px}.editor-row{min-height:48px}
+  .editor-footer,.editor-actions{width:100%}.editor-actions{margin-left:0}.editor-actions button{flex:1 1 0;min-height:42px}
+  .normal-user-home{min-height:auto;padding:0}.normal-user-home-card{margin:0;padding:17px;border-radius:20px}
+  .normal-user-home-card h2{font-size:clamp(22px,7vw,28px);line-height:1.12;letter-spacing:-.04em}
+  .normal-user-home-card>p{font-size:10.5px;line-height:1.65}
+  .normal-user-quick-access{grid-template-columns:1fr;gap:7px}
+  .normal-user-quick-access button,.normal-user-home-card .primary-button,.normal-user-home-card .secondary-button{width:100%;min-height:44px}
+  .tools-directory{margin-top:0}.tools-category{margin-bottom:9px;padding:11px 12px;border-radius:14px}.tools-category h3{font-size:12px}.tools-category p{font-size:8.5px}
+  .tool-launch-grid{grid-template-columns:1fr;gap:8px}.tool-launch-card{min-height:76px;padding:12px;border-radius:16px}
+  .tool-launch-icon{width:39px;height:39px;flex-basis:39px;border-radius:12px}.tool-launch-copy strong{font-size:12px}.tool-launch-copy>span:last-child{font-size:8.8px}
+  .tool-detail-header{grid-template-columns:1fr;gap:8px}.tool-detail-back{min-height:42px;justify-self:stretch;justify-content:center;border-radius:12px;font-size:10px}
+  .connection-card{padding:13px;border-radius:18px}.connection-header{gap:9px}.connection-step-card{padding:12px;border-radius:15px}.connection-step-head{gap:7px}
+  .connect-select-wrap{min-height:48px}
+  .connect-select,.support-select,.support-textarea,.text-input,.editor-input{font-size:16px}
+  .connect-select,.support-select,.text-input{min-height:44px}
+  .connection-actions{grid-template-columns:1fr!important;gap:7px}
+  .connection-actions button,.connect-button,.connection-change-button{width:100%;min-height:44px}
+  .connection-overview{padding:11px;border-radius:14px}.connection-guide,.connection-flow{padding:13px;border-radius:16px}
+  .connection-guide-step,.connection-flow-stage{grid-template-columns:auto minmax(0,1fr);padding:9px}
+  .reply-messages-card{padding:13px;border-radius:18px}.reply-messages-header{grid-template-columns:39px minmax(0,1fr);gap:9px}
+  .reply-messages-header-icon{width:39px;height:39px;border-radius:12px}
+  .reply-messages-header-state{grid-column:2;justify-self:start;margin-top:-3px}
+  .appearance-module-grid,.appearance-theme-grid{grid-template-columns:1fr;gap:8px}
+  .appearance-module-card{padding:13px;border-radius:17px}
+  .appearance-section-head,.appearance-theme-fieldset,.workspace-name-section,.theme-creator-section,.appearance-wallpaper-section,.appearance-effects-section,.appearance-controls{padding:12px;border-radius:16px}
+  .appearance-theme-option{min-height:64px;padding:9px;border-radius:13px}.appearance-control{min-height:58px;padding:9px 10px;border-radius:14px}
+  .appearance-wallpaper-actions{grid-template-columns:1fr;gap:7px}.appearance-wallpaper-upload,.appearance-wallpaper-remove{width:100%;min-height:42px}
+  .workspace-name-input-wrap,.theme-creator-control,.theme-creator-preview{min-height:44px}
+  .support-card,.faq-card{padding:13px;border-radius:18px}.support-intro,.faq-intro{gap:9px}
+  .support-icon,.faq-icon{width:38px;height:38px;flex-basis:38px;border-radius:12px}
+  .support-card-title,.faq-card-title{font-size:13px}.support-card-copy,.faq-card-copy{font-size:9px;line-height:1.55}
+  .support-form{margin-top:13px}.support-field{margin-top:11px}.support-field label{font-size:9px}
+  .support-textarea{min-height:132px;padding:11px;border-radius:12px;line-height:1.55}.support-form-meta{align-items:flex-start;gap:8px;font-size:8px}
+  .support-submit{width:100%;min-height:46px;margin-top:11px}.faq-list{gap:6px}.faq-item summary{min-height:48px;padding:11px}
+  .faq-item p{padding:0 11px 12px;font-size:9px;line-height:1.65}
+  .about-grid{grid-template-columns:1fr;gap:8px}.about-card,.about-details,.credit-card{padding:13px;border-radius:16px}
+  .tab-bar{position:fixed;left:var(--mobile-gutter);right:var(--mobile-gutter);bottom:max(7px,env(safe-area-inset-bottom));width:auto;margin:0;padding:5px;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;border-radius:18px;z-index:200;box-shadow:0 18px 42px rgba(0,0,0,.42),0 3px 12px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.055)}
+  .tab-button{min-width:0;min-height:52px;flex-direction:column;gap:3px;padding:5px 2px;border-radius:13px;font-size:7.5px;line-height:1.05;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tab-button svg{width:17px;height:17px;flex:0 0 17px}.tab-button.active{transform:translateY(-1px);box-shadow:inset 0 1px rgba(255,255,255,.04),0 5px 15px rgba(36,116,190,.10)}.tab-button:active{transform:scale(.96)}
+  .primary-button,.secondary-button,.icon-button,.setting-edit,.connect-button,.tool-launch-card,.connection-guide-toggle,.appearance-theme-option,.appearance-control,.faq-item summary{-webkit-touch-callout:none}
+  .primary-button,.secondary-button{min-height:44px}
+}
+@media(max-width:390px){
+  :root{--mobile-gutter:11px}.app-shell{padding-left:var(--mobile-gutter);padding-right:var(--mobile-gutter)}.app-header{padding-bottom:13px}
+  .brand-mark{width:34px;height:34px;flex-basis:34px}.app-page-title{font-size:17px}
+  .language-button{width:40px;height:40px;flex-basis:40px}.dashboard-actions{grid-template-columns:1fr}
+  .metric-card{min-height:82px;padding:10px}.metric-icon{width:32px;height:32px;flex-basis:32px}.metric-value{font-size:20px}
+  .tab-bar{left:var(--mobile-gutter);right:var(--mobile-gutter)}.tab-button{min-height:50px;font-size:7px}.tab-button svg{width:16px;height:16px;flex-basis:16px}
+}
+@media(prefers-reduced-motion:reduce){
+  .tab-button,.normal-user-home-card,.metric-card,.tool-launch-card{transition:none!important;animation:none!important}
+}
