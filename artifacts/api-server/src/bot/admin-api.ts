@@ -298,17 +298,56 @@ adminApiRouter.post("/broadcast", async (req, res) => {
       (candidate) => candidate.userId === targetUserId && candidate.chatId > 0,
     );
 
+    const formatDirectReplyError = (error: unknown) => {
+      const message = error instanceof Error ? error.message : String(error);
+      const normalized = message.replace(/\\s+/g, " ").trim();
+
+      if (/bot was blocked by the user/i.test(normalized)) {
+        return "Telegram rejected the reply because the user has blocked the bot. Ask the user to unblock the bot and send /start again.";
+      }
+      if (/chat not found|peer_id_invalid|user not found/i.test(normalized)) {
+        return "Telegram could not find an accessible private chat for this user. Ask the user to open the bot and send /start again.";
+      }
+      if (/user is deactivated/i.test(normalized)) {
+        return "Telegram rejected the reply because the user account is deactivated.";
+      }
+
+      return "Telegram rejected the direct reply: " + normalized.slice(0, 240);
+    };
+
+    let privateChatId = targetUserId;
     try {
-      await auth.context.telegram.sendMessage(targetUserId, safeMessage);
+      const privateChat = await auth.context.telegram.getChat(targetUserId);
+      if (privateChat.type !== "private") {
+        throw new Error("Telegram resolved the target ID to a non-private chat.");
+      }
+      privateChatId = privateChat.id;
     } catch (error: unknown) {
+      const reason = error instanceof Error ? error.message : String(error);
       await recordAdminAudit(
         auth,
         "direct_message.failed",
         String(targetUserId),
-        "Direct reply delivery failed.",
+        "Private chat verification failed: " + reason.slice(0, 200),
       );
       res.status(502).json({
-        error: "Telegram could not deliver the direct reply. The user may not have an available private chat with the bot.",
+        error: formatDirectReplyError(error),
+      });
+      return;
+    }
+
+    try {
+      await auth.context.telegram.sendMessage(privateChatId, safeMessage);
+    } catch (error: unknown) {
+      const reason = error instanceof Error ? error.message : String(error);
+      await recordAdminAudit(
+        auth,
+        "direct_message.failed",
+        String(targetUserId),
+        "Direct reply delivery failed: " + reason.slice(0, 200),
+      );
+      res.status(502).json({
+        error: formatDirectReplyError(error),
       });
       return;
     }
