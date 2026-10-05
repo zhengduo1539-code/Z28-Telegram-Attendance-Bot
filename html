@@ -1,0 +1,1316 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <script>window.__z28MiniAppMode = "user";</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#071120">
+  <title>User Dashboard</title>
+  <script src="https://telegram.org/js/telegram-web-app.js?63"></script>
+  <style>__Z28_STYLE__</style>
+</head>
+<body>
+  <div id="splash" class="splash" aria-label="Loading">
+    <div class="splash-orbit splash-orbit-a"></div>
+    <div class="splash-orbit splash-orbit-b"></div>
+    <div class="splash-content">
+      <div class="brand-mark brand-mark-lg" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="splash-kicker">Z28 • TELEGRAM ATTENDANCE</div>
+      <h1 id="splash-title">Welcome</h1>
+      <p>Preparing your dashboard</p>
+    </div>
+  </div>
+
+
+  <div id="appearance-effects" class="appearance-effects-layer" aria-hidden="true">
+    <canvas id="appearance-effects-canvas"></canvas>
+    <div id="appearance-dragon" class="appearance-dragon" hidden>
+      <svg viewBox="0 0 320 190" role="presentation">
+        <defs>
+          <linearGradient id="z28-dragon-body" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ff6879"/>
+            <stop offset="48%" stop-color="#d62f48"/>
+            <stop offset="100%" stop-color="#7d1028"/>
+          </linearGradient>
+          <linearGradient id="z28-dragon-gold" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#ffd978"/>
+            <stop offset="52%" stop-color="#ffb52f"/>
+            <stop offset="100%" stop-color="#c66b13"/>
+          </linearGradient>
+          <filter id="z28-dragon-glow" x="-35%" y="-35%" width="170%" height="170%">
+            <feGaussianBlur stdDeviation="3.5" result="blur"/>
+            <feMerge>
+              <feMergeNode in="blur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+        <g filter="url(#z28-dragon-glow)">
+          <path d="M36 142C70 108 75 72 111 71c36-2 31 45 67 46 36 1 39-43 77-44 18 0 28 10 31 25"
+            fill="none" stroke="url(#z28-dragon-body)" stroke-width="31" stroke-linecap="round"/>
+          <path d="M36 142C70 108 75 72 111 71c36-2 31 45 67 46 36 1 39-43 77-44"
+            fill="none" stroke="url(#z28-dragon-gold)" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="6 10" opacity=".8"/>
+          <path d="M278 52c11 7 18 19 17 31-1 13-9 23-21 28l-14 5-5-14 8-18-7-9 8-13Z"
+            fill="url(#z28-dragon-body)" stroke="#ffc95f" stroke-width="2"/>
+          <path d="M285 45 294 33l-2 15M274 45l-6-14 11 9M300 59l14-5-10 13"
+            fill="none" stroke="#ffc95f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="289" cy="61" r="2.8" fill="#fff3bf"/>
+          <path d="M298 77c8 4 13 10 18 17M296 80c11-1 18 1 25 5"
+            fill="none" stroke="#ffd978" stroke-width="2" stroke-linecap="round"/>
+          <path d="M260 99c-9 13-17 22-30 31M231 129l-8 11M232 128l4 12M183 109c-7 14-12 24-22 36M160 145l-4 12M161 144l9 8"
+            fill="none" stroke="url(#z28-dragon-body)" stroke-width="8" stroke-linecap="round"/>
+          <path d="M69 129c-13-11-27-19-43-20M61 135c-14-2-25 0-37 5"
+            fill="none" stroke="#e94b5e" stroke-width="5" stroke-linecap="round"/>
+          <path d="M35 135l-11 10M36 131l-13-2M40 125l-8-11"
+            fill="none" stroke="#ffc95f" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M308 84c6 4 8 9 7 14-2 7-8 12-15 13 5-5 7-11 6-17-1-4-1-7 2-10Z"
+            fill="#ff9d3b" opacity=".75"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <div id="user-loading" class="loading-layer" hidden aria-live="polite">
+    <div class="loading-panel" role="status" aria-label="Loading dashboard">
+      <div class="loading-spinner" aria-hidden="true"></div>
+      <div>
+        <strong id="loading-title">Loading your dashboard</strong>
+        <span id="loading-subtitle">Checking groups and current activity…</span>
+      </div>
+    </div>
+  </div>
+
+  <main class="app-shell" id="app">
+    <header class="app-header">
+      <div class="brand-cluster">
+        <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="brand-copy">
+          <div class="eyebrow">Z28 ATTENDANCE</div>
+          <h1 id="title" class="app-page-title">User Dashboard</h1>
+          <p id="identity">Checking your Telegram account…</p>
+          <div id="workspace-identity" class="workspace-identity" aria-label="Workspace">My Workspace</div>
+        </div>
+      </div>
+      <button class="icon-button language-button" id="user-language-button" type="button" aria-label="Change language" aria-controls="user-language-menu" aria-haspopup="true" aria-expanded="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.7"></circle><path d="M3.5 12h17"></path><path d="M12 3.3c2.4 2.5 3.6 5.4 3.6 8.7S14.4 18.2 12 20.7 8.4 15.8 8.4 12 9.6 5.8 12 3.3z"></path></svg>
+      </button>
+      <div class="language-menu" id="user-language-menu" aria-label="Language options" hidden>
+        <button type="button" class="language-option active" data-user-lang="en">English</button>
+        <button type="button" class="language-option" data-user-lang="my">Burmese</button>
+        <button type="button" class="language-option" data-user-lang="zh">Chinese (Simplified)</button>
+      </div>
+    </header>
+
+    <div id="notice" class="notice" role="status" aria-live="polite" aria-atomic="true"></div>
+
+    <section id="user-verify-card" class="surface verify-screen" aria-labelledby="user-verify-title" aria-describedby="user-verify-lead" hidden>
+      <div class="section-icon section-icon-accent" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M12 3.5 19 7v4.7c0 4.4-2.7 7.8-7 8.8-4.3-1-7-4.4-7-8.8V7l7-3.5Z"></path><path d="m9 12 2 2 4-4"></path></svg>
+      </div>
+      <div class="eyebrow">SECURE ACCESS</div>
+      <h2 id="user-verify-title">Verify Your Telegram ID</h2>
+      <p id="user-verify-subtitle" class="section-subtitle">User Access</p>
+      <p id="user-verify-lead" class="section-copy">Enter your Telegram user ID to open your group dashboard.</p>
+      <label for="user-id-input" id="user-id-label">Telegram User ID</label>
+      <input id="user-id-input" class="text-input" type="text" inputmode="numeric" autocomplete="off" placeholder="Enter your Telegram ID">
+      <p id="user-id-hint" class="input-hint">Your ID must match the Telegram account currently opening this Mini App.</p>
+      <button id="user-confirm" class="primary-button" type="button" disabled>
+        <span class="button-label">Confirm</span>
+      </button>
+    </section>
+
+    <section id="user-no-group-screen" class="state-screen empty-state" aria-labelledby="user-no-group-title" aria-describedby="user-no-group-message" hidden aria-live="polite">
+      <div class="empty-state-card">
+        <div class="empty-state-topline">
+          <div class="state-icon state-icon-muted" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M4.5 7.5h6l1.5 2h7.5v9a2 2 0 0 1-2 2H6.5a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2Z"></path><path d="M4.5 7.5V5.5a2 2 0 0 1 2-2h4l1.7 2h4.8a2 2 0 0 1 2 2v2"></path></svg>
+          </div>
+          <div class="eyebrow" id="user-no-group-eyebrow">GROUP ACCESS</div>
+        </div>
+
+        <h2 id="user-no-group-title">No eligible groups yet</h2>
+        <p id="user-no-group-message">This Mini App could not find a group that your Telegram account can manage.</p>
+
+        <div class="empty-state-help">
+          <div class="empty-state-help-head">
+            <span id="user-no-group-help-title">Getting started</span>
+            <span class="empty-state-help-caption" id="user-no-group-help-caption">Complete these checks, then reopen the Mini App.</span>
+          </div>
+
+          <ol class="empty-state-steps">
+            <li class="empty-state-step">
+              <span class="empty-state-step-number" aria-hidden="true">01</span>
+              <div>
+                <strong id="user-no-group-step1-title">Add the bot to your group</strong>
+                <span id="user-no-group-step1-copy">Make sure Z28 is still a member of the group you want to manage.</span>
+              </div>
+            </li>
+            <li class="empty-state-step">
+              <span class="empty-state-step-number" aria-hidden="true">02</span>
+              <div>
+                <strong id="user-no-group-step2-title">Check your group role</strong>
+                <span id="user-no-group-step2-copy">Your Telegram account must be the group owner or an administrator.</span>
+              </div>
+            </li>
+            <li class="empty-state-step">
+              <span class="empty-state-step-number" aria-hidden="true">03</span>
+              <div>
+                <strong id="user-no-group-step3-title">Reopen the Mini App</strong>
+                <span id="user-no-group-step3-copy">Open the Mini App again after the access changes are complete.</span>
+              </div>
+            </li>
+          </ol>
+        </div>
+
+        <div class="empty-state-note">
+          <span class="empty-state-note-icon" aria-hidden="true">i</span>
+          <p id="user-no-group-note">Groups that are no longer available to the bot are not shown in your dashboard.</p>
+        </div>
+
+        <div class="empty-state-actions">
+          <button id="user-no-group-back" class="secondary-button empty-state-back" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5 7.5 12l7 7"></path></svg>
+            <span id="user-no-group-back-label">Back to verification</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section id="user-dashboard-error-screen" class="state-screen error-screen" aria-labelledby="user-dashboard-error-title" aria-describedby="user-dashboard-error-lead" hidden aria-live="assertive">
+      <div class="state-icon state-icon-error" aria-hidden="true">!</div>
+      <div class="eyebrow">DASHBOARD ERROR</div>
+      <h2 id="user-dashboard-error-title">Unable to load your dashboard right now.</h2>
+      <p id="user-dashboard-error-lead">Something went wrong while loading your dashboard. Your saved settings were not changed.</p>
+      <button id="user-dashboard-error-retry" class="primary-button" type="button">
+        <span class="button-label">Try Again</span>
+      </button>
+    </section>
+
+    <section id="user-dashboard" class="dashboard-root" hidden>
+      <div id="user-group-options" class="surface group-picker">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">YOUR GROUPS</div>
+            <h2 class="section-title" id="group-options-title">Group Options</h2>
+            <p class="section-subtitle" id="group-options-subtitle">Select a group to open its dashboard.</p>
+          </div>
+        </div>
+        <div id="user-group-options-list" class="group-list"></div>
+      </div>
+
+      <div id="user-selected-dashboard" hidden>
+        <div class="dashboard-head">
+          <div class="dashboard-title-wrap">
+            <div class="eyebrow" id="selected-group-eyebrow">LIVE GROUP DASHBOARD</div>
+            <h2 id="user-selected-group-title" class="group-dashboard-title">
+              <span class="group-dashboard-name">Group</span>
+              <span class="group-dashboard-suffix">Dashboard</span>
+            </h2>
+            <p id="user-dashboard-sub">Live activity overview</p>
+          </div>
+          <div class="dashboard-actions">
+            <button class="icon-button" id="refresh" type="button" aria-label="Refresh dashboard">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 8A8 8 0 0 0 5.1 6.1L3.5 8"></path><path d="M3.5 4.5V8h3.5"></path><path d="M4.5 16A8 8 0 0 0 18.9 17.9l1.6-1.9"></path><path d="M20.5 19.5V16H17"></path></svg>
+            </button>
+            <button class="auto-refresh-control" id="auto-refresh-toggle" type="button" aria-pressed="false" aria-label="Automatic dashboard refresh is turned off" title="Automatic dashboard refresh is turned off">
+              <span class="auto-refresh-indicator" aria-hidden="true"></span>
+              <span id="auto-refresh-label">Auto • Off</span>
+            </button>
+            <button class="secondary-button" id="switch-group" type="button">
+              <span id="switch-group-label">Switch</span>
+            </button>
+          </div>
+        </div>
+
+        <section id="user-onboarding" class="onboarding-card" hidden aria-labelledby="user-onboarding-title">
+          <div class="onboarding-header">
+            <div class="onboarding-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 3.5a8.5 8.5 0 1 0 8.5 8.5A8.5 8.5 0 0 0 12 3.5Z"></path><path d="M12 10.5v5"></path><path d="M12 7.4h.01"></path></svg>
+            </div>
+            <div class="onboarding-copy">
+              <div class="onboarding-kicker">QUICK START</div>
+              <h3 id="user-onboarding-title">Get started with Z28</h3>
+              <p id="user-onboarding-sub">A quick guide to the parts you will use most.</p>
+            </div>
+          </div>
+
+          <div class="onboarding-steps">
+            <article class="onboarding-step">
+              <span class="onboarding-step-number">01</span>
+              <div>
+                <strong id="user-onboarding-step1-title">Choose your group</strong>
+                <p id="user-onboarding-step1-copy">Use Switch any time you need to work with another group.</p>
+              </div>
+            </article>
+            <article class="onboarding-step">
+              <span class="onboarding-step-number">02</span>
+              <div>
+                <strong id="user-onboarding-step2-title">Manage attendance</strong>
+                <p id="user-onboarding-step2-copy">Review limits and update activity settings from your dashboard.</p>
+              </div>
+            </article>
+            <article class="onboarding-step">
+              <span class="onboarding-step-number">03</span>
+              <div>
+                <strong id="user-onboarding-step3-title">Personalize your workspace</strong>
+                <p id="user-onboarding-step3-copy">Customize your theme, wallpaper and layout from Appearance.</p>
+              </div>
+            </article>
+          </div>
+
+          <div class="onboarding-actions">
+            <button id="user-onboarding-tools" class="secondary-button" type="button">Explore Tools</button>
+            <button id="user-onboarding-appearance" class="secondary-button" type="button">Customize Appearance</button>
+            <button id="user-onboarding-dismiss" class="primary-button" type="button">Got it</button>
+          </div>
+        </section>
+
+        <div class="metrics-grid" aria-label="Group activity summary">
+          <article class="metric-card">
+            <div class="metric-icon metric-icon-group" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M8.5 10.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"></path><path d="M15.8 10a2.5 2.5 0 1 0 0-5"></path><path d="M3.5 19c.5-3.4 2.3-5.2 5-5.2s4.5 1.8 5 5.2"></path><path d="M15 14.3c2.8.1 4.4 1.7 5 4.7"></path></svg>
+            </div>
+            <div>
+              <span id="user-group-member-label" class="metric-label">Group members</span>
+              <strong id="user-member-count" class="metric-value">—</strong>
+            </div>
+          </article>
+          <article class="metric-card">
+            <div class="metric-icon metric-icon-live" aria-hidden="true">
+              <span class="live-dot"></span>
+            </div>
+            <div>
+              <span id="user-member-active-label" class="metric-label">Member active</span>
+              <strong id="user-active-count" class="metric-value">—</strong>
+            </div>
+          </article>
+        </div>
+
+        <div class="settings-heading">
+          <div>
+            <div class="eyebrow">GROUP CONFIGURATION</div>
+            <h3 id="settings-title">Activity settings</h3>
+            <p id="settings-subtitle">Manage limits for this group.</p>
+          </div>
+        </div>
+
+        <div id="user-settings-limits-card" class="settings-card"></div>
+        <div id="user-settings-counts-card" class="settings-card"></div>
+      </div>
+
+      <section id="user-appearance-page" class="appearance-page" hidden aria-labelledby="user-appearance-title">
+        <div class="dashboard-head appearance-head">
+          <div class="dashboard-title-wrap">
+            <div class="eyebrow">INTERFACE SETTINGS</div>
+            <h2 id="user-appearance-title">Appearance</h2>
+            <p id="user-appearance-sub">Personalize the Mini App interface.</p>
+          </div>
+        </div>
+
+        <article class="appearance-card">
+          <div class="appearance-section-head">
+            <div class="appearance-section-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M5 6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5v8A2.5 2.5 0 0 1 16.5 17H12l-3.5 3v-3H7.5A2.5 2.5 0 0 1 5 14.5Z"></path><path d="M8.5 10h7"></path><path d="M8.5 13h4.5"></path></svg>
+            </div>
+            <div>
+              <div class="appearance-kicker" id="user-appearance-theme-kicker">DISPLAY</div>
+              <h3 id="user-appearance-theme-title">Theme</h3>
+              <p id="user-appearance-theme-sub">Choose the interface style for this device.</p>
+            </div>
+          </div>
+
+          <section class="workspace-name-section" aria-labelledby="workspace-name-title">
+            <div class="workspace-name-head">
+              <div class="workspace-name-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M4.5 6.5A2.5 2.5 0 0 1 7 4h10a2.5 2.5 0 0 1 2.5 2.5v9A2.5 2.5 0 0 1 17 18h-6l-3.5 2.5V18H7a2.5 2.5 0 0 1-2.5-2.5Z"></path><path d="M8 9h8"></path><path d="M8 12h5"></path></svg>
+              </div>
+              <div class="workspace-name-copy">
+                <div class="appearance-kicker" id="workspace-name-kicker">WORKSPACE IDENTITY</div>
+                <h3 id="workspace-name-title">Personal Workspace Name</h3>
+                <p id="workspace-name-sub">Give your Z28 workspace a name. It is saved only on this device.</p>
+              </div>
+              <span class="workspace-name-badge" id="workspace-name-badge">DEVICE ONLY</span>
+            </div>
+
+            <div class="workspace-name-editor">
+              <div class="workspace-name-input-wrap">
+                <input
+                  id="workspace-name-input"
+                  class="workspace-name-input"
+                  type="text"
+                  maxlength="32"
+                  autocomplete="off"
+                  spellcheck="false"
+                  placeholder="My Workspace"
+                  aria-describedby="workspace-name-hint workspace-name-count"
+                >
+                <span class="workspace-name-input-glow" aria-hidden="true"></span>
+              </div>
+              <div class="workspace-name-meta">
+                <span id="workspace-name-hint">1–32 characters</span>
+                <span id="workspace-name-count">0 / 32</span>
+              </div>
+            </div>
+
+            <div class="workspace-name-actions">
+              <button id="workspace-name-save" class="primary-button workspace-name-save" type="button">
+                <span class="button-label" id="workspace-name-save-label">Save Workspace Name</span>
+              </button>
+              <button id="workspace-name-reset" class="secondary-button workspace-name-reset" type="button">
+                <span class="button-label" id="workspace-name-reset-label">Reset</span>
+              </button>
+            </div>
+
+            <div class="workspace-name-status" id="workspace-name-status" aria-live="polite">
+              <span class="workspace-name-status-dot" id="workspace-name-status-dot" aria-hidden="true"></span>
+              <span id="workspace-name-status-text">Saved on this device.</span>
+            </div>
+          </section>
+
+
+
+          <fieldset class="appearance-theme-fieldset">
+            <legend class="sr-only" id="user-appearance-theme-legend">Theme</legend>
+            <div class="appearance-theme-grid">
+              <label class="appearance-theme-option is-selected" data-theme-option="dark">
+                <input id="appearance-theme-dark" type="radio" name="appearance-theme" value="dark" checked>
+                <span class="appearance-theme-visual appearance-theme-visual-dark" aria-hidden="true">
+                  <span></span><span></span><span></span>
+                </span>
+                <span class="appearance-theme-copy">
+                  <strong id="user-appearance-theme-dark-title">Dark</strong>
+                  <span id="user-appearance-theme-dark-sub">Balanced dark interface</span>
+                </span>
+                <span class="appearance-theme-check" aria-hidden="true">✓</span>
+              </label>
+
+              <label class="appearance-theme-option" data-theme-option="midnight">
+                <input id="appearance-theme-midnight" type="radio" name="appearance-theme" value="midnight">
+                <span class="appearance-theme-visual appearance-theme-visual-midnight" aria-hidden="true">
+                  <span></span><span></span><span></span>
+                </span>
+                <span class="appearance-theme-copy">
+                  <strong id="user-appearance-theme-midnight-title">Midnight</strong>
+                  <span id="user-appearance-theme-midnight-sub">Cooler navy and violet finish</span>
+                </span>
+                <span class="appearance-theme-check" aria-hidden="true">✓</span>
+              </label>
+
+              <label class="appearance-theme-option" data-theme-option="light">
+                <input id="appearance-theme-light" type="radio" name="appearance-theme" value="light">
+                <span class="appearance-theme-visual appearance-theme-visual-light" aria-hidden="true">
+                  <span></span><span></span><span></span>
+                </span>
+                <span class="appearance-theme-copy">
+                  <strong id="user-appearance-theme-light-title">Light</strong>
+                  <span id="user-appearance-theme-light-sub">Soft light interface</span>
+                </span>
+                <span class="appearance-theme-check" aria-hidden="true">✓</span>
+              </label>
+
+              <label class="appearance-theme-option" data-theme-option="white">
+                <input id="appearance-theme-white" type="radio" name="appearance-theme" value="white">
+                <span class="appearance-theme-visual appearance-theme-visual-white" aria-hidden="true">
+                  <span></span><span></span><span></span>
+                </span>
+                <span class="appearance-theme-copy">
+                  <strong id="user-appearance-theme-white-title">White</strong>
+                  <span id="user-appearance-theme-white-sub">Clean pure-white interface</span>
+                </span>
+                <span class="appearance-theme-check" aria-hidden="true">✓</span>
+              </label>
+
+              <label class="appearance-theme-option" data-theme-option="amoled">
+                <input id="appearance-theme-amoled" type="radio" name="appearance-theme" value="amoled">
+                <span class="appearance-theme-visual appearance-theme-visual-amoled" aria-hidden="true">
+                  <span></span><span></span><span></span>
+                </span>
+                <span class="appearance-theme-copy">
+                  <strong id="user-appearance-theme-amoled-title">AMOLED</strong>
+                  <span id="user-appearance-theme-amoled-sub">Pure black for OLED displays</span>
+                </span>
+                <span class="appearance-theme-check" aria-hidden="true">✓</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <section class="theme-creator-section" aria-labelledby="theme-creator-title">
+            <div class="theme-creator-head">
+              <div class="theme-creator-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M12 3.8c4.7 0 8.2 3.2 8.2 7.7 0 2.2-1.3 3.5-3.3 3.5h-1.4a1.7 1.7 0 0 0-1.7 1.7c0 .8-.2 1.4-.7 2-.7.9-1.8 1.4-3 1.4-3.8 0-6.9-3.2-6.9-7.2 0-5.1 3.8-9.1 8.8-9.1Z"></path><circle cx="7.8" cy="10.2" r="1"></circle><circle cx="11.6" cy="7.9" r="1"></circle><circle cx="15.6" cy="8.3" r="1"></circle></svg>
+              </div>
+              <div class="theme-creator-copy">
+                <div class="appearance-kicker">CUSTOMIZATION</div>
+                <h3 id="theme-creator-title">Theme Creator</h3>
+                <p id="theme-creator-sub">Create your own look and keep it saved on this device.</p>
+              </div>
+              <span class="theme-creator-badge" id="theme-creator-badge">DEVICE ONLY</span>
+            </div>
+
+            <div class="theme-creator-preview" id="theme-creator-preview" aria-live="polite">
+              <div class="theme-creator-preview-glow"></div>
+              <div class="theme-creator-preview-window">
+                <div class="theme-creator-preview-top">
+                  <span class="theme-creator-preview-dot"></span>
+                  <span class="theme-creator-preview-title" id="theme-creator-preview-title">Z28 Preview</span>
+                  <span class="theme-creator-preview-status" id="theme-creator-preview-status">CUSTOM</span>
+                </div>
+                <div class="theme-creator-preview-card">
+                  <div>
+                    <small id="theme-creator-preview-label">Your Style</small>
+                    <strong id="theme-creator-preview-value">Personal Theme</strong>
+                  </div>
+                  <span class="theme-creator-preview-chip" id="theme-creator-preview-chip">LIVE</span>
+                </div>
+                <div class="theme-creator-preview-bars" aria-hidden="true"><span></span><span></span><span></span></div>
+              </div>
+            </div>
+
+            <div class="theme-creator-presets" aria-label="Theme presets">
+              <div class="theme-creator-subhead">
+                <strong id="theme-creator-presets-title">Quick palettes</strong>
+                <span id="theme-creator-presets-sub">Start with a preset, then fine-tune it.</span>
+              </div>
+              <div class="theme-palette-grid">
+                <button class="theme-palette-option theme-palette-ocean" type="button" data-theme-palette="ocean" aria-label="Ocean palette">
+                  <span></span><strong id="theme-palette-ocean-label">Ocean</strong>
+                </button>
+                <button class="theme-palette-option theme-palette-violet" type="button" data-theme-palette="violet" aria-label="Violet palette">
+                  <span></span><strong id="theme-palette-violet-label">Violet</strong>
+                </button>
+                <button class="theme-palette-option theme-palette-mint" type="button" data-theme-palette="mint" aria-label="Mint palette">
+                  <span></span><strong id="theme-palette-mint-label">Mint</strong>
+                </button>
+                <button class="theme-palette-option theme-palette-sunset" type="button" data-theme-palette="sunset" aria-label="Sunset palette">
+                  <span></span><strong id="theme-palette-sunset-label">Sunset</strong>
+                </button>
+              </div>
+            </div>
+
+            <div class="theme-creator-controls">
+              <div class="theme-creator-control">
+                <div class="theme-creator-control-head">
+                  <label for="theme-creator-primary" id="theme-creator-primary-label">Primary color</label>
+                  <output id="theme-creator-primary-value">#48A8FF</output>
+                </div>
+                <div class="theme-color-field">
+                  <input id="theme-creator-primary" type="color" value="#48a8ff" aria-describedby="theme-creator-primary-label">
+                  <span id="theme-creator-primary-swatch" class="theme-color-swatch" aria-hidden="true"></span>
+                </div>
+              </div>
+
+              <div class="theme-creator-control">
+                <div class="theme-creator-control-head">
+                  <label for="theme-creator-secondary" id="theme-creator-secondary-label">Secondary color</label>
+                  <output id="theme-creator-secondary-value">#7A68FF</output>
+                </div>
+                <div class="theme-color-field">
+                  <input id="theme-creator-secondary" type="color" value="#7a68ff" aria-describedby="theme-creator-secondary-label">
+                  <span id="theme-creator-secondary-swatch" class="theme-color-swatch" aria-hidden="true"></span>
+                </div>
+              </div>
+
+              <div class="theme-creator-range">
+                <div class="theme-creator-control-head">
+                  <label for="theme-creator-glow" id="theme-creator-glow-label">Glow intensity</label>
+                  <output id="theme-creator-glow-value">60%</output>
+                </div>
+                <input id="theme-creator-glow" type="range" min="0" max="100" step="1" value="60" aria-describedby="theme-creator-glow-label">
+              </div>
+
+              <div class="theme-creator-range">
+                <div class="theme-creator-control-head">
+                  <label for="theme-creator-radius" id="theme-creator-radius-label">Corner radius</label>
+                  <output id="theme-creator-radius-value">18px</output>
+                </div>
+                <input id="theme-creator-radius" type="range" min="10" max="28" step="1" value="18" aria-describedby="theme-creator-radius-label">
+              </div>
+
+              <div class="theme-creator-range theme-creator-range-wide">
+                <div class="theme-creator-control-head">
+                  <label for="theme-creator-background" id="theme-creator-background-label">Background intensity</label>
+                  <output id="theme-creator-background-value">70%</output>
+                </div>
+                <input id="theme-creator-background" type="range" min="0" max="100" step="1" value="70" aria-describedby="theme-creator-background-label">
+              </div>
+            </div>
+
+            <div class="theme-creator-footer">
+              <div class="theme-creator-save-state">
+                <span class="theme-creator-save-dot" id="theme-creator-save-dot" aria-hidden="true"></span>
+                <span id="theme-creator-save-state">Custom theme is not active.</span>
+              </div>
+              <button id="theme-creator-reset" class="secondary-button theme-creator-reset" type="button">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12a7 7 0 0 0 12.3 4.6"></path><path d="M19 12a7 7 0 0 0-12.3-4.6"></path><path d="M17.2 18.4h.1"></path><path d="M6.7 5.6h.1"></path></svg>
+                <span id="theme-creator-reset-label">Reset</span>
+              </button>
+            </div>
+          </section>
+
+          <div class="appearance-wallpaper-section">
+            <div class="appearance-section-mini-head">
+              <span class="appearance-mini-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M5.5 5h13A1.5 1.5 0 0 1 20 6.5v11a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5v-11A1.5 1.5 0 0 1 5.5 5Z"></path><path d="m5 16 4.2-4.1a1 1 0 0 1 1.4 0L14 15.3l1.8-1.8a1 1 0 0 1 1.4 0L20 16.4"></path><circle cx="8.3" cy="8.8" r="1.2"></circle></svg>
+              </span>
+              <span>
+                <strong id="user-appearance-wallpaper-title">Background Wallpaper</strong>
+                <small id="user-appearance-wallpaper-sub">Choose a preset or use an image from this device.</small>
+              </span>
+            </div>
+
+            <fieldset class="appearance-wallpaper-fieldset">
+              <legend class="sr-only" id="user-appearance-wallpaper-legend">Background Wallpaper</legend>
+              <div class="appearance-wallpaper-grid">
+                <label class="appearance-wallpaper-option is-selected" data-wallpaper-option="default">
+                  <input id="appearance-wallpaper-default" type="radio" name="appearance-wallpaper" value="default" checked>
+                  <span class="appearance-wallpaper-preview wallpaper-preview-default" aria-hidden="true"></span>
+                  <span class="appearance-wallpaper-name" id="user-appearance-wallpaper-default">Default</span>
+                  <span class="appearance-wallpaper-check" aria-hidden="true">✓</span>
+                </label>
+                <label class="appearance-wallpaper-option" data-wallpaper-option="aurora">
+                  <input id="appearance-wallpaper-aurora" type="radio" name="appearance-wallpaper" value="aurora">
+                  <span class="appearance-wallpaper-preview wallpaper-preview-aurora" aria-hidden="true"></span>
+                  <span class="appearance-wallpaper-name" id="user-appearance-wallpaper-aurora">Aurora</span>
+                  <span class="appearance-wallpaper-check" aria-hidden="true">✓</span>
+                </label>
+                <label class="appearance-wallpaper-option" data-wallpaper-option="grid">
+                  <input id="appearance-wallpaper-grid" type="radio" name="appearance-wallpaper" value="grid">
+                  <span class="appearance-wallpaper-preview wallpaper-preview-grid" aria-hidden="true"></span>
+                  <span class="appearance-wallpaper-name" id="user-appearance-wallpaper-grid">Neon Grid</span>
+                  <span class="appearance-wallpaper-check" aria-hidden="true">✓</span>
+                </label>
+                <label class="appearance-wallpaper-option" data-wallpaper-option="nebula">
+                  <input id="appearance-wallpaper-nebula" type="radio" name="appearance-wallpaper" value="nebula">
+                  <span class="appearance-wallpaper-preview wallpaper-preview-nebula" aria-hidden="true"></span>
+                  <span class="appearance-wallpaper-name" id="user-appearance-wallpaper-nebula">Nebula</span>
+                  <span class="appearance-wallpaper-check" aria-hidden="true">✓</span>
+                </label>
+                <label class="appearance-wallpaper-option" data-wallpaper-option="ocean">
+                  <input id="appearance-wallpaper-ocean" type="radio" name="appearance-wallpaper" value="ocean">
+                  <span class="appearance-wallpaper-preview wallpaper-preview-ocean" aria-hidden="true"></span>
+                  <span class="appearance-wallpaper-name" id="user-appearance-wallpaper-ocean">Ocean Glow</span>
+                  <span class="appearance-wallpaper-check" aria-hidden="true">✓</span>
+                </label>
+                <label class="appearance-wallpaper-option" data-wallpaper-option="violet">
+                  <input id="appearance-wallpaper-violet" type="radio" name="appearance-wallpaper" value="violet">
+                  <span class="appearance-wallpaper-preview wallpaper-preview-violet" aria-hidden="true"></span>
+                  <span class="appearance-wallpaper-name" id="user-appearance-wallpaper-violet">Violet Glass</span>
+                  <span class="appearance-wallpaper-check" aria-hidden="true">✓</span>
+                </label>
+                <label class="appearance-wallpaper-option" data-wallpaper-option="custom">
+                  <input id="appearance-wallpaper-custom" type="radio" name="appearance-wallpaper" value="custom">
+                  <span id="appearance-wallpaper-custom-preview" class="appearance-wallpaper-preview wallpaper-preview-custom" aria-hidden="true"></span>
+                  <span class="appearance-wallpaper-name" id="user-appearance-wallpaper-custom">Device Image</span>
+                  <span class="appearance-wallpaper-check" aria-hidden="true">✓</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <div class="appearance-wallpaper-actions">
+              <input id="appearance-wallpaper-file" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+              <label id="appearance-wallpaper-upload" class="secondary-button appearance-wallpaper-upload" for="appearance-wallpaper-file">Choose Image</label>
+              <button id="appearance-wallpaper-remove" class="secondary-button appearance-wallpaper-remove" type="button" disabled>Remove Image</button>
+            </div>
+            <p id="appearance-wallpaper-status" class="appearance-wallpaper-status" aria-live="polite">No device image selected.</p>
+          </div>
+
+
+          <div class="appearance-effects-section">
+            <div class="appearance-section-mini-head">
+              <span class="appearance-mini-icon appearance-effect-mini-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M12 3.8 13.8 9l5.2 1.9-5.2 1.8-1.8 5.3-1.8-5.3L5 10.9 10.2 9 12 3.8Z"></path><path d="m18.5 4.5.7 2.1 2.1.7-2.1.7-.7 2.1-.7-2.1-2.1-.7 2.1-.7.7-2.1Z"></path></svg>
+              </span>
+              <span>
+                <strong id="user-appearance-effects-title">Background Effects</strong>
+                <small id="user-appearance-effects-sub">Add a lightweight animated layer to your wallpaper. Saved only on this device.</small>
+              </span>
+            </div>
+
+            <fieldset class="appearance-effects-fieldset">
+              <legend class="sr-only">Background Effects</legend>
+              <div class="appearance-effect-grid">
+                <label class="appearance-effect-option is-selected" data-background-effect-option="none">
+                  <input id="appearance-background-effect-none" type="radio" name="background-effect" value="none" checked>
+                  <span class="appearance-effect-preview appearance-effect-preview-none" aria-hidden="true"><span>OFF</span></span>
+                  <span class="appearance-effect-copy">
+                    <strong id="user-background-effect-none">None</strong>
+                    <small>Clean background</small>
+                  </span>
+                  <span class="appearance-effect-check" aria-hidden="true">✓</span>
+                </label>
+
+                <label class="appearance-effect-option" data-background-effect-option="dollar">
+                  <input id="appearance-background-effect-dollar" type="radio" name="background-effect" value="dollar">
+                  <span class="appearance-effect-preview appearance-effect-preview-dollar" aria-hidden="true"><span>$</span><span>$</span><span>$</span><span>$</span></span>
+                  <span class="appearance-effect-copy">
+                    <strong id="user-background-effect-dollar">Dollar Rain</strong>
+                    <small>Falling currency</small>
+                  </span>
+                  <span class="appearance-effect-check" aria-hidden="true">✓</span>
+                </label>
+
+                <label class="appearance-effect-option" data-background-effect-option="coins">
+                  <input id="appearance-background-effect-coins" type="radio" name="background-effect" value="coins">
+                  <span class="appearance-effect-preview appearance-effect-preview-coins" aria-hidden="true"><span>Z</span><span>●</span><span>Z</span><span>●</span></span>
+                  <span class="appearance-effect-copy">
+                    <strong id="user-background-effect-coins">Gold Coins</strong>
+                    <small>Falling gold coins</small>
+                  </span>
+                  <span class="appearance-effect-check" aria-hidden="true">✓</span>
+                </label>
+
+                <label class="appearance-effect-option" data-background-effect-option="dragon">
+                  <input id="appearance-background-effect-dragon" type="radio" name="background-effect" value="dragon">
+                  <span class="appearance-effect-preview appearance-effect-preview-dragon" aria-hidden="true"><span>龍</span></span>
+                  <span class="appearance-effect-copy">
+                    <strong id="user-background-effect-dragon">Chinese Dragon</strong>
+                    <small>Floating dragon</small>
+                  </span>
+                  <span class="appearance-effect-check" aria-hidden="true">✓</span>
+                </label>
+
+                <label class="appearance-effect-option" data-background-effect-option="hacker">
+                  <input id="appearance-background-effect-hacker" type="radio" name="background-effect" value="hacker">
+                  <span class="appearance-effect-preview appearance-effect-preview-hacker" aria-hidden="true"><span>0101</span><span>&gt;_ Z28</span><span>0011</span></span>
+                  <span class="appearance-effect-copy">
+                    <strong id="user-background-effect-hacker">Hacker Stream</strong>
+                    <small>Falling terminal code</small>
+                  </span>
+                  <span class="appearance-effect-check" aria-hidden="true">✓</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <div class="appearance-effects-intensity">
+              <div class="appearance-effects-intensity-copy">
+                <strong id="user-appearance-effects-intensity">Effect Intensity</strong>
+                <small id="user-appearance-effects-intensity-sub">Control how visible and active the effect feels.</small>
+              </div>
+              <fieldset class="appearance-intensity-fieldset">
+                <legend class="sr-only">Effect intensity</legend>
+                <div class="appearance-intensity-grid">
+                  <label class="appearance-intensity-option" data-background-intensity-option="low">
+                    <input id="appearance-background-intensity-low" type="radio" name="background-effect-intensity" value="low">
+                    <span id="user-background-intensity-low">Low</span>
+                  </label>
+                  <label class="appearance-intensity-option is-selected" data-background-intensity-option="medium">
+                    <input id="appearance-background-intensity-medium" type="radio" name="background-effect-intensity" value="medium" checked>
+                    <span id="user-background-intensity-medium">Medium</span>
+                  </label>
+                  <label class="appearance-intensity-option" data-background-intensity-option="high">
+                    <input id="appearance-background-intensity-high" type="radio" name="background-effect-intensity" value="high">
+                    <span id="user-background-intensity-high">High</span>
+                  </label>
+                </div>
+              </fieldset>
+            </div>
+
+            <p id="appearance-background-effect-status" class="appearance-effects-status" aria-live="polite">No background effect is active.</p>
+          </div>
+
+          <div class="appearance-divider"></div>
+
+
+          <div class="appearance-controls" aria-label="Interface behavior settings">
+            <button id="appearance-animations-toggle" class="appearance-control" type="button" role="switch" aria-checked="true" aria-labelledby="user-appearance-animations-title" aria-describedby="user-appearance-animations-sub">
+              <span class="appearance-control-icon appearance-control-icon-motion" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M5 12c2.5-4.2 4.4-6.3 7-6.3s4.5 2.1 7 6.3c-2.5 4.2-4.4 6.3-7 6.3S7.5 16.2 5 12Z"></path><circle cx="12" cy="12" r="2.4"></circle></svg>
+              </span>
+              <span class="appearance-control-copy">
+                <strong id="user-appearance-animations-title">Animations</strong>
+                <span id="user-appearance-animations-sub">Keep interface motion and transitions enabled.</span>
+              </span>
+              <span class="appearance-switch" aria-hidden="true"><span></span></span>
+              <span class="appearance-control-state" id="user-appearance-animations-state">ON</span>
+            </button>
+
+            <button id="appearance-compact-toggle" class="appearance-control" type="button" role="switch" aria-checked="false" aria-labelledby="user-appearance-compact-title" aria-describedby="user-appearance-compact-sub">
+              <span class="appearance-control-icon appearance-control-icon-compact" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M5 7.5h14"></path><path d="M5 12h14"></path><path d="M5 16.5h9"></path></svg>
+              </span>
+              <span class="appearance-control-copy">
+                <strong id="user-appearance-compact-title">Compact Mode</strong>
+                <span id="user-appearance-compact-sub">Reduce spacing for a denser layout.</span>
+              </span>
+              <span class="appearance-switch" aria-hidden="true"><span></span></span>
+              <span class="appearance-control-state" id="user-appearance-compact-state">OFF</span>
+            </button>
+          </div>
+        </article>
+      </section>
+
+      <section id="user-about-page" class="about-page" hidden>
+        <div class="dashboard-head about-head">
+          <div class="dashboard-title-wrap">
+            <div class="eyebrow">APP INFORMATION</div>
+            <h2 id="user-about-title">About</h2>
+            <p id="user-about-sub">App information and credits</p>
+          </div>
+        </div>
+
+        <div class="about-grid">
+          <article class="about-card">
+            <span class="about-icon" aria-hidden="true">Z</span>
+            <div><span id="user-about-bot-name-label" class="about-label">Bot</span><strong>Z28</strong></div>
+          </article>
+          <article class="about-card">
+            <span class="about-icon" aria-hidden="true">01</span>
+            <div><span id="user-about-bot-version-label" class="about-label">Bot Version</span><strong>1.0.0</strong></div>
+          </article>
+          <article class="about-card">
+            <span class="about-icon" aria-hidden="true">APP</span>
+            <div><span id="user-about-mini-version-label" class="about-label">Mini App Version</span><strong>1.0.0</strong></div>
+          </article>
+        </div>
+
+        <details class="about-details">
+          <summary><span id="user-about-terms-label">Terms of Use</span><span aria-hidden="true">+</span></summary>
+          <p id="user-about-terms-copy">Use this Mini App only for the attendance and group-management functions provided by the bot. Keep your Telegram account secure and use the service according to your group rules.</p>
+        </details>
+        <details class="about-details">
+          <summary><span id="user-about-privacy-label">Privacy</span><span aria-hidden="true">+</span></summary>
+          <p id="user-about-privacy-copy">The Mini App uses Telegram WebApp account information to verify access and show the groups available to you. Information shown in this dashboard is used only for the bot features provided to your account and groups.</p>
+        </details>
+
+        <article class="credit-card">
+          <div class="credit-avatar" aria-hidden="true">CM</div>
+          <div>
+            <span id="user-about-credits-label" class="about-label">Credits</span>
+            <strong>Chan Myae</strong>
+            <span id="user-about-creator-label">Creator</span>
+          </div>
+        </article>
+      </section>
+
+      <section id="user-tools-page" class="tools-page" hidden aria-labelledby="user-tools-title">
+        <div class="dashboard-head tools-head">
+          <div class="dashboard-title-wrap">
+            <div class="eyebrow">GROUP TOOLS</div>
+            <h2 id="user-tools-title">Tools</h2>
+            <p id="user-tools-sub">Connect bot-installed groups with a secure, guided flow.</p>
+          </div>
+        </div>
+
+        <section class="tools-category" aria-labelledby="user-tools-category-title">
+          <div class="tools-category-kicker" id="user-tools-category-kicker">GROUP MANAGEMENT</div>
+          <h3 id="user-tools-category-title">Group tools</h3>
+          <p id="user-tools-category-sub">Tools that configure how Z28 connects and works across your groups.</p>
+        </section>
+
+        
+        <section id="user-tools-directory" class="tools-directory" aria-labelledby="user-tools-directory-title">
+          <div class="tools-context-row">
+            <div class="tools-context-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3"></circle><path d="M5 19c.7-3.2 3-5 7-5s6.3 1.8 7 5"></path></svg>
+            </div>
+            <div class="tools-context-copy">
+              <span id="user-tools-active-group-label">CURRENT GROUP</span>
+              <strong id="user-tools-active-group">—</strong>
+            </div>
+            <span class="tools-context-role" id="user-tools-active-role">ADMIN</span>
+          </div>
+
+          <div class="tools-directory-head">
+            <div>
+              <div class="tools-directory-kicker" id="user-tools-directory-kicker">AVAILABLE TOOLS</div>
+              <h3 id="user-tools-directory-title">Choose a tool</h3>
+              <p id="user-tools-directory-sub">Open a dedicated workspace for the task you want to manage.</p>
+            </div>
+          </div>
+
+          <div class="tool-launch-grid" aria-label="Available tools">
+            <button class="tool-launch-card" type="button" data-user-tool="connection">
+              <span class="tool-launch-icon tool-launch-icon-connection" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M8.8 12h6.4"></path>
+                  <path d="M7.1 8.9 5.4 7.2a3.4 3.4 0 0 0-4.8 4.8l1.7 1.7a3.4 3.4 0 0 0 4.8 0"></path>
+                  <path d="m16.9 15.1 1.7 1.7a3.4 3.4 0 0 0 4.8-4.8l-1.7-1.7a3.4 3.4 0 0 0-4.8 0"></path>
+                </svg>
+              </span>
+              <span class="tool-launch-copy">
+                <span class="tool-launch-kicker" id="user-tool-connection-kicker">GROUP ROUTING</span>
+                <strong id="user-tool-connection-title">Group Connection</strong>
+                <span id="user-tool-connection-sub">Connect one bot-installed group to another for timeout notifications.</span>
+              </span>
+              <span class="tool-launch-arrow" aria-hidden="true">›</span>
+            </button>
+
+            <button class="tool-launch-card" type="button" data-user-tool="replies">
+              <span class="tool-launch-icon tool-launch-icon-replies" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M5 6.8A2.8 2.8 0 0 1 7.8 4h8.4A2.8 2.8 0 0 1 19 6.8v7.4a2.8 2.8 0 0 1-2.8 2.8h-4.7L8 20v-3H7.8A2.8 2.8 0 0 1 5 14.2Z"></path>
+                  <path d="M8.5 9h7"></path>
+                  <path d="M8.5 12.2h4.8"></path>
+                </svg>
+              </span>
+              <span class="tool-launch-copy">
+                <span class="tool-launch-kicker" id="user-tool-replies-kicker">GROUP RESPONSES</span>
+                <strong id="user-tool-replies-title">Activity Reply Messages</strong>
+                <span id="user-tool-replies-sub">Customize the bot's activity replies for this group only.</span>
+              </span>
+              <span class="tool-launch-arrow" aria-hidden="true">›</span>
+            </button>
+          </div>
+        </section>
+
+        <section id="user-tool-detail" class="tool-detail" hidden aria-labelledby="user-tool-detail-title">
+          <div class="tool-detail-header">
+            <button id="user-tool-detail-back" class="tool-detail-back" type="button" aria-label="Back to Tools">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14.5 5-7 7 7 7"></path></svg>
+              <span id="user-tool-detail-back-label">Back to Tools</span>
+            </button>
+            <div class="tool-detail-heading">
+              <div class="tools-directory-kicker" id="user-tool-detail-kicker">TOOL WORKSPACE</div>
+              <h3 id="user-tool-detail-title">Tool</h3>
+              <p id="user-tool-detail-sub">Manage this feature for the selected group.</p>
+            </div>
+          </div>
+
+          <section id="user-tool-detail-replies" class="tool-detail-panel" hidden aria-labelledby="user-reply-messages-title">
+<article class="reply-messages-card" aria-labelledby="user-reply-messages-title">
+          <div class="reply-messages-header">
+            <div class="reply-messages-header-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M5 6.8A2.8 2.8 0 0 1 7.8 4h8.4A2.8 2.8 0 0 1 19 6.8v7.4a2.8 2.8 0 0 1-2.8 2.8h-4.7L8 20v-3H7.8A2.8 2.8 0 0 1 5 14.2Z"></path>
+                <path d="M8.5 9h7"></path>
+                <path d="M8.5 12.2h4.8"></path>
+              </svg>
+            </div>
+            <div class="reply-messages-header-copy">
+              <div class="connection-kicker" id="user-reply-messages-kicker">ACTIVITY RESPONSES</div>
+              <h3 id="user-reply-messages-title">Activity Reply Messages</h3>
+              <p id="user-reply-messages-sub">Customize the bot's activity replies for this group only.</p>
+            </div>
+            <div class="reply-messages-header-state">
+              <span class="reply-messages-state-dot" aria-hidden="true"></span>
+              <span>GROUP ONLY</span>
+            </div>
+          </div>
+
+          <div class="reply-messages-context">
+            <div>
+              <span class="reply-context-label" id="user-reply-messages-group-label">Editing Group</span>
+              <strong id="user-reply-messages-group">—</strong>
+            </div>
+            <span class="reply-role-badge" id="user-reply-messages-role">ADMIN</span>
+          </div>
+
+          <div class="reply-messages-notice" role="note">
+            <span class="reply-messages-notice-icon" aria-hidden="true">i</span>
+            <span id="user-reply-messages-note">Only this selected group is affected. Other groups keep their own messages.</span>
+          </div>
+
+          <div class="reply-messages-locale-bar">
+            <div class="reply-messages-locale-copy">
+              <strong id="user-reply-messages-language-title">Bot Reply Language</strong>
+              <span id="user-reply-messages-language-sub">The bot uses the selected member's language for these replies.</span>
+            </div>
+            <div class="reply-locale-switch" role="tablist" aria-label="Reply language">
+              <button id="user-reply-locale-en" class="reply-locale-button active" type="button" role="tab" aria-selected="true">English</button>
+              <button id="user-reply-locale-zh" class="reply-locale-button" type="button" role="tab" aria-selected="false">中文</button>
+            </div>
+          </div>
+
+          <div id="user-reply-messages-list" class="reply-messages-list" aria-live="polite"></div>
+
+          <div class="reply-messages-actions">
+            <button id="user-reply-save" class="primary-button" type="button" disabled>
+              <span class="button-label">Save Changes</span>
+            </button>
+            <button id="user-reply-discard" class="secondary-button" type="button" disabled>
+              <span class="button-label">Discard Changes</span>
+            </button>
+            <button id="user-reply-reset-language" class="secondary-button" type="button" disabled>
+              <span class="button-label">Reset Language to Default</span>
+            </button>
+          </div>
+
+          <div class="reply-messages-status" id="user-reply-messages-status" aria-live="polite">
+            <span class="reply-status-dot" id="user-reply-status-dot" aria-hidden="true"></span>
+            <span id="user-reply-status-text">Default replies are active for this group.</span>
+          </div>
+        </article>
+
+        
+          </section>
+
+          <section id="user-tool-detail-connection" class="tool-detail-panel" hidden aria-labelledby="user-connect-title">
+          <article class="connection-card">
+          <div class="connection-card-header">
+            <div class="connection-header-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M8.8 12h6.4"></path>
+                <path d="M7.1 8.9 5.4 7.2a3.4 3.4 0 0 0-4.8 4.8l1.7 1.7a3.4 3.4 0 0 0 4.8 0"></path>
+                <path d="m16.9 15.1 1.7 1.7a3.4 3.4 0 0 0 4.8-4.8l-1.7-1.7a3.4 3.4 0 0 0-4.8 0"></path>
+              </svg>
+            </div>
+            <div class="connection-header-copy">
+              <div class="connection-kicker">CONNECTION BUILDER</div>
+              <h3 id="user-connect-title">Group Connection</h3>
+              <p id="user-connect-sub">Connect one bot-installed group to another for timeout notifications.</p>
+            </div>
+            <div class="connection-header-state">
+              <span class="connection-state-dot" aria-hidden="true"></span>
+              <span>SECURE</span>
+            </div>
+          </div>
+
+          <div class="connection-overview" aria-live="polite">
+            <div class="connection-overview-icon" aria-hidden="true">
+              <span></span>
+            </div>
+            <div class="connection-overview-copy">
+              <span class="connection-overview-label" id="user-connect-status-title">Current Connection</span>
+              <strong id="user-connect-status-value">No connection is configured for this source group.</strong>
+              <small id="user-connect-status-meta">—</small>
+            </div>
+            <div class="connection-overview-badge" aria-hidden="true">
+              <span></span>
+            </div>
+          </div>
+
+          <div class="connection-builder">
+            <div class="connection-builder-intro">
+              <div>
+                <div class="connection-builder-kicker">CONFIGURE ROUTE</div>
+                <div class="connection-builder-title">Choose the notification path</div>
+              </div>
+              <div class="connection-builder-line" aria-hidden="true"></div>
+            </div>
+
+            <div class="connection-route">
+              <section class="connection-step-card">
+                <div class="connection-step-head">
+                  <div class="connection-step-number">01</div>
+                  <div>
+                    <label id="user-connect-source-label" for="user-connect-source">Source Group</label>
+                    <span id="user-connect-source-sub">The group where activity timeouts are detected.</span>
+                  </div>
+                </div>
+                <div class="connect-select-wrap">
+                  <select class="connect-select" id="user-connect-source" aria-labelledby="user-connect-source-label" aria-describedby="user-connect-source-sub">
+                    <option value="">Select a group</option>
+                  </select>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                </div>
+                <div class="connection-step-caption">Activity &amp; timeout source</div>
+              </section>
+
+              <div class="connection-bridge" aria-hidden="true">
+                <div class="connection-bridge-line"></div>
+                <div class="connection-bridge-core">
+                  <svg viewBox="0 0 24 24"><path d="M5 12h13"></path><path d="m14 7 5 5-5 5"></path></svg>
+                </div>
+                <div class="connection-bridge-line"></div>
+              </div>
+
+              <section class="connection-step-card">
+                <div class="connection-step-head">
+                  <div class="connection-step-number">02</div>
+                  <div>
+                    <label id="user-connect-target-label" for="user-connect-target">Target Group</label>
+                    <span id="user-connect-target-sub">The bot will send timeout notifications to this group.</span>
+                  </div>
+                </div>
+                <div class="connect-select-wrap">
+                  <select class="connect-select" id="user-connect-target" aria-labelledby="user-connect-target-label" aria-describedby="user-connect-target-sub">
+                    <option value="">Select a group</option>
+                  </select>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                </div>
+                <div class="connection-step-caption">Notification destination</div>
+              </section>
+            </div>
+          </div>
+
+          <div class="connection-actions">
+            <button id="user-connect-submit" class="primary-button connection-save" type="button" disabled>
+              <span class="button-label">Connect Group</span>
+            </button>
+            <button id="user-connect-change" class="secondary-button connection-edit" type="button" hidden>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 8A8 8 0 0 0 5.1 6.1L3.5 8"></path><path d="M3.5 4.5V8h3.5"></path><path d="M4.5 16A8 8 0 0 0 18.9 17.9l1.6-1.9"></path><path d="M20.5 19.5V16H17"></path></svg>
+              <span class="button-label">Edit Connection</span>
+            </button>
+          </div>
+
+          <div class="connection-guide-toggle-row">
+            <button id="user-connect-guide-toggle" class="secondary-button connection-guide-toggle" type="button" aria-controls="user-connect-help" aria-expanded="true">
+              <span class="button-label">Hide Guide</span>
+            </button>
+          </div>
+
+          <div id="user-connect-help" class="connection-help">
+          <div class="connection-guidance" role="note">
+            <div class="connection-guidance-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 9v5"></path><path d="M12 6.5h.01"></path><circle cx="12" cy="12" r="8.5"></circle></svg>
+            </div>
+            <div class="connection-guidance-copy">
+              <strong>Available groups</strong>
+              <span id="user-connect-note">Only groups where Z28 is currently installed are shown.</span>
+            </div>
+          </div>
+
+          <section class="connection-flow" aria-labelledby="user-connect-flow-title">
+            <div class="connection-flow-header">
+              <div class="connection-flow-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M6 7h11"></path><path d="m14 4 3 3-3 3"></path><path d="M18 17H7"></path><path d="m10 14-3 3 3 3"></path></svg>
+              </div>
+              <div>
+                <div class="connection-flow-kicker" id="user-connect-flow-kicker">WHAT HAPPENS AFTER CONNECTING</div>
+                <h3 id="user-connect-flow-title">How the connection works</h3>
+                <p id="user-connect-flow-sub">The connection routes a timeout notice from the Source Group to the Target Group.</p>
+              </div>
+            </div>
+
+            <div class="connection-flow-timeline">
+              <article class="connection-flow-stage">
+                <span class="connection-flow-stage-number">01</span>
+                <div>
+                  <strong id="user-connect-flow-step1-title">Activity starts in the Source Group</strong>
+                  <p id="user-connect-flow-step1-copy">A member starts an activity such as Eat, WC, Smoke, or WCD in the Source Group.</p>
+                </div>
+              </article>
+              <div class="connection-flow-arrow" aria-hidden="true">↓</div>
+              <article class="connection-flow-stage">
+                <span class="connection-flow-stage-number">02</span>
+                <div>
+                  <strong id="user-connect-flow-step2-title">The group time limit applies</strong>
+                  <p id="user-connect-flow-step2-copy">Z28 uses that Source Group's configured activity limit to determine when the activity has gone over time.</p>
+                </div>
+              </article>
+              <div class="connection-flow-arrow" aria-hidden="true">↓</div>
+              <article class="connection-flow-stage">
+                <span class="connection-flow-stage-number">03</span>
+                <div>
+                  <strong id="user-connect-flow-step3-title">The member returns after the limit</strong>
+                  <p id="user-connect-flow-step3-copy">When the member presses Back after the allowed time, Z28 calculates the overtime. A value greater than zero is treated as a timeout.</p>
+                </div>
+              </article>
+              <div class="connection-flow-arrow" aria-hidden="true">↓</div>
+              <article class="connection-flow-stage">
+                <span class="connection-flow-stage-number">04</span>
+                <div>
+                  <strong id="user-connect-flow-step4-title">Z28 creates the timeout notice</strong>
+                  <p id="user-connect-flow-step4-copy">Z28 records the timeout and prepares a notice containing the Source Group, member, activity type, and overtime duration.</p>
+                </div>
+              </article>
+              <div class="connection-flow-arrow" aria-hidden="true">↓</div>
+              <article class="connection-flow-stage">
+                <span class="connection-flow-stage-number">05</span>
+                <div>
+                  <strong id="user-connect-flow-step5-title">The Target Group is notified</strong>
+                  <p id="user-connect-flow-step5-copy">Because the Source Group is connected, the timeout notice is delivered to its configured Target Group instead of being sent nowhere.</p>
+                </div>
+              </article>
+            </div>
+
+            <div class="connection-flow-example">
+              <div class="connection-flow-example-label" id="user-connect-flow-example-label">EXAMPLE</div>
+              <p id="user-connect-flow-example">Source: Main Group → Target: Admin Group. A member starts Eat with a 30-minute limit and returns after 38 minutes. Z28 detects 8 minutes of overtime and sends the timeout notification to Admin Group.</p>
+            </div>
+
+            <div class="connection-flow-important">
+              <div class="connection-flow-important-item">
+                <span class="connection-flow-important-dot is-positive" aria-hidden="true"></span>
+                <span id="user-connect-flow-important1">Within the allowed time: the activity is completed normally and no connected-group timeout notice is created.</span>
+              </div>
+              <div class="connection-flow-important-item">
+                <span class="connection-flow-important-dot" aria-hidden="true"></span>
+                <span id="user-connect-flow-important2">Over the allowed time: the overtime is recorded and the connected Target Group can receive the timeout notice.</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="connection-guide" aria-labelledby="user-connect-guide-title">
+            <div class="connection-guide-header">
+              <div class="connection-guide-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M12 3.5a8.5 8.5 0 1 0 8.5 8.5A8.5 8.5 0 0 0 12 3.5Z"></path><path d="M12 10.5v5"></path><path d="M12 7.4h.01"></path></svg>
+              </div>
+              <div>
+                <div class="connection-guide-kicker" id="user-connect-guide-kicker">HOW IT WORKS</div>
+                <h3 id="user-connect-guide-title">How to connect groups</h3>
+                <p id="user-connect-guide-sub">Follow these steps to route timeout notifications from one group to another.</p>
+              </div>
+            </div>
+            <div class="connection-guide-steps">
+              <article class="connection-guide-step">
+                <span class="connection-guide-number">01</span>
+                <div><strong id="user-connect-guide-step1-title">Choose a Source Group</strong><p id="user-connect-guide-step1-copy">Select the group where Z28 detects activity timeouts. This is the group whose timeout notifications you want to send somewhere else.</p></div>
+              </article>
+              <article class="connection-guide-step">
+                <span class="connection-guide-number">02</span>
+                <div><strong id="user-connect-guide-step2-title">Choose a Target Group</strong><p id="user-connect-guide-step2-copy">Select the group where Z28 should send the timeout notifications. Both groups must be available to you and the bot.</p></div>
+              </article>
+              <article class="connection-guide-step">
+                <span class="connection-guide-number">03</span>
+                <div><strong id="user-connect-guide-step3-title">Review the route</strong><p id="user-connect-guide-step3-copy">Make sure the Source and Target are different groups. The status area above will show that the route is ready before you connect it.</p></div>
+              </article>
+              <article class="connection-guide-step">
+                <span class="connection-guide-number">04</span>
+                <div><strong id="user-connect-guide-step4-title">Connect and verify</strong><p id="user-connect-guide-step4-copy">Press Connect Group. After a successful save, the current connection is shown above and the action changes to Edit Connection when you need to change the target later.</p></div>
+              </article>
+            </div>
+            <div class="connection-guide-rules">
+              <div class="connection-guide-rule"><span class="connection-guide-rule-dot" aria-hidden="true"></span><span id="user-connect-guide-rule1">Only groups that are available to your Telegram account and have the required bot access can be selected.</span></div>
+              <div class="connection-guide-rule"><span class="connection-guide-rule-dot" aria-hidden="true"></span><span id="user-connect-guide-rule2">One Source Group can have one active Target Group. Saving a new target updates that source connection.</span></div>
+              <div class="connection-guide-rule"><span class="connection-guide-rule-dot" aria-hidden="true"></span><span id="user-connect-guide-rule3">If you only want to change the target, use Edit Connection instead of starting over.</span></div>
+            </div>
+          </section>
+
+          </div>
+        </article>
+        </section>
+        </section>
+      </section>
+
+      <section id="user-support-page" class="support-page" hidden>
+        <div class="dashboard-head support-head">
+          <div class="dashboard-title-wrap">
+            <div class="eyebrow">HELP & SUPPORT</div>
+            <h2 id="user-support-title">Help &amp; Support</h2>
+            <p id="user-support-sub">Get help or report a problem</p>
+          </div>
+        </div>
+
+        <article class="support-card">
+          <div class="support-intro">
+            <div class="support-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M5 6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5v7a2.5 2.5 0 0 1-2.5 2.5H12l-3.8 3v-3H7.5A2.5 2.5 0 0 1 5 13.5z"></path><path d="M9 9.2h.01M12 9.2h.01M15 9.2h.01"></path></svg>
+            </div>
+            <div>
+              <div class="support-card-title" id="user-report-title">Report a Problem</div>
+              <p class="support-card-copy" id="user-report-lead">Tell us what went wrong. Your report will be sent to the bot administrators.</p>
+            </div>
+          </div>
+
+          <form id="user-report-form" class="support-form" aria-busy="false">
+            <div class="support-field">
+              <label for="user-report-category" id="user-report-category-label">Category</label>
+              <select id="user-report-category" class="support-select">
+                <option id="user-report-category-bug" value="bug">Bug / Unexpected behavior</option>
+                <option id="user-report-category-access" value="access">Access / Verification</option>
+                <option id="user-report-category-group" value="group">Group / Permissions</option>
+                <option id="user-report-category-settings" value="settings">Settings</option>
+                <option id="user-report-category-other" value="other">Other</option>
+              </select>
+            </div>
+
+            <div class="support-field">
+              <label for="user-report-message" id="user-report-message-label">Describe the problem</label>
+              <textarea
+                id="user-report-message"
+                class="support-textarea"
+                rows="6"
+                maxlength="1200"
+                aria-describedby="user-report-hint user-report-count"
+                placeholder="Please describe what happened…"
+              ></textarea>
+              <div class="support-form-meta">
+                <span id="user-report-hint">Please do not include passwords or other sensitive information.</span>
+                <span id="user-report-count" aria-live="polite" aria-atomic="true">0 / 1200</span>
+              </div>
+            </div>
+
+            <div class="support-context">
+              <span class="support-context-label" id="user-report-context-label">Selected group</span>
+              <strong id="user-report-context-value">—</strong>
+            </div>
+
+            <button id="user-report-submit" class="primary-button support-submit" type="submit">
+              <span class="button-label">Send Report</span>
+            </button>
+          </form>
+        </article>
+
+        <section class="faq-card" aria-labelledby="user-faq-title">
+          <div class="faq-intro">
+            <div class="faq-icon" aria-hidden="true">
+              <span>?</span>
+            </div>
+            <div>
+              <div class="faq-card-title" id="user-faq-title">FAQ / Help Center</div>
+              <p class="faq-card-copy" id="user-faq-sub">Quick answers to common questions about the Z28 Attendance Bot.</p>
+            </div>
+          </div>
+
+          <div class="faq-list">
+            <details class="faq-item">
+              <summary>
+                <span id="user-faq-q1">What is the Z28 Attendance Bot?</span>
+                <span class="faq-toggle" aria-hidden="true">+</span>
+              </summary>
+              <p id="user-faq-a1">Z28 helps groups manage attendance activities and monitor current activity from the Telegram Mini App.</p>
+            </details>
+
+            <details class="faq-item">
+              <summary>
+                <span id="user-faq-q2">Who can access the group dashboard?</span>
+                <span class="faq-toggle" aria-hidden="true">+</span>
+              </summary>
+              <p id="user-faq-a2">Your Telegram account must be a group owner or administrator, and the bot must still be available in that group.</p>
+            </details>
+
+            <details class="faq-item">
+              <summary>
+                <span id="user-faq-q3">How do I change activity limits?</span>
+                <span class="faq-toggle" aria-hidden="true">+</span>
+              </summary>
+              <p id="user-faq-a3">Open the group dashboard, choose Edit on the relevant settings card, update the values, then press Save. You need the required group permissions.</p>
+            </details>
+
+            <details class="faq-item">
+              <summary>
+                <span id="user-faq-q4">What does Auto Refresh do?</span>
+                <span class="faq-toggle" aria-hidden="true">+</span>
+              </summary>
+              <p id="user-faq-a4">When enabled, the dashboard checks for updated group activity every 30 seconds. It is off by default and can be turned on from the dashboard header.</p>
+            </details>
+
+            <details class="faq-item">
+              <summary>
+                <span id="user-faq-q5">Why can’t I see a group?</span>
+                <span class="faq-toggle" aria-hidden="true">+</span>
+              </summary>
+              <p id="user-faq-a5">Make sure the bot is still in the group and that your Telegram account is a group owner or administrator. Groups that are no longer available to the bot are not shown.</p>
+            </details>
+
+            <details class="faq-item">
+              <summary>
+                <span id="user-faq-q6">How do I report a problem?</span>
+                <span class="faq-toggle" aria-hidden="true">+</span>
+              </summary>
+              <p id="user-faq-a6">Open Help &amp; Support, choose a category, describe the problem, and send the report. Do not include passwords or other sensitive information.</p>
+            </details>
+          </div>
+        </section>
+      </section>
+
+      <nav id="user-tabbar" class="tab-bar" hidden aria-label="User dashboard sections">
+        <button class="tab-button active" type="button" data-user-tab="dashboard" aria-current="page">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1.3"></rect><rect x="14" y="4" width="6" height="6" rx="1.3"></rect><rect x="4" y="14" width="6" height="6" rx="1.3"></rect><rect x="14" y="14" width="6" height="6" rx="1.3"></rect></svg>
+          <span id="user-dashboard-tab-label">Dashboard</span>
+        </button>
+        <button class="tab-button" type="button" data-user-tab="tools" aria-current="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 6.2a4 4 0 0 0-5.5 5.5l3.1 3.1a4 4 0 0 0 5.5-5.5l-1.2 1.2"></path><path d="m9.3 17.8 5.4-5.4"></path><path d="M7.2 9.8 5.9 8.5A2.5 2.5 0 1 1 9.4 5l1.3 1.3"></path></svg>
+          <span id="user-tools-tab-label">Tools</span>
+        </button>
+        <button class="tab-button" type="button" data-user-tab="appearance" aria-current="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M8 12h8"></path><path d="M12 8v8"></path></svg>
+          <span id="user-appearance-tab-label">Appearance</span>
+        </button>
+        <button class="tab-button" type="button" data-user-tab="support" aria-current="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 6.5h5l1.6 2h6.4a1.5 1.5 0 0 1 1.5 1.5v8a1.5 1.5 0 0 1-1.5 1.5H5.5A1.5 1.5 0 0 1 4 18V8a1.5 1.5 0 0 1 1.5-1.5Z"></path><path d="M4 9.5h16"></path></svg>
+          <span id="user-support-tab-label">Help &amp; Support</span>
+        </button>
+        <button class="tab-button" type="button" data-user-tab="about" aria-current="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 10.7v5"></path><path d="M12 7.4h.01"></path></svg>
+          <span id="user-about-tab-label">About</span>
+        </button>
+      </nav>
+    </section>
+  </main>
+
+  <script>__Z28_APP__</script>
+</body>
+</html>
