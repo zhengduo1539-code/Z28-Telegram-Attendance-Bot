@@ -430,7 +430,7 @@ const mm: LocaleText = {
   idInfo: (chatId, userId) => `Group ID: ${inlineCode(chatId)}\nUser ID: ${inlineCode(userId)}`,
   botStatsPrivate: "ကျေးဇူးပြု၍ /stats ကို Bot private chat ထဲတွင်အသုံးပြုပါ။",
   telegramUi: {
-    userMenuButton: "📊 ကျွန်ုပ်၏ Dashboard",
+    userMenuButton: "📊 ကျွန်ုပ်၏ ဒက်ရှ်ဘုတ်",
     adminMenuButton: "⚙️ စီမံခန့်ခွဲမှု Panel",
     addBotToGroupButton: "➕ Bot ကို Group ထဲထည့်ရန်",
     openGroupAdminPanelButton: "⚙️ Group Admin Panel ဖွင့်ရန်",
