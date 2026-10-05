@@ -542,7 +542,7 @@ export class CommandHandler {
 
     const scopeKey =
       scope.type === "chat"
-        ? `private:${scope.chat_id}:${isConfiguredAdmin ? "admin" : "default"}`
+        ? `private:${scope.chat_id}:${isConfiguredAdmin ? "admin" : "default"}:${locale}`
         : `member:${scope.chat_id}:${scope.user_id}:admin`;
 
     if (this.adminMenuScopes.has(scopeKey)) return;
@@ -604,7 +604,7 @@ export class CommandHandler {
       inline_keyboard: [
         [
           {
-            text: text.telegramUi.openGroupAdminPanelButton,
+            text: getLocale(locale).telegramUi.openGroupAdminPanelButton,
             style: "primary",
             url,
           },
