@@ -39,6 +39,8 @@
     onboardingVisible: true,
     appearanceTheme: "dark",
     wallpaper: "default",
+    backgroundEffect: "none",
+    backgroundEffectIntensity: "medium",
     customWallpaper: null,
     animationsEnabled: true,
     compactMode: false,
@@ -68,6 +70,8 @@
     appearanceTheme: "z28_appearance_theme",
     wallpaper: "z28_appearance_wallpaper",
     wallpaperCustom: "z28_appearance_wallpaper_custom",
+    backgroundEffect: "z28_appearance_background_effect",
+    backgroundEffectIntensity: "z28_appearance_background_effect_intensity",
     animations: "z28_appearance_animations",
     compactMode: "z28_appearance_compact",
     workspaceName: "z28_workspace_name",
@@ -99,6 +103,293 @@
     radius: 18,
     background: 70
   };
+
+  var BACKGROUND_EFFECTS = ["none","dollar","coins","dragon","hacker"];
+  var BACKGROUND_EFFECT_INTENSITIES = ["low","medium","high"];
+  var backgroundEffectEngine = {
+    canvas: null, ctx: null, dragon: null, width: 0, height: 0, mode: "none", intensity: "medium",
+    particles: [], columns: [], raf: 0, lastFrame: 0, running: false, initialized: false, resizeTimer: null,
+    reducedMotion: Boolean(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+  };
+
+  function effectDensity() {
+    var base = { low: 16, medium: 26, high: 38 }[backgroundEffectEngine.intensity] || 26;
+    return Math.max(10, Math.round(base * Math.min(1.55, Math.max(.72, backgroundEffectEngine.width / 390))));
+  }
+  function effectSpeed() {
+    return { low: .68, medium: 1, high: 1.32 }[backgroundEffectEngine.intensity] || 1;
+  }
+  function createDollar(initial) {
+    var size = 12 + Math.random() * 13;
+    return {
+      x: Math.random() * backgroundEffectEngine.width,
+      y: initial ? Math.random() * backgroundEffectEngine.height : -size - Math.random() * 80,
+      speed: 24 + Math.random() * 42,
+      drift: (Math.random() - .5) * 12,
+      rotation: (Math.random() - .5) * .5,
+      spin: (Math.random() - .5) * .012,
+      size: size,
+      alpha: .42 + Math.random() * .34,
+      glyph: Math.random() > .7 ? "$" + (Math.random() > .5 ? "100" : "500") : "$"
+    };
+  }
+  function createCoin(initial) {
+    var size = 11 + Math.random() * 9;
+    return {
+      x: Math.random() * backgroundEffectEngine.width,
+      y: initial ? Math.random() * backgroundEffectEngine.height : -size * 2 - Math.random() * 80,
+      speed: 30 + Math.random() * 48,
+      drift: (Math.random() - .5) * 15,
+      rotation: Math.random() * Math.PI * 2,
+      spin: (Math.random() > .5 ? 1 : -1) * (.045 + Math.random() * .055),
+      size: size,
+      alpha: .38 + Math.random() * .34
+    };
+  }
+  function resetHacker(initial) {
+    var gap = { low: 26, medium: 22, high: 18 }[backgroundEffectEngine.intensity] || 22;
+    var count = Math.ceil(backgroundEffectEngine.width / gap);
+    backgroundEffectEngine.columns = [];
+    for (var i = 0; i < count; i += 1) {
+      backgroundEffectEngine.columns.push({
+        x: i * gap + Math.random() * 8,
+        y: initial ? Math.random() * backgroundEffectEngine.height : -Math.random() * backgroundEffectEngine.height * .35,
+        speed: 42 + Math.random() * 76,
+        size: 8 + Math.random() * 4,
+        length: { low: 3, medium: 5, high: 7 }[backgroundEffectEngine.intensity] || 5,
+        phase: Math.random() * Math.PI * 2,
+        chars: "01ZX28<>/{}[]#$*+=~"
+      });
+    }
+  }
+  function resetEffectParticles(initial) {
+    backgroundEffectEngine.particles = [];
+    if (backgroundEffectEngine.mode === "hacker") {
+      resetHacker(Boolean(initial));
+      return;
+    }
+    if (backgroundEffectEngine.mode === "dollar" || backgroundEffectEngine.mode === "coins") {
+      for (var i = 0; i < effectDensity(); i += 1) {
+        backgroundEffectEngine.particles.push(
+          backgroundEffectEngine.mode === "dollar" ? createDollar(Boolean(initial)) : createCoin(Boolean(initial))
+        );
+      }
+    }
+  }
+  function resizeBackgroundEffects() {
+    if (!backgroundEffectEngine.canvas || !backgroundEffectEngine.ctx) return;
+    var w = Math.max(1, window.innerWidth || document.documentElement.clientWidth || 1);
+    var h = Math.max(1, window.innerHeight || document.documentElement.clientHeight || 1);
+    var dpr = Math.min(1.5, Math.max(1, window.devicePixelRatio || 1));
+    backgroundEffectEngine.width = w;
+    backgroundEffectEngine.height = h;
+    backgroundEffectEngine.canvas.width = Math.floor(w * dpr);
+    backgroundEffectEngine.canvas.height = Math.floor(h * dpr);
+    backgroundEffectEngine.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    backgroundEffectEngine.ctx.textBaseline = "middle";
+    resetEffectParticles(true);
+  }
+  function drawDollar(p) {
+    var c = backgroundEffectEngine.ctx;
+    c.save();
+    c.translate(p.x, p.y);
+    c.rotate(p.rotation);
+    c.font = "800 " + p.size.toFixed(1) + "px ui-sans-serif,system-ui,sans-serif";
+    c.fillStyle = "rgba(118,255,177," + p.alpha.toFixed(3) + ")";
+    c.shadowBlur = p.size * .8;
+    c.shadowColor = "rgba(72,255,162,.22)";
+    c.fillText(p.glyph, 0, 0);
+    c.restore();
+  }
+  function drawCoin(p) {
+    var c = backgroundEffectEngine.ctx;
+    var scaleX = .32 + Math.abs(Math.sin(p.rotation)) * .68;
+    c.save();
+    c.translate(p.x, p.y);
+    c.scale(scaleX, 1);
+    var g = c.createRadialGradient(-p.size * .25, -p.size * .3, 1, 0, 0, p.size);
+    g.addColorStop(0, "rgba(255,245,180," + p.alpha.toFixed(3) + ")");
+    g.addColorStop(.48, "rgba(245,188,55," + p.alpha.toFixed(3) + ")");
+    g.addColorStop(1, "rgba(137,77,12," + (p.alpha * .94).toFixed(3) + ")");
+    c.fillStyle = g;
+    c.shadowBlur = p.size * .9;
+    c.shadowColor = "rgba(255,193,61,.2)";
+    c.beginPath();
+    c.arc(0, 0, p.size, 0, Math.PI * 2);
+    c.fill();
+    c.lineWidth = 1.1;
+    c.strokeStyle = "rgba(255,226,133," + (p.alpha * .78).toFixed(3) + ")";
+    c.stroke();
+    c.restore();
+    if (scaleX > .48) {
+      c.save();
+      c.translate(p.x, p.y);
+      c.fillStyle = "rgba(114,69,10," + (p.alpha * .7).toFixed(3) + ")";
+      c.font = "900 " + Math.max(7, p.size * .74).toFixed(1) + "px ui-sans-serif,system-ui,sans-serif";
+      c.textAlign = "center";
+      c.fillText("Z", 0, .5);
+      c.restore();
+    }
+  }
+  function drawHacker(dt) {
+    var c = backgroundEffectEngine.ctx;
+    c.fillStyle = "rgba(1,8,5,.10)";
+    c.fillRect(0, 0, backgroundEffectEngine.width, backgroundEffectEngine.height);
+    c.textAlign = "center";
+    backgroundEffectEngine.columns.forEach(function (col) {
+      col.y += col.speed * effectSpeed() * dt;
+      for (var i = 0; i < col.length; i += 1) {
+        var y = col.y - i * (col.size + 6);
+        if (y < -20 || y > backgroundEffectEngine.height + 20) continue;
+        var index = Math.floor((col.phase + i * 1.7 + col.y * .012) % col.chars.length);
+        var alpha = i === 0 ? .78 : Math.max(.08, .42 - i * .055);
+        c.fillStyle = "rgba(84,255,157," + alpha.toFixed(3) + ")";
+        c.font = (i === 0 ? "800 " : "650 ") + col.size.toFixed(1) + "px ui-monospace,SFMono-Regular,Menlo,monospace";
+        c.shadowBlur = i === 0 ? 7 : 0;
+        c.shadowColor = "rgba(84,255,157,.25)";
+        c.fillText(col.chars.charAt(index), col.x, y);
+      }
+      if (col.y - (col.length + 1) * (col.size + 6) > backgroundEffectEngine.height + 30) {
+        col.y = -12 - Math.random() * backgroundEffectEngine.height * .25;
+        col.phase = Math.random() * Math.PI * 2;
+      }
+    });
+    c.shadowBlur = 0;
+    c.textAlign = "start";
+  }
+  function updateDragon(now) {
+    if (!backgroundEffectEngine.dragon) return;
+    var speed = { low: .000035, medium: .000055, high: .000078 }[backgroundEffectEngine.intensity] || .000055;
+    var t = now * speed;
+    var x = backgroundEffectEngine.width * .5 + Math.cos(t) * backgroundEffectEngine.width * .4;
+    var y = backgroundEffectEngine.height * .52 + Math.sin(t * 1.18) * backgroundEffectEngine.height * .28;
+    var rotation = Math.sin(t * 1.45) * 11 + Math.cos(t * .75) * 5;
+    backgroundEffectEngine.dragon.style.transform =
+      "translate3d(" + x.toFixed(1) + "px," + y.toFixed(1) + "px,0) translate(-50%,-50%) rotate(" + rotation.toFixed(2) + "deg)";
+  }
+  function renderBackgroundEffect(now) {
+    if (!backgroundEffectEngine.ctx) return;
+    var c = backgroundEffectEngine.ctx;
+    var dt = Math.min(.05, Math.max(0, (now - (backgroundEffectEngine.lastFrame || now)) / 1000));
+    backgroundEffectEngine.lastFrame = now;
+    if (backgroundEffectEngine.mode === "hacker") {
+      drawHacker(dt);
+      return;
+    }
+    c.clearRect(0, 0, backgroundEffectEngine.width, backgroundEffectEngine.height);
+    if (backgroundEffectEngine.mode === "dollar" || backgroundEffectEngine.mode === "coins") {
+      backgroundEffectEngine.particles.forEach(function (p) {
+        p.y += p.speed * effectSpeed() * dt;
+        p.x += p.drift * dt;
+        p.rotation += p.spin;
+        if (p.y > backgroundEffectEngine.height + p.size * 2) {
+          Object.assign(p, backgroundEffectEngine.mode === "dollar" ? createDollar(false) : createCoin(false));
+        } else if (backgroundEffectEngine.mode === "dollar") {
+          drawDollar(p);
+        } else {
+          drawCoin(p);
+        }
+      });
+    }
+  }
+  function backgroundEffectLoop(now) {
+    if (!backgroundEffectEngine.running) return;
+    renderBackgroundEffect(now);
+    if (backgroundEffectEngine.mode === "dragon") updateDragon(now);
+    backgroundEffectEngine.raf = window.requestAnimationFrame(backgroundEffectLoop);
+  }
+  function stopBackgroundEffectLoop() {
+    backgroundEffectEngine.running = false;
+    if (backgroundEffectEngine.raf) {
+      window.cancelAnimationFrame(backgroundEffectEngine.raf);
+      backgroundEffectEngine.raf = 0;
+    }
+  }
+  function startBackgroundEffectLoop() {
+    if (!backgroundEffectEngine.initialized || backgroundEffectEngine.running) return;
+    backgroundEffectEngine.running = true;
+    backgroundEffectEngine.lastFrame = window.performance.now();
+    if (backgroundEffectEngine.ctx) {
+      backgroundEffectEngine.ctx.clearRect(0, 0, backgroundEffectEngine.width, backgroundEffectEngine.height);
+    }
+    resetEffectParticles(true);
+    if (backgroundEffectEngine.mode === "dragon") updateDragon(backgroundEffectEngine.lastFrame);
+    backgroundEffectEngine.raf = window.requestAnimationFrame(backgroundEffectLoop);
+  }
+  function syncBackgroundEffectEngine() {
+    var mode = BACKGROUND_EFFECTS.indexOf(state.backgroundEffect) >= 0 ? state.backgroundEffect : "none";
+    var intensity = BACKGROUND_EFFECT_INTENSITIES.indexOf(state.backgroundEffectIntensity) >= 0 ? state.backgroundEffectIntensity : "medium";
+    var canAnimate = state.animationsEnabled && !document.hidden && !backgroundEffectEngine.reducedMotion && mode !== "none";
+    backgroundEffectEngine.mode = mode;
+    backgroundEffectEngine.intensity = intensity;
+    document.documentElement.setAttribute("data-background-effect", mode);
+    document.documentElement.setAttribute("data-background-effect-intensity", intensity);
+    if (els["appearance-effects"]) els["appearance-effects"].hidden = !canAnimate;
+    if (els["appearance-dragon"]) els["appearance-dragon"].hidden = !(canAnimate && mode === "dragon");
+    if (els["appearance-effects-canvas"]) els["appearance-effects-canvas"].hidden = !(canAnimate && mode !== "dragon");
+    if (!canAnimate) {
+      stopBackgroundEffectLoop();
+      if (backgroundEffectEngine.ctx) {
+        backgroundEffectEngine.ctx.clearRect(0, 0, backgroundEffectEngine.width, backgroundEffectEngine.height);
+      }
+      return;
+    }
+    resetEffectParticles(false);
+    stopBackgroundEffectLoop();
+    startBackgroundEffectLoop();
+  }
+  function initializeBackgroundEffectEngine() {
+    if (backgroundEffectEngine.initialized) return;
+    backgroundEffectEngine.canvas = els["appearance-effects-canvas"];
+    backgroundEffectEngine.ctx = backgroundEffectEngine.canvas && backgroundEffectEngine.canvas.getContext ? backgroundEffectEngine.canvas.getContext("2d") : null;
+    backgroundEffectEngine.dragon = els["appearance-dragon"];
+    backgroundEffectEngine.initialized = true;
+    resizeBackgroundEffects();
+    window.addEventListener("resize", function () {
+      window.clearTimeout(backgroundEffectEngine.resizeTimer);
+      backgroundEffectEngine.resizeTimer = window.setTimeout(function () {
+        resizeBackgroundEffects();
+        syncBackgroundEffectEngine();
+      }, 120);
+    }, { passive: true });
+    var media = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
+    if (media) {
+      var onChange = function (event) {
+        backgroundEffectEngine.reducedMotion = Boolean(event.matches);
+        syncBackgroundEffectEngine();
+      };
+      if (typeof media.addEventListener === "function") media.addEventListener("change", onChange);
+      else if (typeof media.addListener === "function") media.addListener(onChange);
+    }
+  }
+  function updateBackgroundEffectControls() {
+    var effect = BACKGROUND_EFFECTS.indexOf(state.backgroundEffect) >= 0 ? state.backgroundEffect : "none";
+    var intensity = BACKGROUND_EFFECT_INTENSITIES.indexOf(state.backgroundEffectIntensity) >= 0 ? state.backgroundEffectIntensity : "medium";
+    document.querySelectorAll('input[name="background-effect"]').forEach(function (input) {
+      var selected = input.value === effect;
+      input.checked = selected;
+      var option = input.closest(".appearance-effect-option");
+      if (option) option.classList.toggle("is-selected", selected);
+    });
+    document.querySelectorAll('input[name="background-effect-intensity"]').forEach(function (input) {
+      var selected = input.value === intensity;
+      input.checked = selected;
+      input.disabled = effect === "none";
+      var option = input.closest(".appearance-intensity-option");
+      if (option) {
+        option.classList.toggle("is-selected", selected);
+        option.classList.toggle("is-disabled", effect === "none");
+      }
+    });
+    if (els["appearance-background-effect-status"]) {
+      var label = effect === "dollar" ? text("backgroundEffectDollar")
+        : effect === "coins" ? text("backgroundEffectCoins")
+        : effect === "dragon" ? text("backgroundEffectDragon")
+        : effect === "hacker" ? text("backgroundEffectHacker") : "";
+      els["appearance-background-effect-status"].textContent =
+        effect === "none" ? text("backgroundEffectStatusNone") : text("backgroundEffectStatusActive") + " • " + label;
+    }
+  }
 
   var TEXT = {
     en: {
@@ -237,6 +528,25 @@
       replyTimeoutNotificationTitle: "Group Timeout Notification",
       replyTimeoutNotificationSub: "Sent to the connected Target Group when a Source Group activity times out.",
       wallpaperSub: "Choose a preset or use an image from this device.",
+      backgroundEffects: "Background Effects",
+      backgroundEffectsSub: "Add a lightweight animated layer to your wallpaper. Saved only on this device.",
+      backgroundEffectNone: "None",
+      backgroundEffectNoneSub: "Clean background",
+      backgroundEffectDollar: "Dollar Rain",
+      backgroundEffectDollarSub: "Falling currency",
+      backgroundEffectCoins: "Gold Coins",
+      backgroundEffectCoinsSub: "Falling gold coins",
+      backgroundEffectDragon: "Chinese Dragon",
+      backgroundEffectDragonSub: "Floating dragon",
+      backgroundEffectHacker: "Hacker Stream",
+      backgroundEffectHackerSub: "Falling terminal code",
+      backgroundEffectIntensity: "Effect Intensity",
+      backgroundEffectIntensitySub: "Control how visible and active the effect feels.",
+      backgroundEffectLow: "Low",
+      backgroundEffectMedium: "Medium",
+      backgroundEffectHigh: "High",
+      backgroundEffectStatusNone: "No background effect is active.",
+      backgroundEffectStatusActive: "Background effect is active on this device.",
       wallpaperDefault: "Default",
       wallpaperAurora: "Aurora",
       wallpaperGrid: "Neon Grid",
@@ -556,6 +866,25 @@
       replyTimeoutNotificationTitle: "Group Timeout Notification",
       replyTimeoutNotificationSub: "Source Group activity timeout ဖြစ်သည့်အခါ ချိတ်ထားသော Target Group သို့ ပို့မည့်စာသား။",
       wallpaperSub: "Preset တစ်ခုရွေးပါ သို့မဟုတ် ဤစက်ထဲက image တစ်ပုံကို သုံးပါ။",
+      backgroundEffects: "နောက်ခံ Effect",
+      backgroundEffectsSub: "ရွေးထားသော wallpaper ပေါ်တွင် ပေါ့ပါးသော animation layer ထည့်ပါ။ ဤ device ပေါ်တွင်သာ သိမ်းထားပါမည်။",
+      backgroundEffectNone: "မရှိပါ",
+      backgroundEffectNoneSub: "ရိုးရှင်းသော နောက်ခံ",
+      backgroundEffectDollar: "ဒေါ်လာများ ကျဆင်းခြင်း",
+      backgroundEffectDollarSub: "ဒေါ်လာများ ကျဆင်းမည်",
+      backgroundEffectCoins: "ရွှေဒင်္ဂါးများ",
+      backgroundEffectCoinsSub: "ရွှေဒင်္ဂါးများ ကျဆင်းမည်",
+      backgroundEffectDragon: "တရုတ် နဂါး",
+      backgroundEffectDragonSub: "နဂါး ပေါ့ပါးစွာ လှည့်လည်မည်",
+      backgroundEffectHacker: "Hacker စာတန်းများ",
+      backgroundEffectHackerSub: "Terminal code စာတန်းများ ကျဆင်းမည်",
+      backgroundEffectIntensity: "Effect အား",
+      backgroundEffectIntensitySub: "Effect ၏ မြင်သာမှုနှင့် လှုပ်ရှားမှုကို ချိန်ညှိပါ။",
+      backgroundEffectLow: "နည်း",
+      backgroundEffectMedium: "အလယ်အလတ်",
+      backgroundEffectHigh: "မြင့်",
+      backgroundEffectStatusNone: "နောက်ခံ Effect မည်သည့်အရာမျှ မဖွင့်ထားပါ။",
+      backgroundEffectStatusActive: "နောက်ခံ Effect ကို ဤ device တွင် အသုံးပြုနေပါသည်။",
       wallpaperDefault: "Default",
       wallpaperAurora: "Aurora",
       wallpaperGrid: "Neon Grid",
@@ -874,6 +1203,25 @@
       replyTimeoutNotificationTitle: "群组超时通知",
       replyTimeoutNotificationSub: "源群组活动超时后发送到已连接的目标群组。",
       wallpaperSub: "选择预设，或使用此设备中的图片。",
+      backgroundEffects: "背景效果",
+      backgroundEffectsSub: "为当前壁纸添加轻量动态效果。仅保存在此设备。",
+      backgroundEffectNone: "无",
+      backgroundEffectNoneSub: "简洁背景",
+      backgroundEffectDollar: "美元雨",
+      backgroundEffectDollarSub: "美元从上方落下",
+      backgroundEffectCoins: "金币雨",
+      backgroundEffectCoinsSub: "金币从上方落下",
+      backgroundEffectDragon: "中国龙",
+      backgroundEffectDragonSub: "中国龙环绕移动",
+      backgroundEffectHacker: "黑客代码流",
+      backgroundEffectHackerSub: "终端代码从上方落下",
+      backgroundEffectIntensity: "效果强度",
+      backgroundEffectIntensitySub: "调整效果的可见度和运动强度。",
+      backgroundEffectLow: "低",
+      backgroundEffectMedium: "中",
+      backgroundEffectHigh: "高",
+      backgroundEffectStatusNone: "未启用背景效果。",
+      backgroundEffectStatusActive: "背景效果已在此设备启用。",
       wallpaperDefault: "默认",
       wallpaperAurora: "极光",
       wallpaperGrid: "霓虹网格",
@@ -1143,6 +1491,16 @@
       "user-appearance-wallpaper-ocean","user-appearance-wallpaper-violet","user-appearance-wallpaper-custom",
       "appearance-wallpaper-custom-preview","appearance-wallpaper-file","appearance-wallpaper-upload",
       "appearance-wallpaper-remove","appearance-wallpaper-status",
+      "appearance-effects","appearance-effects-canvas","appearance-dragon",
+      "user-appearance-effects-title","user-appearance-effects-sub",
+      "user-background-effect-none","user-background-effect-none-sub",
+      "user-background-effect-dollar","user-background-effect-dollar-sub",
+      "user-background-effect-coins","user-background-effect-coins-sub",
+      "user-background-effect-dragon","user-background-effect-dragon-sub",
+      "user-background-effect-hacker","user-background-effect-hacker-sub",
+      "user-appearance-effects-intensity","user-appearance-effects-intensity-sub",
+      "user-background-intensity-low","user-background-intensity-medium","user-background-intensity-high",
+      "appearance-background-effect-status",
       "appearance-animations-toggle","user-appearance-animations-title","user-appearance-animations-sub",
       "user-appearance-animations-state","appearance-compact-toggle","user-appearance-compact-title",
       "user-appearance-compact-sub","user-appearance-compact-state",
@@ -1392,6 +1750,8 @@
 
     root.setAttribute("data-theme", state.appearanceTheme);
     root.setAttribute("data-wallpaper", activeWallpaper);
+    root.setAttribute("data-background-effect", state.backgroundEffect);
+    root.setAttribute("data-background-effect-intensity", state.backgroundEffectIntensity);
     if (state.customWallpaper) {
       root.style.setProperty("--z28-custom-wallpaper", "url(" + state.customWallpaper + ")");
     } else {
@@ -1401,6 +1761,8 @@
     root.setAttribute("data-compact", state.compactMode ? "on" : "off");
     applyThemeCreatorStyles();
     updateAppearanceControls();
+    updateBackgroundEffectControls();
+    syncBackgroundEffectEngine();
   }
 
   function updateThemeCreatorControls() {
@@ -1564,6 +1926,7 @@
       state.compactMode ? text("appearanceOn") : text("appearanceOff");
 
     updateThemeCreatorControls();
+    updateBackgroundEffectControls();
   }
 
   function setAppearanceTheme(theme) {
@@ -1587,6 +1950,19 @@
     if (wallpaper === "custom" && !state.customWallpaper) return;
     state.wallpaper = wallpaper;
     writeStorage(STORAGE_KEYS.wallpaper, wallpaper);
+    applyAppearancePreferences();
+  }
+
+  function setBackgroundEffect(effect) {
+    if (BACKGROUND_EFFECTS.indexOf(effect) === -1) return;
+    state.backgroundEffect = effect;
+    writeStorage(STORAGE_KEYS.backgroundEffect, effect);
+    applyAppearancePreferences();
+  }
+  function setBackgroundEffectIntensity(intensity) {
+    if (BACKGROUND_EFFECT_INTENSITIES.indexOf(intensity) === -1) return;
+    state.backgroundEffectIntensity = intensity;
+    writeStorage(STORAGE_KEYS.backgroundEffectIntensity, intensity);
     applyAppearancePreferences();
   }
 
@@ -2105,6 +2481,23 @@
     els["user-appearance-wallpaper-ocean"].textContent = text("wallpaperOcean");
     els["user-appearance-wallpaper-violet"].textContent = text("wallpaperViolet");
     els["user-appearance-wallpaper-custom"].textContent = text("wallpaperCustom");
+    els["user-appearance-effects-title"].textContent = text("backgroundEffects");
+    els["user-appearance-effects-sub"].textContent = text("backgroundEffectsSub");
+    els["user-background-effect-none"].textContent = text("backgroundEffectNone");
+    els["user-background-effect-none-sub"].textContent = text("backgroundEffectNoneSub");
+    els["user-background-effect-dollar"].textContent = text("backgroundEffectDollar");
+    els["user-background-effect-dollar-sub"].textContent = text("backgroundEffectDollarSub");
+    els["user-background-effect-coins"].textContent = text("backgroundEffectCoins");
+    els["user-background-effect-coins-sub"].textContent = text("backgroundEffectCoinsSub");
+    els["user-background-effect-dragon"].textContent = text("backgroundEffectDragon");
+    els["user-background-effect-dragon-sub"].textContent = text("backgroundEffectDragonSub");
+    els["user-background-effect-hacker"].textContent = text("backgroundEffectHacker");
+    els["user-background-effect-hacker-sub"].textContent = text("backgroundEffectHackerSub");
+    els["user-appearance-effects-intensity"].textContent = text("backgroundEffectIntensity");
+    els["user-appearance-effects-intensity-sub"].textContent = text("backgroundEffectIntensitySub");
+    els["user-background-intensity-low"].textContent = text("backgroundEffectLow");
+    els["user-background-intensity-medium"].textContent = text("backgroundEffectMedium");
+    els["user-background-intensity-high"].textContent = text("backgroundEffectHigh");
     els["user-appearance-animations-title"].textContent = text("animations");
     els["user-appearance-animations-sub"].textContent = text("animationsSub");
     els["user-appearance-compact-title"].textContent = text("compactMode");
@@ -4081,6 +4474,15 @@ function populateConnectSelect(select, groups, preferredId) {
       els["appearance-wallpaper-remove"].onclick = removeCustomWallpaper;
     }
 
+    document.querySelectorAll('input[name="background-effect"]').forEach(function (input) {
+      input.onchange = function () { setBackgroundEffect(input.value); };
+    });
+    document.querySelectorAll('input[name="background-effect-intensity"]').forEach(function (input) {
+      input.onchange = function () {
+        if (!input.disabled) setBackgroundEffectIntensity(input.value);
+      };
+    });
+
     els["appearance-animations-toggle"].onclick = toggleAnimations;
     els["appearance-compact-toggle"].onclick = toggleCompactMode;
     els["workspace-name-input"].oninput = function () {
@@ -4148,8 +4550,13 @@ function populateConnectSelect(select, groups, preferredId) {
     };
 
     document.addEventListener("visibilitychange", function () {
-      if (document.hidden) stopAutoRefresh();
-      else scheduleAutoRefresh();
+      if (document.hidden) {
+        stopAutoRefresh();
+        syncBackgroundEffectEngine();
+      } else {
+        scheduleAutoRefresh();
+        syncBackgroundEffectEngine();
+      }
     });
 
     els["switch-group"].onclick = openGroupPicker;
@@ -4247,6 +4654,15 @@ function populateConnectSelect(select, groups, preferredId) {
 
     state.customWallpaper = getStoredCustomWallpaper();
 
+    var storedBackgroundEffect = readStorage(STORAGE_KEYS.backgroundEffect);
+    state.backgroundEffect = BACKGROUND_EFFECTS.indexOf(storedBackgroundEffect) >= 0 ? storedBackgroundEffect : "none";
+
+    var storedBackgroundEffectIntensity = readStorage(STORAGE_KEYS.backgroundEffectIntensity);
+    state.backgroundEffectIntensity =
+      BACKGROUND_EFFECT_INTENSITIES.indexOf(storedBackgroundEffectIntensity) >= 0
+        ? storedBackgroundEffectIntensity
+        : "medium";
+
     var storedWallpaper = readStorage(STORAGE_KEYS.wallpaper);
     state.wallpaper =
       ["default","aurora","grid","nebula","ocean","violet"].indexOf(storedWallpaper) >= 0
@@ -4314,6 +4730,7 @@ function populateConnectSelect(select, groups, preferredId) {
 
   async function initialize() {
     cacheElements();
+    initializeBackgroundEffectEngine();
 
     if (!tg || !initData) {
       els.identity.textContent = text("openTelegram");
