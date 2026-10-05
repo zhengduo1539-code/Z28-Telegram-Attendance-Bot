@@ -14,7 +14,11 @@ const MAX_START_RETRY_DELAY_MS = 30_000;
 const sleep = (milliseconds: number) =>
   new Promise<void>((resolve) => setTimeout(resolve, milliseconds));
 
-export const startTelegramBot = async (logger: Logger) => {
+export type TelegramBotRuntimeHandle = {
+  stop: () => Promise<void>;
+};
+
+export const startTelegramBot = async (logger: Logger): Promise<TelegramBotRuntimeHandle | undefined> => {
   const config = getBotConfig();
   if (!config.token) {
     setBotStatus({ enabled: false, running: false });
@@ -34,27 +38,56 @@ export const startTelegramBot = async (logger: Logger) => {
   setBotStatus({ enabled: true, running: false, lastError: undefined });
 
   let retryDelayMs = config.pollIntervalMs;
+  let store: MongoBotStore | undefined;
+  let telegram: TelegramClient | undefined;
+  let pollingBot: TelegramPollingBot | undefined;
+
   while (true) {
     try {
-      const store = new MongoBotStore(config.mongodbUri, config.dataPath);
+      store = new MongoBotStore(config.mongodbUri, config.dataPath);
       await store.load();
       const attendance = new AttendanceService(store, config);
-      const telegram = new TelegramClient(
+      telegram = new TelegramClient(
         config.token,
         config.telegramRequestTimeoutMs,
       );
       setAdminApiContext({ attendance, config, telegram });
       const handler = new CommandHandler(telegram, attendance, config);
-      const bot = new TelegramPollingBot(config, logger, handler, telegram);
-      await bot.start();
+      pollingBot = new TelegramPollingBot(config, logger, handler, telegram);
+      await pollingBot.start();
+
       const reminders = new ActivityReminderScheduler(
         attendance,
         telegram,
         logger,
       );
       reminders.start();
-      return bot;
+
+      return {
+        stop: async () => {
+          reminders.stop();
+          pollingBot?.stop();
+          telegram?.close();
+          await store?.close();
+        },
+      };
     } catch (error: unknown) {
+      pollingBot?.stop();
+      telegram?.close();
+
+      try {
+        await store?.close();
+      } catch (closeError: unknown) {
+        logger.error(
+          { err: closeError },
+          "Failed to close MongoDB connection after bot startup failure",
+        );
+      }
+
+      pollingBot = undefined;
+      telegram = undefined;
+      store = undefined;
+
       const message = error instanceof Error ? error.message : String(error);
       setBotStatus({ enabled: true, running: false, lastError: message });
       logger.error(
