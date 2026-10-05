@@ -72,7 +72,9 @@
     ocean: { primary: "#27c9ff", secondary: "#3d7dff" },
     violet: { primary: "#a66cff", secondary: "#5d7cff" },
     mint: { primary: "#35e0b3", secondary: "#37a8ff" },
-    sunset: { primary: "#ff9a62", secondary: "#ff5e93" }
+    sunset: { primary: "#ff9a62", secondary: "#ff5e93" },
+    light: { primary: "#2f8cff", secondary: "#6d63ff" },
+    white: { primary: "#2274ff", secondary: "#6257e8" }
   };
 
   var THEME_CREATOR_DEFAULTS = {
@@ -261,6 +263,10 @@
       themeMidnightSub: "Cooler navy and violet finish",
       themeAmoled: "AMOLED",
       themeAmoledSub: "Pure black for OLED displays",
+      themeLight: "Light",
+      themeLightSub: "Soft light interface",
+      themeWhite: "White",
+      themeWhiteSub: "Clean pure-white interface",
       animations: "Animations",
       animationsSub: "Keep interface motion and transitions enabled.",
       compactMode: "Compact Mode",
@@ -501,6 +507,10 @@
       themeMidnightSub: "Navy နှင့် violet အရောင်ပိုင်း ပိုမိုနက်ရှိုင်းသောပုံစံ",
       themeAmoled: "AMOLED",
       themeAmoledSub: "OLED display များအတွက် pure black ပုံစံ",
+      themeLight: "Light",
+      themeLightSub: "မျက်စိသက်သာသော အလင်းရောင် interface ပုံစံ",
+      themeWhite: "White",
+      themeWhiteSub: "သန့်ရှင်းသော အဖြူရောင် interface ပုံစံ",
       animations: "Animations",
       animationsSub: "Interface ရဲ့ motion နဲ့ transition များကို ဖွင့်ထားမည်။",
       compactMode: "Compact Mode",
@@ -739,6 +749,10 @@
       themeMidnightSub: "更深的海军蓝与紫色风格",
       themeAmoled: "AMOLED",
       themeAmoledSub: "适合 OLED 屏幕的纯黑风格",
+      themeLight: "浅色",
+      themeLightSub: "柔和明亮的界面",
+      themeWhite: "纯白",
+      themeWhiteSub: "干净纯白的界面",
       animations: "动画",
       animationsSub: "保持界面动画和过渡效果。",
       compactMode: "紧凑模式",
@@ -859,10 +873,12 @@
       "user-support-tab-label","user-appearance-tab-label","user-report-form",
       "user-appearance-page","user-appearance-title","user-appearance-sub",
       "user-appearance-theme-kicker","user-appearance-theme-title","user-appearance-theme-sub",
-      "appearance-theme-dark","appearance-theme-midnight","appearance-theme-amoled",
+      "appearance-theme-dark","appearance-theme-midnight","appearance-theme-amoled","appearance-theme-light","appearance-theme-white",
       "user-appearance-theme-dark-title","user-appearance-theme-dark-sub",
       "user-appearance-theme-midnight-title","user-appearance-theme-midnight-sub",
       "user-appearance-theme-amoled-title","user-appearance-theme-amoled-sub",
+      "user-appearance-theme-light-title","user-appearance-theme-light-sub",
+      "user-appearance-theme-white-title","user-appearance-theme-white-sub",
       "user-appearance-wallpaper-title","user-appearance-wallpaper-sub",
       "appearance-wallpaper-default","appearance-wallpaper-aurora","appearance-wallpaper-grid",
       "appearance-wallpaper-nebula","appearance-wallpaper-ocean","appearance-wallpaper-violet",
@@ -1235,7 +1251,7 @@
   }
 
   function setAppearanceTheme(theme) {
-    if (theme !== "dark" && theme !== "midnight" && theme !== "amoled") return;
+    if (["dark","midnight","amoled","light","white"].indexOf(theme) === -1) return;
     state.appearanceTheme = theme;
     if (!state.themeCreator || !state.themeCreator.enabled) {
       var base = getThemeBasePalette(theme);
@@ -1547,6 +1563,10 @@
     els["user-appearance-theme-midnight-sub"].textContent = text("themeMidnightSub");
     els["user-appearance-theme-amoled-title"].textContent = text("themeAmoled");
     els["user-appearance-theme-amoled-sub"].textContent = text("themeAmoledSub");
+    els["user-appearance-theme-light-title"].textContent = text("themeLight");
+    els["user-appearance-theme-light-sub"].textContent = text("themeLightSub");
+    els["user-appearance-theme-white-title"].textContent = text("themeWhite");
+    els["user-appearance-theme-white-sub"].textContent = text("themeWhiteSub");
     els["user-appearance-wallpaper-title"].textContent = text("wallpaperTitle");
     els["user-appearance-wallpaper-sub"].textContent = text("wallpaperSub");
     els["user-appearance-wallpaper-default"].textContent = text("wallpaperDefault");
@@ -3160,7 +3180,7 @@
 
     var storedTheme = readStorage(STORAGE_KEYS.appearanceTheme);
     state.appearanceTheme =
-      storedTheme === "midnight" || storedTheme === "amoled" ? storedTheme : "dark";
+      ["midnight","amoled","light","white"].indexOf(storedTheme) >= 0 ? storedTheme : "dark";
 
     var storedWallpaper = readStorage(STORAGE_KEYS.wallpaper);
     state.wallpaper =
