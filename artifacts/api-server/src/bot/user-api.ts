@@ -233,7 +233,13 @@ const buildGroup = async (
     activeCount: Object.values(snapshot.activeActivities).filter(
       (activity) => activity.chatId === groupId,
     ).length,
-    memberCount: await context.telegram.getChatMemberCount(groupId),
+    memberCount: await context.telegram.getChatMemberCount(groupId).catch((error: unknown) => {
+      console.warn("[user-dashboard] member count unavailable", {
+        groupId,
+        message: error instanceof Error ? error.message : String(error),
+      });
+      return 0;
+    }),
     userActive: snapshot.activeActivities[`${groupId}:${userId}`] || null,
     connectedTarget: connected
       ? {
@@ -500,8 +506,22 @@ userApiRouter.post("/dashboard", async (req, res) => {
     return;
   }
 
-  const activityLimits = await auth.context.attendance.getActivityLimits(selected.id);
-  const countLimits = await auth.context.attendance.getActivityCountLimits(selected.id);
+  const [activityLimits, countLimits] = await Promise.all([
+    auth.context.attendance.getActivityLimits(selected.id).catch((error: unknown) => {
+      console.warn("[user-dashboard] activity limits unavailable; using defaults", {
+        groupId: selected.id,
+        message: error instanceof Error ? error.message : String(error),
+      });
+      return defaultActivityLimits;
+    }),
+    auth.context.attendance.getActivityCountLimits(selected.id).catch((error: unknown) => {
+      console.warn("[user-dashboard] activity count limits unavailable; using defaults", {
+        groupId: selected.id,
+        message: error instanceof Error ? error.message : String(error),
+      });
+      return defaultCountLimits;
+    }),
+  ]);
   res.setHeader("Cache-Control", "no-store");
   res.json({
     user: auth.user,
