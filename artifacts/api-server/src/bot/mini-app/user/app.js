@@ -13,6 +13,7 @@
     language: "en",
     verifiedUserId: null,
     selectedGroupId: null,
+    normalUserMode: false,
     dashboard: null,
     requestId: 0,
     appReady: false,
@@ -666,19 +667,19 @@
       privacyCopy: "The Mini App uses Telegram WebApp account information to verify access and show the groups available to you. Information shown in this dashboard is used only for the bot features provided to your account and groups.",
       credits: "Credits",
       creator: "Creator",
-      noGroupEyebrow: "GROUP ACCESS",
-      noGroup: "No eligible groups yet",
-      noGroupCopy: "This Mini App could not find a group that your Telegram account can manage.",
-      noGroupHelpTitle: "Getting started",
-      noGroupHelpCaption: "Complete these checks, then reopen the Mini App.",
-      noGroupStep1Title: "Add the bot to your group",
-      noGroupStep1Copy: "Make sure Z28 is still a member of the group you want to manage.",
-      noGroupStep2Title: "Check your group role",
-      noGroupStep2Copy: "Your Telegram account must be the group owner or an administrator.",
-      noGroupStep3Title: "Reopen the Mini App",
-      noGroupStep3Copy: "Open the Mini App again after the access changes are complete.",
-      noGroupNote: "Groups that are no longer available to the bot are not shown in your dashboard.",
-      noGroupBack: "Back to verification",
+      noGroupEyebrow: "PERSONAL WORKSPACE",
+      noGroup: "Welcome to your Z28 workspace",
+      noGroupCopy: "Your personal Mini App space is ready. Group Dashboard tools will appear automatically when your Telegram account has eligible administrator access.",
+      noGroupHelpTitle: "Quick access",
+      noGroupHelpCaption: "Personal preferences are saved only on this device.",
+      noGroupStep1Title: "Appearance",
+      noGroupStep1Copy: "Customize your theme, wallpaper, animations and workspace name.",
+      noGroupStep2Title: "Help & Support",
+      noGroupStep2Copy: "Browse the FAQ and get guidance for using Z28.",
+      noGroupStep3Title: "About Z28",
+      noGroupStep3Copy: "View app information, privacy, terms and creator details.",
+      noGroupNote: "No group dashboard is available for this account right now. Reopen the Mini App after your group access changes.",
+      noGroupBack: "Check Group Access",
       dashboardError: "Unable to load your dashboard right now.",
       dashboardErrorCopy: "Something went wrong while loading your dashboard. Your saved settings were not changed.",
       tryAgain: "Try Again",
@@ -1002,19 +1003,19 @@
       privacyCopy: "Mini App သည် access အတည်ပြုရန်နှင့် သင့်အတွက် အသုံးပြုနိုင်သော Group များကို ပြသရန် Telegram WebApp account information ကို အသုံးပြုပါသည်။",
       credits: "Credits",
       creator: "ဖန်တီးသူ",
-      noGroupEyebrow: "GROUP ACCESS",
-      noGroup: "အသုံးပြုနိုင်သော Group မတွေ့သေးပါ",
-      noGroupCopy: "ဤ Mini App မှ သင့် Telegram account အနေဖြင့် စီမံနိုင်သော Group ကို မတွေ့ပါ။",
-      noGroupHelpTitle: "စတင်ရန် စစ်ဆေးရန်များ",
-      noGroupHelpCaption: "အောက်ပါအချက်များကို စစ်ဆေးပြီး Mini App ကို ပြန်ဖွင့်ပါ။",
-      noGroupStep1Title: "Bot ကို Group ထဲသို့ ထည့်ထားပါ",
-      noGroupStep1Copy: "စီမံလိုသော Group ထဲတွင် Z28 Bot ရှိနေဆဲဖြစ်ကြောင်း သေချာပါစေ။",
-      noGroupStep2Title: "သင့် Group role ကို စစ်ဆေးပါ",
-      noGroupStep2Copy: "သင့် Telegram account သည် Group owner သို့မဟုတ် administrator ဖြစ်ရပါမည်။",
-      noGroupStep3Title: "Mini App ကို ပြန်ဖွင့်ပါ",
-      noGroupStep3Copy: "Access ပြောင်းလဲမှုများ ပြီးစီးပြီးနောက် Mini App ကို ပြန်ဖွင့်ပါ။",
-      noGroupNote: "Bot မှ အသုံးပြုခွင့်မရှိတော့သော Group များကို Dashboard တွင် မပြပါ။",
-      noGroupBack: "ID အတည်ပြုရန် ပြန်သွားမည်",
+      noGroupEyebrow: "PERSONAL WORKSPACE",
+      noGroup: "သင့် Z28 Workspace မှ ကြိုဆိုပါသည်",
+      noGroupCopy: "သင့်အတွက် Personal Mini App space ကို အသင့်ပြင်ထားပြီးပါပြီ။ Telegram account တွင် Group access ရရှိလာပါက Group Dashboard tools များကို အလိုအလျောက် အသုံးပြုနိုင်ပါမည်။",
+      noGroupHelpTitle: "အမြန်အသုံးပြုရန်",
+      noGroupHelpCaption: "Personal preferences များကို ဤ device ပေါ်တွင်သာ သိမ်းထားပါသည်။",
+      noGroupStep1Title: "Appearance",
+      noGroupStep1Copy: "Theme, wallpaper, animations နှင့် workspace name ကို စိတ်ကြိုက်ပြင်နိုင်ပါသည်။",
+      noGroupStep2Title: "Help & Support",
+      noGroupStep2Copy: "FAQ များကို ကြည့်ရှုပြီး Z28 အသုံးပြုနည်း အကူအညီများ ရယူနိုင်ပါသည်။",
+      noGroupStep3Title: "Z28 အကြောင်း",
+      noGroupStep3Copy: "App အချက်အလက်၊ privacy၊ terms နှင့် creator information များကို ကြည့်နိုင်ပါသည်။",
+      noGroupNote: "ယခုအချိန်တွင် ဤ account အတွက် Group Dashboard မရရှိသေးပါ။ Group access ပြောင်းလဲပြီးနောက် Mini App ကို ပြန်ဖွင့်ပါ။",
+      noGroupBack: "Group Access စစ်မည်",
       dashboardError: "Dashboard ကို ယခုဖွင့်၍ မရသေးပါ။",
       dashboardErrorCopy: "Dashboard ကိုဖွင့်နေစဉ် ပြဿနာတစ်ခု ဖြစ်ပေါ်ခဲ့ပါသည်။ သိမ်းထားပြီးသော setting များကို မပြောင်းလဲထားပါ။",
       tryAgain: "ထပ်ကြိုးစားမည်",
@@ -1336,19 +1337,19 @@
       privacyCopy: "Mini App 使用 Telegram WebApp 账号信息验证访问权限，并显示您可以使用的群组。Dashboard 中的信息仅用于机器人为您的账号和群组提供的功能。",
       credits: "鸣谢",
       creator: "创作者",
-      noGroupEyebrow: "群组访问",
-      noGroup: "暂时没有找到可用群组",
-      noGroupCopy: "此 Mini App 没有找到您的 Telegram 账号可以管理的群组。",
-      noGroupHelpTitle: "开始前请检查",
-      noGroupHelpCaption: "完成以下检查后，请重新打开 Mini App。",
-      noGroupStep1Title: "将 Bot 添加到群组",
-      noGroupStep1Copy: "请确认您要管理的群组中仍然有 Z28 Bot。",
-      noGroupStep2Title: "检查您的群组身份",
-      noGroupStep2Copy: "您的 Telegram 账号必须是群主或管理员。",
-      noGroupStep3Title: "重新打开 Mini App",
-      noGroupStep3Copy: "完成访问权限调整后，再次打开 Mini App。",
-      noGroupNote: "Bot 已无法使用的群组不会显示在您的 Dashboard 中。",
-      noGroupBack: "返回验证",
+      noGroupEyebrow: "个人工作区",
+      noGroup: "欢迎进入您的 Z28 工作区",
+      noGroupCopy: "您的个人 Mini App 空间已经准备好。获得可用的群组管理权限后，Group Dashboard 工具会自动出现。",
+      noGroupHelpTitle: "快速访问",
+      noGroupHelpCaption: "个人偏好设置仅保存在此设备上。",
+      noGroupStep1Title: "外观",
+      noGroupStep1Copy: "自定义主题、壁纸、动画和工作区名称。",
+      noGroupStep2Title: "帮助与支持",
+      noGroupStep2Copy: "查看常见问题并获取 Z28 使用帮助。",
+      noGroupStep3Title: "关于 Z28",
+      noGroupStep3Copy: "查看应用信息、隐私、使用条款和创建者信息。",
+      noGroupNote: "当前账号暂时没有可用的群组仪表板。群组访问权限发生变化后，请重新打开 Mini App。",
+      noGroupBack: "检查群组权限",
       dashboardError: "暂时无法加载您的控制面板。",
       dashboardErrorCopy: "加载控制面板时出现问题。您已保存的设置没有被更改。",
       tryAgain: "再试一次",
@@ -2296,8 +2297,18 @@
 
   function applyLanguage() {
     document.documentElement.lang = state.language === "my" ? "my" : state.language;
-    els.title.textContent = text("title");
-    els.identity.textContent = state.verifiedUserId ? "ID " + state.verifiedUserId : text("startup");
+    if (state.aboutOpen) {
+      els.title.textContent = text("about");
+    } else if (state.supportOpen) {
+      els.title.textContent = text("helpSupport");
+    } else if (state.toolsOpen) {
+      els.title.textContent = text("tools");
+    } else if (state.appearanceOpen) {
+      els.title.textContent = text("appearance");
+    } else {
+      els.title.textContent = state.normalUserMode ? text("noGroup") : text("title");
+    }
+    els.identity.textContent = state.verifiedUserId ? userGreeting() : text("startup");
     applyWorkspaceIdentity();
     if (els["user-selected-group-title"]) {
       var dashboardName = state.dashboard && state.dashboard.selectedGroup
@@ -2576,6 +2587,9 @@
       els.title.textContent = text("appearance");
       els.identity.textContent = userGreeting();
     }
+
+    updateUserTabAccess();
+    updateSupportAvailability();
   }
 
   function openLanguageMenu() {
@@ -2607,6 +2621,7 @@
   }
 
   function showVerification(shouldFocus) {
+    state.normalUserMode = false;
     state.groupPickerOpen = false;
     state.aboutOpen = false;
     state.supportOpen = false;
@@ -2633,18 +2648,45 @@
     }
   }
 
-  function showNoGroup() {
+  function showNoGroup(data) {
+    state.normalUserMode = true;
     state.groupPickerOpen = false;
     state.aboutOpen = false;
     state.supportOpen = false;
     state.toolsOpen = false;
     state.appearanceOpen = false;
+    state.dashboard = data && typeof data === "object" ? data : {
+      hasGroups: false,
+      selectionRequired: false,
+      groups: [],
+    };
+    state.selectedGroupId = null;
+    saveDashboardState({ groupId: null, tab: "dashboard" });
     hideAllPrimaryScreens();
+
+    // The tab bar lives inside the dashboard shell, so keep the shell visible.
+    els["user-dashboard"].hidden = false;
+    els["user-group-options"].hidden = true;
+    els["user-selected-dashboard"].hidden = true;
+    els["user-about-page"].hidden = true;
+    els["user-support-page"].hidden = true;
+    els["user-tools-page"].hidden = true;
+    els["user-appearance-page"].hidden = true;
     els["user-no-group-screen"].hidden = false;
+    els["user-tabbar"].hidden = false;
+
     els.title.textContent = text("noGroup");
-    els.identity.textContent = state.verifiedUserId ? "ID " + state.verifiedUserId : text("startup");
-    els["user-tabbar"].hidden = true;
+    els.identity.textContent = userGreeting();
     setDashboardControls(false);
+    updateUserTabAccess();
+    updateSupportAvailability();
+
+    document.querySelectorAll("[data-user-tab]").forEach(function (button) {
+      var active = button.getAttribute("data-user-tab") === "dashboard";
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-current", active ? "page" : "false");
+    });
+
     updateBackButton();
 
     window.requestAnimationFrame(function () {
@@ -3176,12 +3218,14 @@
     var group = data && data.selectedGroup;
     if (!group) return;
 
+    state.normalUserMode = false;
     state.dashboard = data;
     state.selectedGroupId = Number(group.id);
     saveDashboardState({ groupId: state.selectedGroupId });
 
     if (languageOnly && (state.aboutOpen || state.supportOpen || state.appearanceOpen)) return;
 
+    els["user-no-group-screen"].hidden = true;
     els["user-group-options"].hidden = true;
     els["user-selected-dashboard"].hidden = false;
     els["user-dashboard"].hidden = false;
@@ -3228,6 +3272,8 @@
     setDashboardControls(true);
     updateAutoRefreshControl();
     scheduleAutoRefresh();
+    updateUserTabAccess();
+    updateSupportAvailability();
     updateBackButton();
 
     if (languageOnly) return;  }
@@ -3237,10 +3283,12 @@
       throw new Error(text("invalidResponse"));
     }
     if (!data.hasGroups) {
-      showNoGroup();
+      state.dashboard = data;
+      showNoGroup(data);
       return false;
     }
 
+    state.normalUserMode = false;
     state.dashboard = data;
 
     if (data.selectionRequired) {
@@ -4075,6 +4123,19 @@ function populateConnectSelect(select, groups, preferredId) {
     els["user-tool-detail-back"].setAttribute("aria-label", text("toolBack"));
   }
 
+  function updateUserTabAccess() {
+    if (!els["user-tools-tab-label"]) return;
+    var toolsButton = els["user-tools-tab-label"].closest(".tab-button");
+    if (toolsButton) toolsButton.hidden = state.normalUserMode;
+  }
+
+  function updateSupportAvailability() {
+    var form = els["user-report-form"];
+    if (!form) return;
+    var card = form.closest(".support-card");
+    if (card) card.hidden = state.normalUserMode;
+  }
+
   function openUserTool(tool) {
     if (!state.toolsOpen || state.groupPickerOpen) return;
     if (tool !== "connection" && tool !== "replies") return;
@@ -4128,10 +4189,11 @@ function populateConnectSelect(select, groups, preferredId) {
   }
 
   function setDashboardTab(tab) {
-    if (!state.dashboard || !els["user-tabbar"] || els["user-tabbar"].hidden) return;
+    if ((!state.dashboard && !state.normalUserMode) || !els["user-tabbar"] || els["user-tabbar"].hidden) return;
     if (state.groupPickerOpen) return;
 
     tab = tab === "about" || tab === "support" || tab === "tools" || tab === "appearance" ? tab : "dashboard";
+    if (state.normalUserMode && tab === "tools") return;
     if (state.toolsOpen && tab !== "tools" && state.replyDirty) {
       showNotice(text("replyUnsaved"), "error");
       return;
@@ -4147,6 +4209,7 @@ function populateConnectSelect(select, groups, preferredId) {
     ++state.requestId;
 
     if (state.aboutOpen) {
+      els["user-no-group-screen"].hidden = true;
       els["user-selected-dashboard"].hidden = true;
       els["user-support-page"].hidden = true;
       els["user-tools-page"].hidden = true;
@@ -4156,6 +4219,7 @@ function populateConnectSelect(select, groups, preferredId) {
       els.identity.textContent = userGreeting();
       setDashboardControls(false);
     } else if (state.supportOpen) {
+      els["user-no-group-screen"].hidden = true;
       els["user-selected-dashboard"].hidden = true;
       els["user-about-page"].hidden = true;
       els["user-tools-page"].hidden = true;
@@ -4166,6 +4230,8 @@ function populateConnectSelect(select, groups, preferredId) {
       updateReportContext();
       setDashboardControls(false);
     } else if (state.toolsOpen) {
+      if (state.normalUserMode) return;
+      els["user-no-group-screen"].hidden = true;
       els["user-selected-dashboard"].hidden = true;
       els["user-about-page"].hidden = true;
       els["user-support-page"].hidden = true;
@@ -4177,6 +4243,7 @@ function populateConnectSelect(select, groups, preferredId) {
       resetToolDetailState();
       updateToolsWorkspaceView();
     } else if (state.appearanceOpen) {
+      els["user-no-group-screen"].hidden = true;
       els["user-selected-dashboard"].hidden = true;
       els["user-about-page"].hidden = true;
       els["user-support-page"].hidden = true;
@@ -4191,11 +4258,20 @@ function populateConnectSelect(select, groups, preferredId) {
       els["user-support-page"].hidden = true;
       els["user-tools-page"].hidden = true;
       els["user-appearance-page"].hidden = true;
-      els["user-selected-dashboard"].hidden = false;
-      els.title.textContent = text("title");
-      els.identity.textContent = userGreeting();
-      setDashboardControls(true);
-      if (state.dashboard) renderSelectedDashboard(state.dashboard, true);
+      if (state.normalUserMode) {
+        els["user-selected-dashboard"].hidden = true;
+        els["user-no-group-screen"].hidden = false;
+        els.title.textContent = text("noGroup");
+        els.identity.textContent = userGreeting();
+        setDashboardControls(false);
+      } else {
+        els["user-no-group-screen"].hidden = true;
+        els["user-selected-dashboard"].hidden = false;
+        els.title.textContent = text("title");
+        els.identity.textContent = userGreeting();
+        setDashboardControls(true);
+        if (state.dashboard) renderSelectedDashboard(state.dashboard, true);
+      }
     }
 
     document.querySelectorAll("[data-user-tab]").forEach(function (button) {
@@ -4508,10 +4584,19 @@ function populateConnectSelect(select, groups, preferredId) {
     }
 
     els["user-no-group-back"].onclick = function () {
-      state.verifiedUserId = null;
-      state.selectedGroupId = null;
-      removeStorage(STORAGE_KEYS.verifiedUser);
-      showVerification(true);
+      if (state.refreshInProgress) return;
+      state.refreshInProgress = true;
+      setButton(els["user-no-group-back"], "loading", text("refreshing") + "…");
+      loadUserDashboard(true, undefined)
+        .catch(function (error) {
+          showNotice(error && error.message ? error.message : text("dashboardError"), "error");
+        })
+        .finally(function () {
+          state.refreshInProgress = false;
+          if (!els["user-no-group-screen"].hidden) {
+            setButton(els["user-no-group-back"], "idle", text("noGroupBack"));
+          }
+        });
     };
 
     els["auto-refresh-toggle"].onclick = function () {

@@ -75,58 +75,67 @@
       </button>
     </section>
 
-    <section id="user-no-group-screen" class="state-screen empty-state" aria-labelledby="user-no-group-title" aria-describedby="user-no-group-message" hidden aria-live="polite">
-      <div class="empty-state-card">
+    <section id="user-no-group-screen" class="state-screen normal-user-home" aria-labelledby="user-no-group-title" aria-describedby="user-no-group-message" hidden aria-live="polite">
+      <div class="empty-state-card normal-user-home-card">
         <div class="empty-state-topline">
           <div class="state-icon state-icon-muted" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M4.5 7.5h6l1.5 2h7.5v9a2 2 0 0 1-2 2H6.5a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2Z"></path><path d="M4.5 7.5V5.5a2 2 0 0 1 2-2h4l1.7 2h4.8a2 2 0 0 1 2 2v2"></path></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"></path><path d="M4.5 20c.7-3.5 3.2-5.5 7.5-5.5s6.8 2 7.5 5.5"></path></svg>
           </div>
-          <div class="eyebrow" id="user-no-group-eyebrow">GROUP ACCESS</div>
+          <div class="eyebrow" id="user-no-group-eyebrow">PERSONAL WORKSPACE</div>
         </div>
 
-        <h2 id="user-no-group-title">No eligible groups yet</h2>
-        <p id="user-no-group-message">This Mini App could not find a group that your Telegram account can manage.</p>
+        <h2 id="user-no-group-title">Welcome to your Z28 workspace</h2>
+        <p id="user-no-group-message">Your personal Mini App space is ready. Group Dashboard tools will appear automatically when your Telegram account has eligible administrator access.</p>
 
-        <div class="empty-state-help">
+        <div class="empty-state-help normal-user-quick-access">
           <div class="empty-state-help-head">
-            <span id="user-no-group-help-title">Getting started</span>
-            <span class="empty-state-help-caption" id="user-no-group-help-caption">Complete these checks, then reopen the Mini App.</span>
+            <span id="user-no-group-help-title">Quick access</span>
+            <span class="empty-state-help-caption" id="user-no-group-help-caption">Personal preferences are saved only on this device.</span>
           </div>
 
           <ol class="empty-state-steps">
             <li class="empty-state-step">
-              <span class="empty-state-step-number" aria-hidden="true">01</span>
-              <div>
-                <strong id="user-no-group-step1-title">Add the bot to your group</strong>
-                <span id="user-no-group-step1-copy">Make sure Z28 is still a member of the group you want to manage.</span>
-              </div>
+              <button class="normal-user-home-link" type="button" data-user-tab="appearance">
+                <span class="empty-state-step-number" aria-hidden="true">01</span>
+                <span class="normal-user-home-link-copy">
+                  <strong id="user-no-group-step1-title">Appearance</strong>
+                  <span id="user-no-group-step1-copy">Customize your theme, wallpaper, animations and workspace name.</span>
+                </span>
+                <span class="normal-user-home-arrow" aria-hidden="true">›</span>
+              </button>
             </li>
             <li class="empty-state-step">
-              <span class="empty-state-step-number" aria-hidden="true">02</span>
-              <div>
-                <strong id="user-no-group-step2-title">Check your group role</strong>
-                <span id="user-no-group-step2-copy">Your Telegram account must be the group owner or an administrator.</span>
-              </div>
+              <button class="normal-user-home-link" type="button" data-user-tab="support">
+                <span class="empty-state-step-number" aria-hidden="true">02</span>
+                <span class="normal-user-home-link-copy">
+                  <strong id="user-no-group-step2-title">Help &amp; Support</strong>
+                  <span id="user-no-group-step2-copy">Browse the FAQ and get guidance for using Z28.</span>
+                </span>
+                <span class="normal-user-home-arrow" aria-hidden="true">›</span>
+              </button>
             </li>
             <li class="empty-state-step">
-              <span class="empty-state-step-number" aria-hidden="true">03</span>
-              <div>
-                <strong id="user-no-group-step3-title">Reopen the Mini App</strong>
-                <span id="user-no-group-step3-copy">Open the Mini App again after the access changes are complete.</span>
-              </div>
+              <button class="normal-user-home-link" type="button" data-user-tab="about">
+                <span class="empty-state-step-number" aria-hidden="true">03</span>
+                <span class="normal-user-home-link-copy">
+                  <strong id="user-no-group-step3-title">About Z28</strong>
+                  <span id="user-no-group-step3-copy">View app information, privacy, terms and creator details.</span>
+                </span>
+                <span class="normal-user-home-arrow" aria-hidden="true">›</span>
+              </button>
             </li>
           </ol>
         </div>
 
         <div class="empty-state-note">
           <span class="empty-state-note-icon" aria-hidden="true">i</span>
-          <p id="user-no-group-note">Groups that are no longer available to the bot are not shown in your dashboard.</p>
+          <p id="user-no-group-note">No group dashboard is available for this account right now. Reopen the Mini App after your group access changes.</p>
         </div>
 
         <div class="empty-state-actions">
           <button id="user-no-group-back" class="secondary-button empty-state-back" type="button">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5 7.5 12l7 7"></path></svg>
-            <span id="user-no-group-back-label">Back to verification</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13"></path><path d="m12 6 6 6-6 6"></path></svg>
+            <span id="user-no-group-back-label">Check Group Access</span>
           </button>
         </div>
       </div>
