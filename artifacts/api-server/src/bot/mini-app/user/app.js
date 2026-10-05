@@ -2649,7 +2649,42 @@
     );
   }
 
-  async function apiUserSettings(groupId, type, kind, value) {
+  async function apiUserActivityReplies(groupId) {
+     if (!initData) throw new Error("Telegram session data is missing.");
+     return fetchJson(
+       "/api/user/activity-replies?groupId=" + encodeURIComponent(String(groupId)),
+       {
+         method: "GET",
+         headers: {
+           "X-Telegram-Init-Data": initData,
+           "Accept": "application/json"
+         }
+       },
+       "Activity Reply Messages"
+     );
+   }
+
+   async function apiUserActivityRepliesSave(groupId, messages) {
+     if (!initData) throw new Error("Telegram session data is missing.");
+     return fetchJson(
+       "/api/user/activity-replies",
+       {
+         method: "PUT",
+         headers: {
+           "X-Telegram-Init-Data": initData,
+           "Accept": "application/json",
+           "Content-Type": "application/json"
+         },
+         body: JSON.stringify({
+           groupId: Number(groupId),
+           messages: messages
+         })
+       },
+       "Activity Reply Messages"
+     );
+   }
+
+   async function apiUserSettings(groupId, type, kind, value) {
     if (!initData) throw new Error("Telegram session data is missing.");
     return fetchJson(
       "/api/user/settings",
