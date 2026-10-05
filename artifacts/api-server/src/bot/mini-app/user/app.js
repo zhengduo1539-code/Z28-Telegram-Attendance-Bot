@@ -24,6 +24,7 @@
     connectEditSnapshot: null,
     connectLoading: false,
     connectSaving: false,
+    connectGuideVisible: true,
     appearanceOpen: false,
     appearanceTheme: "dark",
     wallpaper: "default",
@@ -49,6 +50,7 @@
     dashboard: "z28_user_dashboard_state",
     connectSourceGroup: "z28_connect_source_group",
     connectTargetGroup: "z28_connect_target_group",
+    connectGuide: "z28_connect_guide_visible",
     autoRefresh: "z28_user_auto_refresh",
     appearanceTheme: "z28_appearance_theme",
     wallpaper: "z28_appearance_wallpaper",
@@ -229,6 +231,8 @@
       connectGuideRule1: "Only groups that are available to your Telegram account and have the required bot access can be selected.",
       connectGuideRule2: "One Source Group can have one active Target Group. Saving a new target updates that source connection.",
       connectGuideRule3: "If you only want to change the target, use Edit Connection instead of starting over.",
+      connectGuideHide: "Hide Guide",
+      connectGuideShow: "Show Guide",
       connectFlowKicker: "WHAT HAPPENS AFTER CONNECTING",
       connectFlowTitle: "How the connection works",
       connectFlowSub: "The connection routes a timeout notice from the Source Group to the Target Group.",
@@ -467,6 +471,8 @@
       connectGuideRule1: "သင့် Telegram account နဲ့ Bot နှစ်ခုလုံး အသုံးပြုနိုင်သော Group များကိုသာ ရွေးချယ်နိုင်ပါသည်။",
       connectGuideRule2: "Source Group တစ်ခုမှာ active Target Group တစ်ခု ရှိနိုင်ပါသည်။ Target အသစ်ကို Save လုပ်ပါက အဲဒီ Source connection ကို update လုပ်ပါမည်။",
       connectGuideRule3: "Target Group ကိုသာ ပြောင်းလိုပါက အစမှ ပြန်လုပ်စရာမလိုဘဲ ချိတ်ဆက်မှု ပြင်မည် ကို အသုံးပြုပါ။",
+      connectGuideHide: "Guide ကို ဖျောက်မည်",
+      connectGuideShow: "Guide ကို ပြမည်",
       connectFlowKicker: "ချိတ်ဆက်ပြီးနောက် ဘယ်လိုအလုပ်လုပ်သလဲ",
       connectFlowTitle: "Connection အလုပ်လုပ်ပုံ",
       connectFlowSub: "Source Group မှာ ဖြစ်ပေါ်သော timeout notification ကို ချိတ်ဆက်ထားသော Target Group သို့ ပို့ပေးပါသည်။",
@@ -700,6 +706,8 @@
       connectGuideRule1: "只能选择您的 Telegram 账号和 Bot 都可以使用，并具备所需权限的群组。",
       connectGuideRule2: "每个来源群组只能有一个有效目标群组。保存新的目标后，该来源群组的连接会被更新。",
       connectGuideRule3: "如果只想更换目标群组，无需重新开始，请直接使用更换群组。",
+      connectGuideHide: "隐藏说明",
+      connectGuideShow: "显示说明",
       connectFlowKicker: "连接后会发生什么",
       connectFlowTitle: "连接的工作方式",
       connectFlowSub: "连接会把来源群组产生的超时通知发送到目标群组。",
@@ -829,6 +837,7 @@
       "user-connect-guide-step3-title","user-connect-guide-step3-copy",
       "user-connect-guide-step4-title","user-connect-guide-step4-copy",
       "user-connect-guide-rule1","user-connect-guide-rule2","user-connect-guide-rule3",
+      "user-connect-guide-toggle","user-connect-guide-toggle-label","user-connect-help",
       "user-connect-flow-kicker","user-connect-flow-title","user-connect-flow-sub",
       "user-connect-flow-step1-title","user-connect-flow-step1-copy",
       "user-connect-flow-step2-title","user-connect-flow-step2-copy",
@@ -1521,6 +1530,7 @@
     els["user-connect-flow-important1"].textContent = text("connectFlowImportant1");
     els["user-connect-flow-important2"].textContent = text("connectFlowImportant2");
     els["user-connect-status-title"].textContent = text("connectStatus");
+    applyConnectGuideVisibility();
     var connectChangeLabel = els["user-connect-change"] && els["user-connect-change"].querySelector(".button-label");
     if (connectChangeLabel) connectChangeLabel.textContent = state.connectEditMode ? text("cancel") : text("connectChange");
     var connectButtonLabel = els["user-connect-submit"].querySelector(".button-label");
@@ -2388,6 +2398,15 @@
       : null;
   }
 
+  function applyConnectGuideVisibility() {
+    if (!els["user-connect-help"] || !els["user-connect-guide-toggle"]) return;
+    var visible = state.connectGuideVisible !== false;
+    els["user-connect-help"].hidden = !visible;
+    els["user-connect-guide-toggle"].setAttribute("aria-expanded", String(visible));
+    var label = els["user-connect-guide-toggle"].querySelector(".button-label");
+    if (label) label.textContent = visible ? text("connectGuideHide") : text("connectGuideShow");
+  }
+
   function updateConnectStatus() {
     if (!els["user-connect-status-value"] || !els["user-connect-status-meta"]) return;
 
@@ -2971,6 +2990,11 @@
         if (state.connectEditMode) cancelConnectEdit();
         else beginConnectEdit();
       };
+      els["user-connect-guide-toggle"].onclick = function () {
+        state.connectGuideVisible = !state.connectGuideVisible;
+        writeStorage(STORAGE_KEYS.connectGuide, state.connectGuideVisible ? "1" : "0");
+        applyConnectGuideVisibility();
+      };
     }
 
     document.querySelectorAll('input[name="appearance-theme"]').forEach(function (input) {
@@ -3127,6 +3151,9 @@
 
     var savedDashboard = readDashboardState();
     state.selectedGroupId = savedDashboard.groupId;
+
+    var savedConnectGuide = readStorage(STORAGE_KEYS.connectGuide);
+    state.connectGuideVisible = savedConnectGuide !== "0";
 
     var savedAutoRefresh = readStorage(STORAGE_KEYS.autoRefresh);
     state.autoRefreshEnabled = savedAutoRefresh === "1";
