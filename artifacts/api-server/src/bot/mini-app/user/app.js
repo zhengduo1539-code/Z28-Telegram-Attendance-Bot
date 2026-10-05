@@ -15,6 +15,7 @@
     selectedGroupId: null,
     dashboard: null,
     requestId: 0,
+    appReady: false,
     settingsSaving: false,
     groupPickerOpen: false,
     aboutOpen: false,
@@ -24,8 +25,10 @@
     connectEditSnapshot: null,
     connectLoading: false,
     connectSaving: false,
+    connectRequestId: 0,
     connectGuideVisible: true,
     appearanceOpen: false,
+    onboardingVisible: true,
     appearanceTheme: "dark",
     wallpaper: "default",
     customWallpaper: null,
@@ -53,6 +56,7 @@
     connectTargetGroup: "z28_connect_target_group",
     connectGuide: "z28_connect_guide_visible",
     autoRefresh: "z28_user_auto_refresh",
+    onboarding: "z28_user_onboarding_v1",
     appearanceTheme: "z28_appearance_theme",
     wallpaper: "z28_appearance_wallpaper",
     wallpaperCustom: "z28_appearance_wallpaper_custom",
@@ -160,6 +164,21 @@
       autoRefreshDisabled: "Auto refresh disabled.",
       dashboard: "Dashboard",
       wallpaperTitle: "Background Wallpaper",
+      onboardingKicker: "QUICK START",
+      onboardingTitle: "Get started with Z28",
+      onboardingSub: "A quick guide to the parts you will use most.",
+      onboardingStep1Title: "Choose your group",
+      onboardingStep1Copy: "Use Switch any time you need to work with another group.",
+      onboardingStep2Title: "Manage attendance",
+      onboardingStep2Copy: "Review limits and update activity settings from your dashboard.",
+      onboardingStep3Title: "Personalize your workspace",
+      onboardingStep3Copy: "Customize your theme, wallpaper and layout from Appearance.",
+      onboardingTools: "Explore Tools",
+      onboardingAppearance: "Customize Appearance",
+      onboardingDismiss: "Got it",
+      toolsCategoryKicker: "GROUP MANAGEMENT",
+      toolsCategoryTitle: "Group tools",
+      toolsCategorySub: "Tools that configure how Z28 connects and works across your groups.",
       wallpaperSub: "Choose a preset or use an image from this device.",
       wallpaperDefault: "Default",
       wallpaperAurora: "Aurora",
@@ -415,6 +434,21 @@
       autoRefreshDisabled: "Auto Refresh ပိတ်ပြီးပါပြီ။",
       dashboard: "Dashboard",
       wallpaperTitle: "Background Wallpaper",
+      onboardingKicker: "အမြန်စတင်ရန်",
+      onboardingTitle: "Z28 ကို စတင်အသုံးပြုပါ",
+      onboardingSub: "အများဆုံးအသုံးပြုမည့် လုပ်ဆောင်ချက်များကို အမြန်လေ့လာပါ။",
+      onboardingStep1Title: "Group ရွေးပါ",
+      onboardingStep1Copy: "အခြား group တစ်ခုကို စီမံလိုပါက Switch ကို အချိန်မရွေး အသုံးပြုနိုင်ပါသည်။",
+      onboardingStep2Title: "Attendance ကို စီမံပါ",
+      onboardingStep2Copy: "Dashboard မှ activity limits နှင့် settings များကို ကြည့်ရှုပြင်ဆင်နိုင်ပါသည်။",
+      onboardingStep3Title: "Workspace ကို စိတ်ကြိုက်ပြင်ပါ",
+      onboardingStep3Copy: "Appearance မှ theme, wallpaper နှင့် layout ကို စိတ်ကြိုက်ပြင်နိုင်ပါသည်။",
+      onboardingTools: "Tools ကြည့်မည်",
+      onboardingAppearance: "Appearance ပြင်မည်",
+      onboardingDismiss: "နားလည်ပါပြီ",
+      toolsCategoryKicker: "GROUP MANAGEMENT",
+      toolsCategoryTitle: "Group Tools",
+      toolsCategorySub: "Z28 ၏ group ချိတ်ဆက်မှုနှင့် group အလိုက်လုပ်ဆောင်ချက်များကို စီမံရန် tools များ။",
       wallpaperSub: "Preset တစ်ခုရွေးပါ သို့မဟုတ် ဤစက်ထဲက image တစ်ပုံကို သုံးပါ။",
       wallpaperDefault: "Default",
       wallpaperAurora: "Aurora",
@@ -669,6 +703,21 @@
       autoRefreshDisabled: "自动刷新已关闭。",
       dashboard: "仪表板",
       wallpaperTitle: "背景壁纸",
+      onboardingKicker: "快速开始",
+      onboardingTitle: "开始使用 Z28",
+      onboardingSub: "快速了解最常用的功能。",
+      onboardingStep1Title: "选择群组",
+      onboardingStep1Copy: "需要管理其他群组时，随时使用“切换”。",
+      onboardingStep2Title: "管理考勤",
+      onboardingStep2Copy: "在仪表板查看限制并更新活动设置。",
+      onboardingStep3Title: "个性化工作区",
+      onboardingStep3Copy: "在“外观”中自定义主题、壁纸和布局。",
+      onboardingTools: "探索工具",
+      onboardingAppearance: "自定义外观",
+      onboardingDismiss: "知道了",
+      toolsCategoryKicker: "群组管理",
+      toolsCategoryTitle: "群组工具",
+      toolsCategorySub: "管理 Z28 在不同群组之间的连接和相关功能。",
       wallpaperSub: "选择预设，或使用此设备中的图片。",
       wallpaperDefault: "默认",
       wallpaperAurora: "极光",
@@ -869,13 +918,18 @@
       "user-dashboard-error-screen","user-dashboard-error-title","user-dashboard-error-lead",
       "user-dashboard-error-retry","user-dashboard","user-group-options",
       "group-options-title","group-options-subtitle","user-group-options-list",
-      "user-selected-dashboard","selected-group-eyebrow","user-selected-group-title",
+      "user-selected-dashboard","user-onboarding","user-onboarding-title","user-onboarding-sub",
+      "user-onboarding-step1-title","user-onboarding-step1-copy","user-onboarding-step2-title","user-onboarding-step2-copy",
+      "user-onboarding-step3-title","user-onboarding-step3-copy","user-onboarding-tools","user-onboarding-appearance","user-onboarding-dismiss",
+      "selected-group-eyebrow","user-selected-group-title",
       "user-dashboard-sub","refresh","auto-refresh-toggle","auto-refresh-label",
       "switch-group","switch-group-label",
       "user-member-count","user-active-count","user-group-member-label",
       "user-member-active-label","settings-title","settings-subtitle",
       "user-settings-limits-card","user-settings-counts-card",
-      "user-tools-page","user-tools-tab-label","user-tools-title","user-tools-sub","user-connect-title","user-connect-sub",
+      "user-tools-page","user-tools-tab-label","user-tools-title","user-tools-sub",
+      "user-tools-category-kicker","user-tools-category-title","user-tools-category-sub",
+      "user-connect-title","user-connect-sub",
       "user-connect-source-label","user-connect-source-sub","user-connect-source",
       "user-connect-target-label","user-connect-target-sub","user-connect-target",
       "user-connect-note","user-connect-submit","user-connect-status-title","user-connect-status-value",
@@ -1269,6 +1323,31 @@
     };
     removeStorage(STORAGE_KEYS.themeCreator);
     applyAppearancePreferences();
+  }
+
+  function updateOnboardingVisibility() {
+    if (!els["user-onboarding"]) return;
+    var canShow =
+      state.onboardingVisible &&
+      Boolean(state.dashboard && state.dashboard.selectedGroup) &&
+      !state.groupPickerOpen &&
+      !state.aboutOpen &&
+      !state.supportOpen &&
+      !state.toolsOpen &&
+      !state.appearanceOpen;
+    els["user-onboarding"].hidden = !canShow;
+  }
+
+  function completeOnboarding() {
+    if (!state.onboardingVisible) return;
+    state.onboardingVisible = false;
+    writeStorage(STORAGE_KEYS.onboarding, "1");
+    updateOnboardingVisibility();
+  }
+
+  function openOnboardingDestination(tab) {
+    completeOnboarding();
+    setDashboardTab(tab);
   }
 
   function updateAppearanceControls() {
@@ -1748,6 +1827,9 @@
     els["user-appearance-tab-label"].textContent = text("appearance");
     els["user-tools-title"].textContent = text("tools");
     els["user-tools-sub"].textContent = text("toolsSub");
+    els["user-tools-category-kicker"].textContent = text("toolsCategoryKicker");
+    els["user-tools-category-title"].textContent = text("toolsCategoryTitle");
+    els["user-tools-category-sub"].textContent = text("toolsCategorySub");
     els["user-connect-title"].textContent = text("connectTitle");
     els["user-connect-sub"].textContent = text("connectSub");
     els["user-connect-source-label"].textContent = text("connectSource");
@@ -2501,6 +2583,17 @@
     els.title.textContent = text("title");
     els.identity.textContent = userGreeting();
     els["user-dashboard-sub"].textContent = text("dashboardEyebrow");
+    els["user-onboarding-title"].textContent = text("onboardingTitle");
+    els["user-onboarding-sub"].textContent = text("onboardingSub");
+    els["user-onboarding-step1-title"].textContent = text("onboardingStep1Title");
+    els["user-onboarding-step1-copy"].textContent = text("onboardingStep1Copy");
+    els["user-onboarding-step2-title"].textContent = text("onboardingStep2Title");
+    els["user-onboarding-step2-copy"].textContent = text("onboardingStep2Copy");
+    els["user-onboarding-step3-title"].textContent = text("onboardingStep3Title");
+    els["user-onboarding-step3-copy"].textContent = text("onboardingStep3Copy");
+    els["user-onboarding-tools"].textContent = text("onboardingTools");
+    els["user-onboarding-appearance"].textContent = text("onboardingAppearance");
+    els["user-onboarding-dismiss"].textContent = text("onboardingDismiss");
     els["user-selected-group-title"].querySelector(".group-dashboard-name").textContent =
       group.title || String(group.id);
     els["user-selected-group-title"].querySelector(".group-dashboard-suffix").textContent =
@@ -2798,8 +2891,9 @@
   }
 
   async function loadConnectGroups() {
-    if (!state.toolsOpen || state.connectLoading) return;
+    if (!state.toolsOpen || state.connectLoading || state.connectSaving) return;
 
+    var requestId = ++state.connectRequestId;
     state.connectLoading = true;
     state.connectEditMode = false;
     state.connectEditSnapshot = null;
@@ -2810,7 +2904,7 @@
 
     try {
       var data = await apiUserConnectGroups();
-      if (!state.toolsOpen) return;
+      if (requestId !== state.connectRequestId || !state.toolsOpen) return;
 
       var groups = Array.isArray(data.groups) ? data.groups : [];
       state.connectGroups = groups;
@@ -2878,12 +2972,13 @@
       writeStorage(STORAGE_KEYS.connectTargetGroup, defaultTarget || "");
       applyExistingConnectionState();
     } catch (error) {
-      if (!state.toolsOpen) return;
+      if (requestId !== state.connectRequestId || !state.toolsOpen) return;
       showNotice(
         error && error.message ? error.message : text("connectLoadFailed"),
         "error"
       );
     } finally {
+      if (requestId !== state.connectRequestId) return;
       state.connectLoading = false;
       els["user-connect-source"].removeAttribute("aria-busy");
       els["user-connect-target"].removeAttribute("aria-busy");
@@ -2998,10 +3093,17 @@
     if (state.groupPickerOpen) return;
 
     tab = tab === "about" || tab === "support" || tab === "tools" || tab === "appearance" ? tab : "dashboard";
+    var wasToolsOpen = state.toolsOpen;
     state.aboutOpen = tab === "about";
     state.supportOpen = tab === "support";
     state.toolsOpen = tab === "tools";
     state.appearanceOpen = tab === "appearance";
+    if (wasToolsOpen && !state.toolsOpen) {
+      ++state.connectRequestId;
+      state.connectLoading = false;
+      if (els["user-connect-source"]) els["user-connect-source"].removeAttribute("aria-busy");
+      if (els["user-connect-target"]) els["user-connect-target"].removeAttribute("aria-busy");
+    }
     saveDashboardState({ tab: tab });
 
     ++state.requestId;
@@ -3063,6 +3165,7 @@
       button.setAttribute("aria-current", active ? "page" : "false");
     });
 
+    updateOnboardingVisibility();
     updateBackButton();
   }
 
@@ -3380,6 +3483,16 @@
       };
     });
 
+    if (els["user-onboarding-tools"]) {
+      els["user-onboarding-tools"].onclick = function () {
+        openOnboardingDestination("tools");
+      };
+      els["user-onboarding-appearance"].onclick = function () {
+        openOnboardingDestination("appearance");
+      };
+      els["user-onboarding-dismiss"].onclick = completeOnboarding;
+    }
+
     if (tg && tg.BackButton && typeof tg.BackButton.onClick === "function") {
       tg.BackButton.onClick(handleBackButton);
       tg.BackButton.hide();
@@ -3429,6 +3542,7 @@
 
     var savedAutoRefresh = readStorage(STORAGE_KEYS.autoRefresh);
     state.autoRefreshEnabled = savedAutoRefresh === "1";
+    state.onboardingVisible = readStorage(STORAGE_KEYS.onboarding) !== "1";
 
     var storedTheme = readStorage(STORAGE_KEYS.appearanceTheme);
     state.appearanceTheme =
@@ -3490,7 +3604,12 @@
   hideSplash.hidden = false;
 
   function handleStartupFailure(error) {
+    if (state.appReady) {
+      console.error("Z28 Mini App runtime error:", error);
+      return;
+    }
     var message = error && error.message ? error.message : "Unable to start the Mini App.";
+    if (!els.identity) return;
     els.identity.textContent = message;
     showNotice(message, "error");
     hideSplash();
@@ -3529,6 +3648,7 @@
       showVerification();
     }
 
+    state.appReady = true;
     hideSplash();
   }
 
