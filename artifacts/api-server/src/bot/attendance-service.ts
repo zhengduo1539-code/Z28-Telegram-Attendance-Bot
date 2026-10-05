@@ -331,7 +331,7 @@ export class AttendanceService {
 
   async getLocale(chatId: number, userId: number): Promise<Locale> {
     const state = await this.store.load();
-    return state.users[userKey(chatId, userId)]?.locale || "zh";
+    return state.users[userKey(chatId, userId)]?.locale || "en";
   }
 
   async workCheckIn(
@@ -1035,7 +1035,7 @@ export class AttendanceService {
     const key = userKey(candidate.chatId, candidate.userId);
     return {
       activity: claim.activity,
-      locale: state.users[key]?.locale || "zh",
+      locale: state.users[key]?.locale || "en",
       claimedAt: claim.claimedAt,
     };
   }
