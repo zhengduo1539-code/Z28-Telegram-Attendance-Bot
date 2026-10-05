@@ -73,52 +73,6 @@ html[data-theme="light"] .appearance-effects-layer,html[data-theme="white"] .app
 html[data-theme="light"][data-background-effect-intensity="high"] .appearance-effects-layer,html[data-theme="white"][data-background-effect-intensity="high"] .appearance-effects-layer{opacity:.24}
 html[data-animations="off"] .appearance-effects-layer{display:none!important}
 #appearance-effects-canvas{display:block;width:100%;height:100%}
-.appearance-dragon{position:absolute;left:0;top:0;width:min(460px,58vw);aspect-ratio:460/240;transform-origin:50% 50%;will-change:transform;filter:drop-shadow(0 0 18px rgba(235,54,78,.26)) drop-shadow(0 0 34px rgba(255,183,64,.18));perspective:900px}
-.appearance-dragon svg{display:block;width:100%;height:100%;overflow:visible;transform-origin:50% 50%;transform-box:fill-box}
-.appearance-dragon::after{content:"";position:absolute;inset:8% 7%;border-radius:50%;background:radial-gradient(circle,rgba(255,83,73,.08),transparent 66%);filter:blur(20px);pointer-events:none}
-.dragon-creature{transform-box:fill-box;transform-origin:50% 50%;animation:dragonCreatureFloat 6.8s ease-in-out infinite}
-.dragon-body{transform-box:fill-box;transform-origin:50% 50%;animation:dragonBodyPulse 2.65s ease-in-out infinite}
-.dragon-body-highlight{transform-box:fill-box;transform-origin:50% 50%;animation:dragonHighlightFlow 2.2s linear infinite}
-.dragon-scales{transform-box:fill-box;transform-origin:50% 50%;animation:dragonScaleShift 3.6s ease-in-out infinite}
-.dragon-tail{transform-box:fill-box;transform-origin:100% 50%}
-.dragon-tail-top{animation:dragonTailTop 2.25s ease-in-out infinite}
-.dragon-tail-bottom{animation:dragonTailBottom 2.45s ease-in-out infinite .12s}
-.dragon-legs{transform-box:fill-box;transform-origin:50% 50%;animation:dragonLegRhythm 1.9s ease-in-out infinite}
-.dragon-leg-a{animation:dragonLegA 1.9s ease-in-out infinite}
-.dragon-leg-b{animation:dragonLegB 1.9s ease-in-out infinite .08s}
-.dragon-claws{transform-box:fill-box;transform-origin:50% 50%;animation:dragonClawTwitch 1.9s ease-in-out infinite}
-.dragon-neck{transform-box:fill-box;transform-origin:20% 30%;animation:dragonNeckSway 3.8s ease-in-out infinite}
-.dragon-head{transform-box:fill-box;transform-origin:20% 75%;animation:dragonHeadLook 5.4s ease-in-out infinite}
-.dragon-face-shadow,.dragon-snout{transform-box:fill-box;transform-origin:50% 50%;animation:dragonHeadMicro 5.4s ease-in-out infinite}
-.dragon-eye{transform-box:fill-box;transform-origin:50% 50%;animation:dragonBlink 6.4s ease-in-out infinite}
-.dragon-eye-pupil{transform-box:fill-box;transform-origin:50% 50%;animation:dragonPupil 3.8s ease-in-out infinite}
-.dragon-horns{transform-box:fill-box;transform-origin:50% 80%;animation:dragonHornSway 5.1s ease-in-out infinite}
-.dragon-whiskers{transform-box:fill-box;transform-origin:60% 70%;animation:dragonWhiskerSway 2.8s ease-in-out infinite}
-.dragon-chest-spikes{transform-box:fill-box;transform-origin:100% 70%;animation:dragonManeSway 2.4s ease-in-out infinite}
-.dragon-belly{transform-box:fill-box;transform-origin:50% 50%;animation:dragonBellyBreath 2.65s ease-in-out infinite}
-.dragon-fire{transform-box:fill-box;transform-origin:15% 50%;animation:dragonFireFlicker .9s ease-in-out infinite alternate}
-.dragon-motes{animation:dragonMotesFloat 3.2s ease-in-out infinite}
-@keyframes dragonCreatureFloat{0%,100%{transform:translate3d(0,0,0) skewX(0deg)}50%{transform:translate3d(0,-4px,0) skewX(-.7deg)}}
-@keyframes dragonBodyPulse{0%,100%{stroke-width:38}50%{stroke-width:39.6}}
-@keyframes dragonHighlightFlow{0%{stroke-dashoffset:0}100%{stroke-dashoffset:-42}}
-@keyframes dragonScaleShift{0%,100%{opacity:.66;transform:translateX(0) scaleX(1)}50%{opacity:.9;transform:translateX(2px) scaleX(1.012)}}
-@keyframes dragonTailTop{0%,100%{transform:rotate(0deg)}50%{transform:rotate(-7deg) translateY(-2px)}}
-@keyframes dragonTailBottom{0%,100%{transform:rotate(0deg)}50%{transform:rotate(9deg) translateY(2px)}}
-@keyframes dragonLegRhythm{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
-@keyframes dragonLegA{0%,100%{transform:rotate(0deg)}35%{transform:rotate(-7deg)}70%{transform:rotate(3deg)}}
-@keyframes dragonLegB{0%,100%{transform:rotate(0deg)}35%{transform:rotate(6deg)}70%{transform:rotate(-3deg)}}
-@keyframes dragonClawTwitch{0%,100%{opacity:.92}48%{opacity:1}56%{opacity:.72}}
-@keyframes dragonNeckSway{0%,100%{transform:rotate(0deg)}50%{transform:rotate(2.2deg) translateY(-1px)}}
-@keyframes dragonHeadLook{0%,100%{transform:rotate(0deg) translateY(0)}38%{transform:rotate(-4deg) translateY(-2px)}62%{transform:rotate(3deg) translateY(1px)}}
-@keyframes dragonHeadMicro{0%,100%{transform:translate(0,0) rotate(0)}40%{transform:translate(-1px,-1px) rotate(-1deg)}62%{transform:translate(1px,1px) rotate(1deg)}}
-@keyframes dragonBlink{0%,88%,94%,100%{transform:scaleY(1)}90%,92%{transform:scaleY(.12)}}
-@keyframes dragonPupil{0%,100%{transform:translateX(0)}35%{transform:translateX(1px)}65%{transform:translateX(-1px)}}
-@keyframes dragonHornSway{0%,100%{transform:rotate(0)}50%{transform:rotate(-1.6deg)}}
-@keyframes dragonWhiskerSway{0%,100%{transform:rotate(0)}50%{transform:rotate(-4deg) translateY(1px)}}
-@keyframes dragonManeSway{0%,100%{transform:rotate(0) translateX(0)}50%{transform:rotate(5deg) translateX(-2px)}}
-@keyframes dragonBellyBreath{0%,100%{opacity:.72;transform:scaleX(1)}50%{opacity:.95;transform:scaleX(1.04)}}
-@keyframes dragonFireFlicker{0%{transform:scale(1,.9);opacity:.52}100%{transform:scale(1.24,1.12);opacity:.95}}
-@keyframes dragonMotesFloat{0%,100%{transform:translate3d(0,0,0);opacity:.78}50%{transform:translate3d(2px,-5px,0);opacity:1}}
 @media(prefers-reduced-motion:reduce){.appearance-effects-layer{display:none!important}}
 
 .app-header{
@@ -2081,9 +2035,6 @@ html[data-theme="amoled"][data-wallpaper="grid"] body{
 .appearance-effect-preview-coins span{position:absolute;display:grid;place-items:center;width:18px;height:18px;border-radius:50%;border:1px solid rgba(255,232,154,.7);background:radial-gradient(circle at 35% 28%,#fff0ad,#e9a52b 60%,#8d5710);color:#7e4d09;font:900 9px/1 ui-sans-serif,system-ui;box-shadow:0 0 12px rgba(255,193,59,.25);animation:appearanceCoinPreview 2.6s linear infinite}
 .appearance-effect-preview-coins span:nth-child(1){left:16%;top:-20%;animation-delay:-1.4s}.appearance-effect-preview-coins span:nth-child(2){left:41%;top:15%;opacity:.72;animation-delay:-.6s}.appearance-effect-preview-coins span:nth-child(3){left:68%;top:-12%;animation-delay:-2.1s}.appearance-effect-preview-coins span:nth-child(4){left:84%;top:28%;opacity:.66;animation-delay:-1.1s}
 @keyframes appearanceCoinPreview{to{transform:translateY(80px) rotate(150deg);opacity:.08}}
-.appearance-effect-preview-dragon{display:grid;place-items:center;background:radial-gradient(circle at 50% 55%,rgba(239,67,83,.2),transparent 44%),linear-gradient(145deg,#190a10,#070a12)}
-.appearance-effect-preview-dragon span{color:#ff5c6d;font:900 34px/1 Georgia,serif;text-shadow:0 0 18px rgba(255,85,100,.42),0 0 34px rgba(255,183,74,.16);animation:appearanceDragonPreview 3s ease-in-out infinite}
-@keyframes appearanceDragonPreview{50%{transform:translate(8px,-4px) rotate(4deg) scale(1.04)}}
 .appearance-effect-preview-hacker{display:flex;flex-direction:column;justify-content:center;gap:4px;padding:10px 12px;background:linear-gradient(145deg,#03110c,#020807)}
 .appearance-effect-preview-hacker::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(81,255,148,.08),transparent);transform:translateX(-100%);animation:appearanceHackerSweep 2.4s linear infinite}
 .appearance-effect-preview-hacker span{position:relative;color:#54ff9d;font:700 8.5px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.04em;text-shadow:0 0 9px rgba(81,255,148,.28)}.appearance-effect-preview-hacker span:nth-child(2){color:#9dfcbe}
@@ -2098,11 +2049,11 @@ html[data-theme="amoled"][data-wallpaper="grid"] body{
 .appearance-intensity-option:hover{transform:translateY(-1px);border-color:rgba(255,198,99,.25)}.appearance-intensity-option.is-selected{color:#fff0c4;border-color:rgba(255,198,99,.34);background:rgba(255,185,68,.08)}.appearance-intensity-option.is-disabled{opacity:.42;cursor:default}
 .appearance-intensity-option:focus-within{outline:2px solid rgba(255,198,99,.72);outline-offset:2px}
 .appearance-effects-status{margin:10px 1px 0;color:var(--muted-2);font-size:8.5px;line-height:1.45}
-html[data-background-effect="dollar"] .appearance-effects-status{color:#91ffc0}html[data-background-effect="coins"] .appearance-effects-status{color:#ffe09a}html[data-background-effect="dragon"] .appearance-effects-status{color:#ff9aa6}html[data-background-effect="hacker"] .appearance-effects-status{color:#78ffae}
+html[data-background-effect="dollar"] .appearance-effects-status{color:#91ffc0}html[data-background-effect="coins"] .appearance-effects-status{color:#ffe09a}html[data-background-effect="hacker"] .appearance-effects-status{color:#78ffae}
 html[data-compact="on"] .appearance-effect-preview{height:54px}
 @media(max-width:520px){.appearance-effect-grid{grid-template-columns:1fr}.appearance-effects-intensity{grid-template-columns:1fr;gap:8px}.appearance-intensity-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.appearance-intensity-option{min-width:0}}
 @media(max-width:430px){.appearance-effect-option{padding:6px}.appearance-effect-preview{height:54px}.appearance-effect-copy strong{font-size:10.5px}.appearance-effect-copy small{font-size:8px}}
-@media(prefers-reduced-motion:reduce){.appearance-effect-option,.appearance-intensity-option,.appearance-effect-preview-dollar span,.appearance-effect-preview-coins span,.appearance-effect-preview-dragon span,.appearance-effect-preview-hacker::before{animation:none!important;transition:none!important}}
+@media(prefers-reduced-motion:reduce){.appearance-effect-option,.appearance-intensity-option,.appearance-effect-preview-dollar span,.appearance-effect-preview-coins span,.appearance-effect-preview-hacker::before{animation:none!important;transition:none!important}}
 
 .appearance-wallpaper-section{margin-top:18px;padding-top:2px}
 .appearance-section-mini-head{display:flex;align-items:center;gap:10px}
