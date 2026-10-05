@@ -463,7 +463,7 @@
               </span>
               <span>
                 <strong id="user-appearance-wallpaper-title">Background Wallpaper</strong>
-                <small id="user-appearance-wallpaper-sub">Choose a lightweight animated background.</small>
+                <small id="user-appearance-wallpaper-sub">Choose a preset or use an image from this device.</small>
               </span>
             </div>
 
@@ -506,8 +506,21 @@
                   <span class="appearance-wallpaper-name" id="user-appearance-wallpaper-violet">Violet Glass</span>
                   <span class="appearance-wallpaper-check" aria-hidden="true">✓</span>
                 </label>
+                <label class="appearance-wallpaper-option" data-wallpaper-option="custom">
+                  <input id="appearance-wallpaper-custom" type="radio" name="appearance-wallpaper" value="custom">
+                  <span id="appearance-wallpaper-custom-preview" class="appearance-wallpaper-preview wallpaper-preview-custom" aria-hidden="true"></span>
+                  <span class="appearance-wallpaper-name" id="user-appearance-wallpaper-custom">Device Image</span>
+                  <span class="appearance-wallpaper-check" aria-hidden="true">✓</span>
+                </label>
               </div>
             </fieldset>
+
+            <div class="appearance-wallpaper-actions">
+              <input id="appearance-wallpaper-file" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+              <label id="appearance-wallpaper-upload" class="secondary-button appearance-wallpaper-upload" for="appearance-wallpaper-file">Choose Image</label>
+              <button id="appearance-wallpaper-remove" class="secondary-button appearance-wallpaper-remove" type="button" disabled>Remove Image</button>
+            </div>
+            <p id="appearance-wallpaper-status" class="appearance-wallpaper-status" aria-live="polite">No device image selected.</p>
           </div>
 
           <div class="appearance-divider"></div>
