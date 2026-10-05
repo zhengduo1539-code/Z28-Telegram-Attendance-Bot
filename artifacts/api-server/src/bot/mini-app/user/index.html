@@ -656,6 +656,23 @@
             </div>
           </div>
 
+          <div class="connection-actions">
+            <button id="user-connect-submit" class="primary-button connection-save" type="button" disabled>
+              <span class="button-label">Connect Group</span>
+            </button>
+            <button id="user-connect-change" class="secondary-button connection-edit" type="button" hidden>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 8A8 8 0 0 0 5.1 6.1L3.5 8"></path><path d="M3.5 4.5V8h3.5"></path><path d="M4.5 16A8 8 0 0 0 18.9 17.9l1.6-1.9"></path><path d="M20.5 19.5V16H17"></path></svg>
+              <span class="button-label">Edit Connection</span>
+            </button>
+          </div>
+
+          <div class="connection-guide-toggle-row">
+            <button id="user-connect-guide-toggle" class="secondary-button connection-guide-toggle" type="button" aria-controls="user-connect-help" aria-expanded="true">
+              <span class="button-label">Hide Guide</span>
+            </button>
+          </div>
+
+          <div id="user-connect-help" class="connection-help">
           <div class="connection-guidance" role="note">
             <div class="connection-guidance-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M12 9v5"></path><path d="M12 6.5h.01"></path><circle cx="12" cy="12" r="8.5"></circle></svg>
@@ -773,14 +790,6 @@
             </div>
           </section>
 
-          <div class="connection-actions">
-            <button id="user-connect-submit" class="primary-button connection-save" type="button" disabled>
-              <span class="button-label">Connect Group</span>
-            </button>
-            <button id="user-connect-change" class="secondary-button connection-edit" type="button" hidden>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 8A8 8 0 0 0 5.1 6.1L3.5 8"></path><path d="M3.5 4.5V8h3.5"></path><path d="M4.5 16A8 8 0 0 0 18.9 17.9l1.6-1.9"></path><path d="M20.5 19.5V16H17"></path></svg>
-              <span class="button-label">Edit Connection</span>
-            </button>
           </div>
         </article>
       </section>
