@@ -3100,6 +3100,9 @@
     if (!state.toolsOpen || !Number.isSafeInteger(state.selectedGroupId) || state.selectedGroupId >= 0) return;
     var groupId = state.selectedGroupId;
     var requestId = ++state.replyRequestId;
+    state.replyEditorData = null;
+    state.replyOriginalSnapshot = "";
+    state.replyDirty = false;
     state.replyLoading = true;
     updateActivityReplyState();
 
