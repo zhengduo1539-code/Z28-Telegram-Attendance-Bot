@@ -5,7 +5,19 @@ import {
   isConfiguredAdmin,
 } from "./admin-auth";
 import { getAdminApiContext } from "./admin-runtime";
-import type { ActiveActivity, ActivityKind, BotState } from "./types";
+import {
+  ACTIVITY_REPLY_KEYS,
+  ACTIVITY_REPLY_MAX_LENGTH,
+  buildActivityReplyEditorLocale,
+  normalizeActivityReplyTemplate,
+} from "./activity-reply-messages";
+import type {
+  ActivityReplyKey,
+  ActivityKind,
+  BotState,
+  Locale,
+} from "./types";
+import type { ActiveActivity } from "./types";
 
 const activityKinds: ActivityKind[] = ["eat", "wc", "smoke", "wcd"];
 const defaultActivityLimits = { eat: 30, wc: 7, smoke: 7, wcd: 15 };
@@ -525,6 +537,161 @@ userApiRouter.post("/dashboard", async (req, res) => {
       error,
     );
     sendError(res, 500, message);
+  }
+});
+
+userApiRouter.get("/activity-replies", async (req, res) => {
+  const auth = requireTelegramUser(req, res);
+  if (!auth) return;
+
+  const groupId = Number(req.query.groupId);
+  if (!Number.isSafeInteger(groupId) || groupId >= 0) {
+    sendError(res, 400, "Invalid group.");
+    return;
+  }
+
+  const groupRole = await getVerifiedGroupRole(auth.context, groupId, auth.user.id);
+  if (!groupRole) {
+    sendError(res, 403, "Group administrator access required.");
+    return;
+  }
+
+  try {
+    const chat = await auth.context.telegram.getChat(groupId);
+    if (chat.type !== "group" && chat.type !== "supergroup") {
+      sendError(res, 404, "The selected group is unavailable.");
+      return;
+    }
+
+    const customMessages =
+      await auth.context.attendance.getActivityReplyMessages(groupId);
+
+    res.setHeader("Cache-Control", "no-store");
+    res.json({
+      groupId,
+      groupTitle: chat.title || String(groupId),
+      role: groupRole,
+      messages: {
+        en: buildActivityReplyEditorLocale("en", customMessages?.en),
+        zh: buildActivityReplyEditorLocale("zh", customMessages?.zh),
+      },
+    });
+  } catch (error) {
+    console.error("[user-activity-replies] failed to load", {
+      groupId,
+      userId: auth.user.id,
+      message: error instanceof Error ? error.message : String(error),
+    });
+    sendError(res, 502, "Unable to load activity reply messages.");
+  }
+});
+
+userApiRouter.put("/activity-replies", async (req, res) => {
+  const auth = requireTelegramUser(req, res);
+  if (!auth) return;
+
+  const groupId = req.body?.groupId;
+  if (!Number.isSafeInteger(groupId) || groupId >= 0) {
+    sendError(res, 400, "Invalid group.");
+    return;
+  }
+
+  const groupRole = await getVerifiedGroupRole(auth.context, groupId, auth.user.id);
+  if (!groupRole) {
+    sendError(res, 403, "Group administrator access required.");
+    return;
+  }
+
+  const rawMessages = req.body?.messages;
+  if (!rawMessages || typeof rawMessages !== "object" || Array.isArray(rawMessages)) {
+    sendError(res, 400, "Invalid activity reply message payload.");
+    return;
+  }
+
+  const normalizedInput: Record<
+    Locale,
+    Partial<Record<ActivityReplyKey, string | undefined>>
+  > = { en: {}, zh: {} };
+
+  for (const locale of ["en", "zh"] as const) {
+    const localePayload = rawMessages[locale];
+    if (
+      localePayload !== undefined &&
+      (typeof localePayload !== "object" ||
+        localePayload === null ||
+        Array.isArray(localePayload))
+    ) {
+      sendError(res, 400, "Invalid activity reply language payload.");
+      return;
+    }
+
+    for (const key of ACTIVITY_REPLY_KEYS) {
+      if (
+        !localePayload ||
+        !Object.prototype.hasOwnProperty.call(localePayload, key)
+      ) {
+        continue;
+      }
+
+      const value = localePayload[key];
+      if (value !== null && value !== undefined && typeof value !== "string") {
+        sendError(res, 400, "Activity reply messages must be text.");
+        return;
+      }
+
+      if (typeof value === "string" && value.length > ACTIVITY_REPLY_MAX_LENGTH) {
+        sendError(
+          res,
+          400,
+          `Each activity reply message must be at most ${ACTIVITY_REPLY_MAX_LENGTH} characters.`,
+        );
+        return;
+      }
+
+      try {
+        normalizedInput[locale][key] = normalizeActivityReplyTemplate(
+          locale,
+          key,
+          value ?? "",
+        );
+      } catch (error) {
+        sendError(
+          res,
+          400,
+          error instanceof Error
+            ? error.message
+            : "Invalid activity reply template.",
+        );
+        return;
+      }
+    }
+  }
+
+  try {
+    await auth.context.attendance.setActivityReplyMessages(
+      groupId,
+      normalizedInput,
+    );
+
+    const customMessages =
+      await auth.context.attendance.getActivityReplyMessages(groupId);
+
+    res.setHeader("Cache-Control", "no-store");
+    res.json({
+      ok: true,
+      groupId,
+      messages: {
+        en: buildActivityReplyEditorLocale("en", customMessages?.en),
+        zh: buildActivityReplyEditorLocale("zh", customMessages?.zh),
+      },
+    });
+  } catch (error) {
+    console.error("[user-activity-replies] failed to save", {
+      groupId,
+      userId: auth.user.id,
+      message: error instanceof Error ? error.message : String(error),
+    });
+    sendError(res, 500, "Unable to save activity reply messages.");
   }
 });
 
