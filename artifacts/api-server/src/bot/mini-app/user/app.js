@@ -259,13 +259,14 @@
   }
   function updateDragon(now) {
     if (!backgroundEffectEngine.dragon) return;
-    var speed = { low: .000035, medium: .000055, high: .000078 }[backgroundEffectEngine.intensity] || .000055;
+    var speed = { low: .000016, medium: .000022, high: .000031 }[backgroundEffectEngine.intensity] || .000022;
     var t = now * speed;
-    var x = backgroundEffectEngine.width * .5 + Math.cos(t) * backgroundEffectEngine.width * .4;
-    var y = backgroundEffectEngine.height * .52 + Math.sin(t * 1.18) * backgroundEffectEngine.height * .28;
-    var rotation = Math.sin(t * 1.45) * 11 + Math.cos(t * .75) * 5;
+    var x = backgroundEffectEngine.width * .53 + Math.cos(t) * backgroundEffectEngine.width * .30;
+    var y = backgroundEffectEngine.height * .50 + Math.sin(t * 1.05) * backgroundEffectEngine.height * .18;
+    var rotation = Math.sin(t * 1.3) * 5 + Math.cos(t * .72) * 2.5;
+    var scale = backgroundEffectEngine.width < 560 ? .82 : 1;
     backgroundEffectEngine.dragon.style.transform =
-      "translate3d(" + x.toFixed(1) + "px," + y.toFixed(1) + "px,0) translate(-50%,-50%) rotate(" + rotation.toFixed(2) + "deg)";
+      "translate3d(" + x.toFixed(1) + "px," + y.toFixed(1) + "px,0) translate(-50%,-50%) rotate(" + rotation.toFixed(2) + "deg) scale(" + scale.toFixed(2) + ")";
   }
   function renderBackgroundEffect(now) {
     if (!backgroundEffectEngine.ctx) return;
