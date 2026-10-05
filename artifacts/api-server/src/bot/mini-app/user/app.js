@@ -259,14 +259,26 @@
   }
   function updateDragon(now) {
     if (!backgroundEffectEngine.dragon) return;
-    var speed = { low: .000016, medium: .000022, high: .000031 }[backgroundEffectEngine.intensity] || .000022;
+    var speed = { low: .000010, medium: .000014, high: .000019 }[backgroundEffectEngine.intensity] || .000014;
     var t = now * speed;
-    var x = backgroundEffectEngine.width * .53 + Math.cos(t) * backgroundEffectEngine.width * .30;
-    var y = backgroundEffectEngine.height * .50 + Math.sin(t * 1.05) * backgroundEffectEngine.height * .18;
-    var rotation = Math.sin(t * 1.3) * 5 + Math.cos(t * .72) * 2.5;
-    var scale = backgroundEffectEngine.width < 560 ? .82 : 1;
+    var width = backgroundEffectEngine.width;
+    var height = backgroundEffectEngine.height;
+
+    // Slow patrol loop: broad horizontal travel + softer vertical breathing motion.
+    var x = width * .50 + Math.cos(t) * width * .36 + Math.sin(t * .47) * width * .06;
+    var y = height * .49 + Math.sin(t * 1.12) * height * .17 + Math.sin(t * .53) * height * .045;
+
+    // Give the creature a little "flight" feeling: bank into turns and change size with depth.
+    var velocityX = -Math.sin(t) * .36 - Math.cos(t * .47) * .028;
+    var velocityY = Math.cos(t * 1.12) * .19 + Math.cos(t * .53) * .024;
+    var rotation = velocityX * -9 + velocityY * 4;
+    var depth = (Math.sin(t * .82) + 1) * .5;
+    var baseScale = width < 560 ? .78 : .92;
+    var scale = baseScale + depth * .12;
+
     backgroundEffectEngine.dragon.style.transform =
-      "translate3d(" + x.toFixed(1) + "px," + y.toFixed(1) + "px,0) translate(-50%,-50%) rotate(" + rotation.toFixed(2) + "deg) scale(" + scale.toFixed(2) + ")";
+      "translate3d(" + x.toFixed(1) + "px," + y.toFixed(1) + "px,0) translate(-50%,-50%) rotate(" +
+      rotation.toFixed(2) + "deg) scale(" + scale.toFixed(3) + ")";
   }
   function renderBackgroundEffect(now) {
     if (!backgroundEffectEngine.ctx) return;
