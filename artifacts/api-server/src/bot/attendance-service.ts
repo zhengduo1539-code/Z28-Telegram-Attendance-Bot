@@ -637,27 +637,47 @@ export class AttendanceService {
         nextState.groupWarnings = nextState.groupWarnings || {};
         const warnings = nextState.groupWarnings[warningKey] || [];
         const activityName = activityLabel(active.kind, locale);
-        const message = connection
-          ? getLocale(locale).groupTimeoutNotification(
-              connection.targetGroupName,
-              connection.sourceChatId,
-              connection.sourceUsername,
-              active.displayName,
-              active.userId,
-              activityName,
-              timeoutSeconds,
-              formatWarningDateTime(now, this.config.timeZone),
-            )
-          : getLocale(locale).groupTimeoutNotification(
-              "Group",
-              profile.chatId,
-              undefined,
-              active.displayName,
-              active.userId,
-              activityName,
-              timeoutSeconds,
-              formatWarningDateTime(now, this.config.timeZone),
-            );
+        const warningTime = formatWarningDateTime(now, this.config.timeZone);
+        const customTemplate = getGroupActivityReplyTemplate(
+          nextState.groupActivityReplyMessages,
+          profile.chatId,
+          locale,
+          "groupTimeoutNotification",
+        );
+        const message = customTemplate
+          ? renderActivityReplyTemplate(customTemplate, {
+              group_name: connection?.targetGroupName || "Group",
+              group_id: connection?.sourceChatId || profile.chatId,
+              user_name: active.displayName,
+              user_id: active.userId,
+              activity: activityName,
+              timeout_duration:
+                locale === "en"
+                  ? formatEnglishDuration(timeoutSeconds)
+                  : formatChineseDuration(timeoutSeconds),
+              warning_time: warningTime,
+            })
+          : connection
+            ? getLocale(locale).groupTimeoutNotification(
+                connection.targetGroupName,
+                connection.sourceChatId,
+                connection.sourceUsername,
+                active.displayName,
+                active.userId,
+                activityName,
+                timeoutSeconds,
+                warningTime,
+              )
+            : getLocale(locale).groupTimeoutNotification(
+                "Group",
+                profile.chatId,
+                undefined,
+                active.displayName,
+                active.userId,
+                activityName,
+                timeoutSeconds,
+                warningTime,
+              );
 
         warning = {
           id: active.id,
