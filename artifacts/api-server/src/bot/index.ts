@@ -72,9 +72,9 @@ export const startTelegramBot = async (logger: Logger): Promise<TelegramBotRunti
 
       return {
         stop: async () => {
-          reminders.stop();
           pollingBot?.stop();
           telegram?.close();
+          await reminders.stop();
           await store?.close();
         },
       };
