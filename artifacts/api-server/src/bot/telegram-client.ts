@@ -46,6 +46,8 @@ export class TelegramClient {
   private readonly baseUrl: string;
   private queue: Array<QueuedRequest<unknown>> = [];
   private processing = false;
+  private closed = false;
+  private readonly activeControllers = new Set<AbortController>();
   private lastRequestAt = 0;
   private readonly responseCache = new Map<string, { expiresAt: number; value: unknown }>();
   private readonly inFlight = new Map<string, Promise<unknown>>();
@@ -75,6 +77,10 @@ export class TelegramClient {
     payload: Record<string, unknown> = {},
     priority: RequestPriority = "normal",
   ): Promise<T> {
+    if (this.closed) {
+      throw new Error("Telegram API client is closed.");
+    }
+
     // Long polling must not occupy the outbound queue.
     if (method === "getUpdates") return this.performCall<T>(method, payload);
 
@@ -102,9 +108,15 @@ export class TelegramClient {
     this.processing = true;
     try {
       while (this.queue.length) {
+        if (this.closed) break;
+
         const request = this.queue.shift()!;
         const waitMs = Math.max(0, API_MIN_INTERVAL_MS - (Date.now() - this.lastRequestAt));
         if (waitMs) await sleep(waitMs);
+        if (this.closed) {
+          request.reject(new Error("Telegram API client is closed."));
+          continue;
+        }
         try {
           request.resolve(await this.performCall(request.method, request.payload));
         } catch (error) {
@@ -115,6 +127,21 @@ export class TelegramClient {
       this.processing = false;
       if (this.queue.length) void this.processQueue();
     }
+  }
+
+  close(): void {
+    if (this.closed) return;
+    this.closed = true;
+
+    const error = new Error("Telegram API client is closed.");
+    for (const request of this.queue.splice(0)) {
+      request.reject(error);
+    }
+
+    for (const controller of this.activeControllers) {
+      controller.abort();
+    }
+    this.activeControllers.clear();
   }
 
   private cacheKey(method: string, payload: Record<string, unknown>): string {
@@ -190,6 +217,7 @@ export class TelegramClient {
     methodMetric.requests += 1;
     this.methodMetrics.set(method, methodMetric);
     const controller = new AbortController();
+    this.activeControllers.add(controller);
     const timeout = setTimeout(() => controller.abort(), this.requestTimeoutMs);
     try {
       this.lastRequestAt = Date.now();
@@ -228,6 +256,9 @@ export class TelegramClient {
     } catch (error: unknown) {
       if (error instanceof TelegramRateLimitError || error instanceof TelegramRetryableError) throw error;
       if (error instanceof Error && error.name === "AbortError") {
+        if (this.closed) {
+          throw new Error(`Telegram API ${method} aborted because the client is closing.`);
+        }
         throw new TelegramRetryableError(`Telegram API ${method} timed out after ${this.requestTimeoutMs}ms`);
       }
       if (error instanceof TypeError) {
@@ -237,6 +268,7 @@ export class TelegramClient {
       methodMetric.failures += 1;
       throw error;
     } finally {
+      this.activeControllers.delete(controller);
       const latencyMs = Date.now() - startedAt;
       this.metricsTotalLatencyMs += latencyMs;
       methodMetric.totalLatencyMs += latencyMs;
