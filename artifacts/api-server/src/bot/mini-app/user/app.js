@@ -21,6 +21,7 @@
     aboutOpen: false,
     supportOpen: false,
     toolsOpen: false,
+    toolDetail: null,
     connectEditMode: false,
     connectEditSnapshot: null,
     connectLoading: false,
@@ -186,6 +187,17 @@
       toolsCategoryKicker: "GROUP MANAGEMENT",
       toolsCategoryTitle: "Group tools",
       toolsCategorySub: "Tools that configure how Z28 connects and works across your groups.",
+      toolsDirectoryKicker: "AVAILABLE TOOLS",
+      toolsDirectoryTitle: "Choose a tool",
+      toolsDirectorySub: "Open a dedicated workspace for the task you want to manage.",
+      toolsCurrentGroup: "CURRENT GROUP",
+      toolsWorkspaceRoleOwner: "OWNER",
+      toolsWorkspaceRoleAdmin: "ADMIN",
+      toolConnectionKicker: "GROUP ROUTING",
+      toolRepliesKicker: "GROUP RESPONSES",
+      toolBack: "Back to Tools",
+      toolDetailKicker: "TOOL WORKSPACE",
+      toolDetailSub: "Manage this feature for the selected group.",
       replyMessagesKicker: "ACTIVITY RESPONSES",
       replyMessagesTitle: "Activity Reply Messages",
       replyMessagesSub: "Customize the bot's activity replies for this group only.",
@@ -494,6 +506,17 @@
       toolsCategoryKicker: "GROUP MANAGEMENT",
       toolsCategoryTitle: "Group Tools",
       toolsCategorySub: "Z28 ၏ group ချိတ်ဆက်မှုနှင့် group အလိုက်လုပ်ဆောင်ချက်များကို စီမံရန် tools များ။",
+      toolsDirectoryKicker: "AVAILABLE TOOLS",
+      toolsDirectoryTitle: "Tool တစ်ခုရွေးပါ",
+      toolsDirectorySub: "စီမံလိုသောလုပ်ဆောင်ချက်အတွက် သီးခြား workspace ကိုဖွင့်ပါ။",
+      toolsCurrentGroup: "CURRENT GROUP",
+      toolsWorkspaceRoleOwner: "OWNER",
+      toolsWorkspaceRoleAdmin: "ADMIN",
+      toolConnectionKicker: "GROUP ROUTING",
+      toolRepliesKicker: "GROUP RESPONSES",
+      toolBack: "Tools သို့ ပြန်ရန်",
+      toolDetailKicker: "TOOL WORKSPACE",
+      toolDetailSub: "ရွေးထားသော group အတွက် ဤလုပ်ဆောင်ချက်ကို စီမံပါ။",
       replyMessagesKicker: "ACTIVITY RESPONSES",
       replyMessagesTitle: "Activity Reply Messages",
       replyMessagesSub: "ဤ group အတွက်သာ bot ရဲ့ activity reply စာသားတွေကို စိတ်ကြိုက်ပြင်နိုင်ပါသည်။",
@@ -801,6 +824,17 @@
       toolsCategoryKicker: "群组管理",
       toolsCategoryTitle: "群组工具",
       toolsCategorySub: "管理 Z28 在不同群组之间的连接和相关功能。",
+      toolsDirectoryKicker: "可用工具",
+      toolsDirectoryTitle: "选择工具",
+      toolsDirectorySub: "打开对应的独立工作区，管理你需要的功能。",
+      toolsCurrentGroup: "当前群组",
+      toolsWorkspaceRoleOwner: "群主",
+      toolsWorkspaceRoleAdmin: "管理员",
+      toolConnectionKicker: "群组路由",
+      toolRepliesKicker: "群组回复",
+      toolBack: "返回工具",
+      toolDetailKicker: "工具工作区",
+      toolDetailSub: "管理当前选定群组的此功能。",
       replyMessagesKicker: "活动回复",
       replyMessagesTitle: "活动回复消息",
       replyMessagesSub: "仅为当前群组自定义 Bot 的活动回复消息。",
@@ -1049,6 +1083,12 @@
       "user-member-active-label","settings-title","settings-subtitle",
       "user-settings-limits-card","user-settings-counts-card",
       "user-tools-page","user-tools-tab-label","user-tools-title","user-tools-sub",
+      "user-tools-directory","user-tools-directory-kicker","user-tools-directory-title","user-tools-directory-sub",
+      "user-tools-active-group-label","user-tools-active-group","user-tools-active-role",
+      "user-tool-connection-kicker","user-tool-connection-title","user-tool-connection-sub",
+      "user-tool-replies-kicker","user-tool-replies-title","user-tool-replies-sub",
+      "user-tool-detail","user-tool-detail-back","user-tool-detail-back-label","user-tool-detail-kicker",
+      "user-tool-detail-title","user-tool-detail-sub","user-tool-detail-replies","user-tool-detail-connection",
       "user-tools-category-kicker","user-tools-category-title","user-tools-category-sub",
       "user-connect-title","user-connect-sub",
       "user-connect-source-label","user-connect-source-sub","user-connect-source",
@@ -1957,6 +1997,29 @@
     els["user-tools-category-kicker"].textContent = text("toolsCategoryKicker");
     els["user-tools-category-title"].textContent = text("toolsCategoryTitle");
     els["user-tools-category-sub"].textContent = text("toolsCategorySub");
+
+    els["user-tools-directory-kicker"].textContent = text("toolsDirectoryKicker");
+    els["user-tools-directory-title"].textContent = text("toolsDirectoryTitle");
+    els["user-tools-directory-sub"].textContent = text("toolsDirectorySub");
+    els["user-tools-active-group-label"].textContent = text("toolsCurrentGroup");
+    els["user-tool-connection-kicker"].textContent = text("toolConnectionKicker");
+    els["user-tool-connection-title"].textContent = text("connectTitle");
+    els["user-tool-connection-sub"].textContent = text("connectSub");
+    els["user-tool-replies-kicker"].textContent = text("toolRepliesKicker");
+    els["user-tool-replies-title"].textContent = text("replyMessagesTitle");
+    els["user-tool-replies-sub"].textContent = text("replyMessagesSub");
+    els["user-tool-detail-back-label"].textContent = text("toolBack");
+    els["user-tool-detail-kicker"].textContent = text("toolDetailKicker");
+    if (state.toolDetail === "connection") {
+      els["user-tool-detail-title"].textContent = text("connectTitle");
+      els["user-tool-detail-sub"].textContent = text("connectSub");
+    } else if (state.toolDetail === "replies") {
+      els["user-tool-detail-title"].textContent = text("replyMessagesTitle");
+      els["user-tool-detail-sub"].textContent = text("replyMessagesSub");
+    } else {
+      els["user-tool-detail-title"].textContent = text("toolsDirectoryTitle");
+      els["user-tool-detail-sub"].textContent = text("toolsDirectorySub");
+    }
     els["user-reply-messages-kicker"].textContent = text("replyMessagesKicker");
     els["user-reply-messages-title"].textContent = text("replyMessagesTitle");
     els["user-reply-messages-sub"].textContent = text("replyMessagesSub");
@@ -2757,6 +2820,7 @@
     els["user-tools-page"].hidden = true;
     els["user-appearance-page"].hidden = true;
     els["user-tabbar"].hidden = false;
+    resetToolDetailState();
 
     els.title.textContent = text("title");
     els.identity.textContent = userGreeting();
@@ -3572,6 +3636,124 @@ function populateConnectSelect(select, groups, preferredId) {
     }
   }
 
+  function resetToolDetailState() {
+    var detail = state.toolDetail;
+    state.toolDetail = null;
+
+    if (detail === "connection") {
+      ++state.connectRequestId;
+      state.connectLoading = false;
+      if (els["user-connect-source"]) els["user-connect-source"].removeAttribute("aria-busy");
+      if (els["user-connect-target"]) els["user-connect-target"].removeAttribute("aria-busy");
+    }
+
+    if (detail === "replies") {
+      ++state.replyRequestId;
+      state.replyLoading = false;
+      state.replySaving = false;
+      state.replyEditorData = null;
+      state.replyOriginalSnapshot = "";
+      state.replyDirty = false;
+    }
+
+    updateActivityReplyState();
+  }
+
+  function updateToolsWorkspaceContext() {
+    var group = state.dashboard && state.dashboard.selectedGroup;
+    if (els["user-tools-active-group"]) {
+      els["user-tools-active-group"].textContent = group
+        ? (group.title || String(group.id))
+        : "—";
+    }
+    if (els["user-tools-active-role"]) {
+      els["user-tools-active-role"].textContent =
+        group && group.memberStatus === "creator"
+          ? text("toolsWorkspaceRoleOwner")
+          : text("toolsWorkspaceRoleAdmin");
+    }
+  }
+
+  function updateToolsWorkspaceView() {
+    var hasDetail = Boolean(state.toolDetail);
+    if (els["user-tools-directory"]) els["user-tools-directory"].hidden = hasDetail;
+    if (els["user-tool-detail"]) els["user-tool-detail"].hidden = !hasDetail;
+    if (els["user-tool-detail-replies"]) {
+      els["user-tool-detail-replies"].hidden = state.toolDetail !== "replies";
+    }
+    if (els["user-tool-detail-connection"]) {
+      els["user-tool-detail-connection"].hidden = state.toolDetail !== "connection";
+    }
+
+    updateToolsWorkspaceContext();
+
+    if (state.toolDetail === "connection") {
+      els["user-tool-detail-title"].textContent = text("connectTitle");
+      els["user-tool-detail-sub"].textContent = text("connectSub");
+    } else if (state.toolDetail === "replies") {
+      els["user-tool-detail-title"].textContent = text("replyMessagesTitle");
+      els["user-tool-detail-sub"].textContent = text("replyMessagesSub");
+    } else {
+      els["user-tool-detail-title"].textContent = text("toolsDirectoryTitle");
+      els["user-tool-detail-sub"].textContent = text("toolsDirectorySub");
+    }
+
+    els["user-tool-detail-back-label"].textContent = text("toolBack");
+    els["user-tool-detail-back"].setAttribute("aria-label", text("toolBack"));
+  }
+
+  function openUserTool(tool) {
+    if (!state.toolsOpen || state.groupPickerOpen) return;
+    if (tool !== "connection" && tool !== "replies") return;
+
+    if (state.toolDetail === "replies" && tool !== "replies" && state.replyDirty) {
+      showNotice(text("replyUnsaved"), "error");
+      return;
+    }
+
+    if (state.toolDetail && state.toolDetail !== tool) {
+      resetToolDetailState();
+    }
+
+    state.toolDetail = tool;
+    updateToolsWorkspaceView();
+
+    window.requestAnimationFrame(function () {
+      if (els["user-tool-detail"]) {
+        els["user-tool-detail"].scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+      if (els["user-tool-detail-back"]) {
+        els["user-tool-detail-back"].focus({ preventScroll: true });
+      }
+    });
+
+    if (tool === "connection") {
+      void loadConnectGroups();
+    } else {
+      void loadActivityReplyMessages();
+    }
+    updateBackButton();
+  }
+
+  function closeUserTool() {
+    if (!state.toolDetail) return;
+
+    if (state.toolDetail === "replies" && state.replyDirty) {
+      showNotice(text("replyUnsaved"), "error");
+      return;
+    }
+
+    resetToolDetailState();
+    updateToolsWorkspaceView();
+    updateBackButton();
+
+    window.requestAnimationFrame(function () {
+      if (els["user-tools-directory"]) {
+        els["user-tools-directory"].scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
+  }
+
   function setDashboardTab(tab) {
     if (!state.dashboard || !els["user-tabbar"] || els["user-tabbar"].hidden) return;
     if (state.groupPickerOpen) return;
@@ -3586,6 +3768,7 @@ function populateConnectSelect(select, groups, preferredId) {
     state.supportOpen = tab === "support";
     state.toolsOpen = tab === "tools";
     state.appearanceOpen = tab === "appearance";
+    if (!state.toolsOpen) resetToolDetailState();
     if (wasToolsOpen && !state.toolsOpen) {
       ++state.connectRequestId;
       state.connectLoading = false;
@@ -3625,9 +3808,9 @@ function populateConnectSelect(select, groups, preferredId) {
       els["user-tools-page"].hidden = false;
       els.title.textContent = text("tools");
       els.identity.textContent = userGreeting();
-      setDashboardControls(false);      updateConnectStatus();
-      void loadConnectGroups();
-      void loadActivityReplyMessages();
+      setDashboardControls(false);
+      resetToolDetailState();
+      updateToolsWorkspaceView();
     } else if (state.appearanceOpen) {
       els["user-selected-dashboard"].hidden = true;
       els["user-about-page"].hidden = true;
@@ -3727,6 +3910,10 @@ function populateConnectSelect(select, groups, preferredId) {
   }
 
   function handleBackButton() {
+    if (state.toolsOpen && state.toolDetail) {
+      closeUserTool();
+      return;
+    }
     if (state.groupPickerOpen && state.dashboard && state.dashboard.selectedGroup) {
       state.groupPickerOpen = false;
       renderSelectedDashboard(state.dashboard, true);
@@ -3817,6 +4004,13 @@ function populateConnectSelect(select, groups, preferredId) {
 
     els["user-report-message"].oninput = updateReportCharacterCount;
     els["user-report-form"].onsubmit = submitProblemReport;
+
+    document.querySelectorAll("[data-user-tool]").forEach(function (button) {
+      button.onclick = function () {
+        openUserTool(button.getAttribute("data-user-tool"));
+      };
+    });
+    els["user-tool-detail-back"].onclick = closeUserTool;
 
     if (els["user-reply-locale-en"] && els["user-reply-locale-zh"]) {
       els["user-reply-locale-en"].onclick = function () {
