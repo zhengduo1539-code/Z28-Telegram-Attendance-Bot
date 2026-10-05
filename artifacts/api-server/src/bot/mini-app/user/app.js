@@ -3643,6 +3643,7 @@ function populateConnectSelect(select, groups, preferredId) {
     if (detail === "connection") {
       ++state.connectRequestId;
       state.connectLoading = false;
+      state.connectSaving = false;
       if (els["user-connect-source"]) els["user-connect-source"].removeAttribute("aria-busy");
       if (els["user-connect-target"]) els["user-connect-target"].removeAttribute("aria-busy");
     }
@@ -3769,14 +3770,6 @@ function populateConnectSelect(select, groups, preferredId) {
     state.toolsOpen = tab === "tools";
     state.appearanceOpen = tab === "appearance";
     if (!state.toolsOpen) resetToolDetailState();
-    if (wasToolsOpen && !state.toolsOpen) {
-      ++state.connectRequestId;
-      state.connectLoading = false;
-      if (els["user-connect-source"]) els["user-connect-source"].removeAttribute("aria-busy");
-      if (els["user-connect-target"]) els["user-connect-target"].removeAttribute("aria-busy");
-      ++state.replyRequestId;
-      state.replyLoading = false;
-    }
     saveDashboardState({ tab: tab });
 
     ++state.requestId;
