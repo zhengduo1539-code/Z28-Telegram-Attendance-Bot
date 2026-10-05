@@ -268,6 +268,16 @@ export class CommandHandler {
       const profile = profileFromUser(message, requestedLocale);
       if (!profile) return;
       await this.attendance.setLocale(profile, requestedLocale);
+      await this.ensurePrivateMenuButton(
+        message.chat.id,
+        profile.userId,
+        requestedLocale,
+        this.config.botOwnerId === profile.userId ||
+            this.config.adminIds.includes(profile.userId)
+          ? this.config.adminMiniAppUrl
+          : this.config.userMiniAppUrl,
+      );
+
       await this.telegram.sendMessage(
         message.chat.id,
         `${getLocale(requestedLocale).languageChanged}\n\n${getLocale(requestedLocale).help}`,
@@ -584,7 +594,7 @@ export class CommandHandler {
   ): Promise<void> {
     const isConfiguredAdmin =
       this.config.botOwnerId === userId || this.config.adminIds.includes(userId);
-    const scopeKey = `private:${chatId}:${isConfiguredAdmin && miniAppUrl ? "admin" : "default"}`;
+    const scopeKey = `private:${chatId}:${isConfiguredAdmin && miniAppUrl ? "admin" : "default"}:${locale}`;
     if (this.privateMenuButtonScopes.has(scopeKey)) return;
 
     try {
@@ -834,6 +844,16 @@ export class CommandHandler {
       if (!profile) return;
 
       await this.attendance.setLocale(profile, requestedLocale);
+      await this.ensurePrivateMenuButton(
+        message.chat.id,
+        profile.userId,
+        requestedLocale,
+        this.config.botOwnerId === profile.userId ||
+            this.config.adminIds.includes(profile.userId)
+          ? this.config.adminMiniAppUrl
+          : this.config.userMiniAppUrl,
+      );
+
       await this.telegram.sendMessage(
         message.chat.id,
         `${getLocale(requestedLocale).languageChanged}\n\n${getLocale(requestedLocale).help}`,
