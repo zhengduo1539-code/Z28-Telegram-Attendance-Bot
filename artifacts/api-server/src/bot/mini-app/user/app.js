@@ -3677,6 +3677,10 @@ function populateConnectSelect(select, groups, preferredId) {
 
   function updateToolsWorkspaceView() {
     var hasDetail = Boolean(state.toolDetail);
+    var toolsHead = els["user-tools-page"] && els["user-tools-page"].querySelector(".tools-head");
+    var toolsCategory = els["user-tools-page"] && els["user-tools-page"].querySelector(".tools-category");
+    if (toolsHead) toolsHead.hidden = hasDetail;
+    if (toolsCategory) toolsCategory.hidden = hasDetail;
     if (els["user-tools-directory"]) els["user-tools-directory"].hidden = hasDetail;
     if (els["user-tool-detail"]) els["user-tool-detail"].hidden = !hasDetail;
     if (els["user-tool-detail-replies"]) {
