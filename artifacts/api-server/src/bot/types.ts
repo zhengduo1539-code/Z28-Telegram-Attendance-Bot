@@ -85,6 +85,22 @@ export type GroupWarning = {
   createdAt: string;
 };
 
+export type ActivityReplyKey =
+  | "noActive"
+  | "alreadyActive"
+  | "started"
+  | "settled"
+  | "dailyCountLimitReached"
+  | "timeoutReminder"
+  | "groupTimeoutNotification";
+
+export type ActivityReplyLocaleMessages = Partial<Record<ActivityReplyKey, string>>;
+
+export type GroupActivityReplyMessages = Record<
+  string,
+  Partial<Record<Locale, ActivityReplyLocaleMessages>>
+>;
+
 export type MiniAppGroupAccess = {
   userId: number;
   groupId: number;
@@ -101,6 +117,7 @@ export type BotState = {
   groupActivityLimits?: Record<string, Partial<ActivityLimits>>;
   groupActivityCountLimits?: Record<string, Partial<ActivityCountLimits>>;
   groupWarnings?: Record<string, GroupWarning[]>;
+  groupActivityReplyMessages?: GroupActivityReplyMessages;
   reminderEnabled?: boolean;
   connectedGroups?: Record<string, ConnectedGroup>;
   pendingConnects?: Record<string, PendingConnect>;
