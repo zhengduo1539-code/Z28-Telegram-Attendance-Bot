@@ -229,6 +229,23 @@
       connectGuideRule1: "Only groups that are available to your Telegram account and have the required bot access can be selected.",
       connectGuideRule2: "One Source Group can have one active Target Group. Saving a new target updates that source connection.",
       connectGuideRule3: "If you only want to change the target, use Edit Connection instead of starting over.",
+      connectFlowKicker: "WHAT HAPPENS AFTER CONNECTING",
+      connectFlowTitle: "How the connection works",
+      connectFlowSub: "The connection routes a timeout notice from the Source Group to the Target Group.",
+      connectFlowStep1Title: "Activity starts in the Source Group",
+      connectFlowStep1Copy: "A member starts an activity such as Eat, WC, Smoke, or WCD in the Source Group.",
+      connectFlowStep2Title: "The group time limit applies",
+      connectFlowStep2Copy: "Z28 uses that Source Group's configured activity limit to determine when the activity has gone over time.",
+      connectFlowStep3Title: "The member returns after the limit",
+      connectFlowStep3Copy: "When the member presses Back after the allowed time, Z28 calculates the overtime. A value greater than zero is treated as a timeout.",
+      connectFlowStep4Title: "Z28 creates the timeout notice",
+      connectFlowStep4Copy: "Z28 records the timeout and prepares a notice containing the Source Group, member, activity type, and overtime duration.",
+      connectFlowStep5Title: "The Target Group is notified",
+      connectFlowStep5Copy: "Because the Source Group is connected, the timeout notice is delivered to its configured Target Group instead of being sent nowhere.",
+      connectFlowExampleLabel: "EXAMPLE",
+      connectFlowExample: "Source: Main Group → Target: Admin Group. A member starts Eat with a 30-minute limit and returns after 38 minutes. Z28 detects 8 minutes of overtime and sends the timeout notification to Admin Group.",
+      connectFlowImportant1: "Within the allowed time: the activity is completed normally and no connected-group timeout notice is created.",
+      connectFlowImportant2: "Over the allowed time: the overtime is recorded and the connected Target Group can receive the timeout notice.",
       appearance: "Appearance",
       appearanceSub: "Personalize the Mini App interface.",
       appearanceKicker: "INTERFACE SETTINGS",
@@ -450,6 +467,23 @@
       connectGuideRule1: "သင့် Telegram account နဲ့ Bot နှစ်ခုလုံး အသုံးပြုနိုင်သော Group များကိုသာ ရွေးချယ်နိုင်ပါသည်။",
       connectGuideRule2: "Source Group တစ်ခုမှာ active Target Group တစ်ခု ရှိနိုင်ပါသည်။ Target အသစ်ကို Save လုပ်ပါက အဲဒီ Source connection ကို update လုပ်ပါမည်။",
       connectGuideRule3: "Target Group ကိုသာ ပြောင်းလိုပါက အစမှ ပြန်လုပ်စရာမလိုဘဲ ချိတ်ဆက်မှု ပြင်မည် ကို အသုံးပြုပါ။",
+      connectFlowKicker: "ချိတ်ဆက်ပြီးနောက် ဘယ်လိုအလုပ်လုပ်သလဲ",
+      connectFlowTitle: "Connection အလုပ်လုပ်ပုံ",
+      connectFlowSub: "Source Group မှာ ဖြစ်ပေါ်သော timeout notification ကို ချိတ်ဆက်ထားသော Target Group သို့ ပို့ပေးပါသည်။",
+      connectFlowStep1Title: "Source Group တွင် Activity စတင်ပါမည်",
+      connectFlowStep1Copy: "Member တစ်ယောက်က Source Group ထဲမှာ Eat, WC, Smoke သို့မဟုတ် WCD activity တစ်ခု စတင်ပါမည်။",
+      connectFlowStep2Title: "Group ၏ Time Limit ကို အသုံးပြုပါမည်",
+      connectFlowStep2Copy: "Z28 သည် Source Group အတွက် သတ်မှတ်ထားသော activity limit ကို အသုံးပြုပြီး အချိန်ကျော်မကျော် စစ်ဆေးပါမည်။",
+      connectFlowStep3Title: "Limit ကျော်ပြီးမှ Back လုပ်ပါမည်",
+      connectFlowStep3Copy: "Member က သတ်မှတ်ထားသောအချိန်ထက် ကျော်ပြီး Back နှိပ်သောအခါ Z28 က overtime ကိုတွက်ပါမည်။ Zero ထက်ကြီးပါက timeout အဖြစ် သတ်မှတ်ပါသည်။",
+      connectFlowStep4Title: "Z28 က Timeout Notice ပြုလုပ်ပါမည်",
+      connectFlowStep4Copy: "Z28 က timeout ကို မှတ်တမ်းတင်ပြီး Source Group, member, activity အမျိုးအစားနှင့် overtime ကြာချိန် ပါဝင်သော notification ကို ပြုလုပ်ပါမည်။",
+      connectFlowStep5Title: "Target Group သို့ အသိပေးပါမည်",
+      connectFlowStep5Copy: "Source Group ကို connection ချိတ်ထားသောကြောင့် ထို timeout notification ကို သတ်မှတ်ထားသော Target Group သို့ ပို့ပေးပါမည်။",
+      connectFlowExampleLabel: "ဥပမာ",
+      connectFlowExample: "Source: Main Group → Target: Admin Group။ Member တစ်ယောက်က Eat ကို 30 မိနစ် limit နဲ့ စပြီး 38 မိနစ်ကြာမှ ပြန်လာပါက Z28 က 8 မိနစ် overtime ဖြစ်ကြောင်းသိရှိပြီး Admin Group သို့ timeout notification ပို့ပါမည်။",
+      connectFlowImportant1: "သတ်မှတ်ထားသောအချိန်အတွင်း ပြန်လာပါက activity ကို ပုံမှန်ပြီးဆုံးသည်ဟု သတ်မှတ်ပြီး connected-group timeout notice မပြုလုပ်ပါ။",
+      connectFlowImportant2: "သတ်မှတ်ထားသောအချိန်ကို ကျော်သွားပါက overtime ကို မှတ်တမ်းတင်ပြီး ချိတ်ဆက်ထားသော Target Group သို့ timeout notice ပို့နိုင်ပါသည်။",
       appearance: "Appearance",
       appearanceSub: "Mini App ရဲ့ အပြင်အဆင်ကို စိတ်ကြိုက်ပြင်ဆင်ပါ။",
       appearanceKicker: "INTERFACE SETTINGS",
@@ -666,6 +700,23 @@
       connectGuideRule1: "只能选择您的 Telegram 账号和 Bot 都可以使用，并具备所需权限的群组。",
       connectGuideRule2: "每个来源群组只能有一个有效目标群组。保存新的目标后，该来源群组的连接会被更新。",
       connectGuideRule3: "如果只想更换目标群组，无需重新开始，请直接使用更换群组。",
+      connectFlowKicker: "连接后会发生什么",
+      connectFlowTitle: "连接的工作方式",
+      connectFlowSub: "连接会把来源群组产生的超时通知发送到目标群组。",
+      connectFlowStep1Title: "活动在来源群组开始",
+      connectFlowStep1Copy: "成员在来源群组中开始 Eat、WC、Smoke 或 WCD 等活动。",
+      connectFlowStep2Title: "应用来源群组的时间限制",
+      connectFlowStep2Copy: "Z28 使用该来源群组设置的活动时间限制，判断活动是否已经超时。",
+      connectFlowStep3Title: "成员超过限制后点击返回",
+      connectFlowStep3Copy: "成员超过允许时间后点击返回时，Z28 会计算超时时长。只要数值大于零，就会判定为超时。",
+      connectFlowStep4Title: "Z28 生成超时通知",
+      connectFlowStep4Copy: "Z28 记录这次超时，并生成包含来源群组、成员、活动类型和超时时长的通知。",
+      connectFlowStep5Title: "通知发送到目标群组",
+      connectFlowStep5Copy: "由于来源群组已建立连接，超时通知会发送到所配置的目标群组。",
+      connectFlowExampleLabel: "示例",
+      connectFlowExample: "来源：Main Group → 目标：Admin Group。成员开始 Eat，限制为 30 分钟，38 分钟后返回。Z28 判断超时 8 分钟，并向 Admin Group 发送超时通知。",
+      connectFlowImportant1: "在允许时间内返回：活动正常结束，不会创建连接群组超时通知。",
+      connectFlowImportant2: "超过允许时间：记录超时，并可向已连接的目标群组发送超时通知。",
       connectLoadFailed: "无法加载已安装 Bot 的群组，请重试。",
       connectSuccess: "群组连接已成功保存。",
       connectFailed: "无法连接所选群组，请重试。",
@@ -778,6 +829,14 @@
       "user-connect-guide-step3-title","user-connect-guide-step3-copy",
       "user-connect-guide-step4-title","user-connect-guide-step4-copy",
       "user-connect-guide-rule1","user-connect-guide-rule2","user-connect-guide-rule3",
+      "user-connect-flow-kicker","user-connect-flow-title","user-connect-flow-sub",
+      "user-connect-flow-step1-title","user-connect-flow-step1-copy",
+      "user-connect-flow-step2-title","user-connect-flow-step2-copy",
+      "user-connect-flow-step3-title","user-connect-flow-step3-copy",
+      "user-connect-flow-step4-title","user-connect-flow-step4-copy",
+      "user-connect-flow-step5-title","user-connect-flow-step5-copy",
+      "user-connect-flow-example-label","user-connect-flow-example",
+      "user-connect-flow-important1","user-connect-flow-important2",
       "user-about-page","user-about-title","user-about-sub","user-about-bot-name-label",
       "user-about-bot-version-label","user-about-mini-version-label",
       "user-about-terms-label","user-about-terms-copy","user-about-privacy-label",
@@ -1444,6 +1503,23 @@
     els["user-connect-guide-rule1"].textContent = text("connectGuideRule1");
     els["user-connect-guide-rule2"].textContent = text("connectGuideRule2");
     els["user-connect-guide-rule3"].textContent = text("connectGuideRule3");
+    els["user-connect-flow-kicker"].textContent = text("connectFlowKicker");
+    els["user-connect-flow-title"].textContent = text("connectFlowTitle");
+    els["user-connect-flow-sub"].textContent = text("connectFlowSub");
+    els["user-connect-flow-step1-title"].textContent = text("connectFlowStep1Title");
+    els["user-connect-flow-step1-copy"].textContent = text("connectFlowStep1Copy");
+    els["user-connect-flow-step2-title"].textContent = text("connectFlowStep2Title");
+    els["user-connect-flow-step2-copy"].textContent = text("connectFlowStep2Copy");
+    els["user-connect-flow-step3-title"].textContent = text("connectFlowStep3Title");
+    els["user-connect-flow-step3-copy"].textContent = text("connectFlowStep3Copy");
+    els["user-connect-flow-step4-title"].textContent = text("connectFlowStep4Title");
+    els["user-connect-flow-step4-copy"].textContent = text("connectFlowStep4Copy");
+    els["user-connect-flow-step5-title"].textContent = text("connectFlowStep5Title");
+    els["user-connect-flow-step5-copy"].textContent = text("connectFlowStep5Copy");
+    els["user-connect-flow-example-label"].textContent = text("connectFlowExampleLabel");
+    els["user-connect-flow-example"].textContent = text("connectFlowExample");
+    els["user-connect-flow-important1"].textContent = text("connectFlowImportant1");
+    els["user-connect-flow-important2"].textContent = text("connectFlowImportant2");
     els["user-connect-status-title"].textContent = text("connectStatus");
     var connectChangeLabel = els["user-connect-change"] && els["user-connect-change"].querySelector(".button-label");
     if (connectChangeLabel) connectChangeLabel.textContent = state.connectEditMode ? text("cancel") : text("connectChange");
