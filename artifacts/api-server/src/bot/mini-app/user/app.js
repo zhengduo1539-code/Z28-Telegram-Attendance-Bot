@@ -45,6 +45,8 @@
     customWallpaper: null,
     animationsEnabled: true,
     compactMode: false,
+    textSize: "standard",
+    highContrast: false,
     workspaceName: "My Workspace",
     themeCreator: {
       enabled: false,
@@ -75,6 +77,8 @@
     backgroundEffectIntensity: "z28_appearance_background_effect_intensity",
     animations: "z28_appearance_animations",
     compactMode: "z28_appearance_compact",
+    textSize: "z28_appearance_text_size",
+    highContrast: "z28_appearance_high_contrast",
     workspaceName: "z28_workspace_name",
     themeCreator: "z28_appearance_theme_creator"
   };
@@ -654,6 +658,7 @@
       animationsSub: "Keep interface motion and transitions enabled.",
       compactMode: "Compact Mode",
       compactModeSub: "Reduce spacing for a denser layout.",
+      accessibilityTitle: "Accessibility", accessibilitySub: "Make text and contrast easier to read. Preferences are saved only on this device.", textSize: "Text Size", textSizeSub: "Choose a comfortable reading size for this Mini App.", textSizeStandard: "Standard", textSizeStandardSub: "Balanced", textSizeLarge: "Large", textSizeLargeSub: "Easier reading", textSizeExtraLarge: "Extra Large", textSizeExtraLargeSub: "Maximum readability", highContrast: "High Contrast", highContrastSub: "Increase text and control contrast for clearer visibility.",
       appearanceOn: "ON",
       appearanceOff: "OFF",
       about: "About",
@@ -990,6 +995,7 @@
       animationsSub: "Interface ရဲ့ motion နဲ့ transition များကို ဖွင့်ထားမည်။",
       compactMode: "Compact Mode",
       compactModeSub: "Screen space သက်သာစေရန် spacing ကို လျှော့မည်။",
+      accessibilityTitle: "Accessibility", accessibilitySub: "စာသားနှင့် contrast ကို ပိုမိုဖတ်ရှုရလွယ်ကူအောင် ပြင်ဆင်ပါ။ ဤ setting များကို ဤ device ပေါ်တွင်သာ သိမ်းထားပါမည်။", textSize: "Text Size", textSizeSub: "Mini App ကို သက်တောင့်သက်သာ ဖတ်ရှုနိုင်မည့် စာလုံးအရွယ်အစားကို ရွေးပါ။", textSizeStandard: "Standard", textSizeStandardSub: "ပုံမှန်", textSizeLarge: "Large", textSizeLargeSub: "ပိုမိုဖတ်ရလွယ်", textSizeExtraLarge: "Extra Large", textSizeExtraLargeSub: "အများဆုံး ဖတ်ရလွယ်ကူမှု", highContrast: "High Contrast", highContrastSub: "စာသားနှင့် control များကို ပိုမိုရှင်းလင်းစွာ မြင်နိုင်အောင် contrast မြှင့်ပါ။",
       appearanceOn: "ON",
       appearanceOff: "OFF",
       about: "About",
@@ -1324,6 +1330,7 @@
       animationsSub: "保持界面动画和过渡效果。",
       compactMode: "紧凑模式",
       compactModeSub: "减少间距，让布局更加紧凑。",
+      accessibilityTitle: "无障碍阅读", accessibilitySub: "提高文字与对比度的可读性。设置仅保存在此设备上。", textSize: "文字大小", textSizeSub: "选择适合您阅读的 Mini App 文字大小。", textSizeStandard: "标准", textSizeStandardSub: "平衡", textSizeLarge: "大", textSizeLargeSub: "更易阅读", textSizeExtraLarge: "特大", textSizeExtraLargeSub: "最大可读性", highContrast: "高对比度", highContrastSub: "提高文字和控件的对比度，让内容更清晰。",
       appearanceOn: "开启",
       appearanceOff: "关闭",
       about: "关于",
@@ -1483,6 +1490,7 @@
       "appearance-animations-toggle","user-appearance-animations-title","user-appearance-animations-sub",
       "user-appearance-animations-state","appearance-compact-toggle","user-appearance-compact-title",
       "user-appearance-compact-sub","user-appearance-compact-state",
+      "user-appearance-accessibility-title","user-appearance-accessibility-sub","user-accessibility-text-size-title","user-accessibility-text-size-sub","user-accessibility-text-size-value","user-accessibility-text-standard","user-accessibility-text-standard-sub","user-accessibility-text-large","user-accessibility-text-large-sub","user-accessibility-text-extra-large","user-accessibility-text-extra-large-sub","appearance-high-contrast-toggle","user-accessibility-contrast-title","user-accessibility-contrast-sub","user-accessibility-contrast-state",
       "workspace-identity","workspace-name-kicker","workspace-name-title","workspace-name-sub",
       "workspace-name-badge","workspace-name-input","workspace-name-hint","workspace-name-count",
       "workspace-name-save","workspace-name-save-label","workspace-name-reset","workspace-name-reset-label",
@@ -1738,6 +1746,8 @@
     }
     root.setAttribute("data-animations", state.animationsEnabled ? "on" : "off");
     root.setAttribute("data-compact", state.compactMode ? "on" : "off");
+    root.setAttribute("data-text-size", ["standard","large","extra-large"].indexOf(state.textSize) >= 0 ? state.textSize : "standard");
+    root.setAttribute("data-high-contrast", state.highContrast ? "on" : "off");
     applyThemeCreatorStyles();
     updateAppearanceControls();
     updateBackgroundEffectControls();
@@ -1903,6 +1913,16 @@
     els["appearance-compact-toggle"].classList.toggle("is-enabled", state.compactMode);
     els["user-appearance-compact-state"].textContent =
       state.compactMode ? text("appearanceOn") : text("appearanceOff");
+
+    document.querySelectorAll("[data-text-size-option]").forEach(function (button) {
+      var selected = button.getAttribute("data-text-size-option") === state.textSize;
+      button.classList.toggle("is-selected", selected);
+      button.setAttribute("aria-pressed", String(selected));
+    });
+    if (els["user-accessibility-text-size-value"]) els["user-accessibility-text-size-value"].textContent = state.textSize === "large" ? text("textSizeLarge") : state.textSize === "extra-large" ? text("textSizeExtraLarge") : text("textSizeStandard");
+    els["appearance-high-contrast-toggle"].setAttribute("aria-checked", String(state.highContrast));
+    els["appearance-high-contrast-toggle"].classList.toggle("is-enabled", state.highContrast);
+    els["user-accessibility-contrast-state"].textContent = state.highContrast ? text("appearanceOn") : text("appearanceOff");
 
     updateThemeCreatorControls();
     updateBackgroundEffectControls();
@@ -2124,6 +2144,19 @@
   function toggleCompactMode() {
     state.compactMode = !state.compactMode;
     writeStorage(STORAGE_KEYS.compactMode, state.compactMode ? "1" : "0");
+    applyAppearancePreferences();
+  }
+
+  function setTextSize(size) {
+    if (["standard","large","extra-large"].indexOf(size) === -1) return;
+    state.textSize = size;
+    writeStorage(STORAGE_KEYS.textSize, size);
+    applyAppearancePreferences();
+  }
+
+  function toggleHighContrast() {
+    state.highContrast = !state.highContrast;
+    writeStorage(STORAGE_KEYS.highContrast, state.highContrast ? "1" : "0");
     applyAppearancePreferences();
   }
 
@@ -2490,6 +2523,18 @@
     els["user-appearance-animations-sub"].textContent = text("animationsSub");
     els["user-appearance-compact-title"].textContent = text("compactMode");
     els["user-appearance-compact-sub"].textContent = text("compactModeSub");
+    els["user-appearance-accessibility-title"].textContent = text("accessibilityTitle");
+    els["user-appearance-accessibility-sub"].textContent = text("accessibilitySub");
+    els["user-accessibility-text-size-title"].textContent = text("textSize");
+    els["user-accessibility-text-size-sub"].textContent = text("textSizeSub");
+    els["user-accessibility-text-standard"].textContent = text("textSizeStandard");
+    els["user-accessibility-text-standard-sub"].textContent = text("textSizeStandardSub");
+    els["user-accessibility-text-large"].textContent = text("textSizeLarge");
+    els["user-accessibility-text-large-sub"].textContent = text("textSizeLargeSub");
+    els["user-accessibility-text-extra-large"].textContent = text("textSizeExtraLarge");
+    els["user-accessibility-text-extra-large-sub"].textContent = text("textSizeExtraLargeSub");
+    els["user-accessibility-contrast-title"].textContent = text("highContrast");
+    els["user-accessibility-contrast-sub"].textContent = text("highContrastSub");
     els["workspace-name-kicker"].textContent = text("workspaceIdentity");
     els["workspace-name-title"].textContent = text("workspaceNameTitle");
     els["workspace-name-sub"].textContent = text("workspaceNameSub");
@@ -4543,6 +4588,8 @@ function populateConnectSelect(select, groups, preferredId) {
 
     els["appearance-animations-toggle"].onclick = toggleAnimations;
     els["appearance-compact-toggle"].onclick = toggleCompactMode;
+    document.querySelectorAll("[data-text-size-option]").forEach(function (button) { button.onclick = function () { setTextSize(button.getAttribute("data-text-size-option")); }; });
+    els["appearance-high-contrast-toggle"].onclick = toggleHighContrast;
     els["workspace-name-input"].oninput = function () {
       updateWorkspaceNameControls();
     };
@@ -4748,6 +4795,11 @@ function populateConnectSelect(select, groups, preferredId) {
 
     var storedCompact = readStorage(STORAGE_KEYS.compactMode);
     state.compactMode = storedCompact === "1";
+
+    var storedTextSize = readStorage(STORAGE_KEYS.textSize);
+    state.textSize = ["standard","large","extra-large"].indexOf(storedTextSize) >= 0 ? storedTextSize : "standard";
+    var storedHighContrast = readStorage(STORAGE_KEYS.highContrast);
+    state.highContrast = storedHighContrast === "1";
 
     var storedWorkspaceName = getStoredWorkspaceName();
     state.workspaceName = storedWorkspaceName || text("workspaceNameDefault");
