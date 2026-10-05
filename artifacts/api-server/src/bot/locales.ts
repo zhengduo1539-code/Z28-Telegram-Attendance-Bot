@@ -9,6 +9,7 @@ import type {
 
 type LocaleText = {
   title: string;
+  startWelcome: string;
   help: string;
   idInfo: (chatId: number, userId: number) => string;
   botStats: (privateUsers: number, groups: number) => string;
@@ -16,6 +17,19 @@ type LocaleText = {
   adminPanelPrompt: string;
   adminPrivate: string;
   adminMiniAppUnavailable: string;
+  telegramUi: {
+    userMenuButton: string;
+    adminMenuButton: string;
+    addBotToGroupButton: string;
+    openGroupAdminPanelButton: string;
+    groupAdminPanelPrompt: string;
+    addBotToGroupPrompt: string;
+    inputFieldPlaceholder: string;
+  };
+  commandMenu: {
+    user: Array<{ command: string; description: string }>;
+    admin: Array<{ command: string; description: string }>;
+  };
   noActive: (displayName: string, userId: number) => string;
   alreadyActive: (
     displayName: string,
@@ -175,6 +189,42 @@ const zh: LocaleText = {
   ].join("\n"),
   idInfo: (chatId, userId) => `群组标识：${inlineCode(chatId)}\n用户标识：${inlineCode(userId)}`,
   botStatsPrivate: "请在私聊中使用 /stats。",
+  adminPanelPrompt: "点击下面的按钮打开管理面板。",
+  adminPrivate: "请在 Bot 私聊中打开管理面板。",
+  adminMiniAppUnavailable: "管理面板当前不可用，请稍后再试。",
+  telegramUi: {
+    userMenuButton: "📊 我的面板",
+    adminMenuButton: "⚙️ 管理面板",
+    addBotToGroupButton: "➕ 将 Bot 添加到群组",
+    openGroupAdminPanelButton: "⚙️ 打开群组管理面板",
+    groupAdminPanelPrompt: "打开群组管理面板：",
+    addBotToGroupPrompt: "团队需要使用活动打卡功能？请先将 Bot 添加到群组：",
+    inputFieldPlaceholder: "请直接点击按钮打卡",
+  },
+  commandMenu: {
+    user: [
+      { command: "start", description: "开始 / Start" },
+      { command: "work", description: "上班 / Start work" },
+      { command: "back", description: "回座 / Return to seat" },
+      { command: "eat", description: "吃饭 / Meal break" },
+      { command: "wc", description: "上厕所 / Toilet" },
+      { command: "smoke", description: "抽烟 / Smoke break" },
+      { command: "wcd", description: "WCD" },
+      { command: "offwork", description: "下班 / End work" },
+      { command: "help", description: "帮助 / Help" },
+      { command: "lang", description: "语言 / Language" },
+    ],
+    admin: [
+      { command: "start", description: "开始 / Start" },
+      { command: "limit", description: "设置活动时间限制" },
+      { command: "limits", description: "查看活动时间限制" },
+      { command: "countlimit", description: "设置每日活动次数限制" },
+      { command: "countlimits", description: "查看每日活动次数限制" },
+      { command: "reminder", description: "开启/关闭超时提醒" },
+      { command: "reminders", description: "查看超时提醒状态" },
+      { command: "stats", description: "查看 Bot 统计" },
+    ],
+  },
   botStats: (privateUsers, groups) => [
     "📊 Bot Statistics",
     "",
@@ -379,6 +429,39 @@ const mm: LocaleText = {
   ].join("\n"),
   idInfo: (chatId, userId) => `Group ID: ${inlineCode(chatId)}\nUser ID: ${inlineCode(userId)}`,
   botStatsPrivate: "ကျေးဇူးပြု၍ /stats ကို Bot private chat ထဲတွင်အသုံးပြုပါ။",
+  telegramUi: {
+    userMenuButton: "📊 ကျွန်ုပ်၏ Dashboard",
+    adminMenuButton: "⚙️ စီမံခန့်ခွဲမှု Panel",
+    addBotToGroupButton: "➕ Bot ကို Group ထဲထည့်ရန်",
+    openGroupAdminPanelButton: "⚙️ Group Admin Panel ဖွင့်ရန်",
+    groupAdminPanelPrompt: "Group Admin Panel ကို ဖွင့်ရန်:",
+    addBotToGroupPrompt: "Team အတွက် activity check-in အသုံးပြုမည်ဆိုပါက Bot ကို Group ထဲသို့ အရင်ထည့်ပါ:",
+    inputFieldPlaceholder: "Check-in လုပ်ရန် button ကိုနှိပ်ပါ",
+  },
+  commandMenu: {
+    user: [
+      { command: "start", description: "Bot စတင်ရန်" },
+      { command: "work", description: "အလုပ်စဝင်ရန်" },
+      { command: "back", description: "ထိုင်ခုံသို့ပြန်ရန်" },
+      { command: "eat", description: "အစားအသောက်နားချိန်" },
+      { command: "wc", description: "အိမ်သာနားချိန်" },
+      { command: "smoke", description: "ဆေးလိပ်နားချိန်" },
+      { command: "wcd", description: "WCD" },
+      { command: "offwork", description: "အလုပ်ဆင်းရန်" },
+      { command: "help", description: "အကူအညီ" },
+      { command: "lang", description: "ဘာသာစကား" },
+    ],
+    admin: [
+      { command: "start", description: "Bot စတင်ရန်" },
+      { command: "limit", description: "Activity အချိန်ကန့်သတ်ချက် သတ်မှတ်ရန်" },
+      { command: "limits", description: "Activity အချိန်ကန့်သတ်ချက် ကြည့်ရန်" },
+      { command: "countlimit", description: "နေ့စဉ် Activity အကြိမ်ရေ ကန့်သတ်ချက် သတ်မှတ်ရန်" },
+      { command: "countlimits", description: "နေ့စဉ် Activity အကြိမ်ရေ ကန့်သတ်ချက် ကြည့်ရန်" },
+      { command: "reminder", description: "အချိန်ကျော်သတိပေးချက် ဖွင့်/ပိတ်ရန်" },
+      { command: "reminders", description: "အချိန်ကျော်သတိပေးချက် အခြေအနေကြည့်ရန်" },
+      { command: "stats", description: "Bot စာရင်းအင်းများ ကြည့်ရန်" },
+    ],
+  },
   adminPanelPrompt: "အောက်ပါ button ကိုနှိပ်ပြီး Admin Panel ကိုဖွင့်ပါ။",
   adminPrivate: "ကျေးဇူးပြု၍ Bot private chat ထဲမှ Admin Panel ကိုဖွင့်ပါ။",
   adminMiniAppUnavailable: "Admin Panel ကို လက်ရှိအသုံးမပြုနိုင်သေးပါ။ နောက်မှထပ်ကြိုးစားပါ။",
@@ -586,6 +669,39 @@ const en: LocaleText = {
   ].join("\n"),
   idInfo: (chatId, userId) => `Chat ID: ${inlineCode(chatId)}\nUser ID: ${inlineCode(userId)}`,
   botStatsPrivate: "Please use /stats in a private chat.",
+  telegramUi: {
+    userMenuButton: "📊 My Dashboard",
+    adminMenuButton: "⚙️ Admin Panel",
+    addBotToGroupButton: "➕ Add Bot to Your Group",
+    openGroupAdminPanelButton: "⚙️ Open Group Admin Panel",
+    groupAdminPanelPrompt: "Open the Group Admin Panel:",
+    addBotToGroupPrompt: "Add the bot to a group to use activity tracking with your team:",
+    inputFieldPlaceholder: "Tap a button to check in",
+  },
+  commandMenu: {
+    user: [
+      { command: "start", description: "Start" },
+      { command: "work", description: "Start work" },
+      { command: "back", description: "Return to seat" },
+      { command: "eat", description: "Meal break" },
+      { command: "wc", description: "Toilet" },
+      { command: "smoke", description: "Smoke break" },
+      { command: "wcd", description: "WCD" },
+      { command: "offwork", description: "End work" },
+      { command: "help", description: "Help" },
+      { command: "lang", description: "Language" },
+    ],
+    admin: [
+      { command: "start", description: "Start" },
+      { command: "limit", description: "Set activity time limits" },
+      { command: "limits", description: "View activity time limits" },
+      { command: "countlimit", description: "Set daily activity count limits" },
+      { command: "countlimits", description: "View daily activity count limits" },
+      { command: "reminder", description: "Turn overdue reminders on/off" },
+      { command: "reminders", description: "View overdue reminder status" },
+      { command: "stats", description: "View bot statistics" },
+    ],
+  },
   adminPanelPrompt: "Tap the button below to open the Admin Panel.",
   adminPrivate: "Please open the Admin Panel in the bot private chat.",
   adminMiniAppUnavailable: "The Admin Panel is currently unavailable. Please try again later.",
