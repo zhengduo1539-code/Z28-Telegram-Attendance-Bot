@@ -543,6 +543,112 @@ html[data-animations="off"] .appearance-effects-layer{display:none!important}
 .empty-state-back:hover:not(:disabled){
   transform:translateY(-1px);
 }
+.normal-user-home{
+  width:min(680px,100%);
+  margin:clamp(24px,6vh,48px) auto 0;
+}
+.normal-user-home-card{
+  padding:24px;
+  background:
+    radial-gradient(circle at 92% 0%,rgba(72,168,255,.12),transparent 30%),
+    radial-gradient(circle at 8% 100%,rgba(122,104,255,.08),transparent 28%),
+    linear-gradient(145deg,rgba(14,29,49,.95),rgba(5,13,24,.98));
+  box-shadow:0 24px 70px rgba(0,0,0,.28);
+  animation:normalHomeReveal 520ms var(--ease-out) both;
+}
+.normal-user-home-card::after{
+  content:"";
+  position:absolute;
+  inset:auto -18% -52% 28%;
+  height:190px;
+  background:radial-gradient(circle,rgba(72,168,255,.075),transparent 68%);
+  pointer-events:none;
+}
+.normal-user-home-card h2,.normal-user-home-card>p{
+  position:relative;
+  z-index:1;
+}
+.normal-user-quick-access{
+  position:relative;
+  z-index:1;
+}
+.normal-user-home-link{
+  width:100%;
+  min-width:0;
+  display:grid;
+  grid-template-columns:32px minmax(0,1fr) 22px;
+  align-items:center;
+  gap:11px;
+  padding:5px 2px;
+  border:0;
+  background:transparent;
+  color:inherit;
+  text-align:left;
+  cursor:pointer;
+}
+.normal-user-home-link .empty-state-step-number{
+  transition:
+    transform var(--motion-fast) var(--ease-out),
+    border-color var(--motion-fast) ease,
+    background var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease;
+}
+.normal-user-home-link-copy{
+  min-width:0;
+}
+.normal-user-home-link-copy strong{
+  margin:0;
+  color:#e6f1fc;
+  font-size:12px;
+}
+.normal-user-home-link-copy span{
+  display:block;
+  margin-top:4px;
+  color:var(--muted);
+  font-size:10px;
+  line-height:1.55;
+}
+.normal-user-home-arrow{
+  justify-self:end;
+  color:#7195ba;
+  font-size:22px;
+  line-height:1;
+  transition:
+    transform var(--motion-fast) var(--ease-out),
+    color var(--motion-fast) ease;
+}
+.normal-user-home-link:hover .empty-state-step-number{
+  transform:translateX(2px);
+  border-color:rgba(72,168,255,.34);
+  background:rgba(72,168,255,.11);
+  box-shadow:0 0 0 4px rgba(72,168,255,.03);
+}
+.normal-user-home-link:hover .normal-user-home-arrow{
+  color:#acd7ff;
+  transform:translateX(3px);
+}
+.normal-user-home-link:focus-visible{
+  outline:2px solid rgba(72,168,255,.44);
+  outline-offset:3px;
+  border-radius:10px;
+}
+@keyframes normalHomeReveal{
+  from{opacity:0;transform:translate3d(0,9px,0) scale(.985)}
+  to{opacity:1;transform:translate3d(0,0,0) scale(1)}
+}
+@media(max-width:430px){
+  .normal-user-home{margin-top:18px}
+  .normal-user-home-card{padding:19px}
+  .normal-user-home-link{
+    grid-template-columns:30px minmax(0,1fr) 18px;
+    gap:10px;
+  }
+  .normal-user-home-link-copy strong{font-size:11px}
+  .normal-user-home-link-copy span{font-size:9px}
+}
+@media(prefers-reduced-motion:reduce){
+  .normal-user-home-card{animation:none}
+}
 .state-icon-muted{color:#a8bdd6;background:rgba(124,151,181,.08);border:1px solid rgba(124,151,181,.13)}
 .state-icon-error{
   color:#ffacb6;
