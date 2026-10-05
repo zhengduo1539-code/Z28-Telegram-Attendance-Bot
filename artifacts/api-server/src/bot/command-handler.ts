@@ -146,9 +146,14 @@ export class CommandHandler {
       );
     }
 
-    // Do not block normal update handling on Telegram's command-menu API.
-    // A slow/failing setMyCommands call must never make the bot appear frozen.
-    void this.ensureAdminCommandMenu(message, profile.userId, profile.locale);
+    // Do not race a language change with the menu refresh for the previous locale.
+    // Language commands update both the command menu and Mini App button explicitly
+    // after the new locale has been saved.
+    const isLanguageCommand =
+      command?.name === "lang" || command?.name === "language";
+    if (!isLanguageCommand) {
+      void this.ensureAdminCommandMenu(message, profile.userId, profile.locale);
+    }
 
     const pendingConnect = await this.attendance.getPendingConnect(
       message.chat.id,
