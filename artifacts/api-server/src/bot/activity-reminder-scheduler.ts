@@ -1,6 +1,5 @@
 import type { Logger } from "pino";
 import { AttendanceService } from "./attendance-service";
-import { activityLabel, getLocale } from "./locales";
 import { TelegramClient } from "./telegram-client";
 import type { ActiveActivity } from "./types";
 
@@ -88,11 +87,9 @@ export class ActivityReminderScheduler {
     if (!claim) return;
 
     const { activity } = claim;
-    const locale = getLocale(claim.locale);
-    const message = locale.timeoutReminder(
-      activity.displayName,
-      activity.userId,
-      activityLabel(activity.kind, claim.locale),
+    const message = await this.attendance.buildActivityReminderMessage(
+      activity,
+      claim.locale,
     );
 
     try {
