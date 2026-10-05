@@ -654,7 +654,77 @@
           <p id="user-tools-category-sub">Tools that configure how Z28 connects and works across your groups.</p>
         </section>
 
-        <article class="reply-messages-card" aria-labelledby="user-reply-messages-title">
+        
+        <section id="user-tools-directory" class="tools-directory" aria-labelledby="user-tools-directory-title">
+          <div class="tools-context-row">
+            <div class="tools-context-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3"></circle><path d="M5 19c.7-3.2 3-5 7-5s6.3 1.8 7 5"></path></svg>
+            </div>
+            <div class="tools-context-copy">
+              <span id="user-tools-active-group-label">CURRENT GROUP</span>
+              <strong id="user-tools-active-group">—</strong>
+            </div>
+            <span class="tools-context-role" id="user-tools-active-role">ADMIN</span>
+          </div>
+
+          <div class="tools-directory-head">
+            <div>
+              <div class="tools-directory-kicker" id="user-tools-directory-kicker">AVAILABLE TOOLS</div>
+              <h3 id="user-tools-directory-title">Choose a tool</h3>
+              <p id="user-tools-directory-sub">Open a dedicated workspace for the task you want to manage.</p>
+            </div>
+          </div>
+
+          <div class="tool-launch-grid" aria-label="Available tools">
+            <button class="tool-launch-card" type="button" data-user-tool="connection">
+              <span class="tool-launch-icon tool-launch-icon-connection" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M8.8 12h6.4"></path>
+                  <path d="M7.1 8.9 5.4 7.2a3.4 3.4 0 0 0-4.8 4.8l1.7 1.7a3.4 3.4 0 0 0 4.8 0"></path>
+                  <path d="m16.9 15.1 1.7 1.7a3.4 3.4 0 0 0 4.8-4.8l-1.7-1.7a3.4 3.4 0 0 0-4.8 0"></path>
+                </svg>
+              </span>
+              <span class="tool-launch-copy">
+                <span class="tool-launch-kicker" id="user-tool-connection-kicker">GROUP ROUTING</span>
+                <strong id="user-tool-connection-title">Group Connection</strong>
+                <span id="user-tool-connection-sub">Connect one bot-installed group to another for timeout notifications.</span>
+              </span>
+              <span class="tool-launch-arrow" aria-hidden="true">›</span>
+            </button>
+
+            <button class="tool-launch-card" type="button" data-user-tool="replies">
+              <span class="tool-launch-icon tool-launch-icon-replies" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M5 6.8A2.8 2.8 0 0 1 7.8 4h8.4A2.8 2.8 0 0 1 19 6.8v7.4a2.8 2.8 0 0 1-2.8 2.8h-4.7L8 20v-3H7.8A2.8 2.8 0 0 1 5 14.2Z"></path>
+                  <path d="M8.5 9h7"></path>
+                  <path d="M8.5 12.2h4.8"></path>
+                </svg>
+              </span>
+              <span class="tool-launch-copy">
+                <span class="tool-launch-kicker" id="user-tool-replies-kicker">GROUP RESPONSES</span>
+                <strong id="user-tool-replies-title">Activity Reply Messages</strong>
+                <span id="user-tool-replies-sub">Customize the bot's activity replies for this group only.</span>
+              </span>
+              <span class="tool-launch-arrow" aria-hidden="true">›</span>
+            </button>
+          </div>
+        </section>
+
+        <section id="user-tool-detail" class="tool-detail" hidden aria-labelledby="user-tool-detail-title">
+          <div class="tool-detail-header">
+            <button id="user-tool-detail-back" class="tool-detail-back" type="button" aria-label="Back to Tools">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14.5 5-7 7 7 7"></path></svg>
+              <span id="user-tool-detail-back-label">Back to Tools</span>
+            </button>
+            <div class="tool-detail-heading">
+              <div class="tools-directory-kicker" id="user-tool-detail-kicker">TOOL WORKSPACE</div>
+              <h3 id="user-tool-detail-title">Tool</h3>
+              <p id="user-tool-detail-sub">Manage this feature for the selected group.</p>
+            </div>
+          </div>
+
+          <section id="user-tool-detail-replies" class="tool-detail-panel" hidden aria-labelledby="user-reply-messages-title">
+<article class="reply-messages-card" aria-labelledby="user-reply-messages-title">
           <div class="reply-messages-header">
             <div class="reply-messages-header-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24">
@@ -718,7 +788,11 @@
           </div>
         </article>
 
-        <article class="connection-card">
+        
+          </section>
+
+          <section id="user-tool-detail-connection" class="tool-detail-panel" hidden aria-labelledby="user-connect-title">
+
           <div class="connection-card-header">
             <div class="connection-header-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24">
@@ -942,6 +1016,8 @@
 
           </div>
         </article>
+        </section>
+        </section>
       </section>
 
       <section id="user-support-page" class="support-page" hidden>
