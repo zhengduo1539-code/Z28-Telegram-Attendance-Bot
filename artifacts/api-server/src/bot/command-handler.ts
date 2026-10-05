@@ -42,6 +42,24 @@ const profileFromUser = (
   };
 };
 
+
+const languageKeyboard = (locale: Locale): import("./types").InlineKeyboardMarkup => {
+  const options: Array<{ locale: Locale; label: string }> = [
+    { locale: "en", label: "🇬🇧 English" },
+    { locale: "mm", label: "🇲🇲 မြန်မာ" },
+    { locale: "zh", label: "🇨🇳 简体中文" },
+  ];
+  return {
+    inline_keyboard: options.map((option) => [
+      {
+        text: option.locale === locale ? `✓ ${option.label}` : option.label,
+        callback_data: `lang:${option.locale}`,
+        ...(option.locale === locale ? { style: "primary" as const } : {}),
+      },
+    ]),
+  };
+};
+
 const keyboard = (locale: Locale): ReplyKeyboardMarkup => {
   const text = getLocale(locale).buttons;
   return {
@@ -57,7 +75,11 @@ const keyboard = (locale: Locale): ReplyKeyboardMarkup => {
     is_persistent: true,
     one_time_keyboard: false,
     input_field_placeholder:
-      locale === "en" ? "Tap a button to check in" : "请直接点击按钮打卡",
+      locale === "en"
+        ? "Tap a button to check in"
+        : locale === "mm"
+          ? "Check-in လုပ်ရန် button ကိုနှိပ်ပါ"
+          : "请直接点击按钮打卡",
   };
 };
 
@@ -70,6 +92,10 @@ const buttonCommand = (value: string): Command | undefined => {
     Toilet: "wc",
     Smoke: "smoke",
     Back: "back",
+    "အိမ်သာ": "wc",
+    "ဆေးလိပ်": "smoke",
+    "ထိုင်ခုံသို့ပြန်": "back",
+    "ထိုင်ခုံသို့ ပြန်": "back",
   };
   const name = commands[value.trim()];
   return name ? { name } : undefined;
@@ -213,19 +239,32 @@ export class CommandHandler {
 
     if (!command) return;
     if (command.name === "lang" || command.name === "language") {
-      const requestedLocale =
-        command.argument === "eng" ? "en" : command.argument;
-      if (requestedLocale !== "zh" && requestedLocale !== "en") {
+      if (!command.argument) {
         await this.telegram.sendMessage(
           message.chat.id,
-          command.argument
-            ? getLocale(currentLocale).unknownLanguage
-            : getLocale(currentLocale).languageUsage,
+          getLocale(currentLocale).languagePicker,
+          languageKeyboard(currentLocale),
+          message.message_id,
+        );
+        return;
+      }
+
+      const requestedLocale =
+        command.argument === "eng" ? "en" : command.argument;
+      if (
+        requestedLocale !== "zh" &&
+        requestedLocale !== "en" &&
+        requestedLocale !== "mm"
+      ) {
+        await this.telegram.sendMessage(
+          message.chat.id,
+          getLocale(currentLocale).unknownLanguage,
           undefined,
           message.message_id,
         );
         return;
       }
+
       const profile = profileFromUser(message, requestedLocale);
       if (!profile) return;
       await this.attendance.setLocale(profile, requestedLocale);
@@ -768,8 +807,42 @@ export class CommandHandler {
   private async handleCallback(callback: TelegramCallbackQuery) {
     await this.telegram.answerCallbackQuery(callback.id);
     const message = callback.message;
-    const action = callback.data?.split(":")[1];
+    const [namespace, action] = callback.data?.split(":") || [];
     if (!message || !action || !callback.from || callback.from.is_bot) return;
+
+    if (namespace === "lang") {
+      const requestedLocale = action === "eng" ? "en" : action;
+      if (
+        requestedLocale !== "zh" &&
+        requestedLocale !== "en" &&
+        requestedLocale !== "mm"
+      ) {
+        return;
+      }
+
+      const currentLocale = await this.attendance.getLocale(
+        message.chat.id,
+        callback.from.id,
+      );
+      const syntheticMessage: TelegramMessage = {
+        message_id: message.message_id,
+        chat: message.chat,
+        from: callback.from,
+        text: "/lang",
+      };
+      const profile = profileFromUser(syntheticMessage, currentLocale);
+      if (!profile) return;
+
+      await this.attendance.setLocale(profile, requestedLocale);
+      await this.telegram.sendMessage(
+        message.chat.id,
+        `${getLocale(requestedLocale).languageChanged}\n\n${getLocale(requestedLocale).help}`,
+        keyboard(requestedLocale),
+        message.message_id,
+      );
+      return;
+    }
+
     const syntheticMessage: TelegramMessage = {
       message_id: message.message_id,
       chat: message.chat,
