@@ -104,10 +104,10 @@
     background: 70
   };
 
-  var BACKGROUND_EFFECTS = ["none","dollar","coins","dragon","hacker"];
+  var BACKGROUND_EFFECTS = ["none","dollar","coins","hacker"];
   var BACKGROUND_EFFECT_INTENSITIES = ["low","medium","high"];
   var backgroundEffectEngine = {
-    canvas: null, ctx: null, dragon: null, width: 0, height: 0, mode: "none", intensity: "medium",
+    canvas: null, ctx: null, width: 0, height: 0, mode: "none", intensity: "medium",
     particles: [], columns: [], raf: 0, lastFrame: 0, running: false, initialized: false, resizeTimer: null,
     reducedMotion: Boolean(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches)
   };
@@ -257,29 +257,6 @@
     c.shadowBlur = 0;
     c.textAlign = "start";
   }
-  function updateDragon(now) {
-    if (!backgroundEffectEngine.dragon) return;
-    var speed = { low: .000010, medium: .000014, high: .000019 }[backgroundEffectEngine.intensity] || .000014;
-    var t = now * speed;
-    var width = backgroundEffectEngine.width;
-    var height = backgroundEffectEngine.height;
-
-    // Slow patrol loop: broad horizontal travel + softer vertical breathing motion.
-    var x = width * .50 + Math.cos(t) * width * .36 + Math.sin(t * .47) * width * .06;
-    var y = height * .49 + Math.sin(t * 1.12) * height * .17 + Math.sin(t * .53) * height * .045;
-
-    // Give the creature a little "flight" feeling: bank into turns and change size with depth.
-    var velocityX = -Math.sin(t) * .36 - Math.cos(t * .47) * .028;
-    var velocityY = Math.cos(t * 1.12) * .19 + Math.cos(t * .53) * .024;
-    var rotation = velocityX * -9 + velocityY * 4;
-    var depth = (Math.sin(t * .82) + 1) * .5;
-    var baseScale = width < 560 ? .78 : .92;
-    var scale = baseScale + depth * .12;
-
-    backgroundEffectEngine.dragon.style.transform =
-      "translate3d(" + x.toFixed(1) + "px," + y.toFixed(1) + "px,0) translate(-50%,-50%) rotate(" +
-      rotation.toFixed(2) + "deg) scale(" + scale.toFixed(3) + ")";
-  }
   function renderBackgroundEffect(now) {
     if (!backgroundEffectEngine.ctx) return;
     var c = backgroundEffectEngine.ctx;
@@ -308,7 +285,6 @@
   function backgroundEffectLoop(now) {
     if (!backgroundEffectEngine.running) return;
     renderBackgroundEffect(now);
-    if (backgroundEffectEngine.mode === "dragon") updateDragon(now);
     backgroundEffectEngine.raf = window.requestAnimationFrame(backgroundEffectLoop);
   }
   function stopBackgroundEffectLoop() {
@@ -326,7 +302,6 @@
       backgroundEffectEngine.ctx.clearRect(0, 0, backgroundEffectEngine.width, backgroundEffectEngine.height);
     }
     resetEffectParticles(true);
-    if (backgroundEffectEngine.mode === "dragon") updateDragon(backgroundEffectEngine.lastFrame);
     backgroundEffectEngine.raf = window.requestAnimationFrame(backgroundEffectLoop);
   }
   function syncBackgroundEffectEngine() {
@@ -338,8 +313,7 @@
     document.documentElement.setAttribute("data-background-effect", mode);
     document.documentElement.setAttribute("data-background-effect-intensity", intensity);
     if (els["appearance-effects"]) els["appearance-effects"].hidden = !canAnimate;
-    if (els["appearance-dragon"]) els["appearance-dragon"].hidden = !(canAnimate && mode === "dragon");
-    if (els["appearance-effects-canvas"]) els["appearance-effects-canvas"].hidden = !(canAnimate && mode !== "dragon");
+    if (els["appearance-effects-canvas"]) els["appearance-effects-canvas"].hidden = !canAnimate;
     if (!canAnimate) {
       stopBackgroundEffectLoop();
       if (backgroundEffectEngine.ctx) {
@@ -355,7 +329,6 @@
     if (backgroundEffectEngine.initialized) return;
     backgroundEffectEngine.canvas = els["appearance-effects-canvas"];
     backgroundEffectEngine.ctx = backgroundEffectEngine.canvas && backgroundEffectEngine.canvas.getContext ? backgroundEffectEngine.canvas.getContext("2d") : null;
-    backgroundEffectEngine.dragon = els["appearance-dragon"];
     backgroundEffectEngine.initialized = true;
     resizeBackgroundEffects();
     window.addEventListener("resize", function () {
@@ -397,7 +370,6 @@
     if (els["appearance-background-effect-status"]) {
       var label = effect === "dollar" ? text("backgroundEffectDollar")
         : effect === "coins" ? text("backgroundEffectCoins")
-        : effect === "dragon" ? text("backgroundEffectDragon")
         : effect === "hacker" ? text("backgroundEffectHacker") : "";
       els["appearance-background-effect-status"].textContent =
         effect === "none" ? text("backgroundEffectStatusNone") : text("backgroundEffectStatusActive") + " • " + label;
@@ -549,8 +521,6 @@
       backgroundEffectDollarSub: "Falling currency",
       backgroundEffectCoins: "Gold Coins",
       backgroundEffectCoinsSub: "Falling gold coins",
-      backgroundEffectDragon: "Chinese Dragon",
-      backgroundEffectDragonSub: "Floating dragon",
       backgroundEffectHacker: "Hacker Stream",
       backgroundEffectHackerSub: "Falling terminal code",
       backgroundEffectIntensity: "Effect Intensity",
@@ -887,8 +857,6 @@
       backgroundEffectDollarSub: "ဒေါ်လာများ ကျဆင်းမည်",
       backgroundEffectCoins: "ရွှေဒင်္ဂါးများ",
       backgroundEffectCoinsSub: "ရွှေဒင်္ဂါးများ ကျဆင်းမည်",
-      backgroundEffectDragon: "တရုတ် နဂါး",
-      backgroundEffectDragonSub: "နဂါး ပေါ့ပါးစွာ လှည့်လည်မည်",
       backgroundEffectHacker: "Hacker စာတန်းများ",
       backgroundEffectHackerSub: "Terminal code စာတန်းများ ကျဆင်းမည်",
       backgroundEffectIntensity: "Effect အား",
@@ -1224,8 +1192,6 @@
       backgroundEffectDollarSub: "美元从上方落下",
       backgroundEffectCoins: "金币雨",
       backgroundEffectCoinsSub: "金币从上方落下",
-      backgroundEffectDragon: "中国龙",
-      backgroundEffectDragonSub: "中国龙环绕移动",
       backgroundEffectHacker: "黑客代码流",
       backgroundEffectHackerSub: "终端代码从上方落下",
       backgroundEffectIntensity: "效果强度",
@@ -1504,12 +1470,11 @@
       "user-appearance-wallpaper-ocean","user-appearance-wallpaper-violet","user-appearance-wallpaper-custom",
       "appearance-wallpaper-custom-preview","appearance-wallpaper-file","appearance-wallpaper-upload",
       "appearance-wallpaper-remove","appearance-wallpaper-status",
-      "appearance-effects","appearance-effects-canvas","appearance-dragon",
+      "appearance-effects","appearance-effects-canvas",
       "user-appearance-effects-title","user-appearance-effects-sub",
       "user-background-effect-none","user-background-effect-none-sub",
       "user-background-effect-dollar","user-background-effect-dollar-sub",
       "user-background-effect-coins","user-background-effect-coins-sub",
-      "user-background-effect-dragon","user-background-effect-dragon-sub",
       "user-background-effect-hacker","user-background-effect-hacker-sub",
       "user-appearance-effects-intensity","user-appearance-effects-intensity-sub",
       "user-background-intensity-low","user-background-intensity-medium","user-background-intensity-high",
@@ -2502,8 +2467,6 @@
     els["user-background-effect-dollar-sub"].textContent = text("backgroundEffectDollarSub");
     els["user-background-effect-coins"].textContent = text("backgroundEffectCoins");
     els["user-background-effect-coins-sub"].textContent = text("backgroundEffectCoinsSub");
-    els["user-background-effect-dragon"].textContent = text("backgroundEffectDragon");
-    els["user-background-effect-dragon-sub"].textContent = text("backgroundEffectDragonSub");
     els["user-background-effect-hacker"].textContent = text("backgroundEffectHacker");
     els["user-background-effect-hacker-sub"].textContent = text("backgroundEffectHackerSub");
     els["user-appearance-effects-intensity"].textContent = text("backgroundEffectIntensity");
@@ -4668,6 +4631,7 @@ function populateConnectSelect(select, groups, preferredId) {
     state.customWallpaper = getStoredCustomWallpaper();
 
     var storedBackgroundEffect = readStorage(STORAGE_KEYS.backgroundEffect);
+    if (storedBackgroundEffect === "dragon") removeStorage(STORAGE_KEYS.backgroundEffect);
     state.backgroundEffect = BACKGROUND_EFFECTS.indexOf(storedBackgroundEffect) >= 0 ? storedBackgroundEffect : "none";
 
     var storedBackgroundEffectIntensity = readStorage(STORAGE_KEYS.backgroundEffectIntensity);
