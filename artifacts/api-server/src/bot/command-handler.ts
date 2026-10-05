@@ -74,12 +74,7 @@ const keyboard = (locale: Locale): ReplyKeyboardMarkup => {
     resize_keyboard: true,
     is_persistent: true,
     one_time_keyboard: false,
-    input_field_placeholder:
-      locale === "en"
-        ? "Tap a button to check in"
-        : locale === "mm"
-          ? "Check-in လုပ်ရန် button ကိုနှိပ်ပါ"
-          : "请直接点击按钮打卡",
+    input_field_placeholder: text.inputFieldPlaceholder,
   };
 };
 
@@ -101,29 +96,14 @@ const buttonCommand = (value: string): Command | undefined => {
   return name ? { name } : undefined;
 };
 
-export const DEFAULT_MENU_COMMANDS = [
-  { command: "start", description: "开始 / Start" },
-  { command: "work", description: "上班 / Start work" },
-  { command: "back", description: "回座 / Return to seat" },
-  { command: "eat", description: "吃饭 / Meal break" },
-  { command: "wc", description: "上厕所 / Toilet" },
-  { command: "smoke", description: "抽烟 / Smoke break" },
-  { command: "wcd", description: "WCD" },
-  { command: "offwork", description: "下班 / End work" },
-  { command: "help", description: "帮助 / Help" },
-  { command: "lang", description: "语言 / Language" },
-];
+export const getCommandMenu = (
+  locale: Locale,
+  isAdmin: boolean,
+): Array<{ command: string; description: string }> =>
+  isAdmin ? getLocale(locale).commandMenu.admin : getLocale(locale).commandMenu.user;
 
-export const ADMIN_MENU_COMMANDS = [
-  { command: "start", description: "开始 / Start" },
-  { command: "limit", description: "Set activity time limits" },
-  { command: "limits", description: "View activity time limits" },
-  { command: "countlimit", description: "Set daily activity count limits" },
-  { command: "countlimits", description: "View daily activity count limits" },
-  { command: "reminder", description: "Turn overdue reminders on/off" },
-  { command: "reminders", description: "View overdue reminder status" },
-  { command: "stats", description: "View bot statistics" },
-];
+export const DEFAULT_MENU_COMMANDS = getCommandMenu("en", false);
+export const ADMIN_MENU_COMMANDS = getCommandMenu("en", true);
 
 export class CommandHandler {
   private readonly adminMenuScopes = new Set<string>();
@@ -268,14 +248,10 @@ export class CommandHandler {
       const profile = profileFromUser(message, requestedLocale);
       if (!profile) return;
       await this.attendance.setLocale(profile, requestedLocale);
-      await this.ensurePrivateMenuButton(
-        message.chat.id,
+      await this.ensureAdminCommandMenu(
+        message,
         profile.userId,
         requestedLocale,
-        this.config.botOwnerId === profile.userId ||
-            this.config.adminIds.includes(profile.userId)
-          ? this.config.adminMiniAppUrl
-          : this.config.userMiniAppUrl,
       );
 
       await this.telegram.sendMessage(
@@ -305,9 +281,7 @@ export class CommandHandler {
             rows.push([
               {
                 text:
-                  locale === "en"
-                    ? "➕ Add Bot to Your Group"
-                    : "➕ 将 Bot 添加到群组",
+                  text.telegramUi.addBotToGroupButton,
                 style: "primary",
                 url: `https://t.me/${botUsername}?startgroup=attendance`,
               },
@@ -342,9 +316,7 @@ export class CommandHandler {
             [
               {
                 text:
-                  locale === "en"
-                    ? "⚙️ Open Admin Panel"
-                    : "⚙️ 打开管理面板",
+                  text.telegramUi.adminMenuButton,
                 style: "primary",
                 web_app: { url: this.config.adminMiniAppUrl },
               },
@@ -477,12 +449,8 @@ export class CommandHandler {
       await this.telegram.sendMessage(
         message.chat.id,
         isGroupPanel
-          ? locale === "en"
-            ? "Open the Group Admin Panel:"
-            : "打开群组管理面板："
-          : locale === "en"
-            ? "Add the bot to a group to use activity tracking with your team:"
-            : "团队需要使用活动打卡功能？请先将 Bot 添加到群组：",
+          ? text.telegramUi.groupAdminPanelPrompt
+          : text.telegramUi.addBotToGroupPrompt,
         addGroupMarkup,
       );
     }
@@ -552,9 +520,10 @@ export class CommandHandler {
       );
     }
 
+    const text = getLocale(locale);
     const commands = isConfiguredAdmin
-      ? ADMIN_MENU_COMMANDS
-      : DEFAULT_MENU_COMMANDS;
+      ? text.commandMenu.admin
+      : text.commandMenu.user;
 
     const scope =
       message.chat.type === "private"
@@ -602,12 +571,8 @@ export class CommandHandler {
         await this.telegram.setChatMenuButton(chatId, {
           type: "web_app",
           text: isConfiguredAdmin
-            ? locale === "en"
-              ? "⚙️ Admin Panel"
-              : "⚙️ 打开管理面板"
-            : locale === "en"
-              ? "📊 My Dashboard"
-              : "📊 我的面板",
+            ? getLocale(locale).telegramUi.adminMenuButton
+            : getLocale(locale).telegramUi.userMenuButton,
           web_app: { url: miniAppUrl },
         });
       } else {
@@ -639,10 +604,7 @@ export class CommandHandler {
       inline_keyboard: [
         [
           {
-            text:
-              locale === "en"
-                ? "⚙️ Open Group Admin Panel"
-                : "⚙️ 打开群组管理面板",
+            text: text.telegramUi.openGroupAdminPanelButton,
             style: "primary",
             url,
           },
@@ -844,14 +806,10 @@ export class CommandHandler {
       if (!profile) return;
 
       await this.attendance.setLocale(profile, requestedLocale);
-      await this.ensurePrivateMenuButton(
-        message.chat.id,
+      await this.ensureAdminCommandMenu(
+        message,
         profile.userId,
         requestedLocale,
-        this.config.botOwnerId === profile.userId ||
-            this.config.adminIds.includes(profile.userId)
-          ? this.config.adminMiniAppUrl
-          : this.config.userMiniAppUrl,
       );
 
       await this.telegram.sendMessage(
