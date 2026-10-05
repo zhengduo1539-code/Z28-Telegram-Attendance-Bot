@@ -26,6 +26,13 @@
     connectLoading: false,
     connectSaving: false,
     connectRequestId: 0,
+    replyEditorData: null,
+    replyOriginalSnapshot: "",
+    replyLocale: "en",
+    replyRequestId: 0,
+    replyLoading: false,
+    replySaving: false,
+    replyDirty: false,
     connectGuideVisible: true,
     appearanceOpen: false,
     onboardingVisible: true,
@@ -179,6 +186,44 @@
       toolsCategoryKicker: "GROUP MANAGEMENT",
       toolsCategoryTitle: "Group tools",
       toolsCategorySub: "Tools that configure how Z28 connects and works across your groups.",
+      replyMessagesKicker: "ACTIVITY RESPONSES",
+      replyMessagesTitle: "Activity Reply Messages",
+      replyMessagesSub: "Customize the bot's activity replies for this group only.",
+      replyMessagesGroupLabel: "Editing Group",
+      replyMessagesNote: "Only this selected group is affected. Other groups keep their own messages.",
+      replyMessagesLanguageTitle: "Bot Reply Language",
+      replyMessagesLanguageSub: "The bot uses the selected member's language for these replies.",
+      replyCustomBadge: "CUSTOM",
+      replySave: "Save Changes",
+      replyDiscard: "Discard Changes",
+      replyResetLanguage: "Reset Language to Default",
+      replySaving: "Saving…",
+      replySaved: "Activity reply messages saved for this group.",
+      replyDefaultActive: "Default replies are active for this group.",
+      replyCustomActive: "Custom replies are active for this group.",
+      replyUnsaved: "Unsaved activity reply changes.",
+      replyLoadFailed: "Unable to load activity reply messages.",
+      replySaveFailed: "Nothing was saved. Your changes are still here; please try again.",
+      replyPlainTextOnly: "Plain text only. Telegram formatting is disabled for custom replies.",
+      replyVariables: "Available variables",
+      replyInsertVariable: "Insert",
+      replyReset: "Reset",
+      replyConfirmDiscard: "Unsaved activity reply changes will be discarded. Continue?",
+      replyResetConfirm: "Reset all messages in this language to the default templates?",
+      replyNoActiveTitle: "No Active Activity",
+      replyNoActiveSub: "Sent when a member uses Back without an active activity.",
+      replyAlreadyActiveTitle: "Already Active",
+      replyAlreadyActiveSub: "Sent when a member starts another activity while one is already active.",
+      replyStartedTitle: "Activity Started",
+      replyStartedSub: "Sent immediately after Eat, WC, Smoke, or WCD starts successfully.",
+      replySettledTitle: "Activity Settled",
+      replySettledSub: "Sent when an activity is completed with Back to Seat.",
+      replyDailyCountTitle: "Daily Count Limit",
+      replyDailyCountSub: "Sent when the group limit for that activity has been reached.",
+      replyTimeoutReminderTitle: "Timeout Reminder",
+      replyTimeoutReminderSub: "Sent when an active activity passes its allowed time.",
+      replyTimeoutNotificationTitle: "Group Timeout Notification",
+      replyTimeoutNotificationSub: "Sent to the connected Target Group when a Source Group activity times out.",
       wallpaperSub: "Choose a preset or use an image from this device.",
       wallpaperDefault: "Default",
       wallpaperAurora: "Aurora",
@@ -449,6 +494,44 @@
       toolsCategoryKicker: "GROUP MANAGEMENT",
       toolsCategoryTitle: "Group Tools",
       toolsCategorySub: "Z28 ၏ group ချိတ်ဆက်မှုနှင့် group အလိုက်လုပ်ဆောင်ချက်များကို စီမံရန် tools များ။",
+      replyMessagesKicker: "ACTIVITY RESPONSES",
+      replyMessagesTitle: "Activity Reply Messages",
+      replyMessagesSub: "ဤ group အတွက်သာ bot ရဲ့ activity reply စာသားတွေကို စိတ်ကြိုက်ပြင်နိုင်ပါသည်။",
+      replyMessagesGroupLabel: "ပြင်ဆင်နေသော Group",
+      replyMessagesNote: "ရွေးထားသော ဤ group တစ်ခုတည်းကိုသာ သက်ရောက်ပါမည်။ အခြား group များက မိမိတို့၏စာသားအတိုင်း ဆက်ရှိပါမည်။",
+      replyMessagesLanguageTitle: "Bot Reply Language",
+      replyMessagesLanguageSub: "Member တစ်ဦး၏ bot language အလိုက် reply စာသားကို အသုံးပြုပါမည်။",
+      replyCustomBadge: "CUSTOM",
+      replySave: "ပြောင်းလဲချက်များ သိမ်းမည်",
+      replyDiscard: "မသိမ်းရသေးတာ ဖျက်မည်",
+      replyResetLanguage: "ဒီ Language ကို Default ပြန်ထားမည်",
+      replySaving: "သိမ်းနေပါသည်…",
+      replySaved: "ဤ group အတွက် activity reply စာသားများကို သိမ်းပြီးပါပြီ။",
+      replyDefaultActive: "ဤ group တွင် Default reply စာသားများကို အသုံးပြုနေပါသည်။",
+      replyCustomActive: "ဤ group တွင် စိတ်ကြိုက် reply စာသားများကို အသုံးပြုနေပါသည်။",
+      replyUnsaved: "မသိမ်းရသေးသော activity reply ပြောင်းလဲချက်များ ရှိပါသည်။",
+      replyLoadFailed: "Activity reply စာသားများကို မဖတ်နိုင်ပါ။",
+      replySaveFailed: "ဘာမျှ မသိမ်းရသေးပါ။ ပြင်ဆင်ထားသည်များကို ထားရှိပြီး ထပ်မံကြိုးစားပါ။",
+      replyPlainTextOnly: "Plain text သာ အသုံးပြုနိုင်ပါသည်။ Custom reply များတွင် Telegram formatting ကို ပိတ်ထားပါသည်။",
+      replyVariables: "အသုံးပြုနိုင်သော variables",
+      replyInsertVariable: "ထည့်မည်",
+      replyReset: "Reset",
+      replyConfirmDiscard: "မသိမ်းရသေးသော activity reply ပြောင်းလဲချက်များ ပျက်သွားပါမည်။ ဆက်လုပ်မလား?",
+      replyResetConfirm: "ဒီ language ထဲက message အားလုံးကို Default template သို့ ပြန်ထားမလား?",
+      replyNoActiveTitle: "Active Activity မရှိပါ",
+      replyNoActiveSub: "Active activity မရှိဘဲ Back နှိပ်သည့်အခါ ပို့မည့်စာသား။",
+      replyAlreadyActiveTitle: "Activity ရှိနေပြီးသား",
+      replyAlreadyActiveSub: "Activity တစ်ခုလုပ်နေစဉ် နောက်ထပ် activity စသည့်အခါ ပို့မည့်စာသား။",
+      replyStartedTitle: "Activity စတင်ပြီး",
+      replyStartedSub: "Eat, WC, Smoke သို့မဟုတ် WCD အောင်မြင်စွာ စတင်ပြီးချိန်တွင် ပို့မည့်စာသား။",
+      replySettledTitle: "Activity ပြီးဆုံးပြီး",
+      replySettledSub: "Back to Seat ဖြင့် activity ပြီးဆုံးသည့်အခါ ပို့မည့်စာသား။",
+      replyDailyCountTitle: "Daily Count Limit",
+      replyDailyCountSub: "ထို activity ၏ ဒီနေ့အသုံးပြုခွင့် အကြိမ်ရေ limit ပြည့်သည့်အခါ ပို့မည့်စာသား။",
+      replyTimeoutReminderTitle: "Timeout Reminder",
+      replyTimeoutReminderSub: "Activity သတ်မှတ်ချိန်ကျော်သွားသည့်အခါ member ထံ ပို့မည့်စာသား။",
+      replyTimeoutNotificationTitle: "Group Timeout Notification",
+      replyTimeoutNotificationSub: "Source Group activity timeout ဖြစ်သည့်အခါ ချိတ်ထားသော Target Group သို့ ပို့မည့်စာသား။",
       wallpaperSub: "Preset တစ်ခုရွေးပါ သို့မဟုတ် ဤစက်ထဲက image တစ်ပုံကို သုံးပါ။",
       wallpaperDefault: "Default",
       wallpaperAurora: "Aurora",
@@ -718,6 +801,44 @@
       toolsCategoryKicker: "群组管理",
       toolsCategoryTitle: "群组工具",
       toolsCategorySub: "管理 Z28 在不同群组之间的连接和相关功能。",
+      replyMessagesKicker: "活动回复",
+      replyMessagesTitle: "活动回复消息",
+      replyMessagesSub: "仅为当前群组自定义 Bot 的活动回复消息。",
+      replyMessagesGroupLabel: "正在编辑的群组",
+      replyMessagesNote: "仅影响当前选中的群组。其他群组保留各自的消息。",
+      replyMessagesLanguageTitle: "Bot 回复语言",
+      replyMessagesLanguageSub: "Bot 会根据成员选择的语言发送对应回复。",
+      replyCustomBadge: "自定义",
+      replySave: "保存更改",
+      replyDiscard: "放弃更改",
+      replyResetLanguage: "恢复当前语言默认模板",
+      replySaving: "保存中…",
+      replySaved: "此群组的活动回复消息已保存。",
+      replyDefaultActive: "此群组正在使用默认回复消息。",
+      replyCustomActive: "此群组正在使用自定义回复消息。",
+      replyUnsaved: "有未保存的活动回复更改。",
+      replyLoadFailed: "无法加载活动回复消息。",
+      replySaveFailed: "未保存任何更改。当前编辑内容仍然保留，请重试。",
+      replyPlainTextOnly: "仅支持纯文本。自定义回复中会禁用 Telegram 格式化。",
+      replyVariables: "可用变量",
+      replyInsertVariable: "插入",
+      replyReset: "重置",
+      replyConfirmDiscard: "未保存的活动回复更改将被丢弃。是否继续？",
+      replyResetConfirm: "将此语言中的所有消息恢复为默认模板？",
+      replyNoActiveTitle: "没有进行中的活动",
+      replyNoActiveSub: "成员没有进行中的活动却使用返回座位时发送。",
+      replyAlreadyActiveTitle: "已有进行中的活动",
+      replyAlreadyActiveSub: "成员已有活动时再次开始其他活动时发送。",
+      replyStartedTitle: "活动开始",
+      replyStartedSub: "Eat、WC、Smoke 或 WCD 成功开始后发送。",
+      replySettledTitle: "活动结算",
+      replySettledSub: "成员使用返回座位完成活动后发送。",
+      replyDailyCountTitle: "每日次数上限",
+      replyDailyCountSub: "该活动达到群组每日次数上限时发送。",
+      replyTimeoutReminderTitle: "超时提醒",
+      replyTimeoutReminderSub: "进行中的活动超过允许时间时发送给成员。",
+      replyTimeoutNotificationTitle: "群组超时通知",
+      replyTimeoutNotificationSub: "源群组活动超时后发送到已连接的目标群组。",
       wallpaperSub: "选择预设，或使用此设备中的图片。",
       wallpaperDefault: "默认",
       wallpaperAurora: "极光",
@@ -934,6 +1055,12 @@
       "user-connect-target-label","user-connect-target-sub","user-connect-target",
       "user-connect-note","user-connect-submit","user-connect-status-title","user-connect-status-value",
       "user-connect-status-meta","user-connect-change",
+      "user-reply-messages-kicker","user-reply-messages-title","user-reply-messages-sub",
+      "user-reply-messages-group-label","user-reply-messages-group","user-reply-messages-role",
+      "user-reply-messages-note","user-reply-messages-language-title","user-reply-messages-language-sub",
+      "user-reply-locale-en","user-reply-locale-zh","user-reply-messages-list",
+      "user-reply-save","user-reply-discard","user-reply-reset-language",
+      "user-reply-messages-status","user-reply-status-dot","user-reply-status-text",
       "user-connect-guide-kicker","user-connect-guide-title","user-connect-guide-sub",
       "user-connect-guide-step1-title","user-connect-guide-step1-copy",
       "user-connect-guide-step2-title","user-connect-guide-step2-copy",
@@ -1830,6 +1957,22 @@
     els["user-tools-category-kicker"].textContent = text("toolsCategoryKicker");
     els["user-tools-category-title"].textContent = text("toolsCategoryTitle");
     els["user-tools-category-sub"].textContent = text("toolsCategorySub");
+    els["user-reply-messages-kicker"].textContent = text("replyMessagesKicker");
+    els["user-reply-messages-title"].textContent = text("replyMessagesTitle");
+    els["user-reply-messages-sub"].textContent = text("replyMessagesSub");
+    els["user-reply-messages-group-label"].textContent = text("replyMessagesGroupLabel");
+    els["user-reply-messages-note"].textContent = text("replyMessagesNote");
+    els["user-reply-messages-language-title"].textContent = text("replyMessagesLanguageTitle");
+    els["user-reply-messages-language-sub"].textContent = text("replyMessagesLanguageSub");
+    els["user-reply-locale-en"].textContent = "English";
+    els["user-reply-locale-zh"].textContent = "中文";
+    var replySaveLabel = els["user-reply-save"].querySelector(".button-label");
+    var replyDiscardLabel = els["user-reply-discard"].querySelector(".button-label");
+    var replyResetLanguageLabel = els["user-reply-reset-language"].querySelector(".button-label");
+    if (replySaveLabel) replySaveLabel.textContent = state.replySaving ? text("replySaving") : text("replySave");
+    if (replyDiscardLabel) replyDiscardLabel.textContent = text("replyDiscard");
+    if (replyResetLanguageLabel) replyResetLanguageLabel.textContent = text("replyResetLanguage");
+    if (state.replyEditorData && state.toolsOpen) renderActivityReplyEditor();
     els["user-connect-title"].textContent = text("connectTitle");
     els["user-connect-sub"].textContent = text("connectSub");
     els["user-connect-source-label"].textContent = text("connectSource");
@@ -2506,7 +2649,42 @@
     );
   }
 
-  async function apiUserSettings(groupId, type, kind, value) {
+  async function apiUserActivityReplies(groupId) {
+     if (!initData) throw new Error("Telegram session data is missing.");
+     return fetchJson(
+       "/api/user/activity-replies?groupId=" + encodeURIComponent(String(groupId)),
+       {
+         method: "GET",
+         headers: {
+           "X-Telegram-Init-Data": initData,
+           "Accept": "application/json"
+         }
+       },
+       "Activity Reply Messages"
+     );
+   }
+
+   async function apiUserActivityRepliesSave(groupId, messages) {
+     if (!initData) throw new Error("Telegram session data is missing.");
+     return fetchJson(
+       "/api/user/activity-replies",
+       {
+         method: "PUT",
+         headers: {
+           "X-Telegram-Init-Data": initData,
+           "Accept": "application/json",
+           "Content-Type": "application/json"
+         },
+         body: JSON.stringify({
+           groupId: Number(groupId),
+           messages: messages
+         })
+       },
+       "Activity Reply Messages"
+     );
+   }
+
+   async function apiUserSettings(groupId, type, kind, value) {
     if (!initData) throw new Error("Telegram session data is missing.");
     return fetchJson(
       "/api/user/settings",
@@ -2725,7 +2903,313 @@
     }) || null;
   }
 
-  function populateConnectSelect(select, groups, preferredId) {
+  function activityReplyKeys() {
+    return [
+      "noActive",
+      "alreadyActive",
+      "started",
+      "settled",
+      "dailyCountLimitReached",
+      "timeoutReminder",
+      "groupTimeoutNotification"
+    ];
+  }
+
+  function activityReplyLabelSet() {
+    return {
+      noActive: { title: text("replyNoActiveTitle"), sub: text("replyNoActiveSub") },
+      alreadyActive: { title: text("replyAlreadyActiveTitle"), sub: text("replyAlreadyActiveSub") },
+      started: { title: text("replyStartedTitle"), sub: text("replyStartedSub") },
+      settled: { title: text("replySettledTitle"), sub: text("replySettledSub") },
+      dailyCountLimitReached: { title: text("replyDailyCountTitle"), sub: text("replyDailyCountSub") },
+      timeoutReminder: { title: text("replyTimeoutReminderTitle"), sub: text("replyTimeoutReminderSub") },
+      groupTimeoutNotification: { title: text("replyTimeoutNotificationTitle"), sub: text("replyTimeoutNotificationSub") }
+    };
+  }
+
+  function replySnapshot(data) {
+    if (!data) return "";
+    var output = {};
+    ["en", "zh"].forEach(function (locale) {
+      output[locale] = {};
+      activityReplyKeys().forEach(function (key) {
+        var item = data[locale] && data[locale][key];
+        output[locale][key] = item ? String(item.value || "") : "";
+      });
+    });
+    return JSON.stringify(output);
+  }
+
+  function updateActivityReplyState() {
+    var clean = Boolean(
+      state.replyEditorData &&
+      state.replyOriginalSnapshot === replySnapshot(state.replyEditorData)
+    );
+    state.replyDirty = !clean;
+    if (els["user-reply-save"]) els["user-reply-save"].disabled =
+      !state.replyEditorData || state.replyLoading || state.replySaving || !state.replyDirty;
+    if (els["user-reply-discard"]) els["user-reply-discard"].disabled =
+      !state.replyEditorData || state.replyLoading || state.replySaving || !state.replyDirty;
+    if (els["user-reply-reset-language"]) els["user-reply-reset-language"].disabled =
+      !state.replyEditorData || state.replyLoading || state.replySaving;
+  }
+
+  function setActivityReplyStatus(kind, message) {
+    if (!els["user-reply-status-text"] || !els["user-reply-status-dot"]) return;
+    els["user-reply-status-text"].textContent = message;
+    els["user-reply-status-dot"].classList.toggle("is-dirty", kind === "dirty");
+    els["user-reply-status-dot"].classList.toggle("is-saved", kind === "saved");
+    els["user-reply-status-dot"].classList.toggle("is-error", kind === "error");
+  }
+
+  function renderActivityReplyEditor() {
+    if (!els["user-reply-messages-list"] || !state.replyEditorData) return;
+    var locale = state.replyLocale === "zh" ? "zh" : "en";
+    var labels = activityReplyLabelSet();
+    var localeData = state.replyEditorData[locale] || {};
+    var keys = activityReplyKeys();
+    var group = state.dashboard && state.dashboard.selectedGroup;
+
+    if (els["user-reply-messages-group"]) {
+      els["user-reply-messages-group"].textContent = group
+        ? (group.title || String(group.id))
+        : "—";
+    }
+    if (els["user-reply-messages-role"]) {
+      els["user-reply-messages-role"].textContent =
+        group && group.memberStatus === "creator" ? "OWNER" : "ADMIN";
+    }
+
+    [["user-reply-locale-en", "en"], ["user-reply-locale-zh", "zh"]].forEach(function (entry) {
+      var button = els[entry[0]];
+      if (!button) return;
+      var active = locale === entry[1];
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-selected", String(active));
+      button.disabled = state.replyLoading || state.replySaving;
+    });
+
+    els["user-reply-messages-list"].innerHTML = keys.map(function (key, index) {
+      var item = localeData[key];
+      if (!item) return "";
+      var variableHtml = (item.variables || []).map(function (variable) {
+        var token = "{" + variable + "}";
+        return '<button type="button" class="reply-variable-chip" data-reply-variable="' +
+          escapeHtml(token) + '" aria-label="' +
+          escapeHtml(text("replyInsertVariable") + " " + token) + '">' +
+          escapeHtml(token) + '</button>';
+      }).join("");
+      var customBadge = item.value !== item.defaultValue
+        ? '<span class="reply-custom-badge">' + escapeHtml(text("replyCustomBadge")) + '</span>'
+        : "";
+      return '<article class="reply-message-editor" data-reply-key="' + escapeHtml(key) + '">' +
+        '<div class="reply-message-editor-head">' +
+          '<div class="reply-message-editor-index">' + String(index + 1).padStart(2, "0") + '</div>' +
+          '<div class="reply-message-editor-copy">' +
+            '<div class="reply-message-editor-title-row"><h4>' + escapeHtml(labels[key].title) + '</h4>' +
+              customBadge + '</div>' +
+            '<p>' + escapeHtml(labels[key].sub) + '</p>' +
+          '</div>' +
+          '<button type="button" class="secondary-button reply-reset-button" data-reply-reset="' + escapeHtml(key) + '">' +
+            '<span class="button-label">' + escapeHtml(text("replyReset")) + '</span>' +
+          '</button>' +
+        '</div>' +
+        '<textarea class="reply-message-textarea" data-reply-input="' + escapeHtml(key) + '" maxlength="1200" spellcheck="false">' +
+          escapeHtml(item.value) +
+        '</textarea>' +
+        '<div class="reply-message-meta"><span>' + escapeHtml(text("replyPlainTextOnly")) + '</span>' +
+          '<span class="reply-character-count" data-reply-count="' + escapeHtml(key) + '">' +
+            String(item.value.length) + ' / 1200</span>' +
+        '</div>' +
+        '<div class="reply-variable-row"><span class="reply-variable-label">' +
+          escapeHtml(text("replyVariables")) + '</span><div class="reply-variable-chips">' +
+          variableHtml + '</div></div>' +
+      '</article>';
+    }).join("");
+
+    els["user-reply-messages-list"].querySelectorAll("[data-reply-input]").forEach(function (input) {
+      input.oninput = function () {
+        var key = input.getAttribute("data-reply-input");
+        var item = state.replyEditorData[locale] && state.replyEditorData[locale][key];
+        if (!key || !item) return;
+        item.value = input.value;
+        item.customized = input.value.trim() !== item.defaultValue.trim();
+
+        var count = els["user-reply-messages-list"].querySelector(
+          '[data-reply-count="' + key + '"]'
+        );
+        if (count) count.textContent = String(input.value.length) + " / 1200";
+
+        var card = input.closest(".reply-message-editor");
+        var titleRow = card && card.querySelector(".reply-message-editor-title-row");
+        var badge = card && card.querySelector(".reply-custom-badge");
+        if (badge) badge.hidden = !item.customized;
+        else if (item.customized && titleRow) {
+          titleRow.insertAdjacentHTML(
+            "beforeend",
+            '<span class="reply-custom-badge">' + escapeHtml(text("replyCustomBadge")) + '</span>'
+          );
+        }
+        updateActivityReplyState();
+        setActivityReplyStatus(
+          state.replyDirty ? "dirty" : "saved",
+          state.replyDirty ? text("replyUnsaved") : text("replyDefaultActive")
+        );
+      };
+    });
+
+    els["user-reply-messages-list"].querySelectorAll("[data-reply-reset]").forEach(function (button) {
+      button.onclick = function () {
+        var key = button.getAttribute("data-reply-reset");
+        var item = state.replyEditorData[locale] && state.replyEditorData[locale][key];
+        if (!item) return;
+        item.value = item.defaultValue;
+        item.customized = false;
+        renderActivityReplyEditor();
+        setActivityReplyStatus(
+          state.replyDirty ? "dirty" : "saved",
+          state.replyDirty ? text("replyUnsaved") : text("replyDefaultActive")
+        );
+      };
+    });
+
+    els["user-reply-messages-list"].querySelectorAll("[data-reply-variable]").forEach(function (button) {
+      button.onclick = function () {
+        var token = button.getAttribute("data-reply-variable");
+        var key = button.closest(".reply-message-editor")?.getAttribute("data-reply-key");
+        if (!token || !key) return;
+        var input = els["user-reply-messages-list"].querySelector(
+          '[data-reply-input="' + key + '"]'
+        );
+        var item = state.replyEditorData[locale] && state.replyEditorData[locale][key];
+        if (!input || !item) return;
+        var start = input.selectionStart || 0;
+        var end = input.selectionEnd || start;
+        var value = input.value;
+        input.value = value.slice(0, start) + token + value.slice(end);
+        input.focus();
+        input.selectionStart = input.selectionEnd = start + token.length;
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+      };
+    });
+
+    updateActivityReplyState();
+  }
+
+  async function loadActivityReplyMessages() {
+    if (!state.toolsOpen || !Number.isSafeInteger(state.selectedGroupId) || state.selectedGroupId >= 0) return;
+    var groupId = state.selectedGroupId;
+    var requestId = ++state.replyRequestId;
+    state.replyEditorData = null;
+    state.replyOriginalSnapshot = "";
+    state.replyDirty = false;
+    state.replyLoading = true;
+    updateActivityReplyState();
+
+    if (!state.replyEditorData) {
+      els["user-reply-messages-list"].innerHTML =
+        '<div class="reply-messages-loading">' + escapeHtml(text("refreshing")) + '</div>';
+    }
+
+    try {
+      var data = await apiUserActivityReplies(groupId);
+      if (requestId !== state.replyRequestId || !state.toolsOpen || state.selectedGroupId !== groupId) return;
+      if (!data || !data.messages || !data.messages.en || !data.messages.zh) {
+        throw new Error(text("replyLoadFailed"));
+      }
+      state.replyEditorData = data.messages;
+      state.replyLocale = state.replyLocale === "zh" ? "zh" : "en";
+      state.replyOriginalSnapshot = replySnapshot(state.replyEditorData);
+      state.replyDirty = false;
+      renderActivityReplyEditor();
+
+      var hasCustom = ["en", "zh"].some(function (locale) {
+        return state.replyEditorData[locale] &&
+          Object.values(state.replyEditorData[locale]).some(function (item) {
+            return item && item.customized;
+          });
+      });
+      setActivityReplyStatus("saved", hasCustom ? text("replyCustomActive") : text("replyDefaultActive"));
+    } catch (error) {
+      if (requestId !== state.replyRequestId || !state.toolsOpen) return;
+      setActivityReplyStatus("error", error && error.message ? error.message : text("replyLoadFailed"));
+    } finally {
+      if (requestId !== state.replyRequestId) return;
+      state.replyLoading = false;
+      updateActivityReplyState();
+      renderActivityReplyEditor();
+    }
+  }
+
+  async function saveActivityReplyMessages() {
+    if (
+      state.replySaving ||
+      state.replyLoading ||
+      !state.replyEditorData ||
+      !Number.isSafeInteger(state.selectedGroupId) ||
+      state.selectedGroupId >= 0 ||
+      !state.replyDirty
+    ) return;
+    var groupId = state.selectedGroupId;
+    var requestId = state.replyRequestId;
+    state.replySaving = true;
+    updateActivityReplyState();
+
+    var saveLabel = els["user-reply-save"]?.querySelector(".button-label");
+    if (saveLabel) saveLabel.textContent = text("replySaving");
+
+    var messages = { en: {}, zh: {} };
+    ["en", "zh"].forEach(function (locale) {
+      activityReplyKeys().forEach(function (key) {
+        var item = state.replyEditorData[locale] && state.replyEditorData[locale][key];
+        if (item) messages[locale][key] = item.value;
+      });
+    });
+
+    try {
+      var result = await apiUserActivityRepliesSave(groupId, messages);
+      if (requestId !== state.replyRequestId || !state.toolsOpen || state.selectedGroupId !== groupId) return;
+      if (!result || !result.messages) throw new Error(text("replySaveFailed"));
+      state.replyEditorData = result.messages;
+      state.replyOriginalSnapshot = replySnapshot(state.replyEditorData);
+      state.replyDirty = false;
+      renderActivityReplyEditor();
+      setActivityReplyStatus("saved", text("replySaved"));
+      showNotice(text("replySaved"), "ok");
+    } catch (error) {
+      if (requestId !== state.replyRequestId || !state.toolsOpen) return;
+      setActivityReplyStatus("error", error && error.message ? error.message : text("replySaveFailed"));
+      showNotice(error && error.message ? error.message : text("replySaveFailed"), "error");
+    } finally {
+      if (requestId !== state.replyRequestId) return;
+      state.replySaving = false;
+      updateActivityReplyState();
+      var label = els["user-reply-save"]?.querySelector(".button-label");
+      if (label) label.textContent = text("replySave");
+    }
+  }
+
+  function discardActivityReplyChanges() {
+    if (!state.replyDirty || state.replyLoading || state.replySaving) return;
+    if (!window.confirm(text("replyConfirmDiscard"))) return;
+    void loadActivityReplyMessages();
+  }
+
+  function resetActivityReplyLanguage() {
+    if (!state.replyEditorData || state.replyLoading || state.replySaving) return;
+    if (!window.confirm(text("replyResetConfirm"))) return;
+    var locale = state.replyLocale;
+    activityReplyKeys().forEach(function (key) {
+      var item = state.replyEditorData[locale] && state.replyEditorData[locale][key];
+      if (!item) return;
+      item.value = item.defaultValue;
+      item.customized = false;
+    });
+    renderActivityReplyEditor();
+    setActivityReplyStatus("dirty", text("replyUnsaved"));
+  }
+
+function populateConnectSelect(select, groups, preferredId) {
     if (!select) return;
     var current = String(preferredId || "");
     var safeGroups = Array.isArray(groups) ? groups : [];
@@ -3093,6 +3577,10 @@
     if (state.groupPickerOpen) return;
 
     tab = tab === "about" || tab === "support" || tab === "tools" || tab === "appearance" ? tab : "dashboard";
+    if (state.toolsOpen && tab !== "tools" && state.replyDirty) {
+      showNotice(text("replyUnsaved"), "error");
+      return;
+    }
     var wasToolsOpen = state.toolsOpen;
     state.aboutOpen = tab === "about";
     state.supportOpen = tab === "support";
@@ -3103,6 +3591,8 @@
       state.connectLoading = false;
       if (els["user-connect-source"]) els["user-connect-source"].removeAttribute("aria-busy");
       if (els["user-connect-target"]) els["user-connect-target"].removeAttribute("aria-busy");
+      ++state.replyRequestId;
+      state.replyLoading = false;
     }
     saveDashboardState({ tab: tab });
 
@@ -3137,6 +3627,7 @@
       els.identity.textContent = userGreeting();
       setDashboardControls(false);      updateConnectStatus();
       void loadConnectGroups();
+      void loadActivityReplyMessages();
     } else if (state.appearanceOpen) {
       els["user-selected-dashboard"].hidden = true;
       els["user-about-page"].hidden = true;
@@ -3166,6 +3657,7 @@
     });
 
     updateOnboardingVisibility();
+    if (state.toolsOpen && state.replyEditorData) renderActivityReplyEditor();
     updateBackButton();
   }
 
@@ -3325,6 +3817,22 @@
 
     els["user-report-message"].oninput = updateReportCharacterCount;
     els["user-report-form"].onsubmit = submitProblemReport;
+
+    if (els["user-reply-locale-en"] && els["user-reply-locale-zh"]) {
+      els["user-reply-locale-en"].onclick = function () {
+        if (state.replySaving || state.replyLoading) return;
+        state.replyLocale = "en";
+        renderActivityReplyEditor();
+      };
+      els["user-reply-locale-zh"].onclick = function () {
+        if (state.replySaving || state.replyLoading) return;
+        state.replyLocale = "zh";
+        renderActivityReplyEditor();
+      };
+      els["user-reply-save"].onclick = saveActivityReplyMessages;
+      els["user-reply-discard"].onclick = discardActivityReplyChanges;
+      els["user-reply-reset-language"].onclick = resetActivityReplyLanguage;
+    }
 
     if (els["user-connect-source"] && els["user-connect-target"]) {
       els["user-connect-source"].onchange = function () {

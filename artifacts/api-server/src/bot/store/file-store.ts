@@ -44,6 +44,8 @@ export const isBotState = (value: unknown): value is BotState => {
       isObjectRecord(candidate.groupActivityCountLimits)) &&
     (candidate.groupWarnings === undefined ||
       isObjectRecord(candidate.groupWarnings)) &&
+    (candidate.groupActivityReplyMessages === undefined ||
+      isObjectRecord(candidate.groupActivityReplyMessages)) &&
     (candidate.reminderEnabled === undefined ||
       typeof candidate.reminderEnabled === "boolean") &&
     (candidate.managedGroups === undefined ||

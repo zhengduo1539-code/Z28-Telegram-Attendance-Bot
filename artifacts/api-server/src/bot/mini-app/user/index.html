@@ -654,6 +654,70 @@
           <p id="user-tools-category-sub">Tools that configure how Z28 connects and works across your groups.</p>
         </section>
 
+        <article class="reply-messages-card" aria-labelledby="user-reply-messages-title">
+          <div class="reply-messages-header">
+            <div class="reply-messages-header-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M5 6.8A2.8 2.8 0 0 1 7.8 4h8.4A2.8 2.8 0 0 1 19 6.8v7.4a2.8 2.8 0 0 1-2.8 2.8h-4.7L8 20v-3H7.8A2.8 2.8 0 0 1 5 14.2Z"></path>
+                <path d="M8.5 9h7"></path>
+                <path d="M8.5 12.2h4.8"></path>
+              </svg>
+            </div>
+            <div class="reply-messages-header-copy">
+              <div class="connection-kicker" id="user-reply-messages-kicker">ACTIVITY RESPONSES</div>
+              <h3 id="user-reply-messages-title">Activity Reply Messages</h3>
+              <p id="user-reply-messages-sub">Customize the bot's activity replies for this group only.</p>
+            </div>
+            <div class="reply-messages-header-state">
+              <span class="reply-messages-state-dot" aria-hidden="true"></span>
+              <span>GROUP ONLY</span>
+            </div>
+          </div>
+
+          <div class="reply-messages-context">
+            <div>
+              <span class="reply-context-label" id="user-reply-messages-group-label">Editing Group</span>
+              <strong id="user-reply-messages-group">—</strong>
+            </div>
+            <span class="reply-role-badge" id="user-reply-messages-role">ADMIN</span>
+          </div>
+
+          <div class="reply-messages-notice" role="note">
+            <span class="reply-messages-notice-icon" aria-hidden="true">i</span>
+            <span id="user-reply-messages-note">Only this selected group is affected. Other groups keep their own messages.</span>
+          </div>
+
+          <div class="reply-messages-locale-bar">
+            <div class="reply-messages-locale-copy">
+              <strong id="user-reply-messages-language-title">Bot Reply Language</strong>
+              <span id="user-reply-messages-language-sub">The bot uses the selected member's language for these replies.</span>
+            </div>
+            <div class="reply-locale-switch" role="tablist" aria-label="Reply language">
+              <button id="user-reply-locale-en" class="reply-locale-button active" type="button" role="tab" aria-selected="true">English</button>
+              <button id="user-reply-locale-zh" class="reply-locale-button" type="button" role="tab" aria-selected="false">中文</button>
+            </div>
+          </div>
+
+          <div id="user-reply-messages-list" class="reply-messages-list" aria-live="polite"></div>
+
+          <div class="reply-messages-actions">
+            <button id="user-reply-save" class="primary-button" type="button" disabled>
+              <span class="button-label">Save Changes</span>
+            </button>
+            <button id="user-reply-discard" class="secondary-button" type="button" disabled>
+              <span class="button-label">Discard Changes</span>
+            </button>
+            <button id="user-reply-reset-language" class="secondary-button" type="button" disabled>
+              <span class="button-label">Reset Language to Default</span>
+            </button>
+          </div>
+
+          <div class="reply-messages-status" id="user-reply-messages-status" aria-live="polite">
+            <span class="reply-status-dot" id="user-reply-status-dot" aria-hidden="true"></span>
+            <span id="user-reply-status-text">Default replies are active for this group.</span>
+          </div>
+        </article>
+
         <article class="connection-card">
           <div class="connection-card-header">
             <div class="connection-header-icon" aria-hidden="true">

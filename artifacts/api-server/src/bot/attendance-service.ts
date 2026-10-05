@@ -1,4 +1,12 @@
 import type { BotConfig } from "./config";
+import {
+  ACTIVITY_REPLY_KEYS,
+  buildActivityReplyEditorLocale,
+  getGroupActivityReplyTemplate,
+  normalizeActivityReplyTemplate,
+  renderActivityReplyTemplate,
+  type ActivityReplyEditorLocale,
+} from "./activity-reply-messages";
 import { activityLabel, getLocale, type ActivitySummary } from "./locales";
 import type {
   ActivityKind,
@@ -144,7 +152,7 @@ const buildSettlementResponse = (
     } as Record<ActivityKind, number>,
   );
 
-  return text.settled(
+  const defaultMessage = text.settled(
     record.displayName,
     record.userId,
     activityLabel(record.kind, locale),
@@ -155,6 +163,48 @@ const buildSettlementResponse = (
     totalSeconds,
     todayCounts,
   );
+  const customTemplate = getGroupActivityReplyTemplate(
+    state.groupActivityReplyMessages,
+    record.chatId,
+    locale,
+    "settled",
+  );
+
+  return customTemplate
+    ? renderActivityReplyTemplate(customTemplate, {
+        user_name: record.displayName,
+        user_id: record.userId,
+        activity: activityLabel(record.kind, locale),
+        start_time: formatDateTime(new Date(record.startedAt), timeZone),
+        duration:
+          locale === "en"
+            ? formatEnglishDuration(record.elapsedSeconds)
+            : formatChineseDuration(record.elapsedSeconds),
+        limit_minutes: active.limitMinutes,
+        today_activity_time:
+          locale === "en"
+            ? formatEnglishDuration(activitySummary.seconds)
+            : formatChineseDuration(activitySummary.seconds),
+        today_total_time:
+          locale === "en"
+            ? formatEnglishDuration(totalSeconds)
+            : formatChineseDuration(totalSeconds),
+        today_eat_count: todayCounts.eat,
+        today_wc_count: todayCounts.wc,
+        today_smoke_count: todayCounts.smoke,
+        today_wcd_count: todayCounts.wcd,
+        timeout_duration:
+          getTimeoutSeconds(record.elapsedSeconds, active.limitMinutes) > 0
+            ? locale === "en"
+              ? formatEnglishDuration(
+                  getTimeoutSeconds(record.elapsedSeconds, active.limitMinutes),
+                )
+              : formatChineseDuration(
+                  getTimeoutSeconds(record.elapsedSeconds, active.limitMinutes),
+                )
+            : "",
+      })
+    : defaultMessage;
 };
 
 export class AttendanceService {
@@ -325,11 +375,23 @@ export class AttendanceService {
     );
 
     if (active) {
-      return text.alreadyActive(
-        profile.displayName,
-        profile.userId,
-        activityLabel(active.kind, locale),
+      const customTemplate = getGroupActivityReplyTemplate(
+        state.groupActivityReplyMessages,
+        profile.chatId,
+        locale,
+        "alreadyActive",
       );
+      return customTemplate
+        ? renderActivityReplyTemplate(customTemplate, {
+            user_name: profile.displayName,
+            user_id: profile.userId,
+            activity: activityLabel(active.kind, locale),
+          })
+        : text.alreadyActive(
+            profile.displayName,
+            profile.userId,
+            activityLabel(active.kind, locale),
+          );
     }
 
     const dayKey = localDateKey(now, this.config.timeZone);
@@ -346,12 +408,25 @@ export class AttendanceService {
       DEFAULT_ACTIVITY_COUNT_LIMITS[kind];
 
     if (countLimit !== undefined && todayCount >= countLimit) {
-      return text.dailyCountLimitReached(
-        profile.displayName,
-        profile.userId,
-        activityLabel(kind, locale),
-        countLimit,
+      const customTemplate = getGroupActivityReplyTemplate(
+        state.groupActivityReplyMessages,
+        profile.chatId,
+        locale,
+        "dailyCountLimitReached",
       );
+      return customTemplate
+        ? renderActivityReplyTemplate(customTemplate, {
+            user_name: profile.displayName,
+            user_id: profile.userId,
+            activity: activityLabel(kind, locale),
+            count_limit: countLimit,
+          })
+        : text.dailyCountLimitReached(
+            profile.displayName,
+            profile.userId,
+            activityLabel(kind, locale),
+            countLimit,
+          );
     }
 
     const limitMinutes =
@@ -384,14 +459,31 @@ export class AttendanceService {
       );
     }
 
-    return text.started(
-      profile.displayName,
-      profile.userId,
-      activityLabel(kind, locale),
-      formatDateTime(now, this.config.timeZone),
-      todayCount + 1,
-      limitMinutes,
+    const startedTime = formatDateTime(now, this.config.timeZone);
+    const activityName = activityLabel(kind, locale);
+    const customTemplate = getGroupActivityReplyTemplate(
+      state.groupActivityReplyMessages,
+      profile.chatId,
+      locale,
+      "started",
     );
+    return customTemplate
+      ? renderActivityReplyTemplate(customTemplate, {
+          user_name: profile.displayName,
+          user_id: profile.userId,
+          activity: activityName,
+          time: startedTime,
+          count: todayCount + 1,
+          limit_minutes: limitMinutes,
+        })
+      : text.started(
+          profile.displayName,
+          profile.userId,
+          activityName,
+          startedTime,
+          todayCount + 1,
+          limitMinutes,
+        );
   }
 
   async settle(
@@ -414,11 +506,28 @@ export class AttendanceService {
     );
 
     if (!active) {
+      const defaultResponse =
+        settledBy === "offwork"
+          ? text.shiftEnded(formatDateTime(now, this.config.timeZone))
+          : text.noActive(profile.displayName, profile.userId);
+      const customTemplate =
+        settledBy === "back"
+          ? getGroupActivityReplyTemplate(
+              state.groupActivityReplyMessages,
+              profile.chatId,
+              locale,
+              "noActive",
+            )
+          : undefined;
+
       return {
         response:
-          settledBy === "offwork"
-            ? text.shiftEnded(formatDateTime(now, this.config.timeZone))
-            : text.noActive(profile.displayName, profile.userId),
+          customTemplate && settledBy === "back"
+            ? renderActivityReplyTemplate(customTemplate, {
+                user_name: profile.displayName,
+                user_id: profile.userId,
+              })
+            : defaultResponse,
       };
     }
 
@@ -528,27 +637,47 @@ export class AttendanceService {
         nextState.groupWarnings = nextState.groupWarnings || {};
         const warnings = nextState.groupWarnings[warningKey] || [];
         const activityName = activityLabel(active.kind, locale);
-        const message = connection
-          ? getLocale(locale).groupTimeoutNotification(
-              connection.targetGroupName,
-              connection.sourceChatId,
-              connection.sourceUsername,
-              active.displayName,
-              active.userId,
-              activityName,
-              timeoutSeconds,
-              formatWarningDateTime(now, this.config.timeZone),
-            )
-          : getLocale(locale).groupTimeoutNotification(
-              "Group",
-              profile.chatId,
-              undefined,
-              active.displayName,
-              active.userId,
-              activityName,
-              timeoutSeconds,
-              formatWarningDateTime(now, this.config.timeZone),
-            );
+        const warningTime = formatWarningDateTime(now, this.config.timeZone);
+        const customTemplate = getGroupActivityReplyTemplate(
+          nextState.groupActivityReplyMessages,
+          profile.chatId,
+          locale,
+          "groupTimeoutNotification",
+        );
+        const message = customTemplate
+          ? renderActivityReplyTemplate(customTemplate, {
+              group_name: connection?.targetGroupName || "Group",
+              group_id: connection?.sourceChatId || profile.chatId,
+              user_name: active.displayName,
+              user_id: active.userId,
+              activity: activityName,
+              timeout_duration:
+                locale === "en"
+                  ? formatEnglishDuration(timeoutSeconds)
+                  : formatChineseDuration(timeoutSeconds),
+              warning_time: warningTime,
+            })
+          : connection
+            ? getLocale(locale).groupTimeoutNotification(
+                connection.targetGroupName,
+                connection.sourceChatId,
+                connection.sourceUsername,
+                active.displayName,
+                active.userId,
+                activityName,
+                timeoutSeconds,
+                warningTime,
+              )
+            : getLocale(locale).groupTimeoutNotification(
+                "Group",
+                profile.chatId,
+                undefined,
+                active.displayName,
+                active.userId,
+                activityName,
+                timeoutSeconds,
+                warningTime,
+              );
 
         warning = {
           id: active.id,
@@ -735,6 +864,32 @@ export class AttendanceService {
     };
   }
 
+  async buildActivityReminderMessage(
+    activity: ActiveActivity,
+    locale: Locale,
+  ): Promise<string> {
+    const state = await this.store.load();
+    const activityName = activityLabel(activity.kind, locale);
+    const customTemplate = getGroupActivityReplyTemplate(
+      state.groupActivityReplyMessages,
+      activity.chatId,
+      locale,
+      "timeoutReminder",
+    );
+
+    return customTemplate
+      ? renderActivityReplyTemplate(customTemplate, {
+          user_name: activity.displayName,
+          user_id: activity.userId,
+          activity: activityName,
+        })
+      : getLocale(locale).timeoutReminder(
+          activity.displayName,
+          activity.userId,
+          activityName,
+        );
+  }
+
   async isActivityReminderEnabled(): Promise<boolean> {
     const state = await this.store.load();
     return state.reminderEnabled !== false;
@@ -783,6 +938,80 @@ export class AttendanceService {
     return (state.groupWarnings?.[String(chatId)] || [])
       .slice(-Math.max(1, Math.min(limit, 100)))
       .reverse();
+  }
+
+  async getActivityReplyMessages(
+    chatId: number,
+  ): Promise<NonNullable<BotState["groupActivityReplyMessages"]>[string]> {
+    const state = await this.store.load();
+    const messages = state.groupActivityReplyMessages?.[String(chatId)];
+    return messages ? structuredClone(messages) : {};
+  }
+
+  async getActivityReplyEditor(
+    chatId: number,
+  ): Promise<{
+    en: ActivityReplyEditorLocale;
+    zh: ActivityReplyEditorLocale;
+  }> {
+    const messages = await this.getActivityReplyMessages(chatId);
+    return {
+      en: buildActivityReplyEditorLocale("en", messages?.en),
+      zh: buildActivityReplyEditorLocale("zh", messages?.zh),
+    };
+  }
+
+  async setActivityReplyMessages(
+    chatId: number,
+    input: Record<
+      Locale,
+      Partial<Record<(typeof ACTIVITY_REPLY_KEYS)[number], unknown>>
+    >,
+  ): Promise<void> {
+    await this.store.update((state) => {
+      const groupKey = String(chatId);
+      const existing = state.groupActivityReplyMessages?.[groupKey] || {};
+      const next: NonNullable<BotState["groupActivityReplyMessages"]>[string] =
+        {
+          ...(existing.en ? { en: { ...existing.en } } : {}),
+          ...(existing.zh ? { zh: { ...existing.zh } } : {}),
+        };
+
+      for (const locale of ["en", "zh"] as const) {
+        const incoming = input[locale] || {};
+        const current = { ...(next[locale] || {}) };
+
+        for (const key of ACTIVITY_REPLY_KEYS) {
+          if (!Object.prototype.hasOwnProperty.call(incoming, key)) continue;
+          const normalized = normalizeActivityReplyTemplate(
+            locale,
+            key,
+            incoming[key],
+          );
+          if (normalized) current[key] = normalized;
+          else delete current[key];
+        }
+
+        if (Object.keys(current).length) next[locale] = current;
+        else delete next[locale];
+      }
+
+      const hasMessages = Object.values(next).some(
+        (localeMessages) =>
+          localeMessages && Object.keys(localeMessages).length > 0,
+      );
+
+      state.groupActivityReplyMessages =
+        state.groupActivityReplyMessages || {};
+      if (hasMessages) {
+        state.groupActivityReplyMessages[groupKey] = next;
+      } else {
+        delete state.groupActivityReplyMessages[groupKey];
+        if (!Object.keys(state.groupActivityReplyMessages).length) {
+          delete state.groupActivityReplyMessages;
+        }
+      }
+    });
   }
 
   async dueActivityReminders(now = new Date()): Promise<ActiveActivity[]> {
