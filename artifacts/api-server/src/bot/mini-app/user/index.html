@@ -666,6 +666,77 @@
             </div>
           </div>
 
+          <section class="connection-flow" aria-labelledby="user-connect-flow-title">
+            <div class="connection-flow-header">
+              <div class="connection-flow-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M6 7h11"></path><path d="m14 4 3 3-3 3"></path><path d="M18 17H7"></path><path d="m10 14-3 3 3 3"></path></svg>
+              </div>
+              <div>
+                <div class="connection-flow-kicker" id="user-connect-flow-kicker">WHAT HAPPENS AFTER CONNECTING</div>
+                <h3 id="user-connect-flow-title">How the connection works</h3>
+                <p id="user-connect-flow-sub">The connection routes a timeout notice from the Source Group to the Target Group.</p>
+              </div>
+            </div>
+
+            <div class="connection-flow-timeline">
+              <article class="connection-flow-stage">
+                <span class="connection-flow-stage-number">01</span>
+                <div>
+                  <strong id="user-connect-flow-step1-title">Activity starts in the Source Group</strong>
+                  <p id="user-connect-flow-step1-copy">A member starts an activity such as Eat, WC, Smoke, or WCD in the Source Group.</p>
+                </div>
+              </article>
+              <div class="connection-flow-arrow" aria-hidden="true">↓</div>
+              <article class="connection-flow-stage">
+                <span class="connection-flow-stage-number">02</span>
+                <div>
+                  <strong id="user-connect-flow-step2-title">The group time limit applies</strong>
+                  <p id="user-connect-flow-step2-copy">Z28 uses that Source Group's configured activity limit to determine when the activity has gone over time.</p>
+                </div>
+              </article>
+              <div class="connection-flow-arrow" aria-hidden="true">↓</div>
+              <article class="connection-flow-stage">
+                <span class="connection-flow-stage-number">03</span>
+                <div>
+                  <strong id="user-connect-flow-step3-title">The member returns after the limit</strong>
+                  <p id="user-connect-flow-step3-copy">When the member presses Back after the allowed time, Z28 calculates the overtime. A value greater than zero is treated as a timeout.</p>
+                </div>
+              </article>
+              <div class="connection-flow-arrow" aria-hidden="true">↓</div>
+              <article class="connection-flow-stage">
+                <span class="connection-flow-stage-number">04</span>
+                <div>
+                  <strong id="user-connect-flow-step4-title">Z28 creates the timeout notice</strong>
+                  <p id="user-connect-flow-step4-copy">Z28 records the timeout and prepares a notice containing the Source Group, member, activity type, and overtime duration.</p>
+                </div>
+              </article>
+              <div class="connection-flow-arrow" aria-hidden="true">↓</div>
+              <article class="connection-flow-stage">
+                <span class="connection-flow-stage-number">05</span>
+                <div>
+                  <strong id="user-connect-flow-step5-title">The Target Group is notified</strong>
+                  <p id="user-connect-flow-step5-copy">Because the Source Group is connected, the timeout notice is delivered to its configured Target Group instead of being sent nowhere.</p>
+                </div>
+              </article>
+            </div>
+
+            <div class="connection-flow-example">
+              <div class="connection-flow-example-label" id="user-connect-flow-example-label">EXAMPLE</div>
+              <p id="user-connect-flow-example">Source: Main Group → Target: Admin Group. A member starts Eat with a 30-minute limit and returns after 38 minutes. Z28 detects 8 minutes of overtime and sends the timeout notification to Admin Group.</p>
+            </div>
+
+            <div class="connection-flow-important">
+              <div class="connection-flow-important-item">
+                <span class="connection-flow-important-dot is-positive" aria-hidden="true"></span>
+                <span id="user-connect-flow-important1">Within the allowed time: the activity is completed normally and no connected-group timeout notice is created.</span>
+              </div>
+              <div class="connection-flow-important-item">
+                <span class="connection-flow-important-dot" aria-hidden="true"></span>
+                <span id="user-connect-flow-important2">Over the allowed time: the overtime is recorded and the connected Target Group can receive the timeout notice.</span>
+              </div>
+            </div>
+          </section>
+
           <section class="connection-guide" aria-labelledby="user-connect-guide-title">
             <div class="connection-guide-header">
               <div class="connection-guide-icon" aria-hidden="true">
