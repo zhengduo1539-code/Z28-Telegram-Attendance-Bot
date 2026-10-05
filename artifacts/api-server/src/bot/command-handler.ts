@@ -850,6 +850,7 @@ export class CommandHandler {
       text: action === "back" ? "/back" : `/${action}`,
     };
     await this.handleMessage(syntheticMessage);
-  }}
+  }
+}
 
 export { keyboard };
