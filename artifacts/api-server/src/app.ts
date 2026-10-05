@@ -33,6 +33,15 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Lightweight public liveness endpoint for uptime monitors.
+// It intentionally does not depend on MongoDB or Telegram polling state.
+app.get("/", (_req, res) => {
+  res.status(200).json({
+    status: "ok",
+    service: "Z28 Telegram Attendance Bot",
+  });
+});
+
 app.get("/admin", adminPageHandler);
 app.get("/user", userPageHandler);
 app.get("/user-app", userPageHandler);
