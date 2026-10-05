@@ -43,24 +43,27 @@ const shutdown = (signal: NodeJS.Signals) => {
   }, 25_000);
   forceExitTimer.unref();
 
-  void (async () => {
+  const stopRuntime = async () => {
     try {
       await telegramRuntime?.stop();
     } catch (error: unknown) {
       logger.error({ err: error }, "Failed to stop Telegram runtime cleanly");
     }
+  };
 
-    server.close((error) => {
-      if (error) {
-        logger.error({ err: error }, "HTTP server failed to close cleanly");
-      } else {
-        logger.info("HTTP server closed; Z28 runtime shutdown complete");
-      }
+  server.close((error) => {
+    if (error) {
+      logger.error({ err: error }, "HTTP server failed to close cleanly");
+    } else {
+      logger.info("HTTP server closed; draining Z28 runtime");
+    }
 
+    void stopRuntime().finally(() => {
       clearTimeout(forceExitTimer);
+      logger.info("Z28 runtime shutdown complete");
       process.exit(0);
     });
-  })();
+  });
 };
 
 process.once("SIGTERM", () => shutdown("SIGTERM"));
