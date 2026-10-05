@@ -1,4 +1,4 @@
-export type Locale = "zh" | "en";
+export type Locale = "zh" | "en" | "mm";
 
 export type ActivityKind = "eat" | "wc" | "smoke" | "wcd";
 
