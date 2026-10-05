@@ -3005,10 +3005,8 @@
   }
 
   function updateActivityReplyState() {
-    var clean = Boolean(
-      state.replyEditorData &&
-      state.replyOriginalSnapshot === replySnapshot(state.replyEditorData)
-    );
+    var clean = !state.replyEditorData ||
+      state.replyOriginalSnapshot === replySnapshot(state.replyEditorData);
     state.replyDirty = !clean;
     if (els["user-reply-save"]) els["user-reply-save"].disabled =
       !state.replyEditorData || state.replyLoading || state.replySaving || !state.replyDirty;
