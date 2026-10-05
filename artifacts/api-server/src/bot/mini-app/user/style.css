@@ -3366,3 +3366,23 @@ html[data-custom-theme="on"] .connection-flow{border-color:rgba(var(--creator-ac
 html[data-custom-theme="on"] .connection-flow-icon{border-color:rgba(var(--creator-accent-rgb),.25);color:var(--creator-accent);background:linear-gradient(145deg,rgba(var(--creator-accent-rgb),.10),rgba(var(--creator-secondary-rgb),.06))}
 html[data-custom-theme="on"] .connection-flow-example{border-color:rgba(var(--creator-accent-rgb),.17);background:rgba(var(--creator-accent-rgb),.035)}
 @media(max-width:520px){.connection-flow{padding:13px}}
+
+/* Group Connection help placement and local hide/show control. */
+.connection-guide-toggle-row{margin-top:9px}
+.connection-guide-toggle{
+  width:100%;min-height:39px;border:1px solid rgba(123,165,216,.12);
+  background:rgba(7,18,31,.58);color:#9fc7e8;justify-content:center;
+}
+.connection-guide-toggle .button-label{font-size:9px;letter-spacing:.01em}
+.connection-guide-toggle:hover:not(:disabled){border-color:rgba(72,168,255,.24);background:rgba(15,31,50,.72);color:#cce9ff}
+.connection-guide-toggle:active:not(:disabled){transform:translateY(1px)}
+.connection-help[hidden]{display:none !important}
+html[data-custom-theme="on"] .connection-guide-toggle{
+  border-color:rgba(var(--creator-accent-rgb),.19);
+  background:rgba(var(--creator-accent-rgb),.045);color:var(--creator-accent);
+}
+html[data-custom-theme="on"] .connection-guide-toggle:hover:not(:disabled){
+  border-color:rgba(var(--creator-accent-rgb),.32);
+  background:rgba(var(--creator-accent-rgb),.075);
+}
+@media(max-width:430px){.connection-guide-toggle{min-height:41px}}
