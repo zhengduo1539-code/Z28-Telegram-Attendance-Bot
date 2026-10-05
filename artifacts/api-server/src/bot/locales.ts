@@ -67,6 +67,7 @@ type LocaleText = {
   shiftEnded: (time: string) => string;
   languageChanged: string;
   languageUsage: string;
+  languagePicker: string;
   unknownLanguage: string;
   unknownCommand: string;
   buttons: {
@@ -140,6 +141,17 @@ const formatEnglishDuration = (totalSeconds: number): string => {
 const getTimeoutSeconds = (durationSeconds: number, limitMinutes: number) =>
   Math.max(0, Math.floor(durationSeconds - limitMinutes * 60));
 
+const formatBurmeseDuration = (totalSeconds: number): string => {
+  const safeSeconds = Math.max(0, Math.floor(totalSeconds));
+  const hours = Math.floor(safeSeconds / 3600);
+  const minutes = Math.floor((safeSeconds % 3600) / 60);
+  const seconds = safeSeconds % 60;
+  const pad = (value: number) => String(value).padStart(2, "0");
+  return hours > 0
+    ? `${pad(hours)} နာရီ ${pad(minutes)} မိနစ် ${pad(seconds)} စက္ကန့်`
+    : `${pad(minutes)} မိနစ် ${pad(seconds)} စက္ကန့်`;
+};
+
 const zh: LocaleText = {
   title: "打卡机器人 M58",
   startWelcome: [
@@ -155,8 +167,7 @@ const zh: LocaleText = {
     `${inlineCode("/smoke")} — 抽烟`,
     `${inlineCode("/wcd")} — WCD`,
     `${inlineCode("/offwork")} — 下班`,
-    `${inlineCode("/lang en")} — 切换英文`,
-    `${inlineCode("/lang zh")} — 切换中文`,
+    `${inlineCode("/lang")} — 选择语言`,
     `${inlineCode("/id")} — 查看当前群组 ID 或用户 ID（私聊中显示用户 ID）`,
     "",
     "",
@@ -306,8 +317,9 @@ const zh: LocaleText = {
   shiftStarted: (time) => `✅ 上班打卡成功：${inlineCode(time)}`,
   shiftEnded: (time) => `✅ 下班打卡成功：${inlineCode(time)}`,
   languageChanged: "语言已切换为中文。",
-  languageUsage: "用法：/lang zh 或 /lang en（/lang eng 也可以）",
-  unknownLanguage: "支持的语言：zh（中文）、en/eng（English）。",
+  languageUsage: "请使用 /lang，然后点击按钮选择语言。",
+  languagePicker: "请选择您要使用的语言。",
+  unknownLanguage: "支持的语言：zh（简体中文）、en（English）、mm（缅甸语）。",
   unknownCommand: "未知命令。请使用 /help 查看可用命令。",
   buttons: { wc: "上厕所", smoke: "抽烟", wcd: "WCD", back: "回座" },
   adminOnly: "此命令仅限 Bot owner/admin 使用。",
@@ -345,6 +357,212 @@ const zh: LocaleText = {
     `✅ 超时提醒已${enabled ? "开启" : "关闭"}（45 秒宽限）。`,
 };
 
+const mm: LocaleText = {
+  title: "Attendance Bot",
+  startWelcome: [
+    "Attendance Bot မှ ကြိုဆိုပါတယ်။",
+    `${inlineCode("/help")} ကိုသုံးပြီး ရရှိနိုင်သော command များနှင့် အသုံးပြုပုံကို ကြည့်နိုင်ပါတယ်။`,
+  ].join("\n"),
+  help: [
+    "အသုံးပြုနိုင်သော command များ:",
+    `${inlineCode("/work")} — အလုပ်စဝင်မည်`,
+    `${inlineCode("/back")} — ထိုင်ခုံသို့ပြန်ပြီး လက်ရှိ activity ကို အပြီးသတ်မည်`,
+    `${inlineCode("/eat")} — အစားအသောက်နားချိန်`,
+    `${inlineCode("/wc")} — အိမ်သာ`,
+    `${inlineCode("/smoke")} — ဆေးလိပ်နားချိန်`,
+    `${inlineCode("/wcd")} — WCD`,
+    `${inlineCode("/offwork")} — အလုပ်ဆင်းမည်`,
+    `${inlineCode("/lang")} — ဘာသာစကားရွေးချယ်မည်`,
+    `${inlineCode("/id")} — လက်ရှိ group ID သို့မဟုတ် user ID ကိုကြည့်မည်`,
+    "",
+    `Activity စတင်ပြီးနောက် ပြန်လာသောအခါ ${inlineCode("/back")} ကိုသုံးပါ။`,
+  ].join("\n"),
+  idInfo: (chatId, userId) => `Group ID: ${inlineCode(chatId)}\nUser ID: ${inlineCode(userId)}`,
+  botStatsPrivate: "ကျေးဇူးပြု၍ /stats ကို Bot private chat ထဲတွင်အသုံးပြုပါ။",
+  adminPanelPrompt: "အောက်ပါ button ကိုနှိပ်ပြီး Admin Panel ကိုဖွင့်ပါ။",
+  adminPrivate: "ကျေးဇူးပြု၍ Bot private chat ထဲမှ Admin Panel ကိုဖွင့်ပါ။",
+  adminMiniAppUnavailable: "Admin Panel ကို လက်ရှိအသုံးမပြုနိုင်သေးပါ။ နောက်မှထပ်ကြိုးစားပါ။",
+  botStats: (privateUsers, groups) => [
+    "📊 Bot Statistics",
+    "",
+    `👤 Users (PM): ${inlineCode(privateUsers)}`,
+    `👥 Groups: ${inlineCode(groups)}`,
+  ].join("\n"),
+  noActive: (displayName, userId) => [
+    "User: " + userLink(displayName, userId),
+    "User ID: " + inlineCode(userId),
+    "Status: " + inlineCode("❌ ထိုင်ခုံသို့ပြန် Check-In မအောင်မြင်ပါ။"),
+    "အကြောင်းရင်း: " + inlineCode("လက်ရှိလုပ်ဆောင်နေသော activity မရှိပါ။"),
+    "အသုံးပြုနိုင်သည်:",
+    inlineCode("အိမ်သာ"),
+    inlineCode("ဆေးလိပ်"),
+    inlineCode("WCD"),
+  ].join("\n"),
+  alreadyActive: (displayName, userId, activity) => {
+    const identity = userIdentity(displayName, userId);
+    return [
+      `User: ${identity.name}`,
+      `User ID: ${identity.id}`,
+      divider,
+      `Status: ❌ ${inlineCode("Check-In မအောင်မြင်ပါ။")}`,
+      `အကြောင်းရင်း: လက်ရှိ ${inlineCode(activity)} activity လုပ်ဆောင်နေပါသည်။`,
+      divider,
+      `အကြံပြုချက်: အခြား activity မစတင်မီ ${inlineCode("/back")} ကိုအရင်သုံးပါ။`,
+      divider,
+      `ထိုင်ခုံသို့ပြန်ရန်: ${inlineCode("/back")}`,
+    ].join("\n");
+  },
+  started: (displayName, userId, activity, time, occurrence, limitMinutes) => {
+    const identity = userIdentity(displayName, userId);
+    return [
+      `User: ${identity.name}`,
+      `User ID: ${identity.id}`,
+      divider,
+      `✅ Check-In အောင်မြင်ပါသည်: ${inlineCode(activity)} - ${inlineCode(time)}`,
+      `သတိ: ယခုသည် ${inlineCode(`${occurrence} ကြိမ်မြောက် ${activity}`)} ဖြစ်ပါသည်။`,
+      divider,
+      `ဤ activity အတွက် အချိန်ကန့်သတ်ချက်: ${inlineCode(`${limitMinutes} မိနစ်`)}`,
+      divider,
+      "အကြံပြုချက်: Activity ပြီးဆုံးပါက အချိန်မီ ထိုင်ခုံသို့ပြန်ပြီး check-in လုပ်ပါ။",
+      divider,
+      `ထိုင်ခုံသို့ပြန်ရန်: ${inlineCode("/back")}`,
+    ].join("\n");
+  },
+  settled: (
+    displayName, userId, activity, startTime, durationSeconds, limitMinutes,
+    todayActivitySeconds, todayTotalSeconds, todayCounts,
+  ) => {
+    const identity = userIdentity(displayName, userId);
+    const timeoutSeconds = getTimeoutSeconds(durationSeconds, limitMinutes);
+    return [
+      `User: ${identity.name}`,
+      `User ID: ${identity.id}`,
+      divider,
+      `✅ ${inlineCode(startTime)} ထိုင်ခုံသို့ပြန် Check-In အောင်မြင်ပါသည်: ${inlineCode(activity)}`,
+      divider,
+      "ဤ activity ၏ အချိန်ကို အပြီးသတ်တွက်ချက်ပြီးပါပြီ။",
+      divider,
+      `ဤ activity အသုံးပြုချိန်: ${inlineCode(formatBurmeseDuration(durationSeconds))}`,
+      divider,
+      `ယနေ့ ${inlineCode(activity)} စုစုပေါင်းအချိန်: ${inlineCode(formatBurmeseDuration(todayActivitySeconds))}`,
+      `ယနေ့ activity အားလုံး စုစုပေါင်းအချိန်: ${inlineCode(formatBurmeseDuration(todayTotalSeconds))}`,
+      ...(timeoutSeconds > 0
+        ? [
+            "⚠️ သတိပေးချက်: ဤ activity ၏ အချိန်ကန့်သတ်ချက်ကို ကျော်လွန်သွားပါပြီ။",
+            `ကျော်လွန်ချိန်: ${inlineCode(formatBurmeseDuration(timeoutSeconds))}`,
+          ]
+        : []),
+      divider,
+      ...(["wc", "smoke", "wcd", "eat"] as ActivityKind[])
+        .filter((kind) => todayCounts[kind] > 0)
+        .map((kind) =>
+          `ယနေ့ ${activityLabel(kind, "mm")}: ${inlineCode(`${todayCounts[kind]} ကြိမ်`)}`,
+        ),
+    ].join("\n");
+  },
+  dailyCountLimitReached: (displayName, userId, activity, countLimit) => [
+    "User: " + inlineCode(displayName),
+    "User ID: " + inlineCode(userId),
+    "⚠️ သတိပေးချက်: " + inlineCode(`ယနေ့ ${activity} အသုံးပြုမှုသည် ${countLimit} ကြိမ် ကန့်သတ်ချက်သို့ ရောက်ရှိပါပြီ။`),
+    "အသုံးပြုနိုင်သည်:",
+    "အိမ်သာ: " + inlineCode("/wc"),
+    "ဆေးလိပ်: " + inlineCode("/smoke"),
+    "WCD: " + inlineCode("/wcd"),
+  ].join("\n"),
+  timeoutReminder: (displayName, userId, activity) => {
+    const identity = userIdentity(displayName, userId);
+    return [
+      `User: ${identity.name}`,
+      `User ID: ${identity.id}`,
+      `⚠️ သတိပေးချက်: သင့် ${inlineCode(activity)} activity သည် အချိန်ကျော်လွန်နေပါပြီ။ ထိုင်ခုံသို့ အမြန်ပြန်ပေးပါ။`,
+      `ထိုင်ခုံသို့ပြန်ရန်: ${inlineCode("/back")}`,
+    ].join("\n");
+  },
+  connectPrompt: [
+    "ချိတ်ဆက်မည့် target group ID သို့မဟုတ် group link ကို ပို့ပါ။",
+    `${inlineCode("/id")} ကိုအသုံးပြုပြီး group ID ကို ကြည့်နိုင်ပါတယ်။`,
+    `ထို့နောက် ${inlineCode("/connect -1234567890")} ကဲ့သို့ ပို့ပြီး ပြန်ချိတ်ဆက်ပါ။`,
+  ].join("\n"),
+  connectUsage: "Group ထဲတွင် /connect ကိုသုံးပြီး target group ID သို့မဟုတ် public group link ကို ပို့ပါ။",
+  connectAdminOnly: "ဤ group ၏ owner သို့မဟုတ် administrator သာ /connect ကိုအသုံးပြုနိုင်ပါသည်။",
+  connectSuccess: (groupName, groupId) => [
+    "✅ Group ချိတ်ဆက်မှု အောင်မြင်ပါသည်။",
+    `Group: ${inlineCode(groupName)}`,
+    `Group ID: ${inlineCode(groupId)}`,
+  ].join("\n"),
+  connectSelf: [
+    `❌ ${inlineCode("ချိတ်ဆက်မှု မအောင်မြင်ပါ။")}`,
+    "ထည့်သွင်းထားသော group ID သည် လက်ရှိ group ၏ ID ဖြစ်နေပါသည်။",
+    `Current group သည် ${inlineCode("Target Group (timeout warning လက်ခံမည့် group)")} ဖြစ်ပါသည်။`,
+    `Activity ပြုလုပ်သည့် group ၏ ID ကို ထည့်ပါ။ ဥပမာ ${inlineCode("/connect -1234567890")}`,
+    `ထို့နောက် activity timeout ဖြစ်ပြီး ${inlineCode("/back")} အသုံးပြုသောအခါ warning message ကို ဤ current group သို့ ပို့ပေးပါမည်။`,
+  ].join("\n"),
+  connectInvalid: [
+    "ဤ group ကို မသိရှိနိုင်ပါ သို့မဟုတ် ဝင်ရောက်အသုံးပြုနိုင်ခြင်းမရှိပါ။",
+    `${inlineCode("/id")} ကိုအသုံးပြုပြီး မှန်ကန်သော group ID ကိုကြည့်ကာ ${inlineCode("/connect -1234567890")} ဖြင့် ပြန်ချိတ်ဆက်ပါ။`,
+    "Bot သည် target group ထဲတွင် ရှိနေကြောင်း သေချာပါစေ။ Public group များအတွက် t.me link ကိုလည်း အသုံးပြုနိုင်ပါသည်။",
+  ].join("\n"),
+  groupTimeoutNotification: (groupName, groupId, username, displayName, userId, activity, timeoutSeconds, warningTime) => {
+    const minutes = Math.floor(timeoutSeconds / 60);
+    const seconds = timeoutSeconds % 60;
+    const pad = (value: number) => String(value).padStart(2, "0");
+    return [
+      `Group: ${inlineCode(groupName)}`,
+      `Group ID: ${inlineCode(groupId)}`,
+      `User: ${inlineCode(displayName)}`,
+      `User ID: ${inlineCode(userId)}`,
+      `Activity: ${inlineCode(activity.toUpperCase())}`,
+      `အခြေအနေ: ${inlineCode("Activity တစ်ခု၏ အချိန်ကန့်သတ်ချက်ကို ကျော်လွန်သွားပါပြီ။")}`,
+      `ကျော်လွန်ချိန်: ${inlineCode(`${pad(minutes)} မိနစ် ${pad(seconds)} စက္ကန့်`)}`,
+      `သတိပေးချိန်: ${inlineCode(warningTime || "—")}`,
+    ].join("\n");
+  },
+  workCheckIn: (displayName, userId, checkedAt) => [
+    `User: ${userLink(displayName, userId)}`,
+    `User ID: ${inlineCode(userId)}`,
+    `အလုပ်စဝင် Check-In အချိန်: ${inlineCode(checkedAt)}`,
+  ].join("\n"),
+  shiftStarted: (time) => `✅ အလုပ်စဝင် Check-In အောင်မြင်ပါသည်: ${inlineCode(time)}`,
+  shiftEnded: (time) => `✅ အလုပ်ဆင်း Check-In အောင်မြင်ပါသည်: ${inlineCode(time)}`,
+  languageChanged: "ဘာသာစကားကို မြန်မာဘာသာသို့ ပြောင်းလဲပြီးပါပြီ။",
+  languageUsage: "/lang ကိုသုံးပြီး ပေါ်လာသော button များထဲမှ ဘာသာစကားကို ရွေးချယ်ပါ။",
+  languagePicker: "သင်အသုံးပြုလိုသော ဘာသာစကားကို ရွေးချယ်ပါ။",
+  unknownLanguage: "ရရှိနိုင်သော ဘာသာစကားများ: mm (မြန်မာ), en (English), zh (简体中文)။",
+  unknownCommand: "မသိသော command ဖြစ်ပါသည်။ /help ကိုအသုံးပြုပြီး အသေးစိတ်ကြည့်ပါ။",
+  buttons: { wc: "အိမ်သာ", smoke: "ဆေးလိပ်", wcd: "WCD", back: "ထိုင်ခုံသို့ပြန်" },
+  adminOnly: "ဤ command သည် Bot owner/admin များအတွက်သာ ဖြစ်ပါသည်။",
+  limitPrivate: "ကျေးဇူးပြု၍ ဤ command ကို Bot private chat ထဲတွင် အသုံးပြုပါ။",
+  limitUsage: "အသုံးပြုပုံ: /limit <eat|wc|smoke|wcd> <minutes> ဥပမာ /limit wc 10",
+  unknownActivity: "ထောက်ပံ့ထားသော activity များ: eat, wc, smoke, wcd။",
+  invalidLimit: "မိနစ်အရေအတွက်သည် 0 ထက်ကြီးသော ကိန်းပြည့်ဖြစ်ရပါမည်။",
+  limits: (limits) => [
+    "လက်ရှိ activity အချိန်ကန့်သတ်ချက်များ:",
+    `အစားအသောက် / eat: ${inlineCode(`${limits.eat} မိနစ်`)}`,
+    `အိမ်သာ / wc: ${inlineCode(`${limits.wc} မိနစ်`)}`,
+    `ဆေးလိပ် / smoke: ${inlineCode(`${limits.smoke} မိနစ်`)}`,
+    `WCD / wcd: ${inlineCode(`${limits.wcd} မိနစ်`)}`,
+  ].join("\n"),
+  limitUpdated: (activity, minutes) =>
+    `✅ ${inlineCode(activity)} activity အချိန်ကန့်သတ်ချက်ကို ${inlineCode(`${minutes} မိနစ်`)} သို့ ပြောင်းပြီးပါပြီ။`,
+  countLimitPrivate: "ကျေးဇူးပြု၍ ဤ command ကို Bot private chat ထဲတွင် အသုံးပြုပါ။",
+  countLimitUsage: "အသုံးပြုပုံ: /countlimit <eat|wc|smoke|wcd> <count> ဥပမာ /countlimit wcd 2",
+  invalidCountLimit: "အကြိမ်အရေအတွက်သည် 0 ထက်ကြီးသော ကိန်းပြည့်ဖြစ်ရပါမည်။",
+  countLimits: (limits) => [
+    "ယနေ့အသုံးပြုမှု အကြိမ်ရေကန့်သတ်ချက်များ:",
+    `အစားအသောက် / eat: ${inlineCode(limits.eat ?? "မသတ်မှတ်ရသေး")}`,
+    `အိမ်သာ / wc: ${inlineCode(limits.wc ?? "မသတ်မှတ်ရသေး")}`,
+    `ဆေးလိပ် / smoke: ${inlineCode(limits.smoke ?? "မသတ်မှတ်ရသေး")}`,
+    `WCD / wcd: ${inlineCode(limits.wcd ?? "မသတ်မှတ်ရသေး")}`,
+  ].join("\n"),
+  countLimitUpdated: (activity, count) =>
+    `✅ ${inlineCode(activity)} အတွက် ယနေ့အသုံးပြုမှုအကြိမ်ရေ ကန့်သတ်ချက်ကို ${inlineCode(`${count} ကြိမ်`)} သို့ သတ်မှတ်ပြီးပါပြီ။`,
+  reminderPrivate: "ကျေးဇူးပြု၍ ဤ command ကို Bot private chat ထဲတွင် အသုံးပြုပါ။",
+  reminderUsage: "/reminder on သို့မဟုတ် /reminder off ကိုအသုံးပြုပါ။",
+  reminderStatus: (enabled) =>
+    `အချိန်ကျော်လွန်သတိပေးချက်: ${inlineCode(enabled ? "ဖွင့်ထားသည်" : "ပိတ်ထားသည်")} (45 စက္ကန့် grace period)`,
+  reminderUpdated: (enabled) =>
+    `✅ အချိန်ကျော်လွန်သတိပေးချက်ကို ${enabled ? "ဖွင့်" : "ပိတ်"}ပြီးပါပြီ (45 စက္ကန့် grace period)။`,
+};
 const en: LocaleText = {
   title: "Attendance Bot M58",
   startWelcome: [
@@ -360,8 +578,7 @@ const en: LocaleText = {
     `${inlineCode("/smoke")} — Smoke break`,
     `${inlineCode("/wcd")} — WCD`,
     `${inlineCode("/offwork")} — End work`,
-    `${inlineCode("/lang en")} — Switch to English`,
-    `${inlineCode("/lang zh")} — Switch to Chinese`,
+    `${inlineCode("/lang")} — Choose language`,
     `${inlineCode("/id")} — View the current group ID or user ID (in private chat, shows your user ID)`,
     "",
     "",
@@ -522,8 +739,9 @@ const en: LocaleText = {
   shiftStarted: (time) => `✅ Work check-in succeeded: ${inlineCode(time)}`,
   shiftEnded: (time) => `✅ Work check-out succeeded: ${inlineCode(time)}`,
   languageChanged: "Language switched to English.",
-  languageUsage: "Usage: /lang zh or /lang en (/lang eng also works)",
-  unknownLanguage: "Supported languages: zh (中文), en/eng (English).",
+  languageUsage: "Use /lang and select a language from the buttons.",
+  languagePicker: "Choose the language you want to use.",
+  unknownLanguage: "Supported languages: en (English), mm (Burmese), zh (Simplified Chinese).",
   unknownCommand: "Unknown command. Use /help to see available commands.",
   buttons: { wc: "Toilet", smoke: "Smoke", wcd: "WCD", back: "Back" },
   adminOnly: "This command is only available to the bot owner/admins.",
@@ -562,13 +780,17 @@ const en: LocaleText = {
     `✅ Overdue reminder has been turned ${enabled ? "ON" : "OFF"} (45-second grace).`,
 };
 
-export const getLocale = (locale: Locale): LocaleText =>
-  locale === "en" ? en : zh;
+export const getLocale = (locale: Locale): LocaleText => {
+  if (locale === "en") return en;
+  if (locale === "mm") return mm;
+  return zh;
+};
 
 export const activityLabel = (kind: ActivityKind, locale: Locale): string => {
   const labels = {
     zh: { eat: "吃饭", wc: "上厕所", smoke: "抽烟", wcd: "WCD" },
     en: { eat: "Meal", wc: "Toilet", smoke: "Smoke", wcd: "Big toilet" },
+    mm: { eat: "အစားအသောက်", wc: "အိမ်သာ", smoke: "ဆေးလိပ်", wcd: "WCD" },
   };
   return labels[locale][kind];
 };
