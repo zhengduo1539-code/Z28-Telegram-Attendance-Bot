@@ -215,7 +215,7 @@ const zh: LocaleText = {
       { command: "lang", description: "选择语言" },
     ],
     admin: [
-      { command: "start", description: "开始 / Start" },
+      { command: "start", description: "开始使用" },
       { command: "limit", description: "设置活动时间限制" },
       { command: "limits", description: "查看活动时间限制" },
       { command: "countlimit", description: "设置每日活动次数限制" },
