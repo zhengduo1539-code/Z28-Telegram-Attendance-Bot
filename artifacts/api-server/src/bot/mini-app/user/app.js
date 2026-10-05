@@ -3574,6 +3574,10 @@ function populateConnectSelect(select, groups, preferredId) {
     if (state.groupPickerOpen) return;
 
     tab = tab === "about" || tab === "support" || tab === "tools" || tab === "appearance" ? tab : "dashboard";
+    if (state.toolsOpen && tab !== "tools" && state.replyDirty) {
+      showNotice(text("replyUnsaved"), "error");
+      return;
+    }
     var wasToolsOpen = state.toolsOpen;
     state.aboutOpen = tab === "about";
     state.supportOpen = tab === "support";
@@ -3584,6 +3588,8 @@ function populateConnectSelect(select, groups, preferredId) {
       state.connectLoading = false;
       if (els["user-connect-source"]) els["user-connect-source"].removeAttribute("aria-busy");
       if (els["user-connect-target"]) els["user-connect-target"].removeAttribute("aria-busy");
+      ++state.replyRequestId;
+      state.replyLoading = false;
     }
     saveDashboardState({ tab: tab });
 
@@ -3618,6 +3624,7 @@ function populateConnectSelect(select, groups, preferredId) {
       els.identity.textContent = userGreeting();
       setDashboardControls(false);      updateConnectStatus();
       void loadConnectGroups();
+      void loadActivityReplyMessages();
     } else if (state.appearanceOpen) {
       els["user-selected-dashboard"].hidden = true;
       els["user-about-page"].hidden = true;
@@ -3647,6 +3654,7 @@ function populateConnectSelect(select, groups, preferredId) {
     });
 
     updateOnboardingVisibility();
+    if (state.toolsOpen && state.replyEditorData) renderActivityReplyEditor();
     updateBackButton();
   }
 
@@ -3806,6 +3814,22 @@ function populateConnectSelect(select, groups, preferredId) {
 
     els["user-report-message"].oninput = updateReportCharacterCount;
     els["user-report-form"].onsubmit = submitProblemReport;
+
+    if (els["user-reply-locale-en"] && els["user-reply-locale-zh"]) {
+      els["user-reply-locale-en"].onclick = function () {
+        if (state.replySaving || state.replyLoading) return;
+        state.replyLocale = "en";
+        renderActivityReplyEditor();
+      };
+      els["user-reply-locale-zh"].onclick = function () {
+        if (state.replySaving || state.replyLoading) return;
+        state.replyLocale = "zh";
+        renderActivityReplyEditor();
+      };
+      els["user-reply-save"].onclick = saveActivityReplyMessages;
+      els["user-reply-discard"].onclick = discardActivityReplyChanges;
+      els["user-reply-reset-language"].onclick = resetActivityReplyLanguage;
+    }
 
     if (els["user-connect-source"] && els["user-connect-target"]) {
       els["user-connect-source"].onchange = function () {
