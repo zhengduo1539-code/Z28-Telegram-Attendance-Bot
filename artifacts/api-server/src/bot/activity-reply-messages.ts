@@ -126,6 +126,42 @@ const DEFAULT_ACTIVITY_REPLY_TEMPLATES: Record<Locale, Record<ActivityReplyKey, 
       "超时时长：{timeout_duration}", "提醒时间：{warning_time}",
     ].join("\n"),
   },
+  mm: {
+    noActive: [
+      "User: {user_name}", "User ID: {user_id}", "Status: ❌ ထိုင်ခုံသို့ပြန် Check-In မအောင်မြင်ပါ။",
+      "အကြောင်းရင်း: လက်ရှိလုပ်ဆောင်နေသော activity မရှိပါ။", "အကြံပြုချက်: Activity တစ်ခုကို အရင်စတင်ပြီး ပြန်လာသောအခါ /back ကိုသုံးပါ။",
+    ].join("\n"),
+    alreadyActive: [
+      "User: {user_name}", "User ID: {user_id}", "Status: ❌ Check-In မအောင်မြင်ပါ။",
+      "အကြောင်းရင်း: လက်ရှိ activity: {activity}", "အကြံပြုချက်: အခြား activity မစတင်မီ /back ကိုအရင်သုံးပါ။",
+    ].join("\n"),
+    started: [
+      "User: {user_name}", "User ID: {user_id}", "✅ Check-In အောင်မြင်ပါသည်: {activity} - {time}",
+      "သတိ: {activity} ကို {count} ကြိမ်မြောက် အသုံးပြုခြင်းဖြစ်ပါသည်။", "ဤ activity အတွက် အချိန်ကန့်သတ်ချက်: {limit_minutes} မိနစ်",
+      "အကြံပြုချက်: Activity ပြီးဆုံးပါက ထိုင်ခုံသို့ပြန်ပြီး check-in လုပ်ပါ။", "ထိုင်ခုံသို့ပြန်ရန်: /back",
+    ].join("\n"),
+    settled: [
+      "User: {user_name}", "User ID: {user_id}", "✅ {start_time} ထိုင်ခုံသို့ပြန် Check-In အောင်မြင်ပါသည်: {activity}",
+      "ဤ activity အသုံးပြုချိန်: {duration}", "ယနေ့ {activity} စုစုပေါင်းအချိန်: {today_activity_time}",
+      "ယနေ့ activity အားလုံး စုစုပေါင်းအချိန်: {today_total_time}",
+      "ယနေ့ အကြိမ်ရေ — အစားအသောက်: {today_eat_count} | အိမ်သာ: {today_wc_count} | ဆေးလိပ်: {today_smoke_count} | WCD: {today_wcd_count}",
+      "ကျော်လွန်ချိန်: {timeout_duration}",
+    ].join("\n"),
+    dailyCountLimitReached: [
+      "User: {user_name}", "User ID: {user_id}",
+      "⚠️ သတိပေးချက်: ယနေ့ {activity} အသုံးပြုမှုသည် {count_limit} ကြိမ် ကန့်သတ်ချက်သို့ ရောက်ရှိပါပြီ။",
+    ].join("\n"),
+    timeoutReminder: [
+      "User: {user_name}", "User ID: {user_id}",
+      "⚠️ သတိပေးချက်: သင့် {activity} activity သည် အချိန်ကျော်လွန်နေပါပြီ။ ထိုင်ခုံသို့ အမြန်ပြန်ပေးပါ။",
+      "ထိုင်ခုံသို့ပြန်ရန်: /back",
+    ].join("\n"),
+    groupTimeoutNotification: [
+      "Group: {group_name}", "Group ID: {group_id}", "User: {user_name}", "User ID: {user_id}",
+      "Activity: {activity}", "အခြေအနေ: Activity တစ်ခု၏ အချိန်ကန့်သတ်ချက်ကို ကျော်လွန်သွားပါပြီ။",
+      "ကျော်လွန်ချိန်: {timeout_duration}", "သတိပေးချိန်: {warning_time}",
+    ].join("\n"),
+  },
 };
 
 const escapeHtml = (value: string): string =>
@@ -140,7 +176,7 @@ export const validateActivityReplyTemplate = (
   key: ActivityReplyKey,
   value: unknown,
 ): string | undefined => {
-  if (locale !== "en" && locale !== "zh") return "Unsupported reply language.";
+  if (locale !== "en" && locale !== "zh" && locale !== "mm") return "Unsupported reply language.";
   if (!(ACTIVITY_REPLY_KEYS as readonly string[]).includes(key)) {
     return "Unsupported activity reply.";
   }
