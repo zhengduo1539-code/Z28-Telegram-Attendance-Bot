@@ -3449,3 +3449,100 @@ html[data-theme="light"] .appearance-wallpaper-option.is-selected .appearance-wa
 html[data-theme="light"] .group-dashboard-name,html[data-theme="white"] .group-dashboard-name,html[data-theme="light"] .group-dashboard-suffix,html[data-theme="white"] .group-dashboard-suffix{color:var(--text)}
 html[data-theme="light"] .connection-guide-toggle,html[data-theme="white"] .connection-guide-toggle{color:var(--text);border-color:var(--line-strong);background:var(--surface-soft)}
 @media(max-width:520px){html[data-theme="light"] .appearance-theme-grid,html[data-theme="white"] .appearance-theme-grid{grid-template-columns:1fr}}
+
+
+/* Device wallpaper: local-only image background. */
+html[data-wallpaper="custom"] body{
+  background-image:
+    linear-gradient(180deg,rgba(7,13,23,.46),rgba(7,13,23,.76)),
+    var(--z28-custom-wallpaper);
+  background-size:cover,cover;
+  background-position:center,center;
+  background-repeat:no-repeat,no-repeat;
+  background-attachment:fixed;
+  background-color:var(--bg-0);
+}
+html[data-theme="midnight"][data-wallpaper="custom"] body{
+  background-image:
+    linear-gradient(180deg,rgba(5,6,17,.44),rgba(5,6,17,.78)),
+    var(--z28-custom-wallpaper);
+}
+html[data-theme="amoled"][data-wallpaper="custom"] body{
+  background-image:
+    linear-gradient(180deg,rgba(0,0,0,.42),rgba(0,0,0,.82)),
+    var(--z28-custom-wallpaper);
+}
+html[data-theme="light"][data-wallpaper="custom"] body{
+  background-image:
+    linear-gradient(180deg,rgba(245,248,252,.40),rgba(238,243,248,.74)),
+    var(--z28-custom-wallpaper);
+}
+html[data-theme="white"][data-wallpaper="custom"] body{
+  background-image:
+    linear-gradient(180deg,rgba(255,255,255,.42),rgba(255,255,255,.76)),
+    var(--z28-custom-wallpaper);
+}
+html[data-wallpaper="custom"] body::before,
+html[data-wallpaper="custom"] body::after{opacity:.025}
+
+.wallpaper-preview-custom{
+  background:
+    radial-gradient(circle at 28% 28%,rgba(72,168,255,.28),transparent 24%),
+    radial-gradient(circle at 78% 70%,rgba(122,104,255,.24),transparent 30%),
+    linear-gradient(145deg,#10213a,#050a12);
+  background-position:center;
+  background-size:cover;
+}
+.wallpaper-preview-custom.has-image{
+  background-color:#07111e;
+  background-repeat:no-repeat;
+}
+
+.appearance-wallpaper-actions{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:8px;
+  margin-top:10px;
+}
+.appearance-wallpaper-upload,
+.appearance-wallpaper-remove{
+  min-height:40px;
+  justify-content:center;
+  font-size:9px;
+  padding:0 12px;
+}
+.appearance-wallpaper-upload{
+  cursor:pointer;
+}
+.appearance-wallpaper-upload.is-busy{
+  opacity:.62;
+  pointer-events:none;
+}
+.appearance-wallpaper-remove:disabled{
+  opacity:.42;
+  cursor:not-allowed;
+}
+.appearance-wallpaper-status{
+  margin:8px 2px 0;
+  color:var(--muted-2);
+  font-size:8.8px;
+  line-height:1.5;
+}
+html[data-wallpaper="custom"] .appearance-wallpaper-option[data-wallpaper-option="custom"]{
+  border-color:rgba(72,168,255,.48);
+}
+html[data-theme="light"] .appearance-wallpaper-status,
+html[data-theme="white"] .appearance-wallpaper-status{
+  color:var(--muted);
+}
+html[data-theme="light"] .appearance-wallpaper-upload,
+html[data-theme="white"] .appearance-wallpaper-upload,
+html[data-theme="light"] .appearance-wallpaper-remove,
+html[data-theme="white"] .appearance-wallpaper-remove{
+  color:var(--text);
+  border-color:var(--line-strong);
+  background:var(--surface-soft);
+}
+@media(max-width:430px){
+  .appearance-wallpaper-actions{grid-template-columns:1fr}
+}

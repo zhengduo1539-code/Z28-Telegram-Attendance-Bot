@@ -28,6 +28,7 @@
     appearanceOpen: false,
     appearanceTheme: "dark",
     wallpaper: "default",
+    customWallpaper: null,
     animationsEnabled: true,
     compactMode: false,
     workspaceName: "My Workspace",
@@ -54,6 +55,7 @@
     autoRefresh: "z28_user_auto_refresh",
     appearanceTheme: "z28_appearance_theme",
     wallpaper: "z28_appearance_wallpaper",
+    wallpaperCustom: "z28_appearance_wallpaper_custom",
     animations: "z28_appearance_animations",
     compactMode: "z28_appearance_compact",
     workspaceName: "z28_workspace_name",
@@ -158,13 +160,24 @@
       autoRefreshDisabled: "Auto refresh disabled.",
       dashboard: "Dashboard",
       wallpaperTitle: "Background Wallpaper",
-      wallpaperSub: "Choose a lightweight background style.",
+      wallpaperSub: "Choose a preset or use an image from this device.",
       wallpaperDefault: "Default",
       wallpaperAurora: "Aurora",
       wallpaperGrid: "Neon Grid",
       wallpaperNebula: "Nebula",
       wallpaperOcean: "Ocean Glow",
       wallpaperViolet: "Violet Glass",
+      wallpaperCustom: "Device Image",
+      wallpaperUpload: "Choose Image",
+      wallpaperRemove: "Remove Image",
+      wallpaperCustomEmpty: "No device image selected.",
+      wallpaperCustomSaved: "Custom wallpaper is active • saved on this device.",
+      wallpaperProcessing: "Preparing wallpaper…",
+      wallpaperSaved: "Wallpaper updated successfully.",
+      wallpaperRemoved: "Device wallpaper removed.",
+      wallpaperInvalidType: "Please choose a JPG, PNG or WebP image.",
+      wallpaperInvalidSize: "That image is too large to process. Choose a smaller image.",
+      wallpaperStorageFailed: "This device could not save the wallpaper. Choose a smaller image or free some browser storage.",
       themeCreator: "Theme Creator",
       themeCreatorSub: "Create your own look and keep it saved on this device.",
       themeCreatorPresets: "Quick palettes",
@@ -402,13 +415,24 @@
       autoRefreshDisabled: "Auto Refresh ပိတ်ပြီးပါပြီ။",
       dashboard: "Dashboard",
       wallpaperTitle: "Background Wallpaper",
-      wallpaperSub: "ပေါ့ပါးပြီး လှပသော background ပုံစံကို ရွေးချယ်ပါ။",
+      wallpaperSub: "Preset တစ်ခုရွေးပါ သို့မဟုတ် ဤစက်ထဲက image တစ်ပုံကို သုံးပါ။",
       wallpaperDefault: "Default",
       wallpaperAurora: "Aurora",
       wallpaperGrid: "Neon Grid",
       wallpaperNebula: "Nebula",
       wallpaperOcean: "Ocean Glow",
       wallpaperViolet: "Violet Glass",
+      wallpaperCustom: "Device Image",
+      wallpaperUpload: "Image ရွေးမည်",
+      wallpaperRemove: "Image ဖယ်မည်",
+      wallpaperCustomEmpty: "Device image မရွေးရသေးပါ။",
+      wallpaperCustomSaved: "ကိုယ်ပိုင် wallpaper ကို ဤစက်ပေါ်တွင် သိမ်းထားပြီး အသုံးပြုနေပါသည်။",
+      wallpaperProcessing: "Wallpaper ကို ပြင်ဆင်နေပါသည်…",
+      wallpaperSaved: "Wallpaper ပြောင်းလဲပြီးပါပြီ။",
+      wallpaperRemoved: "Device wallpaper ကို ဖယ်ရှားပြီးပါပြီ။",
+      wallpaperInvalidType: "JPG, PNG သို့မဟုတ် WebP image ကိုသာ ရွေးပါ။",
+      wallpaperInvalidSize: "ဤ image သည် process လုပ်ရန် ကြီးလွန်းပါသည်။ သေးငယ်သော image ကို ရွေးပါ။",
+      wallpaperStorageFailed: "ဤစက်တွင် wallpaper သိမ်း၍မရပါ။ Image ပိုသေးသည့်တစ်ခုကို ရွေးပါ သို့မဟုတ် browser storage အချို့ရှင်းပါ။",
       themeCreator: "Theme Creator",
       themeCreatorSub: "ကိုယ်ပိုင်အပြင်အဆင်ကို ဖန်တီးပြီး ဤစက်ပေါ်မှာပဲ သိမ်းထားနိုင်ပါသည်။",
       themeCreatorPresets: "အမြန်ရွေးချယ်ရန် Palette များ",
@@ -645,13 +669,24 @@
       autoRefreshDisabled: "自动刷新已关闭。",
       dashboard: "仪表板",
       wallpaperTitle: "背景壁纸",
-      wallpaperSub: "选择轻量且具有动画效果的背景样式。",
+      wallpaperSub: "选择预设，或使用此设备中的图片。",
       wallpaperDefault: "默认",
       wallpaperAurora: "极光",
       wallpaperGrid: "霓虹网格",
       wallpaperNebula: "星云",
       wallpaperOcean: "海洋光",
       wallpaperViolet: "紫色玻璃",
+      wallpaperCustom: "设备图片",
+      wallpaperUpload: "选择图片",
+      wallpaperRemove: "移除图片",
+      wallpaperCustomEmpty: "尚未选择设备图片。",
+      wallpaperCustomSaved: "自定义壁纸已启用 • 仅保存在此设备。",
+      wallpaperProcessing: "正在准备壁纸…",
+      wallpaperSaved: "壁纸已成功更新。",
+      wallpaperRemoved: "设备壁纸已移除。",
+      wallpaperInvalidType: "请选择 JPG、PNG 或 WebP 图片。",
+      wallpaperInvalidSize: "图片太大，无法处理。请选择较小的图片。",
+      wallpaperStorageFailed: "此设备无法保存壁纸。请选择更小的图片，或释放一些浏览器存储空间。",
       themeCreator: "主题创建器",
       themeCreatorSub: "创建自己的界面风格，并仅保存在此设备上。",
       themeCreatorPresets: "快速配色",
@@ -881,10 +916,12 @@
       "user-appearance-theme-white-title","user-appearance-theme-white-sub",
       "user-appearance-wallpaper-title","user-appearance-wallpaper-sub",
       "appearance-wallpaper-default","appearance-wallpaper-aurora","appearance-wallpaper-grid",
-      "appearance-wallpaper-nebula","appearance-wallpaper-ocean","appearance-wallpaper-violet",
+      "appearance-wallpaper-nebula","appearance-wallpaper-ocean","appearance-wallpaper-violet","appearance-wallpaper-custom",
       "user-appearance-wallpaper-default","user-appearance-wallpaper-aurora",
       "user-appearance-wallpaper-grid","user-appearance-wallpaper-nebula",
-      "user-appearance-wallpaper-ocean","user-appearance-wallpaper-violet",
+      "user-appearance-wallpaper-ocean","user-appearance-wallpaper-violet","user-appearance-wallpaper-custom",
+      "appearance-wallpaper-custom-preview","appearance-wallpaper-file","appearance-wallpaper-upload",
+      "appearance-wallpaper-remove","appearance-wallpaper-status",
       "appearance-animations-toggle","user-appearance-animations-title","user-appearance-animations-sub",
       "user-appearance-animations-state","appearance-compact-toggle","user-appearance-compact-title",
       "user-appearance-compact-sub","user-appearance-compact-state",
@@ -1124,8 +1161,21 @@
 
   function applyAppearancePreferences() {
     var root = document.documentElement;
+    var activeWallpaper = state.wallpaper;
+
+    if (activeWallpaper === "custom" && !state.customWallpaper) {
+      activeWallpaper = "default";
+      state.wallpaper = "default";
+      writeStorage(STORAGE_KEYS.wallpaper, "default");
+    }
+
     root.setAttribute("data-theme", state.appearanceTheme);
-    root.setAttribute("data-wallpaper", state.wallpaper);
+    root.setAttribute("data-wallpaper", activeWallpaper);
+    if (state.customWallpaper) {
+      root.style.setProperty("--z28-custom-wallpaper", "url(" + state.customWallpaper + ")");
+    } else {
+      root.style.removeProperty("--z28-custom-wallpaper");
+    }
     root.setAttribute("data-animations", state.animationsEnabled ? "on" : "off");
     root.setAttribute("data-compact", state.compactMode ? "on" : "off");
     applyThemeCreatorStyles();
@@ -1232,11 +1282,31 @@
     });
 
     document.querySelectorAll('input[name="appearance-wallpaper"]').forEach(function (input) {
-      var selectedWallpaper = input.value === state.wallpaper;
+      var selectedWallpaper = input.value === state.wallpaper &&
+        (input.value !== "custom" || Boolean(state.customWallpaper));
       input.checked = selectedWallpaper;
       var wallpaperOption = input.closest(".appearance-wallpaper-option");
       if (wallpaperOption) wallpaperOption.classList.toggle("is-selected", selectedWallpaper);
     });
+
+    if (els["appearance-wallpaper-custom-preview"]) {
+      els["appearance-wallpaper-custom-preview"].style.backgroundImage = state.customWallpaper
+        ? "url(" + state.customWallpaper + ")"
+        : "";
+      els["appearance-wallpaper-custom-preview"].classList.toggle("has-image", Boolean(state.customWallpaper));
+    }
+    if (els["appearance-wallpaper-upload"]) {
+      els["appearance-wallpaper-upload"].textContent = text("wallpaperUpload");
+    }
+    if (els["appearance-wallpaper-remove"]) {
+      els["appearance-wallpaper-remove"].textContent = text("wallpaperRemove");
+      els["appearance-wallpaper-remove"].disabled = !state.customWallpaper;
+    }
+    if (els["appearance-wallpaper-status"]) {
+      els["appearance-wallpaper-status"].textContent = state.customWallpaper
+        ? text("wallpaperCustomSaved")
+        : text("wallpaperCustomEmpty");
+    }
 
     els["appearance-animations-toggle"].setAttribute("aria-checked", String(state.animationsEnabled));
     els["appearance-animations-toggle"].classList.toggle("is-enabled", state.animationsEnabled);
@@ -1266,11 +1336,182 @@
   }
 
   function setWallpaper(wallpaper) {
-    var allowed = ["default","aurora","grid","nebula","ocean","violet"];
+    var allowed = ["default","aurora","grid","nebula","ocean","violet","custom"];
     if (allowed.indexOf(wallpaper) === -1) return;
+    if (wallpaper === "custom" && !state.customWallpaper) return;
     state.wallpaper = wallpaper;
     writeStorage(STORAGE_KEYS.wallpaper, wallpaper);
     applyAppearancePreferences();
+  }
+
+  function getStoredCustomWallpaper() {
+    var raw = readStorage(STORAGE_KEYS.wallpaperCustom);
+    if (!raw) return null;
+    if (
+      raw.length > 1800000 ||
+      !/^data:image\/jpeg;base64,[A-Za-z0-9+/]+={0,2}$/.test(raw)
+    ) {
+      removeStorage(STORAGE_KEYS.wallpaperCustom);
+      return null;
+    }
+    return raw;
+  }
+
+  function writeStorageChecked(key, value) {
+    try {
+      localStorage.setItem(key, value);
+      return localStorage.getItem(key) === value;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function restoreStorageValue(key, value) {
+    if (value == null) removeStorage(key);
+    else writeStorage(key, value);
+  }
+
+  function compressWallpaperImage(file) {
+    return new Promise(function (resolve, reject) {
+      if (!file || ["image/jpeg","image/png","image/webp"].indexOf(file.type) === -1) {
+        reject(new Error("wallpaperInvalidType"));
+        return;
+      }
+      if (file.size > 15 * 1024 * 1024) {
+        reject(new Error("wallpaperInvalidSize"));
+        return;
+      }
+
+      var image = new Image();
+      var objectUrl = null;
+      var cleanup = function () {
+        if (objectUrl && window.URL && typeof window.URL.revokeObjectURL === "function") {
+          window.URL.revokeObjectURL(objectUrl);
+        }
+        objectUrl = null;
+      };
+
+      image.onerror = function () {
+        cleanup();
+        reject(new Error("wallpaperInvalidType"));
+      };
+
+      image.onload = function () {
+        try {
+          var maxSides = [1600,1400,1200,1000,900];
+          var qualities = [0.78,0.68,0.58,0.50];
+          var width = Number(image.naturalWidth || image.width);
+          var height = Number(image.naturalHeight || image.height);
+          if (!width || !height) throw new Error("wallpaperInvalidType");
+
+          for (var s = 0; s < maxSides.length; s += 1) {
+            var scale = Math.min(1, maxSides[s] / Math.max(width, height));
+            var canvas = document.createElement("canvas");
+            canvas.width = Math.max(1, Math.round(width * scale));
+            canvas.height = Math.max(1, Math.round(height * scale));
+            var context = canvas.getContext("2d");
+            if (!context) continue;
+            context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+            for (var q = 0; q < qualities.length; q += 1) {
+              var dataUrl = canvas.toDataURL("image/jpeg", qualities[q]);
+              if (dataUrl.length <= 1800000) {
+                cleanup();
+                resolve(dataUrl);
+                return;
+              }
+            }
+          }
+          cleanup();
+          reject(new Error("wallpaperInvalidSize"));
+        } catch (_) {
+          cleanup();
+          reject(new Error("wallpaperInvalidSize"));
+        }
+      };
+
+      if (window.URL && typeof window.URL.createObjectURL === "function") {
+        objectUrl = window.URL.createObjectURL(file);
+        image.src = objectUrl;
+        return;
+      }
+
+      var reader = new FileReader();
+      reader.onerror = function () {
+        reject(new Error("wallpaperInvalidType"));
+      };
+      reader.onload = function () {
+        image.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function handleCustomWallpaperFile(file) {
+    if (!file || !els["appearance-wallpaper-file"]) return;
+
+    els["appearance-wallpaper-file"].disabled = true;
+    if (els["appearance-wallpaper-upload"]) {
+      els["appearance-wallpaper-upload"].classList.add("is-busy");
+      els["appearance-wallpaper-upload"].setAttribute("aria-disabled", "true");
+    }
+    showNotice(text("wallpaperProcessing"), "ok");
+
+    var previousCustomStorage = readStorage(STORAGE_KEYS.wallpaperCustom);
+    var previousWallpaperStorage = readStorage(STORAGE_KEYS.wallpaper);
+    var previousCustomState = state.customWallpaper;
+    var previousWallpaperState = state.wallpaper;
+
+    try {
+      var dataUrl = await compressWallpaperImage(file);
+      if (!writeStorageChecked(STORAGE_KEYS.wallpaperCustom, dataUrl)) {
+        throw new Error("wallpaperStorageFailed");
+      }
+      if (!writeStorageChecked(STORAGE_KEYS.wallpaper, "custom")) {
+        restoreStorageValue(STORAGE_KEYS.wallpaperCustom, previousCustomStorage);
+        restoreStorageValue(STORAGE_KEYS.wallpaper, previousWallpaperStorage);
+        throw new Error("wallpaperStorageFailed");
+      }
+
+      state.customWallpaper = dataUrl;
+      state.wallpaper = "custom";
+      applyAppearancePreferences();
+      showNotice(text("wallpaperSaved"), "ok");
+    } catch (error) {
+      state.customWallpaper = previousCustomState;
+      state.wallpaper = previousWallpaperState;
+      showNotice(text(error && TEXT[state.language] && TEXT[state.language][error.message]
+        ? error.message
+        : "wallpaperStorageFailed"), "error");
+    } finally {
+      els["appearance-wallpaper-file"].value = "";
+      els["appearance-wallpaper-file"].disabled = false;
+      if (els["appearance-wallpaper-upload"]) {
+        els["appearance-wallpaper-upload"].classList.remove("is-busy");
+        els["appearance-wallpaper-upload"].removeAttribute("aria-disabled");
+      }
+      updateAppearanceControls();
+    }
+  }
+
+  function removeCustomWallpaper() {
+    if (!state.customWallpaper) return;
+
+    var previousCustomStorage = readStorage(STORAGE_KEYS.wallpaperCustom);
+    var previousWallpaperStorage = readStorage(STORAGE_KEYS.wallpaper);
+
+    removeStorage(STORAGE_KEYS.wallpaperCustom);
+    if (!writeStorageChecked(STORAGE_KEYS.wallpaper, "default")) {
+      restoreStorageValue(STORAGE_KEYS.wallpaperCustom, previousCustomStorage);
+      restoreStorageValue(STORAGE_KEYS.wallpaper, previousWallpaperStorage);
+      showNotice(text("wallpaperStorageFailed"), "error");
+      return;
+    }
+
+    state.customWallpaper = null;
+    state.wallpaper = "default";
+    applyAppearancePreferences();
+    showNotice(text("wallpaperRemoved"), "ok");
   }
 
   function toggleAnimations() {
@@ -1575,6 +1816,7 @@
     els["user-appearance-wallpaper-nebula"].textContent = text("wallpaperNebula");
     els["user-appearance-wallpaper-ocean"].textContent = text("wallpaperOcean");
     els["user-appearance-wallpaper-violet"].textContent = text("wallpaperViolet");
+    els["user-appearance-wallpaper-custom"].textContent = text("wallpaperCustom");
     els["user-appearance-animations-title"].textContent = text("animations");
     els["user-appearance-animations-sub"].textContent = text("animationsSub");
     els["user-appearance-compact-title"].textContent = text("compactMode");
@@ -3029,6 +3271,16 @@
       };
     });
 
+    if (els["appearance-wallpaper-file"]) {
+      els["appearance-wallpaper-file"].onchange = function () {
+        var file = els["appearance-wallpaper-file"].files && els["appearance-wallpaper-file"].files[0];
+        handleCustomWallpaperFile(file);
+      };
+    }
+    if (els["appearance-wallpaper-remove"]) {
+      els["appearance-wallpaper-remove"].onclick = removeCustomWallpaper;
+    }
+
     els["appearance-animations-toggle"].onclick = toggleAnimations;
     els["appearance-compact-toggle"].onclick = toggleCompactMode;
     els["workspace-name-input"].oninput = function () {
@@ -3182,11 +3434,19 @@
     state.appearanceTheme =
       ["midnight","amoled","light","white"].indexOf(storedTheme) >= 0 ? storedTheme : "dark";
 
+    state.customWallpaper = getStoredCustomWallpaper();
+
     var storedWallpaper = readStorage(STORAGE_KEYS.wallpaper);
     state.wallpaper =
       ["default","aurora","grid","nebula","ocean","violet"].indexOf(storedWallpaper) >= 0
         ? storedWallpaper
-        : "default";
+        : storedWallpaper === "custom" && state.customWallpaper
+          ? "custom"
+          : "default";
+
+    if (storedWallpaper === "custom" && !state.customWallpaper) {
+      removeStorage(STORAGE_KEYS.wallpaper);
+    }
 
     var storedAnimations = readStorage(STORAGE_KEYS.animations);
     state.animationsEnabled = storedAnimations !== "0";
