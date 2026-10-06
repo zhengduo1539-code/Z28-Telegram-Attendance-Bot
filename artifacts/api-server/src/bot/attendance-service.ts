@@ -22,6 +22,27 @@ import type {
 } from "./types";
 import type { BotStore } from "./store/types";
 
+const normalizeActivityName = (value: unknown): string => {
+  if (typeof value !== "string") return "";
+  return value
+    .replace(/[\u0000-\u001F\u007F]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 32);
+};
+
+const activityLabelForState = (
+  state: BotState,
+  chatId: number,
+  kind: ActivityKind,
+  locale: Locale,
+): string =>
+  activityLabel(
+    kind,
+    locale,
+    state.groupActivityNames?.[String(chatId)],
+  );
+
 const trackedActivities: ActivityKind[] = ["eat", "wc", "smoke", "wcd"];
 const DEFAULT_ACTIVITY_COUNT_LIMITS: ActivityCountLimits = {
   eat: Number.POSITIVE_INFINITY,
@@ -155,7 +176,7 @@ const buildSettlementResponse = (
   const defaultMessage = text.settled(
     record.displayName,
     record.userId,
-    activityLabel(record.kind, locale),
+    activityLabelForState(state, record.chatId, record.kind, locale),
     formatDateTime(new Date(record.startedAt), timeZone),
     record.elapsedSeconds,
     active.limitMinutes,
@@ -174,7 +195,7 @@ const buildSettlementResponse = (
     ? renderActivityReplyTemplate(customTemplate, {
         user_name: record.displayName,
         user_id: record.userId,
-        activity: activityLabel(record.kind, locale),
+        activity: activityLabelForState(state, record.chatId, record.kind, locale),
         start_time: formatDateTime(new Date(record.startedAt), timeZone),
         duration:
           locale === "en"
@@ -334,6 +355,23 @@ export class AttendanceService {
     return state.users[userKey(chatId, userId)]?.locale || "en";
   }
 
+  async getUserInteractionSettings(
+    chatId: number,
+    userId: number,
+  ): Promise<{
+    locale: Locale;
+    activityNames: Partial<Record<ActivityKind, string>>;
+  }> {
+    const state = await this.store.load();
+    return {
+      locale: state.users[userKey(chatId, userId)]?.locale || "en",
+      activityNames: structuredClone(
+        state.groupActivityNames?.[String(chatId)] || {},
+      ),
+    };
+  }
+
+
   async workCheckIn(
     profile: Omit<UserProfile, "createdAt" | "updatedAt">,
   ): Promise<string> {
@@ -385,12 +423,12 @@ export class AttendanceService {
         ? renderActivityReplyTemplate(customTemplate, {
             user_name: profile.displayName,
             user_id: profile.userId,
-            activity: activityLabel(active.kind, locale),
+            activity: activityLabelForState(state, profile.chatId, active.kind, locale),
           })
         : text.alreadyActive(
             profile.displayName,
             profile.userId,
-            activityLabel(active.kind, locale),
+            activityLabelForState(state, profile.chatId, active.kind, locale),
           );
     }
 
@@ -418,13 +456,13 @@ export class AttendanceService {
         ? renderActivityReplyTemplate(customTemplate, {
             user_name: profile.displayName,
             user_id: profile.userId,
-            activity: activityLabel(kind, locale),
+            activity: activityLabelForState(state, profile.chatId, kind, locale),
             count_limit: countLimit,
           })
         : text.dailyCountLimitReached(
             profile.displayName,
             profile.userId,
-            activityLabel(kind, locale),
+            activityLabelForState(state, profile.chatId, kind, locale),
             countLimit,
           );
     }
@@ -454,13 +492,13 @@ export class AttendanceService {
         profile.displayName,
         profile.userId,
         concurrentActive
-          ? activityLabel(concurrentActive.kind, locale)
-          : activityLabel(kind, locale),
+          ? activityLabelForState(state, profile.chatId, concurrentActive.kind, locale)
+          : activityLabelForState(state, profile.chatId, kind, locale),
       );
     }
 
     const startedTime = formatDateTime(now, this.config.timeZone);
-    const activityName = activityLabel(kind, locale);
+    const activityName = activityLabelForState(state, profile.chatId, kind, locale);
     const customTemplate = getGroupActivityReplyTemplate(
       state.groupActivityReplyMessages,
       profile.chatId,
@@ -636,7 +674,7 @@ export class AttendanceService {
       if (isTimeout) {
         nextState.groupWarnings = nextState.groupWarnings || {};
         const warnings = nextState.groupWarnings[warningKey] || [];
-        const activityName = activityLabel(active.kind, locale);
+        const activityName = activityLabelForState(nextState, profile.chatId, active.kind, locale);
         const warningTime = formatWarningDateTime(now, this.config.timeZone);
         const customTemplate = getGroupActivityReplyTemplate(
           nextState.groupActivityReplyMessages,
@@ -869,7 +907,7 @@ export class AttendanceService {
     locale: Locale,
   ): Promise<string> {
     const state = await this.store.load();
-    const activityName = activityLabel(activity.kind, locale);
+    const activityName = activityLabelForState(state, activity.chatId, activity.kind, locale);
     const customTemplate = getGroupActivityReplyTemplate(
       state.groupActivityReplyMessages,
       activity.chatId,
@@ -938,6 +976,44 @@ export class AttendanceService {
     return (state.groupWarnings?.[String(chatId)] || [])
       .slice(-Math.max(1, Math.min(limit, 100)))
       .reverse();
+  }
+
+  async getActivityNames(
+    chatId: number,
+  ): Promise<Partial<Record<ActivityKind, string>>> {
+    const state = await this.store.load();
+    return state.groupActivityNames?.[String(chatId)]
+      ? structuredClone(state.groupActivityNames[String(chatId)])
+      : {};
+  }
+
+  async setActivityNames(
+    chatId: number,
+    input: Partial<Record<ActivityKind, unknown>>,
+  ): Promise<void> {
+    await this.store.update((state) => {
+      const groupKey = String(chatId);
+      const current = {
+        ...(state.groupActivityNames?.[groupKey] || {}),
+      } as Partial<Record<ActivityKind, string>>;
+
+      for (const kind of trackedActivities) {
+        if (!Object.prototype.hasOwnProperty.call(input, kind)) continue;
+        const normalized = normalizeActivityName(input[kind]);
+        if (normalized) current[kind] = normalized;
+        else delete current[kind];
+      }
+
+      state.groupActivityNames = state.groupActivityNames || {};
+      if (Object.keys(current).length) {
+        state.groupActivityNames[groupKey] = current;
+      } else {
+        delete state.groupActivityNames[groupKey];
+        if (!Object.keys(state.groupActivityNames).length) {
+          delete state.groupActivityNames;
+        }
+      }
+    });
   }
 
   async getActivityReplyMessages(
