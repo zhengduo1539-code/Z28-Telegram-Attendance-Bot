@@ -101,6 +101,11 @@ export type GroupActivityReplyMessages = Record<
   Partial<Record<Locale, ActivityReplyLocaleMessages>>
 >;
 
+export type GroupActivityNames = Record<
+  string,
+  Partial<Record<ActivityKind, string>>
+>;
+
 export type MiniAppGroupAccess = {
   userId: number;
   groupId: number;
@@ -118,6 +123,7 @@ export type BotState = {
   groupActivityCountLimits?: Record<string, Partial<ActivityCountLimits>>;
   groupWarnings?: Record<string, GroupWarning[]>;
   groupActivityReplyMessages?: GroupActivityReplyMessages;
+  groupActivityNames?: GroupActivityNames;
   reminderEnabled?: boolean;
   connectedGroups?: Record<string, ConnectedGroup>;
   pendingConnects?: Record<string, PendingConnect>;
