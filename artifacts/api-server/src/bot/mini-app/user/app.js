@@ -677,6 +677,7 @@
       noGroupEyebrow: "PERSONAL WORKSPACE",
       noGroup: "Welcome to your Z28 workspace",
       noGroupConnect: "Connect a Group",
+      noGroupStatus: "No group connected",
       noGroupCopy: "Your personal Mini App space is ready. Group Dashboard tools will appear automatically when your Telegram account has eligible administrator access.",
       noGroupHelpTitle: "Quick access",
       noGroupHelpCaption: "Personal preferences are saved only on this device.",
@@ -1018,6 +1019,7 @@
       noGroupEyebrow: "PERSONAL WORKSPACE",
       noGroup: "သင့် Z28 Workspace မှ ကြိုဆိုပါသည်",
       noGroupConnect: "Group ချိတ်ဆက်မည်",
+      noGroupStatus: "Group ချိတ်ဆက်ထားခြင်း မရှိသေးပါ",
       noGroupCopy: "သင့်အတွက် Personal Mini App space ကို အသင့်ပြင်ထားပြီးပါပြီ။ Telegram account တွင် Group access ရရှိလာပါက Group Dashboard tools များကို အလိုအလျောက် အသုံးပြုနိုင်ပါမည်။",
       noGroupHelpTitle: "အမြန်အသုံးပြုရန်",
       noGroupHelpCaption: "Personal preferences များကို ဤ device ပေါ်တွင်သာ သိမ်းထားပါသည်။",
@@ -1357,6 +1359,7 @@
       noGroupEyebrow: "个人工作区",
       noGroup: "欢迎进入您的 Z28 工作区",
       noGroupConnect: "连接群组",
+      noGroupStatus: "尚未连接群组",
       noGroupCopy: "您的个人 Mini App 空间已经准备好。获得可用的群组管理权限后，Group Dashboard 工具会自动出现。",
       noGroupHelpTitle: "快速访问",
       noGroupHelpCaption: "个人偏好设置仅保存在此设备上。",
@@ -4145,7 +4148,7 @@ function populateConnectSelect(select, groups, preferredId) {
     if (els["user-tools-active-group"]) {
       els["user-tools-active-group"].textContent = group
         ? (group.title || String(group.id))
-        : text("noGroupConnect");
+        : text("noGroupStatus");
     }
     if (els["user-tools-active-role"]) {
       els["user-tools-active-role"].textContent = group
