@@ -716,6 +716,7 @@
       reportHint: "Please do not include passwords or other sensitive information.",
       reportCount: "0 / 1200",
       reportContext: "Selected group",
+      reportNoGroup: "No group connected",
       reportSend: "Send Report",
       reportSending: "Sending",
       reportSent: "Report sent successfully. Thank you.",
@@ -1056,6 +1057,7 @@
       reportHint: "Password သို့မဟုတ် အခြား sensitive information များကို မထည့်ပါနှင့်။",
       reportCount: "0 / 1200",
       reportContext: "ရွေးထားသော Group",
+      reportNoGroup: "Group ချိတ်ဆက်ထားခြင်း မရှိသေးပါ",
       reportSend: "Report ပို့မည်",
       reportSending: "ပို့နေသည်",
       reportSent: "Report ကို အောင်မြင်စွာ ပို့ပြီးပါပြီ။ ကျေးဇူးတင်ပါသည်။",
@@ -1394,6 +1396,7 @@
       reportHint: "请不要填写密码或其他敏感信息。",
       reportCount: "0 / 1200",
       reportContext: "当前群组",
+      reportNoGroup: "尚未连接群组",
       reportSend: "发送报告",
       reportSending: "发送中",
       reportSent: "报告已成功发送，谢谢。",
@@ -2793,7 +2796,7 @@
     if (!els["user-report-context-value"]) return;
     var group = state.dashboard && state.dashboard.selectedGroup;
     els["user-report-context-value"].textContent =
-      group && group.title ? group.title : text("reportContext");
+      group && group.title ? group.title : text("reportNoGroup");
   }
 
   function updateReportCharacterCount() {
@@ -2805,7 +2808,7 @@
 
   async function submitProblemReport(event) {
     event.preventDefault();
-    if (!state.dashboard || !state.dashboard.selectedGroup || !els["user-report-submit"] || els["user-report-submit"].disabled) return;
+    if (!els["user-report-submit"] || els["user-report-submit"].disabled) return;
 
     var message = els["user-report-message"].value.trim();
     if (message.length < 10) {
@@ -3169,11 +3172,12 @@
           "Accept": "application/json",
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({
+        body: JSON.stringify(Object.assign({
           category: category,
-          message: message,
-          groupId: Number(groupId)
-        })
+          message: message
+        }, Number.isSafeInteger(Number(groupId)) && Number(groupId) < 0
+          ? { groupId: Number(groupId) }
+          : {}))
       },
       "Report"
     );
