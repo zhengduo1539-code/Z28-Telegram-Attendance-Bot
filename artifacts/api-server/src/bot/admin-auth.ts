@@ -25,6 +25,7 @@ export const validateTelegramInitData = (
   initData: string,
   botToken: string,
   now = Date.now(),
+  maxAgeMs = MAX_INIT_DATA_AGE_MS,
 ): ValidatedAdminUser | undefined => {
   if (!initData || !botToken) return undefined;
 
@@ -39,7 +40,7 @@ export const validateTelegramInitData = (
 
   const authTime = authDate * 1000;
   if (
-    now - authTime > MAX_INIT_DATA_AGE_MS ||
+    now - authTime > maxAgeMs ||
     authTime - now > FUTURE_CLOCK_SKEW_MS
   ) {
     return undefined;
