@@ -472,10 +472,13 @@
       toolsDirectoryTitle: "Choose a tool",
       toolsDirectorySub: "Open a dedicated workspace for the task you want to manage.",
       toolsCurrentGroup: "CURRENT GROUP",
+      toolsWorkspacePersonal: "PERSONAL",
       toolsWorkspaceRoleOwner: "OWNER",
       toolsWorkspaceRoleAdmin: "ADMIN",
       toolConnectionKicker: "GROUP ROUTING",
       toolRepliesKicker: "GROUP RESPONSES",
+      toolRequiresGroup: "Group ချိတ်ဆက်ပြီးမှ အသုံးပြုနိုင်ပါသည်။",
+      toolRequiresGroup: "Available after connecting a group.",
       toolBack: "Back to Tools",
       toolDetailKicker: "TOOL WORKSPACE",
       toolDetailSub: "Manage this feature for the selected group.",
@@ -674,6 +677,7 @@
       creator: "Creator",
       noGroupEyebrow: "PERSONAL WORKSPACE",
       noGroup: "Welcome to your Z28 workspace",
+      noGroupConnect: "Connect a Group",
       noGroupCopy: "Your personal Mini App space is ready. Group Dashboard tools will appear automatically when your Telegram account has eligible administrator access.",
       noGroupHelpTitle: "Quick access",
       noGroupHelpCaption: "Personal preferences are saved only on this device.",
@@ -809,6 +813,7 @@
       toolsDirectoryTitle: "Tool တစ်ခုရွေးပါ",
       toolsDirectorySub: "စီမံလိုသောလုပ်ဆောင်ချက်အတွက် သီးခြား workspace ကိုဖွင့်ပါ။",
       toolsCurrentGroup: "CURRENT GROUP",
+      toolsWorkspacePersonal: "ကိုယ်ပိုင် Workspace",
       toolsWorkspaceRoleOwner: "OWNER",
       toolsWorkspaceRoleAdmin: "ADMIN",
       toolConnectionKicker: "GROUP ROUTING",
@@ -1011,6 +1016,7 @@
       creator: "ဖန်တီးသူ",
       noGroupEyebrow: "PERSONAL WORKSPACE",
       noGroup: "သင့် Z28 Workspace မှ ကြိုဆိုပါသည်",
+      noGroupConnect: "Group ချိတ်ဆက်မည်",
       noGroupCopy: "သင့်အတွက် Personal Mini App space ကို အသင့်ပြင်ထားပြီးပါပြီ။ Telegram account တွင် Group access ရရှိလာပါက Group Dashboard tools များကို အလိုအလျောက် အသုံးပြုနိုင်ပါမည်။",
       noGroupHelpTitle: "အမြန်အသုံးပြုရန်",
       noGroupHelpCaption: "Personal preferences များကို ဤ device ပေါ်တွင်သာ သိမ်းထားပါသည်။",
@@ -1145,10 +1151,12 @@
       toolsDirectoryTitle: "选择工具",
       toolsDirectorySub: "打开对应的独立工作区，管理你需要的功能。",
       toolsCurrentGroup: "当前群组",
+      toolsWorkspacePersonal: "个人工作区",
       toolsWorkspaceRoleOwner: "群主",
       toolsWorkspaceRoleAdmin: "管理员",
       toolConnectionKicker: "群组路由",
       toolRepliesKicker: "群组回复",
+      toolRequiresGroup: "连接群组后即可使用。",
       toolBack: "返回工具",
       toolDetailKicker: "工具工作区",
       toolDetailSub: "管理当前选定群组的此功能。",
@@ -1346,6 +1354,7 @@
       creator: "创作者",
       noGroupEyebrow: "个人工作区",
       noGroup: "欢迎进入您的 Z28 工作区",
+      noGroupConnect: "连接群组",
       noGroupCopy: "您的个人 Mini App 空间已经准备好。获得可用的群组管理权限后，Group Dashboard 工具会自动出现。",
       noGroupHelpTitle: "快速访问",
       noGroupHelpCaption: "个人偏好设置仅保存在此设备上。",
@@ -1404,7 +1413,7 @@
       "user-no-group-step1-title","user-no-group-step1-copy",
       "user-no-group-step2-title","user-no-group-step2-copy",
       "user-no-group-step3-title","user-no-group-step3-copy","user-no-group-note",
-      "user-no-group-back","user-no-group-back-label",
+      "user-no-group-connect","user-no-group-back","user-no-group-back-label",
       "user-dashboard-error-screen","user-dashboard-error-title","user-dashboard-error-lead",
       "user-dashboard-error-retry","user-dashboard","user-group-options",
       "group-options-title","group-options-subtitle","user-group-options-list",
@@ -2368,6 +2377,7 @@
     els["user-no-group-step3-title"].textContent = text("noGroupStep3Title");
     els["user-no-group-step3-copy"].textContent = text("noGroupStep3Copy");
     els["user-no-group-note"].textContent = text("noGroupNote");
+    els["user-no-group-connect"].querySelector(".button-label").textContent = text("noGroupConnect");
     els["user-no-group-back-label"].textContent = text("noGroupBack");
     els["user-id-label"].textContent = text("idLabel");
     els["user-id-input"].placeholder = text("idPlaceholder");
@@ -4123,16 +4133,22 @@ function populateConnectSelect(select, groups, preferredId) {
 
   function updateToolsWorkspaceContext() {
     var group = state.dashboard && state.dashboard.selectedGroup;
+    if (els["user-tools-active-group-label"]) {
+      els["user-tools-active-group-label"].textContent = group
+        ? text("toolsCurrentGroup")
+        : text("noGroupEyebrow");
+    }
     if (els["user-tools-active-group"]) {
       els["user-tools-active-group"].textContent = group
         ? (group.title || String(group.id))
-        : "—";
+        : text("noGroupConnect");
     }
     if (els["user-tools-active-role"]) {
-      els["user-tools-active-role"].textContent =
-        group && group.memberStatus === "creator"
-          ? text("toolsWorkspaceRoleOwner")
-          : text("toolsWorkspaceRoleAdmin");
+      els["user-tools-active-role"].textContent = group
+        ? (group.memberStatus === "creator"
+            ? text("toolsWorkspaceRoleOwner")
+            : text("toolsWorkspaceRoleAdmin"))
+        : text("toolsWorkspacePersonal");
     }
   }
 
@@ -4153,6 +4169,14 @@ function populateConnectSelect(select, groups, preferredId) {
 
     updateToolsWorkspaceContext();
 
+    document.querySelectorAll("[data-user-tool]").forEach(function (button) {
+      var tool = button.getAttribute("data-user-tool");
+      var unavailable = state.normalUserMode && tool === "replies";
+      button.disabled = unavailable;
+      button.setAttribute("aria-disabled", unavailable ? "true" : "false");
+      button.title = unavailable ? text("toolRequiresGroup") : "";
+    });
+
     if (state.toolDetail === "connection") {
       els["user-tool-detail-title"].textContent = text("connectTitle");
       els["user-tool-detail-sub"].textContent = text("connectSub");
@@ -4171,19 +4195,23 @@ function populateConnectSelect(select, groups, preferredId) {
   function updateUserTabAccess() {
     if (!els["user-tools-tab-label"]) return;
     var toolsButton = els["user-tools-tab-label"].closest(".tab-button");
-    if (toolsButton) toolsButton.hidden = state.normalUserMode;
+    if (toolsButton) toolsButton.hidden = false;
   }
 
   function updateSupportAvailability() {
     var form = els["user-report-form"];
     if (!form) return;
     var card = form.closest(".support-card");
-    if (card) card.hidden = state.normalUserMode;
+    if (card) card.hidden = false;
   }
 
   function openUserTool(tool) {
     if (!state.toolsOpen || state.groupPickerOpen) return;
     if (tool !== "connection" && tool !== "replies") return;
+    if (state.normalUserMode && tool === "replies") {
+      showNotice(text("toolRequiresGroup"), "error");
+      return;
+    }
 
     if (state.toolDetail === "replies" && tool !== "replies" && state.replyDirty) {
       showNotice(text("replyUnsaved"), "error");
@@ -4238,7 +4266,6 @@ function populateConnectSelect(select, groups, preferredId) {
     if (state.groupPickerOpen) return;
 
     tab = tab === "about" || tab === "support" || tab === "tools" || tab === "appearance" ? tab : "dashboard";
-    if (state.normalUserMode && tab === "tools") return;
     if (state.toolsOpen && tab !== "tools" && state.replyDirty) {
       showNotice(text("replyUnsaved"), "error");
       return;
@@ -4275,7 +4302,6 @@ function populateConnectSelect(select, groups, preferredId) {
       updateReportContext();
       setDashboardControls(false);
     } else if (state.toolsOpen) {
-      if (state.normalUserMode) return;
       els["user-no-group-screen"].hidden = true;
       els["user-selected-dashboard"].hidden = true;
       els["user-about-page"].hidden = true;
@@ -4629,6 +4655,11 @@ function populateConnectSelect(select, groups, preferredId) {
 
       els["theme-creator-reset"].onclick = resetThemeCreator;
     }
+
+    els["user-no-group-connect"].onclick = function () {
+      if (state.refreshInProgress) return;
+      setDashboardTab("tools");
+    };
 
     els["user-no-group-back"].onclick = function () {
       if (state.refreshInProgress) return;
