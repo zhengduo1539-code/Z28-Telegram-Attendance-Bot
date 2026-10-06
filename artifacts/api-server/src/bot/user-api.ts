@@ -21,6 +21,7 @@ import type { ActiveActivity } from "./types";
 const activityKinds: ActivityKind[] = ["eat", "wc", "smoke", "wcd"];
 const defaultActivityLimits = { eat: 30, wc: 7, smoke: 7, wcd: 15 };
 const defaultCountLimits = { eat: Number.POSITIVE_INFINITY, wc: 7, smoke: 7, wcd: 2 };
+const ACTIVITY_NAME_MAX_LENGTH = 32;
 const REPORT_MAX_LENGTH = 1200;
 const REPORT_MIN_LENGTH = 10;
 const REPORT_COOLDOWN_MS = 30_000;
@@ -522,6 +523,7 @@ userApiRouter.post("/dashboard", async (req, res) => {
       return defaultCountLimits;
     }),
   ]);
+  const activityNames = snapshot.groupActivityNames?.[String(selected.id)] || {};
   res.setHeader("Cache-Control", "no-store");
   res.json({
     user: auth.user,
@@ -541,6 +543,12 @@ userApiRouter.post("/dashboard", async (req, res) => {
       wc: countLimits.wc ?? defaultCountLimits.wc,
       smoke: countLimits.smoke ?? defaultCountLimits.smoke,
       wcd: countLimits.wcd ?? defaultCountLimits.wcd,
+    },
+    activityNames: {
+      eat: activityNames.eat ?? "",
+      wc: activityNames.wc ?? "",
+      smoke: activityNames.smoke ?? "",
+      wcd: activityNames.wcd ?? "",
     },
   });
   } catch (error) {
@@ -705,6 +713,126 @@ userApiRouter.put("/activity-replies", async (req, res) => {
       message: error instanceof Error ? error.message : String(error),
     });
     sendError(res, 500, "Unable to save activity reply messages.");
+  }
+});
+
+const normalizeActivityName = (value: string): string =>
+  value
+    .replace(/[\u0000-\u001F\u007F]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+userApiRouter.get("/activity-names", async (req, res) => {
+  const auth = requireTelegramUser(req, res);
+  if (!auth) return;
+
+  const groupId = Number(req.query.groupId);
+  if (!Number.isSafeInteger(groupId) || groupId >= 0) {
+    sendError(res, 400, "Invalid group.");
+    return;
+  }
+
+  const groupRole = await getVerifiedGroupRole(auth.context, groupId, auth.user.id);
+  if (!groupRole) {
+    sendError(res, 403, "Group administrator access required.");
+    return;
+  }
+
+  try {
+    const chat = await auth.context.telegram.getChat(groupId);
+    if (chat.type !== "group" && chat.type !== "supergroup") {
+      sendError(res, 404, "The selected group is unavailable.");
+      return;
+    }
+
+    const names = await auth.context.attendance.getActivityNames(groupId);
+    res.setHeader("Cache-Control", "no-store");
+    res.json({
+      groupId,
+      groupTitle: chat.title || String(groupId),
+      role: groupRole,
+      names: {
+        eat: names.eat ?? "",
+        wc: names.wc ?? "",
+        smoke: names.smoke ?? "",
+        wcd: names.wcd ?? "",
+      },
+    });
+  } catch (error) {
+    console.error("[user-activity-names] failed to load", {
+      groupId,
+      userId: auth.user.id,
+      message: error instanceof Error ? error.message : String(error),
+    });
+    sendError(res, 502, "Unable to load activity names.");
+  }
+});
+
+userApiRouter.put("/activity-names", async (req, res) => {
+  const auth = requireTelegramUser(req, res);
+  if (!auth) return;
+
+  const groupId = req.body?.groupId;
+  if (!Number.isSafeInteger(groupId) || groupId >= 0) {
+    sendError(res, 400, "Invalid group.");
+    return;
+  }
+
+  const groupRole = await getVerifiedGroupRole(auth.context, groupId, auth.user.id);
+  if (!groupRole) {
+    sendError(res, 403, "Group administrator access required.");
+    return;
+  }
+
+  const rawNames = req.body?.names;
+  if (!rawNames || typeof rawNames !== "object" || Array.isArray(rawNames)) {
+    sendError(res, 400, "Invalid activity names payload.");
+    return;
+  }
+
+  const normalizedNames: Partial<Record<ActivityKind, string>> = {};
+  for (const kind of activityKinds) {
+    const rawValue = rawNames[kind];
+    if (rawValue === undefined || rawValue === null) continue;
+    if (typeof rawValue !== "string") {
+      sendError(res, 400, "Activity names must be text.");
+      return;
+    }
+
+    const normalized = normalizeActivityName(rawValue);
+    if (Array.from(normalized).length > ACTIVITY_NAME_MAX_LENGTH) {
+      sendError(
+        res,
+        400,
+        `Each activity name must be at most ${ACTIVITY_NAME_MAX_LENGTH} characters.`,
+      );
+      return;
+    }
+    normalizedNames[kind] = normalized;
+  }
+
+  try {
+    await auth.context.attendance.setActivityNames(groupId, normalizedNames);
+    const names = await auth.context.attendance.getActivityNames(groupId);
+
+    res.setHeader("Cache-Control", "no-store");
+    res.json({
+      ok: true,
+      groupId,
+      names: {
+        eat: names.eat ?? "",
+        wc: names.wc ?? "",
+        smoke: names.smoke ?? "",
+        wcd: names.wcd ?? "",
+      },
+    });
+  } catch (error) {
+    console.error("[user-activity-names] failed to save", {
+      groupId,
+      userId: auth.user.id,
+      message: error instanceof Error ? error.message : String(error),
+    });
+    sendError(res, 500, "Unable to save activity names.");
   }
 });
 
