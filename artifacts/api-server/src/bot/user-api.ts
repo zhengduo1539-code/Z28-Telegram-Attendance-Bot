@@ -24,6 +24,7 @@ const defaultCountLimits = { eat: Number.POSITIVE_INFINITY, wc: 7, smoke: 7, wcd
 const ACTIVITY_NAME_MAX_LENGTH = 32;
 const REPORT_MAX_LENGTH = 1200;
 const REPORT_MIN_LENGTH = 10;
+const USER_MINI_APP_INIT_DATA_MAX_AGE_MS = 24 * 60 * 60 * 1000;
 const REPORT_COOLDOWN_MS = 30_000;
 const reportCooldowns = new Map<number, number>();
 const reportCategoryLabels = {
@@ -91,6 +92,8 @@ const requireTelegramUser = (req: Request, res: Response) => {
   const validated = validateTelegramInitData(
     getTelegramInitData(req),
     context.config.token,
+    Date.now(),
+    USER_MINI_APP_INIT_DATA_MAX_AGE_MS,
   );
   if (!validated) {
     sendError(res, 401, "Invalid or expired Telegram session.");
