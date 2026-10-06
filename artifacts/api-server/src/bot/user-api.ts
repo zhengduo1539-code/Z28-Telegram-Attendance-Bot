@@ -766,6 +766,7 @@ userApiRouter.post("/report", async (req, res) => {
   const category = typeof req.body?.category === "string" ? req.body.category.trim() : "";
   const message = typeof req.body?.message === "string" ? req.body.message.trim() : "";
   const groupId = req.body?.groupId;
+  const hasGroup = Number.isSafeInteger(groupId) && groupId < 0;
 
   if (!Object.prototype.hasOwnProperty.call(reportCategoryLabels, category)) {
     sendError(res, 400, "Select a valid report category.");
@@ -779,7 +780,7 @@ userApiRouter.post("/report", async (req, res) => {
     sendError(res, 400, "Report message is too long.");
     return;
   }
-  if (!Number.isSafeInteger(groupId) || groupId >= 0) {
+  if (groupId !== undefined && groupId !== null && !hasGroup) {
     sendError(res, 400, "Invalid group.");
     return;
   }
@@ -791,21 +792,24 @@ userApiRouter.post("/report", async (req, res) => {
     return;
   }
 
-  const groupRole = await getVerifiedGroupRole(auth.context, groupId, auth.user.id);
-  if (!groupRole) {
-    sendError(res, 403, "You are not authorized to report an issue for this group.");
-    return;
-  }
-
-  let groupTitle = String(groupId);
-  try {
-    const chat = await auth.context.telegram.getChat(groupId);
-    if (chat.type === "group" || chat.type === "supergroup") {
-      groupTitle = chat.title || groupTitle;
+  let groupTitle = "No group connected";
+  if (hasGroup) {
+    const groupRole = await getVerifiedGroupRole(auth.context, groupId, auth.user.id);
+    if (!groupRole) {
+      sendError(res, 403, "You are not authorized to report an issue for this group.");
+      return;
     }
-  } catch {
-    sendError(res, 403, "The selected group is no longer available.");
-    return;
+
+    groupTitle = String(groupId);
+    try {
+      const chat = await auth.context.telegram.getChat(groupId);
+      if (chat.type === "group" || chat.type === "supergroup") {
+        groupTitle = chat.title || groupTitle;
+      }
+    } catch {
+      sendError(res, 403, "The selected group is no longer available.");
+      return;
+    }
   }
 
   const adminIds = [
@@ -839,7 +843,7 @@ userApiRouter.post("/report", async (req, res) => {
     `Username: <code>${escapeTelegramHtml(username)}</code>`,
     `User ID: <code>${auth.user.id}</code>`,
     `Group: <b>${escapeTelegramHtml(groupTitle)}</b>`,
-    `Group ID: <code>${groupId}</code>`,
+    `Group ID: <code>${hasGroup ? groupId : "—"}</code>`,
     `Time: <code>${escapeTelegramHtml(timestamp)}</code>`,
     "",
     "<b>Message</b>",
