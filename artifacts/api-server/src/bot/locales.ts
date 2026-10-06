@@ -902,13 +902,18 @@ export const getLocale = (locale: Locale): LocaleText => {
   return zh;
 };
 
-export const activityLabel = (kind: ActivityKind, locale: Locale): string => {
+export const activityLabel = (
+  kind: ActivityKind,
+  locale: Locale,
+  customLabels?: Partial<Record<ActivityKind, string>>,
+): string => {
   const labels = {
     zh: { eat: "吃饭", wc: "上厕所", smoke: "抽烟", wcd: "WCD" },
     en: { eat: "Meal", wc: "Toilet", smoke: "Smoke", wcd: "Big toilet" },
     mm: { eat: "အစားအသောက်", wc: "အိမ်သာ", smoke: "ဆေးလိပ်", wcd: "WCD" },
   };
-  return labels[locale][kind];
+  const custom = customLabels?.[kind]?.trim();
+  return custom || labels[locale][kind];
 };
 
 export const helpText = (locale: Locale): string => getLocale(locale).help;
