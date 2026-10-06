@@ -60,14 +60,17 @@ const languageKeyboard = (locale: Locale): import("./types").InlineKeyboardMarku
   };
 };
 
-const keyboard = (locale: Locale): ReplyKeyboardMarkup => {
+const keyboard = (
+  locale: Locale,
+  activityNames: Partial<Record<ActivityKind, string>> = {},
+): ReplyKeyboardMarkup => {
   const text = getLocale(locale).buttons;
   return {
     keyboard: [
       [
-        { text: text.wc },
-        { text: text.smoke },
-        { text: text.wcd },
+        { text: activityNames.wc?.trim() || text.wc },
+        { text: activityNames.smoke?.trim() || text.smoke },
+        { text: activityNames.wcd?.trim() || text.wcd },
       ],
       [{ text: text.back, style: "primary" }],
     ],
@@ -78,7 +81,10 @@ const keyboard = (locale: Locale): ReplyKeyboardMarkup => {
   };
 };
 
-const buttonCommand = (value: string): Command | undefined => {
+const buttonCommand = (
+  value: string,
+  activityNames: Partial<Record<ActivityKind, string>> = {},
+): Command | undefined => {
   const commands: Record<string, string> = {
     "上厕所": "wc",
     "抽烟": "smoke",
@@ -92,6 +98,14 @@ const buttonCommand = (value: string): Command | undefined => {
     "ထိုင်ခုံသို့ပြန်": "back",
     "ထိုင်ခုံသို့ ပြန်": "back",
   };
+
+  for (const kind of ["eat", "wc", "smoke", "wcd"] as const) {
+    const label = activityNames[kind]?.trim();
+    if (label && !Object.prototype.hasOwnProperty.call(commands, label)) {
+      commands[label] = kind;
+    }
+  }
+
   const name = commands[value.trim()];
   return name ? { name } : undefined;
 };
@@ -130,11 +144,15 @@ export class CommandHandler {
 
   private async handleMessage(message: TelegramMessage) {
     if (!message.text || !message.from || message.from.is_bot) return;
-    const command = parseCommand(message.text) || buttonCommand(message.text);
-    const currentLocale = await this.attendance.getLocale(
-      message.chat.id,
-      message.from.id,
-    );
+    const interactionSettings =
+      await this.attendance.getUserInteractionSettings(
+        message.chat.id,
+        message.from.id,
+      );
+    const currentLocale = interactionSettings.locale;
+    const activityNames = interactionSettings.activityNames;
+    const command =
+      parseCommand(message.text) || buttonCommand(message.text, activityNames);
     const profile = profileFromUser(message, currentLocale);
     if (!profile) return;
 
@@ -277,7 +295,7 @@ export class CommandHandler {
     switch (command.name) {
       case "start": {
         response = text.startWelcome;
-        markup = keyboard(locale);
+        markup = keyboard(locale, activityNames);
         if (message.chat.type === "private") {
           const botUsername = await this.telegram.getBotUsername();
           const rows: import("./types").InlineKeyboardButton[][] = [];
@@ -332,7 +350,7 @@ export class CommandHandler {
       }
       case "help":
         response = text.help;
-        markup = keyboard(locale);
+        markup = keyboard(locale, activityNames);
         break;
       case "id": {
         response = text.idInfo(message.chat.id, message.from.id);
@@ -356,22 +374,22 @@ export class CommandHandler {
       }
       case "work":
         response = await this.attendance.workCheckIn(profile);
-        markup = keyboard(locale);
+        markup = keyboard(locale, activityNames);
         break;
       case "back":
         response = await this.handleSettlement(profile, "back");
-        markup = keyboard(locale);
+        markup = keyboard(locale, activityNames);
         break;
       case "eat":
       case "wc":
       case "smoke":
       case "wcd":
         response = await this.attendance.startActivity(profile, command.name);
-        markup = keyboard(locale);
+        markup = keyboard(locale, activityNames);
         break;
       case "offwork":
         response = await this.handleSettlement(profile, "offwork");
-        markup = keyboard(locale);
+        markup = keyboard(locale, activityNames);
         break;
       case "connect":
         if (message.chat.type === "private") {
