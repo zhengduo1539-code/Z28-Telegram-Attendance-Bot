@@ -418,6 +418,13 @@
       groupConfiguration: "GROUP CONFIGURATION",
       settingsTitle: "Activity settings",
       settingsSub: "Manage limits for this group.",
+      activityNamesTitle: "Activity Names",
+      activityNamesSub: "Rename the four activity labels for this group. Leave a field blank to use the default.",
+      activityNamesHint: "Up to 32 characters. This changes the display name only; /eat, /wc, /smoke and /wcd stay unchanged.",
+      saveActivityNames: "Save Names",
+      resetActivityNames: "Reset to Defaults",
+      activityNamesSaved: "Activity names saved.",
+      activityNamesSaveFailed: "Activity names could not be saved. Your changes are still here.",
       activityLimits: "Activity Limits",
       durationControl: "Duration Control",
       dailyCountLimits: "Daily Count Limits",
@@ -760,6 +767,13 @@
       groupConfiguration: "GROUP CONFIGURATION",
       settingsTitle: "Activity settings",
       settingsSub: "ဤ Group အတွက် limit များကို စီမံပါ။",
+      activityNamesTitle: "Activity အမည်များ",
+      activityNamesSub: "ဤ Group အတွက် activity လေးမျိုး၏ ပြသမည့်အမည်များကို ပြောင်းနိုင်ပါသည်။ အကွက်ကိုဗလာထားလျှင် မူလအမည်ကို အသုံးပြုပါမည်။",
+      activityNamesHint: "အများဆုံး 32 စာလုံးအထိ သတ်မှတ်နိုင်ပါသည်။ ပြသမည့်အမည်သာ ပြောင်းမည်ဖြစ်ပြီး /eat, /wc, /smoke, /wcd command များ မပြောင်းပါ။",
+      saveActivityNames: "အမည်များသိမ်းမည်",
+      resetActivityNames: "မူလအမည်သို့ ပြန်ထားမည်",
+      activityNamesSaved: "Activity အမည်များကို သိမ်းပြီးပါပြီ။",
+      activityNamesSaveFailed: "Activity အမည်များကို မသိမ်းနိုင်ပါ။ ပြင်ဆင်ထားသည်များ မပျောက်သေးပါ။",
       activityLimits: "Activity Limits",
       durationControl: "ကြာချိန် ထိန်းချုပ်မှု",
       dailyCountLimits: "Daily Count Limits",
@@ -1101,6 +1115,13 @@
       groupConfiguration: "群组配置",
       settingsTitle: "活动设置",
       settingsSub: "管理此群组的限制。",
+      activityNamesTitle: "活动名称",
+      activityNamesSub: "为此群组重命名四种活动。留空即可恢复使用默认名称。",
+      activityNamesHint: "最多 32 个字符。这里只改变显示名称；/eat、/wc、/smoke 和 /wcd 命令保持不变。",
+      saveActivityNames: "保存名称",
+      resetActivityNames: "恢复默认",
+      activityNamesSaved: "活动名称已保存。",
+      activityNamesSaveFailed: "活动名称保存失败。您的更改仍然保留。",
       activityLimits: "活动时间限制",
       durationControl: "时长控制",
       dailyCountLimits: "每日次数限制",
@@ -1431,7 +1452,7 @@
       "switch-group","switch-group-label",
       "user-member-count","user-active-count","user-group-member-label",
       "user-member-active-label","settings-title","settings-subtitle",
-      "user-settings-limits-card","user-settings-counts-card",
+      "user-settings-limits-card","user-settings-counts-card","user-settings-names-card",
       "user-tools-page","user-tools-tab-label","user-tools-title","user-tools-sub",
       "user-tools-directory","user-tools-directory-kicker","user-tools-directory-title","user-tools-directory-sub",
       "user-tools-active-group-label","user-tools-active-group","user-tools-active-role",
@@ -2272,7 +2293,7 @@
   }
 
   function hasOpenSettingsEditor() {
-    var editors = document.querySelectorAll(".setting-editor");
+    var editors = document.querySelectorAll(".setting-editor, .activity-name-editor");
     for (var index = 0; index < editors.length; index += 1) {
       if (!editors[index].hidden) return true;
     }
@@ -2906,6 +2927,228 @@
       '</div></div>';
   }
 
+  function normalizeActivityNameInput(value) {
+    return String(value == null ? "" : value)
+      .replace(/[\u0000-\u001F\u007F]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function activityNameDisplay(kind, values) {
+    var custom = normalizeActivityNameInput(values && values[kind]);
+    return custom || text(kind);
+  }
+
+  function renderActivityNamesCard(values, groupId) {
+    var kinds = [
+      ["eat", text("eat")],
+      ["wc", text("wc")],
+      ["smoke", text("smoke")],
+      ["wcd", text("wcd")]
+    ];
+    var safeValues = values || {};
+
+    var preview = kinds.map(function (row) {
+      return '<div class="setting-value"><span class="setting-value-label">' +
+        escapeHtml(row[1]) + '</span><strong class="setting-value-number">' +
+        escapeHtml(activityNameDisplay(row[0], safeValues)) + '</strong></div>';
+    }).join("");
+
+    var editors = kinds.map(function (row) {
+      var value = normalizeActivityNameInput(safeValues[row[0]]);
+      return '<div class="editor-row">' +
+        '<div><span class="editor-label">' + escapeHtml(row[1]) + '</span>' +
+        '<span class="editor-hint">' + escapeHtml(text("activityNamesHint")) + '</span></div>' +
+        '<input class="activity-name-input" data-activity-name-kind="' + row[0] +
+        '" type="text" maxlength="32" autocomplete="off" spellcheck="false" value="' +
+        escapeHtml(value) + '" data-original-value="' + escapeHtml(value) + '">' +
+        '</div>';
+    }).join("");
+
+    return '<div class="setting-head"><span class="setting-icon">' + settingIcon("duration") +
+      '</span><div><div class="setting-title">' + escapeHtml(text("activityNamesTitle")) +
+      '</div><div class="setting-sub">' + escapeHtml(text("activityNamesSub")) + '</div></div></div>' +
+      '<div class="setting-view"><div class="setting-grid">' + preview +
+      '</div><button type="button" class="setting-edit activity-name-edit">' +
+      escapeHtml(text("edit")) + '</button></div>' +
+      '<div class="setting-editor activity-name-editor" hidden>' +
+      '<div class="activity-name-grid">' + editors + '</div>' +
+      '<div class="editor-footer">' +
+      '<div class="editor-status" hidden><span class="editor-status-dot"></span><span>' +
+      escapeHtml(text("unsavedChanges")) + '</span></div>' +
+      '<div class="change-summary" hidden aria-live="polite"></div>' +
+      '<div class="editor-error" hidden role="alert"></div>' +
+      '<div class="editor-actions"><button type="button" class="setting-cancel activity-name-cancel">' +
+      escapeHtml(text("cancel")) + '</button><button type="button" class="activity-name-reset">' +
+      escapeHtml(text("resetActivityNames")) + '</button><button type="button" class="setting-save activity-name-save">' +
+      '<span class="button-label">' + escapeHtml(text("saveActivityNames")) + '</span></button></div>' +
+      '</div></div>';
+  }
+
+  function validateActivityNameEditor(editor, revealError) {
+    var invalid = false;
+    var dirty = false;
+    editor.querySelectorAll(".activity-name-input").forEach(function (input) {
+      var value = normalizeActivityNameInput(input.value);
+      var fieldInvalid = Array.from(value).length > 32;
+      input.classList.toggle("is-invalid", fieldInvalid);
+      input.setAttribute("aria-invalid", String(fieldInvalid));
+      if (fieldInvalid) invalid = true;
+      if (value !== normalizeActivityNameInput(input.getAttribute("data-original-value"))) dirty = true;
+    });
+
+    var status = editor.querySelector(".editor-status");
+    if (status) status.hidden = !dirty;
+    var error = editor.querySelector(".editor-error");
+    if (error) {
+      error.hidden = !(revealError && invalid);
+      error.textContent = invalid
+        ? text("activityNamesHint")
+        : "";
+    }
+
+    var saveButton = editor.querySelector(".activity-name-save");
+    if (saveButton && !state.settingsSaving) saveButton.disabled = invalid || !dirty;
+    var resetButton = editor.querySelector(".activity-name-reset");
+    if (resetButton && !state.settingsSaving) resetButton.disabled = !dirty;
+
+    var summary = editor.querySelector(".change-summary");
+    if (summary) {
+      if (!dirty) {
+        summary.hidden = true;
+        summary.textContent = "";
+      } else {
+        var changes = [];
+        editor.querySelectorAll(".activity-name-input").forEach(function (input) {
+          var value = normalizeActivityNameInput(input.value);
+          var original = normalizeActivityNameInput(input.getAttribute("data-original-value"));
+          if (value === original) return;
+          var kind = input.getAttribute("data-activity-name-kind");
+          changes.push("<strong>" + escapeHtml(text(kind)) + "</strong> " +
+            escapeHtml(original || text(kind)) + " → " +
+            escapeHtml(value || text(kind)));
+        });
+        summary.hidden = false;
+        summary.classList.remove("is-error");
+        summary.innerHTML = "<span>" + escapeHtml(text("changesToSave")) +
+          ":</span> " + changes.join(", ");
+      }
+    }
+
+    return !invalid;
+  }
+
+  function bindActivityNamesEditor() {
+    var card = els["user-settings-names-card"];
+    if (!card) return;
+
+    var edit = card.querySelector(".activity-name-edit");
+    var view = card.querySelector(".setting-view");
+    var editor = card.querySelector(".activity-name-editor");
+    if (!edit || !view || !editor) return;
+
+    edit.onclick = function () {
+      view.hidden = true;
+      editor.hidden = false;
+      validateActivityNameEditor(editor, false);
+      var input = editor.querySelector(".activity-name-input");
+      if (input) input.focus();
+    };
+
+    editor.querySelectorAll(".activity-name-input").forEach(function (input) {
+      input.oninput = function () {
+        if (state.settingsSaving) return;
+        validateActivityNameEditor(editor, true);
+      };
+      input.onkeydown = function (event) {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          var cancel = editor.querySelector(".activity-name-cancel");
+          if (cancel) cancel.click();
+        }
+      };
+    });
+
+    var cancel = editor.querySelector(".activity-name-cancel");
+    if (cancel) cancel.onclick = function () {
+      editor.querySelectorAll(".activity-name-input").forEach(function (input) {
+        input.value = input.getAttribute("data-original-value") || "";
+        input.classList.remove("is-invalid");
+        input.setAttribute("aria-invalid", "false");
+      });
+      var error = editor.querySelector(".editor-error");
+      if (error) error.hidden = true;
+      var summary = editor.querySelector(".change-summary");
+      if (summary) summary.hidden = true;
+      editor.hidden = true;
+      view.hidden = false;
+      scheduleAutoRefresh();
+    };
+
+    var reset = editor.querySelector(".activity-name-reset");
+    if (reset) reset.onclick = function () {
+      if (state.settingsSaving) return;
+      editor.querySelectorAll(".activity-name-input").forEach(function (input) {
+        input.value = "";
+      });
+      validateActivityNameEditor(editor, true);
+    };
+
+    var save = editor.querySelector(".activity-name-save");
+    if (save) save.onclick = function () {
+      saveActivityNames(save);
+    };
+  }
+
+  async function saveActivityNames(button) {
+    if (state.settingsSaving) return;
+    var editor = button.closest(".activity-name-editor");
+    if (!editor) return;
+    if (!validateActivityNameEditor(editor, true)) {
+      showNotice(text("activityNamesSaveFailed"), "error");
+      return;
+    }
+
+    var names = {};
+    editor.querySelectorAll(".activity-name-input").forEach(function (input) {
+      names[input.getAttribute("data-activity-name-kind")] =
+        normalizeActivityNameInput(input.value);
+    });
+
+    var groupId = state.selectedGroupId;
+    if (!Number.isSafeInteger(groupId) || groupId >= 0) {
+      showNotice("Invalid group.", "error");
+      return;
+    }
+
+    state.settingsSaving = true;
+    button.disabled = true;
+    button.classList.add("is-saving");
+    setButton(button, "loading", text("saving") + "…");
+
+    try {
+      var data = await apiUserActivityNamesSave(groupId, names);
+      if (!data || !data.names) throw new Error(text("activityNamesSaveFailed"));
+      showNotice(text("activityNamesSaved"), "ok");
+      editor.hidden = true;
+      editor.closest(".settings-card").querySelector(".setting-view").hidden = false;
+      await loadUserDashboard(false, groupId);
+    } catch (error) {
+      showNotice(
+        error && error.message ? error.message : text("activityNamesSaveFailed"),
+        "error"
+      );
+      validateActivityNameEditor(editor, true);
+      button.disabled = false;
+      button.classList.remove("is-saving");
+      setButton(button, "idle", text("saveActivityNames"));
+    } finally {
+      state.settingsSaving = false;
+      if (!editor.hidden) validateActivityNameEditor(editor, true);
+      else button.classList.remove("is-saving");
+    }
+  }
+
   function updateChangeSummary(editor, errorMessage) {
     var summary = editor.querySelector(".change-summary");
     if (!summary) return;
@@ -3243,6 +3486,41 @@
     );
   }
 
+   async function apiUserActivityNames(groupId) {
+    if (!initData) throw new Error("Telegram session data is missing.");
+    return fetchJson(
+      "/api/user/activity-names?groupId=" + encodeURIComponent(String(groupId)),
+      {
+        method: "GET",
+        headers: {
+          "X-Telegram-Init-Data": initData,
+          "Accept": "application/json"
+        }
+      },
+      "Activity Names"
+    );
+  }
+
+  async function apiUserActivityNamesSave(groupId, names) {
+    if (!initData) throw new Error("Telegram session data is missing.");
+    return fetchJson(
+      "/api/user/activity-names",
+      {
+        method: "PUT",
+        headers: {
+          "X-Telegram-Init-Data": initData,
+          "Accept": "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          groupId: Number(groupId),
+          names: names
+        })
+      },
+      "Activity Names"
+    );
+  }
+
   function updateMetrics(group) {
     var memberValue = String(Number(group.memberCount) || 0);
     var activeValue = String(Number(group.activeCount) || 0);
@@ -3322,8 +3600,11 @@
       renderSettingCard("duration", data.activityLimits || DEFAULTS.duration, group.id);
     els["user-settings-counts-card"].innerHTML =
       renderSettingCard("count", data.countLimits || DEFAULTS.count, group.id);
+    els["user-settings-names-card"].innerHTML =
+      renderActivityNamesCard(data.activityNames || {}, group.id);
 
     bindSettingEditors();
+    bindActivityNamesEditor();
 
     document.querySelectorAll("[data-user-tab]").forEach(function (button) {
       var active = button.getAttribute("data-user-tab") === "dashboard";
@@ -4277,6 +4558,23 @@ function populateConnectSelect(select, groups, preferredId) {
       showNotice(text("replyUnsaved"), "error");
       return;
     }
+    var activityNameEditor = document.querySelector(".activity-name-editor");
+    if (tab !== "dashboard" && activityNameEditor && !activityNameEditor.hidden &&
+        !validateActivityNameEditor(activityNameEditor, false)) {
+      return;
+    }
+    if (tab !== "dashboard" && activityNameEditor && !activityNameEditor.hidden) {
+      var nameEditorDirty = false;
+      activityNameEditor.querySelectorAll(".activity-name-input").forEach(function (input) {
+        if (normalizeActivityNameInput(input.value) !== normalizeActivityNameInput(input.getAttribute("data-original-value"))) {
+          nameEditorDirty = true;
+        }
+      });
+      if (nameEditorDirty) {
+        showNotice(text("unsavedChanges"), "error");
+        return;
+      }
+    }
     var wasToolsOpen = state.toolsOpen;
     state.aboutOpen = tab === "about";
     state.supportOpen = tab === "support";
@@ -4368,6 +4666,11 @@ function populateConnectSelect(select, groups, preferredId) {
     var hasUnsaved = false;
     document.querySelectorAll(".editor-input[data-original-value]").forEach(function (input) {
       if (input.value !== input.getAttribute("data-original-value")) hasUnsaved = true;
+    });
+    document.querySelectorAll(".activity-name-input[data-original-value]").forEach(function (input) {
+      if (normalizeActivityNameInput(input.value) !== normalizeActivityNameInput(input.getAttribute("data-original-value"))) {
+        hasUnsaved = true;
+      }
     });
     if (hasUnsaved) {
       showNotice(
