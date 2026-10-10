@@ -88,27 +88,29 @@ html[data-animations="off"] .appearance-effects-layer{display:none!important}
 .brand-mark{
   width:42px;height:42px;flex:0 0 42px;
   display:grid;place-items:center;
-  grid-template-columns:repeat(3,5px);
-  align-content:center;
-  gap:4px;
-  border:1px solid rgba(104,181,255,.28);
+  border:1px solid rgba(104,181,255,.32);
   border-radius:14px;
-  background:linear-gradient(145deg,rgba(53,140,255,.18),rgba(122,104,255,.12));
-  box-shadow:0 12px 28px rgba(41,111,206,.18),inset 0 1px rgba(255,255,255,.05);
+  background:linear-gradient(145deg,rgba(53,140,255,.2),rgba(122,104,255,.15));
+  box-shadow:0 12px 28px rgba(41,111,206,.18),inset 0 1px rgba(255,255,255,.06);
+  overflow:hidden;
 }
-.brand-mark span{
-  width:5px;border-radius:5px;
-  background:linear-gradient(180deg,#8fd2ff,#5574ff);
-  box-shadow:0 0 14px rgba(72,168,255,.35);
+.brand-mark-text{
+  display:block;
+  font-size:12px;
+  line-height:1;
+  font-weight:950;
+  letter-spacing:-.075em;
+  padding-right:.07em;
+  color:transparent;
+  background:linear-gradient(110deg,#8fd2ff 0%,#f5fbff 28%,#74b7ff 52%,#c7bfff 72%,#8fd2ff 100%);
+  background-size:220% 100%;
+  -webkit-background-clip:text;
+  background-clip:text;
+  filter:drop-shadow(0 0 7px rgba(72,168,255,.38));
+  animation:z28WordmarkShimmer 3.8s ease-in-out infinite;
 }
-.brand-mark span:nth-child(1){height:13px}
-.brand-mark span:nth-child(2){height:21px}
-.brand-mark span:nth-child(3){height:29px}
-.brand-mark-lg{width:62px;height:62px;flex-basis:62px;border-radius:20px;grid-template-columns:repeat(3,7px);gap:6px}
-.brand-mark-lg span{width:7px}
-.brand-mark-lg span:nth-child(1){height:20px}
-.brand-mark-lg span:nth-child(2){height:32px}
-.brand-mark-lg span:nth-child(3){height:43px}
+.brand-mark-lg{width:62px;height:62px;flex-basis:62px;border-radius:20px}
+.brand-mark-lg .brand-mark-text{font-size:20px;letter-spacing:-.085em;filter:drop-shadow(0 0 10px rgba(72,168,255,.42))}
 
 .brand-copy{min-width:0}
 .eyebrow{
@@ -1497,20 +1499,13 @@ body::after{
 .brand-mark{
   animation:brandBreath 4.5s ease-in-out infinite;
 }
-.brand-mark span{
-  transform-origin:center bottom;
-  animation:barPulse 2.7s ease-in-out infinite;
-}
-.brand-mark span:nth-child(2){animation-delay:.22s}
-.brand-mark span:nth-child(3){animation-delay:.44s}
-
 @keyframes brandBreath{
-  0%,100%{box-shadow:0 12px 28px rgba(41,111,206,.18),inset 0 1px rgba(255,255,255,.05)}
-  50%{box-shadow:0 16px 34px rgba(41,111,206,.28),0 0 24px rgba(72,168,255,.08),inset 0 1px rgba(255,255,255,.06)}
+  0%,100%{box-shadow:0 12px 28px rgba(41,111,206,.18),inset 0 1px rgba(255,255,255,.06);transform:translateY(0)}
+  50%{box-shadow:0 16px 34px rgba(41,111,206,.28),0 0 24px rgba(72,168,255,.1),inset 0 1px rgba(255,255,255,.08);transform:translateY(-1px)}
 }
-@keyframes barPulse{
-  0%,100%{transform:scaleY(1);opacity:1}
-  50%{transform:scaleY(.82);opacity:.78}
+@keyframes z28WordmarkShimmer{
+  0%,100%{background-position:100% 50%;opacity:.92}
+  50%{background-position:0% 50%;opacity:1}
 }
 
 .live-dot{
@@ -1619,7 +1614,7 @@ body::after{
   .app-header,.verify-screen,.group-picker,.dashboard-head,
   .metrics-grid .metric-card,.settings-heading,.settings-card,
   .group-option,.about-head,.about-card,.about-details,.credit-card,
-  .brand-mark,.brand-mark span,.live-dot,.user-loading .loading-panel,
+  .brand-mark,.brand-mark-text,.live-dot,.user-loading .loading-panel,
   .state-icon-error,.splash-content,.splash-kicker,.splash h1,.splash p,.tab-bar,.tab-button.active,
   .auto-refresh-control.is-enabled .auto-refresh-indicator,
   .app-page-title,
@@ -4917,9 +4912,8 @@ html[data-custom-theme="on"] .appearance-module-card{
   .app-shell{width:100%;max-width:100%;margin:0;padding:max(10px,env(safe-area-inset-top)) var(--mobile-gutter) calc(108px + env(safe-area-inset-bottom))}
   .app-header{min-height:52px;align-items:center;gap:9px;padding:2px 0 16px}
   .brand-cluster{min-width:0;gap:9px;flex:1 1 auto}
-  .brand-mark{width:36px;height:36px;flex-basis:36px;border-radius:12px;grid-template-columns:repeat(3,4px);gap:3px}
-  .brand-mark span{width:4px}
-  .brand-mark span:nth-child(1){height:11px}.brand-mark span:nth-child(2){height:17px}.brand-mark span:nth-child(3){height:23px}
+  .brand-mark{width:36px;height:36px;flex-basis:36px;border-radius:12px}
+  .brand-mark-text{font-size:10px}
   .brand-copy{min-width:0;overflow:hidden}
   .brand-copy .eyebrow{font-size:8px;letter-spacing:.14em;white-space:nowrap}
   .app-page-title{max-width:100%;margin:2px 0 1px;font-size:clamp(17px,5vw,21px);line-height:1.14;letter-spacing:-.035em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
