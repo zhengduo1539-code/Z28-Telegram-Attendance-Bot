@@ -400,6 +400,7 @@
       faqA6: "Open Help & Support, choose a category, describe the problem, and send the report. Do not include passwords or other sensitive information.",
       title: "User Dashboard",
       dashboardEyebrow: "LIVE GROUP DASHBOARD",
+      dashboardOverview: "Live activity overview",
       hello: "Hello",
       secureAccess: "SECURE ACCESS",
       verifyTitle: "Verify Your Telegram ID",
@@ -749,6 +750,7 @@
       faqA6: "Help & Support ကိုဖွင့်ပြီး အမျိုးအစားရွေးပါ။ ပြဿနာကို ရေးပြီး Report ပို့ပါ။ Password သို့မဟုတ် sensitive information များကို မထည့်ပါနှင့်။",
       title: "User Dashboard",
       dashboardEyebrow: "LIVE GROUP DASHBOARD",
+      dashboardOverview: "လုပ်ဆောင်မှုအခြေအနေ အကျဉ်းချုပ်",
       hello: "မင်္ဂလာပါ",
       secureAccess: "လုံခြုံစွာ ဝင်ရောက်ရန်",
       verifyTitle: "Telegram ID အတည်ပြုရန်",
@@ -1098,6 +1100,7 @@
       faqA6: "打开帮助与支持，选择问题类型，描述问题并发送报告。请不要填写密码或其他敏感信息。",
       title: "用户仪表板",
       dashboardEyebrow: "实时群组仪表板",
+      dashboardOverview: "实时活动概览",
       hello: "你好",
       secureAccess: "安全访问",
       verifyTitle: "验证您的 Telegram ID",
@@ -3578,7 +3581,7 @@
 
     els.title.textContent = text("title");
     els.identity.textContent = userGreeting();
-    els["user-dashboard-sub"].textContent = text("dashboardEyebrow");
+    els["user-dashboard-sub"].textContent = text("dashboardOverview");
     els["user-onboarding-title"].textContent = text("onboardingTitle");
     els["user-onboarding-sub"].textContent = text("onboardingSub");
     els["user-onboarding-step1-title"].textContent = text("onboardingStep1Title");

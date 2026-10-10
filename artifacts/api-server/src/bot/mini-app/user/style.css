@@ -878,9 +878,10 @@ html[data-animations="off"] .appearance-effects-layer{display:none!important}
 }
 .group-dashboard-title{
   display:flex;
-  align-items:baseline;
-  flex-wrap:wrap;
-  gap:.34em .42em;
+  flex-direction:column;
+  align-items:flex-start;
+  flex-wrap:nowrap;
+  gap:8px;
   max-width:100%;
 }
 .group-dashboard-name{
