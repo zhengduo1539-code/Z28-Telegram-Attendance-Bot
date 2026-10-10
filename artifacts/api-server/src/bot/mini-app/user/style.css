@@ -1261,28 +1261,70 @@ html[data-animations="off"] .appearance-effects-layer{display:none!important}
 .loading-panel span{display:block;margin-top:3px;color:var(--muted);font-size:10px;line-height:1.45}
 
 .splash{
+  --splash-blue:#72c7ff;
   position:fixed;inset:0;z-index:200;
   display:grid;place-items:center;
   overflow:hidden;
+  isolation:isolate;
+  padding:24px;
   background:
-    radial-gradient(circle at 50% 44%,rgba(72,168,255,.12),transparent 25%),
-    linear-gradient(180deg,#050c18,#02070f);
+    radial-gradient(ellipse at 50% 42%,rgba(43,115,214,.17),transparent 32%),
+    radial-gradient(ellipse at 50% 68%,rgba(92,75,203,.09),transparent 40%),
+    linear-gradient(155deg,#081321 0%,#040a13 52%,#02060c 100%);
   transition:opacity .45s ease,visibility .45s ease;
 }
-.splash.hide{opacity:0;visibility:hidden;pointer-events:none}
-.splash-content{position:relative;z-index:2;text-align:center}
-.splash-content .brand-mark{margin:0 auto 20px}
-.splash-kicker{color:#7098c1;font-size:9px;font-weight:850;letter-spacing:.18em}
-.splash h1{margin:8px 0 4px;font-size:34px;letter-spacing:-.05em}
-.splash p{margin:0;color:#6f829a;font-size:11px}
-.splash-orbit{
-  position:absolute;border:1px solid rgba(104,181,255,.08);border-radius:50%;
-  transform:translate(-50%,-50%);
-  left:50%;top:50%;
+.splash::before{
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background-image:linear-gradient(rgba(136,184,235,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(136,184,235,.035) 1px,transparent 1px);
+  background-size:42px 42px;
+  mask-image:radial-gradient(ellipse at center,black 8%,transparent 76%);
+  opacity:.55;
 }
-.splash-orbit-a{width:230px;height:230px;animation:orbitPulse 3.8s ease-in-out infinite}
-.splash-orbit-b{width:340px;height:340px;border-color:rgba(122,104,255,.06);animation:orbitPulse 3.8s ease-in-out -1.4s infinite}
-@keyframes orbitPulse{50%{transform:translate(-50%,-50%) scale(1.07);opacity:.38}}
+.splash::after{
+  content:"";position:absolute;inset:12px;pointer-events:none;
+  border:1px solid rgba(148,190,238,.075);border-radius:24px;
+}
+.splash.hide{opacity:0;visibility:hidden;pointer-events:none}
+.splash-content{position:relative;z-index:2;width:min(100%,380px);text-align:center;display:flex;flex-direction:column;align-items:center;padding:34px 25px 29px;border:1px solid rgba(146,190,245,.13);border-radius:28px;background:linear-gradient(145deg,rgba(15,31,51,.76),rgba(5,13,24,.55));box-shadow:0 30px 100px rgba(0,0,0,.32),inset 0 1px rgba(255,255,255,.045);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.splash-brand-frame{position:relative;display:grid;place-items:center;width:100px;height:100px;margin:0 auto 21px}
+.splash-brand-halo{position:absolute;inset:0;border:1px solid rgba(99,180,255,.2);border-radius:29px;transform:rotate(45deg);background:linear-gradient(145deg,rgba(61,142,255,.09),rgba(125,94,255,.025));box-shadow:0 0 42px rgba(49,137,255,.1),inset 0 0 25px rgba(72,168,255,.035);animation:splashHalo 6s ease-in-out infinite}
+.splash-content .brand-mark{position:relative;width:72px;height:72px;flex-basis:72px;margin:0;border-radius:22px;border-color:rgba(129,198,255,.36);background:linear-gradient(145deg,rgba(37,113,197,.28),rgba(62,62,149,.22));box-shadow:0 14px 34px rgba(0,0,0,.24),0 0 32px rgba(55,143,255,.12),inset 0 1px rgba(255,255,255,.1)}
+.splash-content .brand-mark-text{font-size:23px;filter:drop-shadow(0 0 12px rgba(72,168,255,.48))}
+.splash-kicker{display:flex;align-items:center;justify-content:center;gap:10px;color:#87a9cd;font-size:8px;font-weight:850;letter-spacing:.2em;line-height:1.5;white-space:nowrap}
+.splash-kicker-line{display:block;width:17px;height:1px;background:linear-gradient(90deg,transparent,rgba(110,184,255,.7))}
+.splash-kicker-line:last-child{transform:rotate(180deg)}
+.splash-kicker-divider{color:#6479b7}
+.splash h1{margin:17px 0 7px;font-size:clamp(30px,8vw,38px);font-weight:800;line-height:1.05;letter-spacing:-.055em;color:#f3f8ff;text-shadow:0 2px 28px rgba(88,166,255,.12)}
+.splash p{margin:0;color:#91a5bd;font-size:12px;line-height:1.65;letter-spacing:.015em}
+.splash-status{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:25px;color:#7892af;font-size:8px;font-weight:750;letter-spacing:.14em;white-space:nowrap}
+.splash-status-dot{width:6px;height:6px;border-radius:50%;background:#6de3bd;box-shadow:0 0 12px rgba(109,227,189,.65);animation:splashStatusPulse 1.8s ease-in-out infinite}
+.splash-status-divider{width:3px;height:3px;border-radius:50%;background:#536a87}
+.splash-progress{position:relative;width:min(100%,190px);height:2px;margin-top:16px;overflow:hidden;border-radius:5px;background:rgba(111,155,201,.14)}
+.splash-progress span{position:absolute;inset:0 auto 0 -40%;width:40%;border-radius:inherit;background:linear-gradient(90deg,transparent,#66baff,#b8dfff,transparent);box-shadow:0 0 12px rgba(87,173,255,.6);animation:splashProgress 1.8s ease-in-out infinite}
+.splash-orbit{
+  position:absolute;border:1px solid rgba(104,181,255,.1);border-radius:50%;
+  transform:translate(-50%,-50%);
+  left:50%;top:46%;pointer-events:none;
+}
+.splash-orbit-a{width:260px;height:260px;animation:orbitPulse 5.5s ease-in-out infinite}
+.splash-orbit-b{width:370px;height:370px;border-color:rgba(122,104,255,.075);animation:orbitPulse 5.5s ease-in-out -2s infinite}
+@keyframes orbitPulse{50%{transform:translate(-50%,-50%) scale(1.045);opacity:.42}}
+@keyframes splashHalo{0%,100%{transform:rotate(45deg) scale(.96);opacity:.72}50%{transform:rotate(45deg) scale(1.04);opacity:1}}
+@keyframes splashStatusPulse{0%,100%{opacity:.65;box-shadow:0 0 6px rgba(109,227,189,.35)}50%{opacity:1;box-shadow:0 0 14px rgba(109,227,189,.72)}}
+@keyframes splashProgress{0%{left:-40%}100%{left:110%}}
+@media(max-width:420px){
+  .splash-content{padding:28px 17px 24px;border-radius:24px}
+  .splash-brand-frame{width:88px;height:88px;margin-bottom:18px}
+  .splash-content .brand-mark{width:64px;height:64px;flex-basis:64px;border-radius:19px}
+  .splash-content .brand-mark-text{font-size:21px}
+  .splash-kicker{font-size:7px;letter-spacing:.15em;gap:7px}
+  .splash-kicker-line{width:11px}
+  .splash-status{gap:6px;font-size:7px;letter-spacing:.11em}
+  .splash-orbit-a{width:220px;height:220px}.splash-orbit-b{width:310px;height:310px}
+}
+@media(prefers-reduced-motion:reduce){
+  .splash-brand-halo,.splash-status-dot,.splash-progress span,.splash-orbit-a,.splash-orbit-b{animation:none!important}
+}
 
 @media(max-width:620px){
   .app-shell{padding-left:14px;padding-right:14px}
