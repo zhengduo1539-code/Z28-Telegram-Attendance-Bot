@@ -494,7 +494,17 @@ userApiRouter.post("/dashboard", async (req, res) => {
       : groups.find((group) => group.id === requestedGroupId);
 
   if (requestedGroupId !== undefined && !selected) {
-    sendError(res, 403, "You are not an owner or administrator of that group.");
+    // A previously saved group can become unavailable after permissions change
+    // or the bot is removed. Return the current authorized group list so the
+    // Mini App can prompt the user to select a valid group instead of failing.
+    res.setHeader("Cache-Control", "no-store");
+    res.json({
+      user: auth.user,
+      groups,
+      hasGroups: true,
+      selectionRequired: true,
+      message: "Your previous group selection is no longer available. Select a group to continue.",
+    });
     return;
   }
 
