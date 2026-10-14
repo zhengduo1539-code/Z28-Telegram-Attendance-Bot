@@ -5,6 +5,7 @@ import router from "./routes";
 import { adminApiRouter, adminPageHandler, userPageHandler } from "./bot/admin-api";
 import { groupAdminApiRouter } from "./bot/group-admin-api";
 import { userApiRouter } from "./bot/user-api";
+import { controlCenterApiRouter } from "./bot/control-center-api";
 import { logger } from "./lib/logger";
 import { getAdminApiContext } from "./bot/admin-runtime";
 
@@ -15,16 +16,10 @@ app.use(
     logger,
     serializers: {
       req(req) {
-        return {
-          id: req.id,
-          method: req.method,
-          url: req.url?.split("?")[0],
-        };
+        return { id: req.id, method: req.method, url: req.url?.split("?")[0] };
       },
       res(res) {
-        return {
-          statusCode: res.statusCode,
-        };
+        return { statusCode: res.statusCode };
       },
     },
   }),
@@ -33,13 +28,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Lightweight public liveness endpoint for uptime monitors.
-// It intentionally does not depend on MongoDB or Telegram polling state.
+// Public liveness endpoint for uptime monitors; intentionally lightweight.
 app.get("/", (_req, res) => {
-  res.status(200).json({
-    status: "ok",
-    service: "Z28 Telegram Attendance Bot",
-  });
+  res.status(200).json({ status: "ok", service: "Z28 Telegram Attendance Bot" });
 });
 
 app.get("/admin", adminPageHandler);
@@ -48,27 +39,18 @@ app.get("/user-app", userPageHandler);
 app.use("/api/admin", adminApiRouter);
 app.use("/api/group-admin", groupAdminApiRouter);
 app.use("/api/user", userApiRouter);
+app.use("/api/control-center", controlCenterApiRouter);
 app.use("/api", router);
-
-export default app;
-
 
 app.use(async (error: unknown, req: express.Request, res: express.Response, next: express.NextFunction) => {
   const context = getAdminApiContext();
   const isAdminApi = req.path.startsWith("/api/admin");
   const statusCode = 500;
-  const message =
-    error instanceof Error
-      ? error.message.slice(0, 2000)
-      : "Unknown server error";
+  const message = error instanceof Error ? error.message.slice(0, 2000) : "Unknown server error";
 
   if (isAdminApi && context) {
     const entry = {
-      id:
-        "system-" +
-        Date.now().toString(36) +
-        "-" +
-        Math.random().toString(36).slice(2, 8),
+      id: "system-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8),
       actorUserId: 0,
       actorName: "System",
       role: "administrator" as const,
@@ -77,12 +59,8 @@ app.use(async (error: unknown, req: express.Request, res: express.Response, next
       details: "[Admin API] HTTP " + statusCode + ": " + message,
       createdAt: new Date().toISOString(),
     };
-
     void context.attendance.createAuditLog(entry).catch((auditError: unknown) => {
-      logger.error(
-        { err: auditError, source: req.path },
-        "Failed to persist admin API error notification",
-      );
+      logger.error({ err: auditError, source: req.path }, "Failed to persist admin API error notification");
     });
   }
 
@@ -90,8 +68,7 @@ app.use(async (error: unknown, req: express.Request, res: express.Response, next
     next(error);
     return;
   }
-
-  res.status(statusCode).json({
-    error: "Internal server error.",
-  });
+  res.status(statusCode).json({ error: "Internal server error." });
 });
+
+export default app;
