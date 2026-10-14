@@ -5,7 +5,6 @@ import router from "./routes";
 import { adminApiRouter, adminPageHandler, userPageHandler } from "./bot/admin-api";
 import { groupAdminApiRouter } from "./bot/group-admin-api";
 import { userApiRouter } from "./bot/user-api";
-import { controlCenterApiRouter } from "./bot/control-center-api";
 import { logger } from "./lib/logger";
 import { getAdminApiContext } from "./bot/admin-runtime";
 
@@ -39,7 +38,6 @@ app.get("/user-app", userPageHandler);
 app.use("/api/admin", adminApiRouter);
 app.use("/api/group-admin", groupAdminApiRouter);
 app.use("/api/user", userApiRouter);
-app.use("/api/control-center", controlCenterApiRouter);
 app.use("/api", router);
 
 app.use(async (error: unknown, req: express.Request, res: express.Response, next: express.NextFunction) => {
