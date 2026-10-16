@@ -19,6 +19,8 @@ import type {
   MiniAppGroupAccess,
   GroupWarning,
   AuditLogEntry,
+  ReplyKeyboardEmojiKey,
+  ReplyKeyboardEmojiIds,
 } from "./types";
 import type { BotStore } from "./store/types";
 
@@ -371,6 +373,25 @@ export class AttendanceService {
     };
   }
 
+  async getReplyKeyboardEmojiIds(): Promise<ReplyKeyboardEmojiIds> {
+    const state = await this.store.load();
+    return structuredClone(state.replyKeyboardEmojiIds || {});
+  }
+
+  async setReplyKeyboardEmojiId(key: ReplyKeyboardEmojiKey, customEmojiId?: string): Promise<ReplyKeyboardEmojiIds> {
+    await this.store.update((state) => {
+      const next = { ...(state.replyKeyboardEmojiIds || {}) };
+      if (customEmojiId) next[key] = customEmojiId;
+      else delete next[key];
+      state.replyKeyboardEmojiIds = next;
+    });
+    return this.getReplyKeyboardEmojiIds();
+  }
+
+  async clearReplyKeyboardEmojiIds(): Promise<ReplyKeyboardEmojiIds> {
+    await this.store.update((state) => { state.replyKeyboardEmojiIds = {}; });
+    return {};
+  }
 
   async workCheckIn(
     profile: Omit<UserProfile, "createdAt" | "updatedAt">,
