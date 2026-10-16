@@ -449,7 +449,7 @@ export class CommandHandler {
   private async handleSetmsgCommand(message: TelegramMessage, profile: Omit<UserProfile, "createdAt" | "updatedAt">, argument?: string): Promise<void> {
     const text = getLocale(profile.locale);
     if (!this.isConfiguredAdmin(profile.userId)) {
-      await this.telegram.sendMessage(message.chat.id, text.adminOnly, undefined, message.message_id);
+      await this.telegram.sendMessage(message.chat.id, await this.attendance.renderBotReplyMessage(profile.locale, "adminOnly", text.adminOnly), undefined, message.message_id);
       return;
     }
     if (message.chat.type !== "private" || message.chat.id !== profile.userId) {
@@ -505,7 +505,7 @@ export class CommandHandler {
     const locale = await this.attendance.getLocale(message.chat.id, callback.from.id);
     const text = getLocale(locale);
     if (!this.isConfiguredAdmin(callback.from.id)) {
-      await this.telegram.sendMessage(message.chat.id, text.adminOnly);
+      await this.telegram.sendMessage(message.chat.id, await this.attendance.renderBotReplyMessage(locale, "adminOnly", text.adminOnly));
       return;
     }
     if (message.chat.type !== "private" || message.chat.id !== callback.from.id) {
@@ -1180,24 +1180,29 @@ export class CommandHandler {
       message.chat.type === "group" || message.chat.type === "supergroup"
         ? await this.isGroupAdmin(message)
         : false;
-    if (!isConfiguredAdmin && !isGroupAdmin) return text.adminOnly;
+    if (!isConfiguredAdmin && !isGroupAdmin) return this.attendance.renderBotReplyMessage(profile.locale, "adminOnly", text.adminOnly);
     if (message.chat.type !== "private" && !isGroupAdmin && !isConfiguredAdmin) {
-      return text.countLimitPrivate;
+      return this.attendance.renderBotReplyMessage(profile.locale, "countLimitPrivate", text.countLimitPrivate);
     }
 
     const parts = argument?.split(/\s+/).filter(Boolean) || [];
     if (parts.length === 0) {
-      return text.countLimits(await this.attendance.getActivityCountLimits());
+      const limits = await this.attendance.getActivityCountLimits();
+      return this.attendance.renderBotReplyMessage(profile.locale, "countLimits", text.countLimits(limits), {
+        eat_count: limits.eat ?? "unlimited", wc_count: limits.wc ?? "unlimited",
+        smoke_count: limits.smoke ?? "unlimited", wcd_count: limits.wcd ?? "unlimited",
+      });
     }
-    if (parts.length !== 2) return text.countLimitUsage;
+    if (parts.length !== 2) return this.attendance.renderBotReplyMessage(profile.locale, "countLimitUsage", text.countLimitUsage);
 
     const kind = parts[0] as ActivityKind;
-    if (!["eat", "wc", "smoke", "wcd"].includes(kind)) return text.unknownActivity;
+    if (!["eat", "wc", "smoke", "wcd"].includes(kind)) return this.attendance.renderBotReplyMessage(profile.locale, "unknownActivity", text.unknownActivity);
     const count = Number(parts[1]);
-    if (!Number.isInteger(count) || count <= 0) return text.invalidCountLimit;
+    if (!Number.isInteger(count) || count <= 0) return this.attendance.renderBotReplyMessage(profile.locale, "invalidCountLimit", text.invalidCountLimit);
 
     await this.attendance.setActivityCountLimit(kind, count);
-    return text.countLimitUpdated(activityLabel(kind, profile.locale), count);
+    const activity = activityLabel(kind, profile.locale);
+    return this.attendance.renderBotReplyMessage(profile.locale, "countLimitUpdated", text.countLimitUpdated(activity, count), { activity, count });
   }
 
   private async handleReminderCommand(
@@ -1209,18 +1214,18 @@ export class CommandHandler {
     const isAdmin =
       this.config.botOwnerId === profile.userId ||
       this.config.adminIds.includes(profile.userId);
-    if (!isAdmin) return text.adminOnly;
-    if (message.chat.type !== "private") return text.reminderPrivate;
+    if (!isAdmin) return this.attendance.renderBotReplyMessage(profile.locale, "adminOnly", text.adminOnly);
+    if (message.chat.type !== "private") return this.attendance.renderBotReplyMessage(profile.locale, "reminderPrivate", text.reminderPrivate);
 
     if (!argument) {
       const enabled = await this.attendance.isActivityReminderEnabled();
-      return text.reminderStatus(enabled);
+      return this.attendance.renderBotReplyMessage(profile.locale, "reminderStatus", text.reminderStatus(enabled), { enabled: enabled ? "on" : "off" });
     }
-    if (argument !== "on" && argument !== "off") return text.reminderUsage;
+    if (argument !== "on" && argument !== "off") return this.attendance.renderBotReplyMessage(profile.locale, "reminderUsage", text.reminderUsage);
 
     const enabled = argument === "on";
     await this.attendance.setActivityReminderEnabled(enabled);
-    return text.reminderUpdated(enabled);
+    return this.attendance.renderBotReplyMessage(profile.locale, "reminderUpdated", text.reminderUpdated(enabled), { enabled: enabled ? "on" : "off" });
   }
 
   private async handleLimitCommand(
@@ -1236,28 +1241,32 @@ export class CommandHandler {
       message.chat.type === "group" || message.chat.type === "supergroup"
         ? await this.isGroupAdmin(message)
         : false;
-    if (!isConfiguredAdmin && !isGroupAdmin) return text.adminOnly;
+    if (!isConfiguredAdmin && !isGroupAdmin) return this.attendance.renderBotReplyMessage(profile.locale, "adminOnly", text.adminOnly);
     if (message.chat.type !== "private" && !isGroupAdmin && !isConfiguredAdmin) {
-      return text.limitPrivate;
+      return this.attendance.renderBotReplyMessage(profile.locale, "limitPrivate", text.limitPrivate);
     }
 
     const parts = argument?.split(/\s+/).filter(Boolean) || [];
     if (parts.length === 0) {
-      return text.limits(await this.attendance.getActivityLimits());
+      const limits = await this.attendance.getActivityLimits();
+      return this.attendance.renderBotReplyMessage(profile.locale, "limits", text.limits(limits), {
+        eat_minutes: limits.eat, wc_minutes: limits.wc, smoke_minutes: limits.smoke, wcd_minutes: limits.wcd,
+      });
     }
-    if (parts.length !== 2) return text.limitUsage;
+    if (parts.length !== 2) return this.attendance.renderBotReplyMessage(profile.locale, "limitUsage", text.limitUsage);
 
     const kind = parts[0] as ActivityKind;
     if (!["eat", "wc", "smoke", "wcd"].includes(kind)) {
-      return text.unknownActivity;
+      return this.attendance.renderBotReplyMessage(profile.locale, "unknownActivity", text.unknownActivity);
     }
     const minutes = Number(parts[1]);
     if (!Number.isInteger(minutes) || minutes <= 0) {
-      return text.invalidLimit;
+      return this.attendance.renderBotReplyMessage(profile.locale, "invalidLimit", text.invalidLimit);
     }
 
     await this.attendance.setActivityLimit(kind, minutes);
-    return text.limitUpdated(activityLabel(kind, profile.locale), minutes);
+    const activity = activityLabel(kind, profile.locale);
+    return this.attendance.renderBotReplyMessage(profile.locale, "limitUpdated", text.limitUpdated(activity, minutes), { activity, minutes });
   }
 
   private async handleMyChatMember(update: NonNullable<TelegramUpdate["my_chat_member"]>) {
