@@ -760,40 +760,50 @@ export class AttendanceService {
           locale,
           "groupTimeoutNotification",
         );
+        const templateValues = {
+          group_name: connection?.targetGroupName || "Group",
+          group_id: connection?.sourceChatId || profile.chatId,
+          username: connection?.sourceUsername || "",
+          user_name: active.displayName,
+          user_id: active.userId,
+          activity: activityName,
+          timeout_duration:
+            locale === "en"
+              ? formatEnglishDuration(timeoutSeconds)
+              : formatChineseDuration(timeoutSeconds),
+          warning_time: warningTime,
+        };
+        const defaultMessage = connection
+          ? getLocale(locale).groupTimeoutNotification(
+              connection.targetGroupName,
+              connection.sourceChatId,
+              connection.sourceUsername,
+              active.displayName,
+              active.userId,
+              activityName,
+              timeoutSeconds,
+              warningTime,
+            )
+          : getLocale(locale).groupTimeoutNotification(
+              "Group",
+              profile.chatId,
+              undefined,
+              active.displayName,
+              active.userId,
+              activityName,
+              timeoutSeconds,
+              warningTime,
+            );
+        const globalTemplate = getBotReplyTemplate(
+          nextState.botReplyMessages,
+          locale,
+          "groupTimeoutNotification",
+        );
         const message = customTemplate
-          ? renderActivityReplyTemplate(customTemplate, {
-              group_name: connection?.targetGroupName || "Group",
-              group_id: connection?.sourceChatId || profile.chatId,
-              user_name: active.displayName,
-              user_id: active.userId,
-              activity: activityName,
-              timeout_duration:
-                locale === "en"
-                  ? formatEnglishDuration(timeoutSeconds)
-                  : formatChineseDuration(timeoutSeconds),
-              warning_time: warningTime,
-            })
-          : connection
-            ? getLocale(locale).groupTimeoutNotification(
-                connection.targetGroupName,
-                connection.sourceChatId,
-                connection.sourceUsername,
-                active.displayName,
-                active.userId,
-                activityName,
-                timeoutSeconds,
-                warningTime,
-              )
-            : getLocale(locale).groupTimeoutNotification(
-                "Group",
-                profile.chatId,
-                undefined,
-                active.displayName,
-                active.userId,
-                activityName,
-                timeoutSeconds,
-                warningTime,
-              );
+          ? renderActivityReplyTemplate(customTemplate, templateValues)
+          : globalTemplate
+            ? renderActivityReplyTemplate(globalTemplate, templateValues)
+            : defaultMessage;
 
         warning = {
           id: active.id,
