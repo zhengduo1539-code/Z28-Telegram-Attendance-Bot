@@ -1,6 +1,16 @@
 import type { AttendanceService } from "./attendance-service";
 import type { BotConfig } from "./config";
 import { activityLabel, getLocale } from "./locales";
+import {
+  BOT_REPLY_CATEGORIES,
+  BOT_REPLY_KEYS,
+  BOT_REPLY_KEYS_BY_CATEGORY,
+  BOT_REPLY_LABELS,
+  BOT_REPLY_VARIABLES,
+  validateBotReplyTemplate,
+  type BotReplyCategory,
+  type BotReplyMessageKey,
+} from "./bot-reply-messages";
 import type {
   ActivityKind,
   Locale,
@@ -145,6 +155,21 @@ export const ADMIN_MENU_COMMANDS = getCommandMenu("en", true);
 
 const REPLY_KEYBOARD_EMOJI_KEYS: ReplyKeyboardEmojiKey[] = ["wc", "smoke", "wcd", "back"];
 const SETMSG_PENDING_TTL_MS = 5 * 60 * 1_000;
+const BOT_REPLY_LOCALES: Array<{ locale: Locale; label: string }> = [
+  { locale: "en", label: "🇬🇧 English" },
+  { locale: "mm", label: "🇲🇲 မြန်မာ" },
+  { locale: "zh", label: "🇨🇳 简体中文" },
+];
+const isLocale = (value: string | undefined): value is Locale =>
+  value === "en" || value === "mm" || value === "zh";
+const isBotReplyCategory = (value: string | undefined): value is BotReplyCategory =>
+  value !== undefined && (BOT_REPLY_CATEGORIES as readonly string[]).includes(value);
+const localeName = (locale: Locale): string =>
+  BOT_REPLY_LOCALES.find((item) => item.locale === locale)?.label || locale;
+const botReplyCategoryForKey = (key: BotReplyMessageKey): BotReplyCategory =>
+  BOT_REPLY_CATEGORIES.find((category) =>
+    BOT_REPLY_KEYS_BY_CATEGORY[category].includes(key),
+  ) || "general";
 
 export class CommandHandler {
   private readonly adminMenuScopes = new Set<string>();
@@ -153,6 +178,12 @@ export class CommandHandler {
   private readonly pendingReplyKeyboardEmoji = new Map<number, {
     chatId: number;
     key: ReplyKeyboardEmojiKey;
+    expiresAt: number;
+  }>();
+  private readonly pendingBotReplyMessage = new Map<number, {
+    chatId: number;
+    locale: Locale;
+    key: BotReplyMessageKey;
     expiresAt: number;
   }>();
 
@@ -201,7 +232,169 @@ export class CommandHandler {
       { text: labels.clearAll, callback_data: "setmsg:clear_all", style: "danger" },
       { text: labels.cancel, callback_data: "setmsg:cancel" },
     ]);
+    rows.push([{ text: getLocale(locale).setmsgRootLabels.back, callback_data: "setmsg:menu:root" }]);
     return { inline_keyboard: rows };
+  }
+
+  private buildSetmsgRootMenu(locale: Locale): import("./types").InlineKeyboardMarkup {
+    const labels = getLocale(locale).setmsgRootLabels;
+    return {
+      inline_keyboard: [
+        [
+          { text: labels.emoji, callback_data: "setmsg:mode:emoji" },
+          { text: labels.replies, callback_data: "setmsg:mode:text" },
+        ],
+        [{ text: labels.cancel, callback_data: "setmsg:cancel" }],
+      ],
+    };
+  }
+
+  private buildBotReplyLocaleMenu(locale: Locale): import("./types").InlineKeyboardMarkup {
+    const rows = BOT_REPLY_LOCALES.map((option) => [
+      {
+        text: option.label,
+        callback_data: `setmsg:locale:${option.locale}`,
+        ...(option.locale === locale ? { style: "primary" as const } : {}),
+      },
+    ]);
+    rows.push([{ text: getLocale(locale).setmsgRootLabels.back, callback_data: "setmsg:mode:text" }]);
+    return { inline_keyboard: rows };
+  }
+
+  private buildBotReplyCategoryMenu(uiLocale: Locale, targetLocale: Locale): import("./types").InlineKeyboardMarkup {
+    const text = getLocale(uiLocale);
+    const labels = text.setmsgTextCategories;
+    return {
+      inline_keyboard: [
+        [
+          { text: labels.general, callback_data: `setmsg:category:${targetLocale}:general` },
+          { text: labels.attendance, callback_data: `setmsg:category:${targetLocale}:attendance` },
+        ],
+        [
+          { text: labels.admin, callback_data: `setmsg:category:${targetLocale}:admin` },
+          { text: labels.connect, callback_data: `setmsg:category:${targetLocale}:connect` },
+        ],
+        [{ text: text.setmsgRootLabels.back, callback_data: "setmsg:mode:text" }],
+        [{ text: text.setmsgRootLabels.cancel, callback_data: "setmsg:cancel" }],
+      ],
+    };
+  }
+
+  private async buildBotReplyKeyMenu(
+    uiLocale: Locale,
+    targetLocale: Locale,
+    category: BotReplyCategory,
+  ): Promise<import("./types").InlineKeyboardMarkup> {
+    const text = getLocale(uiLocale);
+    const labels = text.setmsgRootLabels;
+    const configured = await this.attendance.getBotReplyMessages(targetLocale);
+    const keys = BOT_REPLY_KEYS_BY_CATEGORY[category];
+    const rows: import("./types").InlineKeyboardButton[][] = [];
+    for (let index = 0; index < keys.length; index += 2) {
+      rows.push(keys.slice(index, index + 2).map((key) => ({
+        text: `${configured[key] ? "✅" : "▫️"} ${BOT_REPLY_LABELS[key]}`,
+        callback_data: `setmsg:key:${targetLocale}:${key}`,
+      })));
+    }
+    rows.push([
+      {
+        text: labels.resetAllText,
+        callback_data: `setmsg:cleartexts:${targetLocale}`,
+        style: "danger",
+      },
+    ]);
+    rows.push([
+      {
+        text: labels.back,
+        callback_data: `setmsg:locale:${targetLocale}`,
+      },
+      {
+        text: labels.cancel,
+        callback_data: "setmsg:cancel",
+      },
+    ]);
+    return { inline_keyboard: rows };
+  }
+
+  private async startBotReplyTextSetup(
+    chatId: number,
+    userId: number,
+    uiLocale: Locale,
+    targetLocale: Locale,
+    key: BotReplyMessageKey,
+    replyToMessageId?: number,
+  ): Promise<void> {
+    this.pendingBotReplyMessage.set(userId, {
+      chatId,
+      locale: targetLocale,
+      key,
+      expiresAt: Date.now() + SETMSG_PENDING_TTL_MS,
+    });
+    await this.telegram.sendMessage(
+      chatId,
+      getLocale(uiLocale).setmsgTextPrompt(
+        BOT_REPLY_LABELS[key],
+        localeName(targetLocale),
+        [...BOT_REPLY_VARIABLES[key]],
+      ),
+      undefined,
+      replyToMessageId,
+    );
+  }
+
+  private async handlePendingBotReplyText(message: TelegramMessage): Promise<boolean> {
+    if (!message.text || !message.from || message.from.is_bot || message.chat.type !== "private") return false;
+    const pending = this.pendingBotReplyMessage.get(message.from.id);
+    if (!pending || pending.chatId !== message.chat.id) return false;
+
+    const uiLocale = await this.attendance.getLocale(message.chat.id, message.from.id);
+    const uiText = getLocale(uiLocale);
+    const incomingCommand = parseCommand(message.text);
+
+    if (pending.expiresAt <= Date.now()) {
+      this.pendingBotReplyMessage.delete(message.from.id);
+      if (incomingCommand) return false;
+      await this.telegram.sendMessage(message.chat.id, uiText.setmsgExpired);
+      return true;
+    }
+
+    if (incomingCommand?.name === "cancel") {
+      this.pendingBotReplyMessage.delete(message.from.id);
+      await this.telegram.sendMessage(message.chat.id, uiText.setmsgCancelled);
+      return true;
+    }
+
+    if (incomingCommand?.name === "reset") {
+      this.pendingBotReplyMessage.delete(message.from.id);
+      await this.attendance.setBotReplyTemplate(pending.locale, pending.key);
+      await this.telegram.sendMessage(
+        message.chat.id,
+        uiText.setmsgTextCleared(BOT_REPLY_LABELS[pending.key], localeName(pending.locale)),
+        await this.buildBotReplyKeyMenu(uiLocale, pending.locale, botReplyCategoryForKey(pending.key)),
+      );
+      return true;
+    }
+
+    if (incomingCommand) {
+      this.pendingBotReplyMessage.delete(message.from.id);
+      return false;
+    }
+
+    const validationError = validateBotReplyTemplate(pending.key, message.text);
+    if (validationError) {
+      await this.telegram.sendMessage(message.chat.id, uiText.setmsgTextInvalid(validationError));
+      return true;
+    }
+
+    await this.attendance.setBotReplyTemplate(pending.locale, pending.key, message.text);
+    this.pendingBotReplyMessage.delete(message.from.id);
+    await this.telegram.sendMessage(
+      message.chat.id,
+      uiText.setmsgTextSaved(BOT_REPLY_LABELS[pending.key], localeName(pending.locale)),
+      await this.buildBotReplyKeyMenu(uiLocale, pending.locale, botReplyCategoryForKey(pending.key)),
+      message.message_id,
+    );
+    return true;
   }
 
   private async startReplyKeyboardEmojiSetup(chatId: number, userId: number, locale: Locale, key: ReplyKeyboardEmojiKey, replyToMessageId?: number): Promise<void> {
@@ -266,25 +459,48 @@ export class CommandHandler {
     const arg = argument?.trim().toLowerCase();
     if (arg === "reset" || arg === "clear" || arg === "all") {
       this.pendingReplyKeyboardEmoji.delete(profile.userId);
+      this.pendingBotReplyMessage.delete(profile.userId);
       await this.attendance.clearReplyKeyboardEmojiIds();
       const settings = await this.attendance.getUserInteractionSettings(message.chat.id, profile.userId);
       await this.telegram.sendMessage(message.chat.id, text.setmsgClearedAll, await this.replyKeyboard(profile.locale, settings.activityNames), message.message_id);
       return;
     }
+    if (arg === "text" || arg === "texts" || arg === "replies") {
+      this.pendingReplyKeyboardEmoji.delete(profile.userId);
+      this.pendingBotReplyMessage.delete(profile.userId);
+      await this.telegram.sendMessage(message.chat.id, text.setmsgTextChooseLocale, this.buildBotReplyLocaleMenu(profile.locale), message.message_id);
+      return;
+    }
+    if (arg === "emoji" || arg === "icons") {
+      this.pendingBotReplyMessage.delete(profile.userId);
+      await this.telegram.sendMessage(message.chat.id, text.setmsgEmojiMenu, this.buildSetmsgMenu(profile.locale, await this.attendance.getReplyKeyboardEmojiIds()), message.message_id);
+      return;
+    }
     if (arg) {
-      const key = this.parseReplyKeyboardEmojiKey(arg);
-      if (!key) {
-        await this.telegram.sendMessage(message.chat.id, text.setmsgUsage, undefined, message.message_id);
+      const emojiKey = this.parseReplyKeyboardEmojiKey(arg);
+      if (emojiKey) {
+        this.pendingBotReplyMessage.delete(profile.userId);
+        await this.startReplyKeyboardEmojiSetup(message.chat.id, profile.userId, profile.locale, emojiKey, message.message_id);
         return;
       }
-      await this.startReplyKeyboardEmojiSetup(message.chat.id, profile.userId, profile.locale, key, message.message_id);
+      const replyKey = BOT_REPLY_KEYS.find((key) =>
+        key.toLowerCase() === arg || key.toLowerCase().replace(/^[a-z]/, (letter) => letter) === arg ||
+        ({ welcome: "startWelcome", stats: "botStats", userids: "idInfo" } as Record<string, string>)[arg] === key,
+      );
+      if (replyKey) {
+        this.pendingReplyKeyboardEmoji.delete(profile.userId);
+        await this.startBotReplyTextSetup(message.chat.id, profile.userId, profile.locale, profile.locale, replyKey, message.message_id);
+        return;
+      }
+      await this.telegram.sendMessage(message.chat.id, text.setmsgUsage, undefined, message.message_id);
       return;
     }
     this.pendingReplyKeyboardEmoji.delete(profile.userId);
-    await this.telegram.sendMessage(message.chat.id, text.setmsgMenu, this.buildSetmsgMenu(profile.locale, await this.attendance.getReplyKeyboardEmojiIds()), message.message_id);
+    this.pendingBotReplyMessage.delete(profile.userId);
+    await this.telegram.sendMessage(message.chat.id, text.setmsgMenu, this.buildSetmsgRootMenu(profile.locale), message.message_id);
   }
 
-  private async handleSetmsgCallback(callback: TelegramCallbackQuery, message: TelegramMessage, action?: string, value?: string): Promise<void> {
+  private async handleSetmsgCallback(callback: TelegramCallbackQuery, message: TelegramMessage, action?: string, value?: string, extra?: string): Promise<void> {
     if (!callback.from || callback.from.is_bot) return;
     const locale = await this.attendance.getLocale(message.chat.id, callback.from.id);
     const text = getLocale(locale);
@@ -296,7 +512,70 @@ export class CommandHandler {
       await this.telegram.sendMessage(message.chat.id, text.setmsgPrivate);
       return;
     }
+    if (action === "menu" && value === "root") {
+      this.pendingBotReplyMessage.delete(callback.from.id);
+      this.pendingReplyKeyboardEmoji.delete(callback.from.id);
+      await this.telegram.sendMessage(message.chat.id, text.setmsgMenu, this.buildSetmsgRootMenu(locale), message.message_id);
+      return;
+    }
+    if (action === "mode" && value === "emoji") {
+      this.pendingBotReplyMessage.delete(callback.from.id);
+      await this.telegram.sendMessage(message.chat.id, text.setmsgEmojiMenu, this.buildSetmsgMenu(locale, await this.attendance.getReplyKeyboardEmojiIds()), message.message_id);
+      return;
+    }
+    if (action === "mode" && value === "text") {
+      this.pendingReplyKeyboardEmoji.delete(callback.from.id);
+      this.pendingBotReplyMessage.delete(callback.from.id);
+      await this.telegram.sendMessage(message.chat.id, text.setmsgTextChooseLocale, this.buildBotReplyLocaleMenu(locale), message.message_id);
+      return;
+    }
+    if (action === "locale" && isLocale(value)) {
+      await this.telegram.sendMessage(
+        message.chat.id,
+        text.setmsgTextChooseCategory(localeName(value)),
+        this.buildBotReplyCategoryMenu(locale, value),
+        message.message_id,
+      );
+      return;
+    }
+    if (action === "category" && isLocale(value) && isBotReplyCategory(extra)) {
+      await this.telegram.sendMessage(
+        message.chat.id,
+        text.setmsgTextChooseMessage(localeName(value), text.setmsgTextCategories[extra]),
+        await this.buildBotReplyKeyMenu(locale, value, extra),
+        message.message_id,
+      );
+      return;
+    }
+    if ((action === "key" || action === "resettext") && isLocale(value) && extra &&
+        (BOT_REPLY_KEYS as readonly string[]).includes(extra)) {
+      const key = extra as BotReplyMessageKey;
+      const category = botReplyCategoryForKey(key);
+      if (action === "resettext") {
+        await this.attendance.setBotReplyTemplate(value, key);
+        await this.telegram.sendMessage(
+          message.chat.id,
+          text.setmsgTextCleared(BOT_REPLY_LABELS[key], localeName(value)),
+          await this.buildBotReplyKeyMenu(locale, value, category),
+          message.message_id,
+        );
+        return;
+      }
+      await this.startBotReplyTextSetup(message.chat.id, callback.from.id, locale, value, key, message.message_id);
+      return;
+    }
+    if (action === "cleartexts" && isLocale(value)) {
+      await this.attendance.clearBotReplyTemplates(value);
+      await this.telegram.sendMessage(
+        message.chat.id,
+        text.setmsgTextClearedAll(localeName(value)),
+        this.buildBotReplyCategoryMenu(locale, value),
+        message.message_id,
+      );
+      return;
+    }
     if (action === "cancel") {
+      this.pendingBotReplyMessage.delete(callback.from.id);
       this.pendingReplyKeyboardEmoji.delete(callback.from.id);
       await this.telegram.sendMessage(message.chat.id, text.setmsgCancelled);
       return;
@@ -310,7 +589,7 @@ export class CommandHandler {
     }
     const key = this.parseReplyKeyboardEmojiKey(value);
     if (!key || (action !== "select" && action !== "clear")) {
-      await this.telegram.sendMessage(message.chat.id, text.setmsgMenu, this.buildSetmsgMenu(locale, await this.attendance.getReplyKeyboardEmojiIds()), message.message_id);
+      await this.telegram.sendMessage(message.chat.id, text.setmsgEmojiMenu, this.buildSetmsgMenu(locale, await this.attendance.getReplyKeyboardEmojiIds()), message.message_id);
       return;
     }
     if (action === "select") {
@@ -342,6 +621,7 @@ export class CommandHandler {
 
   private async handleMessage(message: TelegramMessage) {
     if (!message.text || !message.from || message.from.is_bot) return;
+    if (await this.handlePendingBotReplyText(message)) return;
     if (await this.handlePendingReplyKeyboardEmoji(message)) return;
     const interactionSettings =
       await this.attendance.getUserInteractionSettings(
@@ -1009,7 +1289,8 @@ export class CommandHandler {
     if (!message || !namespace || !callback.from || callback.from.is_bot) return;
 
     if (namespace === "setmsg") {
-      await this.handleSetmsgCallback(callback, message, action, value);
+      const [, , , extra] = callback.data?.split(":") || [];
+      await this.handleSetmsgCallback(callback, message, action, value, extra);
       return;
     }
     if (!action) return;
