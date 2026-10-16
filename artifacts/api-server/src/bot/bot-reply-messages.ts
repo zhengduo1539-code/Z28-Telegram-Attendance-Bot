@@ -8,7 +8,6 @@ export const BOT_REPLY_KEYS = [
   "help",
   "languageChanged",
   "languagePicker",
-  "languageUsage",
   "unknownLanguage",
   "unknownCommand",
   "idInfo",
@@ -22,7 +21,6 @@ export const BOT_REPLY_KEYS = [
   "dailyCountLimitReached",
   "timeoutReminder",
   "groupTimeoutNotification",
-  "shiftStarted",
   "shiftEnded",
   "adminOnly",
   "adminPrivate",
@@ -56,13 +54,13 @@ export type BotReplyMessages = Partial<Record<Locale, Partial<Record<BotReplyMes
 
 export const BOT_REPLY_KEYS_BY_CATEGORY: Record<BotReplyCategory, readonly BotReplyMessageKey[]> = {
   general: [
-    "startWelcome", "help", "languageChanged", "languagePicker", "languageUsage",
+    "startWelcome", "help", "languageChanged", "languagePicker",
     "unknownLanguage", "unknownCommand", "idInfo", "botStats", "botStatsPrivate",
   ],
   attendance: [
     "workCheckIn", "noActive", "alreadyActive", "started", "settled",
     "dailyCountLimitReached", "timeoutReminder", "groupTimeoutNotification",
-    "shiftStarted", "shiftEnded",
+    "shiftEnded",
   ],
   admin: [
     "adminOnly", "adminPrivate", "adminPanelPrompt", "adminMiniAppUnavailable",
@@ -82,7 +80,6 @@ export const BOT_REPLY_LABELS: Record<BotReplyMessageKey, string> = {
   help: "Help message",
   languageChanged: "Language changed",
   languagePicker: "Language picker prompt",
-  languageUsage: "Language command help",
   unknownLanguage: "Unknown language",
   unknownCommand: "Unknown command",
   idInfo: "Chat / user ID",
@@ -96,7 +93,6 @@ export const BOT_REPLY_LABELS: Record<BotReplyMessageKey, string> = {
   dailyCountLimitReached: "Daily activity limit reached",
   timeoutReminder: "Activity timeout reminder",
   groupTimeoutNotification: "Group timeout notification",
-  shiftStarted: "Shift started",
   shiftEnded: "Shift ended",
   adminOnly: "Admin-only notice",
   adminPrivate: "Admin panel private-chat notice",
@@ -130,7 +126,6 @@ export const BOT_REPLY_VARIABLES: Record<BotReplyMessageKey, readonly string[]> 
   help: [],
   languageChanged: [],
   languagePicker: [],
-  languageUsage: [],
   unknownLanguage: [],
   unknownCommand: [],
   idInfo: ["chat_id", "user_id"],
@@ -151,7 +146,6 @@ export const BOT_REPLY_VARIABLES: Record<BotReplyMessageKey, readonly string[]> 
     "group_name", "group_id", "username", "user_name", "user_id", "activity",
     "timeout_duration", "warning_time",
   ],
-  shiftStarted: ["time"],
   shiftEnded: ["time"],
   adminOnly: [],
   adminPrivate: [],
@@ -190,7 +184,7 @@ export const validateBotReplyTemplate = (
   if (typeof value !== "string") return "Reply message must be text.";
 
   const normalized = value.trim();
-  if (!normalized) return undefined;
+  if (!normalized) return "Reply text cannot be empty. Send /reset to restore the default instead.";
   if (normalized.length > BOT_REPLY_MAX_LENGTH) {
     return `Reply message must be at most ${BOT_REPLY_MAX_LENGTH} characters.`;
   }
