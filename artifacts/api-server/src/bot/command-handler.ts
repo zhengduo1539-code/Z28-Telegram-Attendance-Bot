@@ -4,6 +4,8 @@ import { activityLabel, getLocale } from "./locales";
 import type {
   ActivityKind,
   Locale,
+  ReplyKeyboardButton,
+  ReplyKeyboardEmojiIds,
   ReplyKeyboardMarkup,
   TelegramCallbackQuery,
   TelegramMessage,
@@ -63,16 +65,32 @@ const languageKeyboard = (locale: Locale): import("./types").InlineKeyboardMarku
 const keyboard = (
   locale: Locale,
   activityNames: Partial<Record<ActivityKind, string>> = {},
+  iconCustomEmojiIds: ReplyKeyboardEmojiIds = {},
 ): ReplyKeyboardMarkup => {
   const text = getLocale(locale).buttons;
+  const makeButton = (
+    buttonText: string,
+    iconKey: keyof ReplyKeyboardEmojiIds,
+    style?: ReplyKeyboardButton["style"],
+  ): ReplyKeyboardButton => {
+    const iconCustomEmojiId = iconCustomEmojiIds[iconKey];
+    return {
+      text: buttonText,
+      ...(iconCustomEmojiId
+        ? { icon_custom_emoji_id: iconCustomEmojiId }
+        : {}),
+      ...(style ? { style } : {}),
+    };
+  };
+
   return {
     keyboard: [
       [
-        { text: activityNames.wc?.trim() || text.wc },
-        { text: activityNames.smoke?.trim() || text.smoke },
-        { text: activityNames.wcd?.trim() || text.wcd },
+        makeButton(activityNames.wc?.trim() || text.wc, "wc"),
+        makeButton(activityNames.smoke?.trim() || text.smoke, "smoke"),
+        makeButton(activityNames.wcd?.trim() || text.wcd, "wcd"),
       ],
-      [{ text: text.back, style: "primary" }],
+      [makeButton(text.back, "back", "primary")],
     ],
     resize_keyboard: true,
     is_persistent: true,
@@ -129,6 +147,13 @@ export class CommandHandler {
     private readonly attendance: AttendanceService,
     private readonly config: BotConfig,
   ) {}
+
+  private replyKeyboard(
+    locale: Locale,
+    activityNames: Partial<Record<ActivityKind, string>> = {},
+  ): ReplyKeyboardMarkup {
+    return keyboard(locale, activityNames, this.config.replyKeyboardEmojiIds);
+  }
 
   async handleUpdate(update: TelegramUpdate): Promise<void> {
     if (update.my_chat_member) {
@@ -280,7 +305,7 @@ export class CommandHandler {
       await this.telegram.sendMessage(
         message.chat.id,
         `${getLocale(requestedLocale).languageChanged}\n\n${getLocale(requestedLocale).help}`,
-        keyboard(requestedLocale),
+        this.replyKeyboard(requestedLocale),
         message.message_id,
       );
       return;
@@ -295,7 +320,7 @@ export class CommandHandler {
     switch (command.name) {
       case "start": {
         response = text.startWelcome;
-        markup = keyboard(locale, activityNames);
+        markup = this.replyKeyboard(locale, activityNames);
         if (message.chat.type === "private") {
           const botUsername = await this.telegram.getBotUsername();
           const rows: import("./types").InlineKeyboardButton[][] = [];
@@ -350,7 +375,7 @@ export class CommandHandler {
       }
       case "help":
         response = text.help;
-        markup = keyboard(locale, activityNames);
+        markup = this.replyKeyboard(locale, activityNames);
         break;
       case "id": {
         response = text.idInfo(message.chat.id, message.from.id);
@@ -374,22 +399,22 @@ export class CommandHandler {
       }
       case "work":
         response = await this.attendance.workCheckIn(profile);
-        markup = keyboard(locale, activityNames);
+        markup = this.replyKeyboard(locale, activityNames);
         break;
       case "back":
         response = await this.handleSettlement(profile, "back");
-        markup = keyboard(locale, activityNames);
+        markup = this.replyKeyboard(locale, activityNames);
         break;
       case "eat":
       case "wc":
       case "smoke":
       case "wcd":
         response = await this.attendance.startActivity(profile, command.name);
-        markup = keyboard(locale, activityNames);
+        markup = this.replyKeyboard(locale, activityNames);
         break;
       case "offwork":
         response = await this.handleSettlement(profile, "offwork");
-        markup = keyboard(locale, activityNames);
+        markup = this.replyKeyboard(locale, activityNames);
         break;
       case "connect":
         if (message.chat.type === "private") {
@@ -838,7 +863,7 @@ export class CommandHandler {
       await this.telegram.sendMessage(
         message.chat.id,
         `${getLocale(requestedLocale).languageChanged}\n\n${getLocale(requestedLocale).help}`,
-        keyboard(requestedLocale),
+        this.replyKeyboard(requestedLocale),
         message.message_id,
       );
       return;
