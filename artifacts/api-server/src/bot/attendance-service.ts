@@ -7,6 +7,11 @@ import {
   renderActivityReplyTemplate,
   type ActivityReplyEditorLocale,
 } from "./activity-reply-messages";
+import {
+  getBotReplyTemplate,
+  normalizeBotReplyTemplate,
+  type BotReplyMessageKey,
+} from "./bot-reply-messages";
 import { activityLabel, getLocale, type ActivitySummary } from "./locales";
 import type {
   ActivityKind,
@@ -193,41 +198,38 @@ const buildSettlementResponse = (
     "settled",
   );
 
-  return customTemplate
-    ? renderActivityReplyTemplate(customTemplate, {
-        user_name: record.displayName,
-        user_id: record.userId,
-        activity: activityLabelForState(state, record.chatId, record.kind, locale),
-        start_time: formatDateTime(new Date(record.startedAt), timeZone),
-        duration:
-          locale === "en"
-            ? formatEnglishDuration(record.elapsedSeconds)
-            : formatChineseDuration(record.elapsedSeconds),
-        limit_minutes: active.limitMinutes,
-        today_activity_time:
-          locale === "en"
-            ? formatEnglishDuration(activitySummary.seconds)
-            : formatChineseDuration(activitySummary.seconds),
-        today_total_time:
-          locale === "en"
-            ? formatEnglishDuration(totalSeconds)
-            : formatChineseDuration(totalSeconds),
-        today_eat_count: todayCounts.eat,
-        today_wc_count: todayCounts.wc,
-        today_smoke_count: todayCounts.smoke,
-        today_wcd_count: todayCounts.wcd,
-        timeout_duration:
-          getTimeoutSeconds(record.elapsedSeconds, active.limitMinutes) > 0
-            ? locale === "en"
-              ? formatEnglishDuration(
-                  getTimeoutSeconds(record.elapsedSeconds, active.limitMinutes),
-                )
-              : formatChineseDuration(
-                  getTimeoutSeconds(record.elapsedSeconds, active.limitMinutes),
-                )
-            : "",
-      })
-    : defaultMessage;
+  const values = {
+    user_name: record.displayName,
+    user_id: record.userId,
+    activity: activityLabelForState(state, record.chatId, record.kind, locale),
+    start_time: formatDateTime(new Date(record.startedAt), timeZone),
+    duration:
+      locale === "en"
+        ? formatEnglishDuration(record.elapsedSeconds)
+        : formatChineseDuration(record.elapsedSeconds),
+    limit_minutes: active.limitMinutes,
+    today_activity_time:
+      locale === "en"
+        ? formatEnglishDuration(activitySummary.seconds)
+        : formatChineseDuration(activitySummary.seconds),
+    today_total_time:
+      locale === "en"
+        ? formatEnglishDuration(totalSeconds)
+        : formatChineseDuration(totalSeconds),
+    today_eat_count: todayCounts.eat,
+    today_wc_count: todayCounts.wc,
+    today_smoke_count: todayCounts.smoke,
+    today_wcd_count: todayCounts.wcd,
+    timeout_duration:
+      getTimeoutSeconds(record.elapsedSeconds, active.limitMinutes) > 0
+        ? locale === "en"
+          ? formatEnglishDuration(getTimeoutSeconds(record.elapsedSeconds, active.limitMinutes))
+          : formatChineseDuration(getTimeoutSeconds(record.elapsedSeconds, active.limitMinutes))
+        : "",
+  };
+  if (customTemplate) return renderActivityReplyTemplate(customTemplate, values);
+  const globalTemplate = getBotReplyTemplate(state.botReplyMessages, locale, "settled");
+  return globalTemplate ? renderActivityReplyTemplate(globalTemplate, values) : defaultMessage;
 };
 
 export class AttendanceService {
@@ -373,6 +375,54 @@ export class AttendanceService {
     };
   }
 
+  async getBotReplyMessages(locale: Locale): Promise<Partial<Record<BotReplyMessageKey, string>>> {
+    const state = await this.store.load();
+    return structuredClone(state.botReplyMessages?.[locale] || {});
+  }
+
+  async getBotReplyTemplate(locale: Locale, key: BotReplyMessageKey): Promise<string | undefined> {
+    const state = await this.store.load();
+    return getBotReplyTemplate(state.botReplyMessages, locale, key);
+  }
+
+  async setBotReplyTemplate(
+    locale: Locale,
+    key: BotReplyMessageKey,
+    value?: string,
+  ): Promise<Partial<Record<BotReplyMessageKey, string>>> {
+    const normalized = value === undefined ? undefined : normalizeBotReplyTemplate(key, value);
+    await this.store.update((state) => {
+      const next = { ...(state.botReplyMessages?.[locale] || {}) };
+      if (normalized) next[key] = normalized;
+      else delete next[key];
+      state.botReplyMessages = state.botReplyMessages || {};
+      if (Object.keys(next).length) state.botReplyMessages[locale] = next;
+      else {
+        delete state.botReplyMessages[locale];
+        if (!Object.keys(state.botReplyMessages).length) delete state.botReplyMessages;
+      }
+    });
+    return this.getBotReplyMessages(locale);
+  }
+
+  async clearBotReplyTemplates(locale: Locale): Promise<void> {
+    await this.store.update((state) => {
+      if (!state.botReplyMessages) return;
+      delete state.botReplyMessages[locale];
+      if (!Object.keys(state.botReplyMessages).length) delete state.botReplyMessages;
+    });
+  }
+
+  async renderBotReplyMessage(
+    locale: Locale,
+    key: BotReplyMessageKey,
+    defaultMessage: string,
+    values: Record<string, string | number> = {},
+  ): Promise<string> {
+    const template = await this.getBotReplyTemplate(locale, key);
+    return template ? renderActivityReplyTemplate(template, values) : defaultMessage;
+  }
+
   async getReplyKeyboardEmojiIds(): Promise<ReplyKeyboardEmojiIds> {
     const state = await this.store.load();
     return structuredClone(state.replyKeyboardEmojiIds || {});
@@ -411,7 +461,12 @@ export class AttendanceService {
       second: "2-digit",
       hour12: false,
     }).format(now).replace(",", " ");
-    return text.workCheckIn(profile.displayName, profile.userId, checkedAt);
+    return this.renderBotReplyMessage(
+      locale,
+      "workCheckIn",
+      text.workCheckIn(profile.displayName, profile.userId, checkedAt),
+      { user_name: profile.displayName, user_id: profile.userId, checked_at: checkedAt },
+    );
   }
 
   async startActivity(
@@ -434,23 +489,24 @@ export class AttendanceService {
     );
 
     if (active) {
+      const values = {
+        user_name: profile.displayName,
+        user_id: profile.userId,
+        activity: activityLabelForState(state, profile.chatId, active.kind, locale),
+      };
       const customTemplate = getGroupActivityReplyTemplate(
         state.groupActivityReplyMessages,
         profile.chatId,
         locale,
         "alreadyActive",
       );
-      return customTemplate
-        ? renderActivityReplyTemplate(customTemplate, {
-            user_name: profile.displayName,
-            user_id: profile.userId,
-            activity: activityLabelForState(state, profile.chatId, active.kind, locale),
-          })
-        : text.alreadyActive(
-            profile.displayName,
-            profile.userId,
-            activityLabelForState(state, profile.chatId, active.kind, locale),
-          );
+      if (customTemplate) return renderActivityReplyTemplate(customTemplate, values);
+      return this.renderBotReplyMessage(
+        locale,
+        "alreadyActive",
+        text.alreadyActive(profile.displayName, profile.userId, values.activity),
+        values,
+      );
     }
 
     const dayKey = localDateKey(now, this.config.timeZone);
@@ -473,19 +529,19 @@ export class AttendanceService {
         locale,
         "dailyCountLimitReached",
       );
-      return customTemplate
-        ? renderActivityReplyTemplate(customTemplate, {
-            user_name: profile.displayName,
-            user_id: profile.userId,
-            activity: activityLabelForState(state, profile.chatId, kind, locale),
-            count_limit: countLimit,
-          })
-        : text.dailyCountLimitReached(
-            profile.displayName,
-            profile.userId,
-            activityLabelForState(state, profile.chatId, kind, locale),
-            countLimit,
-          );
+      const values = {
+        user_name: profile.displayName,
+        user_id: profile.userId,
+        activity: activityLabelForState(state, profile.chatId, kind, locale),
+        count_limit: countLimit,
+      };
+      if (customTemplate) return renderActivityReplyTemplate(customTemplate, values);
+      return this.renderBotReplyMessage(
+        locale,
+        "dailyCountLimitReached",
+        text.dailyCountLimitReached(profile.displayName, profile.userId, values.activity, countLimit),
+        values,
+      );
     }
 
     const limitMinutes =
@@ -509,12 +565,14 @@ export class AttendanceService {
         profile.chatId,
         profile.userId,
       );
-      return text.alreadyActive(
-        profile.displayName,
-        profile.userId,
-        concurrentActive
-          ? activityLabelForState(state, profile.chatId, concurrentActive.kind, locale)
-          : activityLabelForState(state, profile.chatId, kind, locale),
+      const activityName = concurrentActive
+        ? activityLabelForState(state, profile.chatId, concurrentActive.kind, locale)
+        : activityLabelForState(state, profile.chatId, kind, locale);
+      return this.renderBotReplyMessage(
+        locale,
+        "alreadyActive",
+        text.alreadyActive(profile.displayName, profile.userId, activityName),
+        { user_name: profile.displayName, user_id: profile.userId, activity: activityName },
       );
     }
 
@@ -526,23 +584,21 @@ export class AttendanceService {
       locale,
       "started",
     );
-    return customTemplate
-      ? renderActivityReplyTemplate(customTemplate, {
-          user_name: profile.displayName,
-          user_id: profile.userId,
-          activity: activityName,
-          time: startedTime,
-          count: todayCount + 1,
-          limit_minutes: limitMinutes,
-        })
-      : text.started(
-          profile.displayName,
-          profile.userId,
-          activityName,
-          startedTime,
-          todayCount + 1,
-          limitMinutes,
-        );
+    const values = {
+      user_name: profile.displayName,
+      user_id: profile.userId,
+      activity: activityName,
+      time: startedTime,
+      count: todayCount + 1,
+      limit_minutes: limitMinutes,
+    };
+    if (customTemplate) return renderActivityReplyTemplate(customTemplate, values);
+    return this.renderBotReplyMessage(
+      locale,
+      "started",
+      text.started(profile.displayName, profile.userId, activityName, startedTime, todayCount + 1, limitMinutes),
+      values,
+    );
   }
 
   async settle(
@@ -565,9 +621,10 @@ export class AttendanceService {
     );
 
     if (!active) {
+      const shiftEndTime = formatDateTime(now, this.config.timeZone);
       const defaultResponse =
         settledBy === "offwork"
-          ? text.shiftEnded(formatDateTime(now, this.config.timeZone))
+          ? text.shiftEnded(shiftEndTime)
           : text.noActive(profile.displayName, profile.userId);
       const customTemplate =
         settledBy === "back"
@@ -579,14 +636,14 @@ export class AttendanceService {
             )
           : undefined;
 
+      const values = settledBy === "offwork"
+        ? { time: shiftEndTime }
+        : { user_name: profile.displayName, user_id: profile.userId };
+      const globalKey: BotReplyMessageKey = settledBy === "offwork" ? "shiftEnded" : "noActive";
       return {
-        response:
-          customTemplate && settledBy === "back"
-            ? renderActivityReplyTemplate(customTemplate, {
-                user_name: profile.displayName,
-                user_id: profile.userId,
-              })
-            : defaultResponse,
+        response: customTemplate && settledBy === "back"
+          ? renderActivityReplyTemplate(customTemplate, values)
+          : await this.renderBotReplyMessage(locale, globalKey, defaultResponse, values),
       };
     }
 
@@ -936,17 +993,18 @@ export class AttendanceService {
       "timeoutReminder",
     );
 
-    return customTemplate
-      ? renderActivityReplyTemplate(customTemplate, {
-          user_name: activity.displayName,
-          user_id: activity.userId,
-          activity: activityName,
-        })
-      : getLocale(locale).timeoutReminder(
-          activity.displayName,
-          activity.userId,
-          activityName,
-        );
+    const values = {
+      user_name: activity.displayName,
+      user_id: activity.userId,
+      activity: activityName,
+    };
+    if (customTemplate) return renderActivityReplyTemplate(customTemplate, values);
+    return this.renderBotReplyMessage(
+      locale,
+      "timeoutReminder",
+      getLocale(locale).timeoutReminder(activity.displayName, activity.userId, activityName),
+      values,
+    );
   }
 
   async isActivityReminderEnabled(): Promise<boolean> {
