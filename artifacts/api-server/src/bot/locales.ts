@@ -110,6 +110,17 @@ type LocaleText = {
   setmsgPrivate: string;
   setmsgUsage: string;
   setmsgMenu: string;
+  setmsgEmojiMenu: string;
+  setmsgTextChooseLocale: string;
+  setmsgTextChooseCategory: (localeName: string) => string;
+  setmsgTextChooseMessage: (localeName: string, categoryName: string) => string;
+  setmsgTextPrompt: (key: string, localeName: string, variables: string[]) => string;
+  setmsgTextSaved: (key: string, localeName: string) => string;
+  setmsgTextCleared: (key: string, localeName: string) => string;
+  setmsgTextClearedAll: (localeName: string) => string;
+  setmsgTextInvalid: (reason: string) => string;
+  setmsgRootLabels: { emoji: string; replies: string; cancel: string; back: string; resetAllText: string; configured: string; notConfigured: string };
+  setmsgTextCategories: { general: string; attendance: string; admin: string; connect: string };
   setmsgPrompt: (button: string) => string;
   setmsgSaved: (button: string) => string;
   setmsgInvalidEmoji: string;
@@ -421,7 +432,18 @@ const zh: LocaleText = {
     `✅ 超时提醒已${enabled ? "开启" : "关闭"}（45 秒宽限）。`,
   setmsgPrivate: "请在 Bot 私聊中使用 /setmsg。",
   setmsgUsage: "用法：/setmsg [wc|smoke|wcd|back|reset]",
-  setmsgMenu: "请选择要设置自定义表情图标的 Reply Keyboard 按钮。✅ 表示已设置。",
+  setmsgMenu: "请选择要自定义的内容。您可以设置 Reply Keyboard 自定义表情图标，也可以编辑 Bot 回复文案。",
+  setmsgEmojiMenu: "请选择要设置自定义表情图标的 Reply Keyboard 按钮。✅ 表示已设置。",
+  setmsgTextChooseLocale: "请选择要编辑回复文案的语言。",
+  setmsgTextChooseCategory: (localeName) => `请选择 ${localeName} 的回复文案类别。`,
+  setmsgTextChooseMessage: (localeName, categoryName) => `请选择 ${localeName} · ${categoryName} 下需要编辑的回复。✅ 表示已自定义。`,
+  setmsgTextPrompt: (key, localeName, variables) => `请发送新的 ${localeName} 回复文案：${key}。每行会保留。可用变量：${variables.length ? variables.map((name) => `{${name}}`).join(", ") : "无"}。发送 /reset 恢复默认文案，/cancel 取消；5 分钟后过期。`,
+  setmsgTextSaved: (key, localeName) => `✅ 已保存 ${localeName} 的 ${key} 回复文案。`,
+  setmsgTextCleared: (key, localeName) => `✅ 已将 ${localeName} 的 ${key} 回复文案恢复为默认值。`,
+  setmsgTextClearedAll: (localeName) => `✅ 已清除 ${localeName} 的所有自定义回复文案。`,
+  setmsgTextInvalid: (reason) => `无法保存回复文案：${reason}`,
+  setmsgRootLabels: { emoji: "Animated Emoji", replies: "Bot Reply Text", cancel: "取消", back: "返回", resetAllText: "恢复本语言默认文案", configured: "已自定义", notConfigured: "默认" },
+  setmsgTextCategories: { general: "常规", attendance: "打卡回复", admin: "管理设置", connect: "群组连接" },
   setmsgPrompt: (button) => `请直接发送一个 Telegram 自定义表情，用作 ${button} 按钮图标。普通 Unicode 表情无法用作按钮图标。发送 /cancel 可取消；此请求 5 分钟后过期。`,
   setmsgSaved: (button) => `✅ 已为 ${inlineCode(button)} 按钮保存自定义表情图标。下方键盘已刷新。`,
   setmsgInvalidEmoji: "未检测到单个 Telegram 自定义表情。请直接发送一个自定义表情，不要添加其他文字或空格。",
@@ -675,7 +697,18 @@ const mm: LocaleText = {
     `✅ အချိန်ကျော်လွန်သတိပေးချက်ကို ${enabled ? "ဖွင့်" : "ပိတ်"}ပြီးပါပြီ (45 စက္ကန့် grace period)။`,
   setmsgPrivate: "ကျေးဇူးပြု၍ /setmsg ကို Bot private chat ထဲတွင် အသုံးပြုပါ။",
   setmsgUsage: "အသုံးပြုပုံ: /setmsg [wc|smoke|wcd|back|reset]",
-  setmsgMenu: "Reply Keyboard ခလုတ်များအတွက် Animated Custom Emoji သတ်မှတ်လိုသော ခလုတ်ကို ရွေးချယ်ပါ။ ✅ သည် သတ်မှတ်ပြီးကြောင်း ပြပါသည်။",
+  setmsgMenu: "စိတ်ကြိုက်ပြင်ဆင်လိုသည့် အမျိုးအစားကို ရွေးချယ်ပါ။ Reply Keyboard Animated Emoji နှင့် Bot reply စာသားများကို ပြင်ဆင်နိုင်ပါသည်။",
+  setmsgEmojiMenu: "Reply Keyboard ခလုတ်များအတွက် Animated Custom Emoji သတ်မှတ်လိုသော ခလုတ်ကို ရွေးချယ်ပါ။ ✅ သည် သတ်မှတ်ပြီးကြောင်း ပြပါသည်။",
+  setmsgTextChooseLocale: "Reply စာသားပြင်ဆင်မည့် ဘာသာစကားကို ရွေးချယ်ပါ။",
+  setmsgTextChooseCategory: (localeName) => `${localeName} ဘာသာစကားအတွက် ပြင်ဆင်မည့် Reply အမျိုးအစားကို ရွေးပါ။`,
+  setmsgTextChooseMessage: (localeName, categoryName) => `${localeName} · ${categoryName} ထဲမှ ပြင်ဆင်မည့် Reply ကို ရွေးပါ။ ✅ သည် စိတ်ကြိုက်သတ်မှတ်ထားခြင်းကို ပြပါသည်။`,
+  setmsgTextPrompt: (key, localeName, variables) => `${localeName} အတွက် ${key} reply စာသားအသစ်ကို ပို့ပါ။ စာကြောင်းခွဲများကို ထိန်းသိမ်းပါမည်။ အသုံးပြုနိုင်သော variable များ: ${variables.length ? variables.map((name) => `{${name}}`).join(", ") : "မရှိပါ"}။ Default ပြန်ထားရန် /reset၊ ပယ်ဖျက်ရန် /cancel ကိုသုံးပါ။ ၅ မိနစ်အကြာ သက်တမ်းကုန်ပါမည်။`,
+  setmsgTextSaved: (key, localeName) => `✅ ${localeName} အတွက် ${key} reply စာသားကို သိမ်းဆည်းပြီးပါပြီ။`,
+  setmsgTextCleared: (key, localeName) => `✅ ${localeName} ၏ ${key} reply စာသားကို မူလ default သို့ ပြန်ထားပြီးပါပြီ။`,
+  setmsgTextClearedAll: (localeName) => `✅ ${localeName} အတွက် စိတ်ကြိုက် Reply စာသားအားလုံးကို ရှင်းလင်းပြီးပါပြီ။`,
+  setmsgTextInvalid: (reason) => `Reply စာသားကို သိမ်းဆည်း၍မရပါ: ${reason}`,
+  setmsgRootLabels: { emoji: "Animated Emoji", replies: "Bot Reply စာသား", cancel: "ပယ်ဖျက်ရန်", back: "နောက်သို့", resetAllText: "ဤဘာသာစကား Default ပြန်ထားရန်", configured: "ပြင်ဆင်ထား", notConfigured: "Default" },
+  setmsgTextCategories: { general: "အထွေထွေ", attendance: "Check-in Reply", admin: "Admin Settings", connect: "Group ချိတ်ဆက်မှု" },
   setmsgPrompt: (button) => `${button} ခလုတ်အတွက် Telegram Custom Emoji တစ်ခုတည်းကို တိုက်ရိုက်ပို့ပါ။ ပုံမှန် Unicode Emoji သည် ခလုတ် icon အဖြစ် မသုံးနိုင်ပါ။ ပယ်ဖျက်ရန် /cancel ကို အသုံးပြုပါ။ ဤတောင်းဆိုမှုသည် ၅ မိနစ်အကြာ သက်တမ်းကုန်ပါမည်။`,
   setmsgSaved: (button) => `✅ ${inlineCode(button)} ခလုတ်အတွက် Custom Emoji icon ကို သိမ်းဆည်းပြီးပါပြီ။ အောက်ပါ keyboard ကို ပြန်လည်ပြသထားပါသည်။`,
   setmsgInvalidEmoji: "Telegram Custom Emoji တစ်ခုတည်းကို မတွေ့ပါ။ Custom Emoji တစ်ခုတည်းကို စာသား သို့မဟုတ် space မပါဘဲ တိုက်ရိုက်ပို့ပါ။",
@@ -938,7 +971,18 @@ const en: LocaleText = {
     `✅ Overdue reminder has been turned ${enabled ? "ON" : "OFF"} (45-second grace).`,
   setmsgPrivate: "Please use /setmsg in the bot's private chat.",
   setmsgUsage: "Usage: /setmsg [wc|smoke|wcd|back|reset]",
-  setmsgMenu: "Choose the reply-keyboard button whose custom emoji icon you want to configure. ✅ means an icon is set.",
+  setmsgMenu: "Choose what to customize: reply-keyboard animated emoji or Bot reply text.",
+  setmsgEmojiMenu: "Choose the reply-keyboard button whose custom emoji icon you want to configure. ✅ means an icon is set.",
+  setmsgTextChooseLocale: "Choose the language of the reply text you want to edit.",
+  setmsgTextChooseCategory: (localeName) => `Choose a reply-text category for ${localeName}.`,
+  setmsgTextChooseMessage: (localeName, categoryName) => `Choose a ${localeName} reply in ${categoryName}. ✅ means customized.`,
+  setmsgTextPrompt: (key, localeName, variables) => `Send the new ${key} reply text for ${localeName}. Line breaks are preserved. Available placeholders: ${variables.length ? variables.map((name) => `{${name}}`).join(", ") : "none"}. Send /reset to restore the default or /cancel to cancel. Expires in 5 minutes.`,
+  setmsgTextSaved: (key, localeName) => `✅ Saved the ${key} reply text for ${localeName}.`,
+  setmsgTextCleared: (key, localeName) => `✅ Restored the default ${key} reply text for ${localeName}.`,
+  setmsgTextClearedAll: (localeName) => `✅ Cleared all custom reply text for ${localeName}.`,
+  setmsgTextInvalid: (reason) => `Could not save reply text: ${reason}`,
+  setmsgRootLabels: { emoji: "Animated Emoji", replies: "Bot Reply Text", cancel: "Cancel", back: "Back", resetAllText: "Reset this language", configured: "Customized", notConfigured: "Default" },
+  setmsgTextCategories: { general: "General", attendance: "Attendance", admin: "Admin settings", connect: "Group connection" },
   setmsgPrompt: (button) => `Send exactly one Telegram custom emoji to use as the icon for ${button}. A regular Unicode emoji cannot be used as a button icon. Send /cancel to cancel. This request expires in 5 minutes.`,
   setmsgSaved: (button) => `✅ Saved the custom emoji icon for ${inlineCode(button)}. The keyboard below has been refreshed.`,
   setmsgInvalidEmoji: "No single Telegram custom emoji entity was found. Send one custom emoji directly, without other text or spaces.",

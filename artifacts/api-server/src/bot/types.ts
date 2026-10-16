@@ -1,3 +1,5 @@
+import type { BotReplyMessages } from "./bot-reply-messages";
+
 export type Locale = "zh" | "en" | "mm";
 
 export type ActivityKind = "eat" | "wc" | "smoke" | "wcd";
@@ -129,6 +131,7 @@ export type BotState = {
   pendingConnects?: Record<string, PendingConnect>;
   managedGroups?: Record<string, ManagedGroup>;
   replyKeyboardEmojiIds?: ReplyKeyboardEmojiIds;
+  botReplyMessages?: BotReplyMessages;
 };
 
 export type TelegramUser = {
