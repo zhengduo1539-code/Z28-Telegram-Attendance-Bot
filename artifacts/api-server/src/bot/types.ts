@@ -128,6 +128,7 @@ export type BotState = {
   connectedGroups?: Record<string, ConnectedGroup>;
   pendingConnects?: Record<string, PendingConnect>;
   managedGroups?: Record<string, ManagedGroup>;
+  replyKeyboardEmojiIds?: ReplyKeyboardEmojiIds;
 };
 
 export type TelegramUser = {
@@ -145,11 +146,19 @@ export type TelegramChat = {
   username?: string;
 };
 
+export type TelegramMessageEntity = {
+  type: string;
+  offset: number;
+  length: number;
+  custom_emoji_id?: string;
+};
+
 export type TelegramMessage = {
   message_id: number;
   chat: TelegramChat;
   from?: TelegramUser;
   text?: string;
+  entities?: TelegramMessageEntity[];
   date?: number;
 };
 
@@ -193,9 +202,8 @@ export type ReplyKeyboardButton = {
   style?: "danger" | "success" | "primary";
 };
 
-export type ReplyKeyboardEmojiIds = Partial<
-  Record<"wc" | "smoke" | "wcd" | "back", string>
->;
+export type ReplyKeyboardEmojiKey = "wc" | "smoke" | "wcd" | "back";
+export type ReplyKeyboardEmojiIds = Partial<Record<ReplyKeyboardEmojiKey, string>>;
 
 export type ReplyKeyboardMarkup = {
   keyboard: ReplyKeyboardButton[][];
