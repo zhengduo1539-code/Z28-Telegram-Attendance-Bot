@@ -4,15 +4,12 @@ A modular Telegram group bot for work, break, return-to-seat, and activity-time 
 
 See `render.yaml` for Render deployment configuration.
 
-## Animated reply-keyboard icons
+## Configure animated reply-keyboard icons
 
-Z28 supports Telegram Bot API 9.4 custom emoji icons on reply-keyboard buttons. Configure these optional environment variables with **custom emoji IDs** (numeric IDs, not Unicode emoji or sticker file IDs):
+Use `/setmsg` in the bot's private chat (bot owner / configured administrators only):
 
-- `REPLY_KEYBOARD_EMOJI_WC_ID` — Toilet
-- `REPLY_KEYBOARD_EMOJI_SMOKE_ID` — Smoke
-- `REPLY_KEYBOARD_EMOJI_WCD_ID` — WCD
-- `REPLY_KEYBOARD_EMOJI_BACK_ID` — Return to seat
+1. Choose **Toilet**, **Smoke**, **WCD**, or **Back**.
+2. Send a single Telegram **custom emoji** directly to the bot. A standard Unicode emoji is not sufficient; the bot reads the custom emoji ID from the Telegram message entity.
+3. The icon is saved to persistent bot state and the keyboard is refreshed. Use `/cancel` to cancel a pending setup, or choose **Clear** / **Clear all** in the menu to remove icons. You can also use `/setmsg wc`, `/setmsg smoke`, `/setmsg wcd`, or `/setmsg back` to configure a specific button directly. `/setmsg reset` clears all configured icons.
 
-Use IDs for animated custom emojis to get the animated effect. If an ID is unset or is not numeric, Z28 leaves that button without a custom icon and continues to function normally. The bot owner must have Telegram Premium (unless the bot has the applicable additional usernames purchased on Fragment) for custom emoji button icons to be available.
-
-After setting the values in the hosting service's environment, redeploy or restart the bot.
+Custom emoji button icons are subject to Telegram Bot API eligibility requirements: the bot owner must have Telegram Premium, unless the bot has the applicable additional usernames purchased on Fragment. The custom emoji ID must refer to an actual Telegram custom emoji; animated effects depend on the selected emoji and the Telegram client.

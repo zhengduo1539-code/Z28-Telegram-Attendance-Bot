@@ -107,6 +107,19 @@ type LocaleText = {
   reminderUsage: string;
   reminderStatus: (enabled: boolean) => string;
   reminderUpdated: (enabled: boolean) => string;
+  setmsgPrivate: string;
+  setmsgUsage: string;
+  setmsgMenu: string;
+  setmsgPrompt: (button: string) => string;
+  setmsgSaved: (button: string) => string;
+  setmsgInvalidEmoji: string;
+  setmsgExpired: string;
+  setmsgCancelled: string;
+  setmsgClearedButton: (button: string) => string;
+  setmsgClearedAll: string;
+  setmsgNothingToClear: string;
+  setmsgIconNotVisible: string;
+  setmsgLabels: { wc: string; smoke: string; wcd: string; back: string; clear: string; clearAll: string; cancel: string; configured: string; notConfigured: string };
 };
 
 const escapeHtml = (value: string): string =>
@@ -222,6 +235,7 @@ const zh: LocaleText = {
       { command: "countlimits", description: "查看每日活动次数限制" },
       { command: "reminder", description: "开启/关闭超时提醒" },
       { command: "reminders", description: "查看超时提醒状态" },
+      { command: "setmsg", description: "设置 Reply Keyboard 自定义表情" },
       { command: "stats", description: "查看 Bot 统计" },
     ],
   },
@@ -405,6 +419,19 @@ const zh: LocaleText = {
     `超时提醒当前：${inlineCode(enabled ? "开启" : "关闭")}（45 秒宽限）`,
   reminderUpdated: (enabled) =>
     `✅ 超时提醒已${enabled ? "开启" : "关闭"}（45 秒宽限）。`,
+  setmsgPrivate: "请在 Bot 私聊中使用 /setmsg。",
+  setmsgUsage: "用法：/setmsg [wc|smoke|wcd|back|reset]",
+  setmsgMenu: "请选择要设置自定义表情图标的 Reply Keyboard 按钮。✅ 表示已设置。",
+  setmsgPrompt: (button) => `请直接发送一个 Telegram 自定义表情，用作 ${button} 按钮图标。普通 Unicode 表情无法用作按钮图标。发送 /cancel 可取消；此请求 5 分钟后过期。`,
+  setmsgSaved: (button) => `✅ 已为 ${inlineCode(button)} 按钮保存自定义表情图标。下方键盘已刷新。`,
+  setmsgInvalidEmoji: "未检测到单个 Telegram 自定义表情。请直接发送一个自定义表情，不要添加其他文字或空格。",
+  setmsgExpired: "此设置请求已过期。请重新使用 /setmsg。",
+  setmsgCancelled: "已取消自定义表情设置。",
+  setmsgClearedButton: (button) => `✅ 已清除 ${inlineCode(button)} 按钮的自定义图标。`,
+  setmsgClearedAll: "✅ 已清除所有 Reply Keyboard 自定义图标。",
+  setmsgNothingToClear: "此按钮尚未设置自定义图标。",
+  setmsgIconNotVisible: "图标 ID 已保存，但 Telegram 未允许此 Bot 在键盘上显示自定义表情。请确认 Bot owner 具有 Telegram Premium，或 Bot 符合 Telegram 的其他使用资格。",
+  setmsgLabels: { wc: "🚽 厕所", smoke: "🚬 抽烟", wcd: "🟣 WCD", back: "↩️ 回座", clear: "清除", clearAll: "清除全部", cancel: "取消", configured: "已设置", notConfigured: "未设置" },
 };
 
 const mm: LocaleText = {
@@ -459,6 +486,7 @@ const mm: LocaleText = {
       { command: "countlimits", description: "နေ့စဉ် Activity အကြိမ်ရေ ကန့်သတ်ချက် ကြည့်ရန်" },
       { command: "reminder", description: "အချိန်ကျော်သတိပေးချက် ဖွင့်/ပိတ်ရန်" },
       { command: "reminders", description: "အချိန်ကျော်သတိပေးချက် အခြေအနေကြည့်ရန်" },
+      { command: "setmsg", description: "Reply Keyboard Animated Emoji သတ်မှတ်ရန်" },
       { command: "stats", description: "Bot စာရင်းအင်းများ ကြည့်ရန်" },
     ],
   },
@@ -645,6 +673,19 @@ const mm: LocaleText = {
     `အချိန်ကျော်လွန်သတိပေးချက်: ${inlineCode(enabled ? "ဖွင့်ထားသည်" : "ပိတ်ထားသည်")} (45 စက္ကန့် grace period)`,
   reminderUpdated: (enabled) =>
     `✅ အချိန်ကျော်လွန်သတိပေးချက်ကို ${enabled ? "ဖွင့်" : "ပိတ်"}ပြီးပါပြီ (45 စက္ကန့် grace period)။`,
+  setmsgPrivate: "ကျေးဇူးပြု၍ /setmsg ကို Bot private chat ထဲတွင် အသုံးပြုပါ။",
+  setmsgUsage: "အသုံးပြုပုံ: /setmsg [wc|smoke|wcd|back|reset]",
+  setmsgMenu: "Reply Keyboard ခလုတ်များအတွက် Animated Custom Emoji သတ်မှတ်လိုသော ခလုတ်ကို ရွေးချယ်ပါ။ ✅ သည် သတ်မှတ်ပြီးကြောင်း ပြပါသည်။",
+  setmsgPrompt: (button) => `${button} ခလုတ်အတွက် Telegram Custom Emoji တစ်ခုတည်းကို တိုက်ရိုက်ပို့ပါ။ ပုံမှန် Unicode Emoji သည် ခလုတ် icon အဖြစ် မသုံးနိုင်ပါ။ ပယ်ဖျက်ရန် /cancel ကို အသုံးပြုပါ။ ဤတောင်းဆိုမှုသည် ၅ မိနစ်အကြာ သက်တမ်းကုန်ပါမည်။`,
+  setmsgSaved: (button) => `✅ ${inlineCode(button)} ခလုတ်အတွက် Custom Emoji icon ကို သိမ်းဆည်းပြီးပါပြီ။ အောက်ပါ keyboard ကို ပြန်လည်ပြသထားပါသည်။`,
+  setmsgInvalidEmoji: "Telegram Custom Emoji တစ်ခုတည်းကို မတွေ့ပါ။ Custom Emoji တစ်ခုတည်းကို စာသား သို့မဟုတ် space မပါဘဲ တိုက်ရိုက်ပို့ပါ။",
+  setmsgExpired: "သတ်မှတ်မှု တောင်းဆိုချက် သက်တမ်းကုန်သွားပါပြီ။ /setmsg ကို ထပ်မံအသုံးပြုပါ။",
+  setmsgCancelled: "Custom Emoji သတ်မှတ်မှုကို ပယ်ဖျက်ပြီးပါပြီ။",
+  setmsgClearedButton: (button) => `✅ ${inlineCode(button)} ခလုတ်၏ Custom Emoji icon ကို ဖယ်ရှားပြီးပါပြီ။`,
+  setmsgClearedAll: "✅ Reply Keyboard ခလုတ်အားလုံး၏ Custom Emoji icon များကို ဖယ်ရှားပြီးပါပြီ။",
+  setmsgNothingToClear: "ဤခလုတ်အတွက် Custom Emoji icon မသတ်မှတ်ရသေးပါ။",
+  setmsgIconNotVisible: "Emoji ID ကို သိမ်းဆည်းပြီးပါပြီ။ သို့သော် Telegram သည် ဤ Bot အတွက် keyboard ပေါ်တွင် Custom Emoji ပြသခွင့် မပေးပါ။ Bot owner တွင် Telegram Premium ရှိကြောင်း သို့မဟုတ် Bot သည် Telegram ၏ အခြားသတ်မှတ်ချက်များနှင့် ကိုက်ညီကြောင်း စစ်ဆေးပါ။",
+  setmsgLabels: { wc: "🚽 အိမ်သာ", smoke: "🚬 ဆေးလိပ်", wcd: "🟣 WCD", back: "↩️ ထိုင်ခုံသို့ပြန်", clear: "ဖျက်ရန်", clearAll: "အားလုံးဖျက်ရန်", cancel: "ပယ်ဖျက်ရန်", configured: "သတ်မှတ်ပြီး", notConfigured: "မသတ်မှတ်ရသေး" },
 };
 const en: LocaleText = {
   title: "Attendance Bot M58",
@@ -699,6 +740,7 @@ const en: LocaleText = {
       { command: "countlimits", description: "View daily activity count limits" },
       { command: "reminder", description: "Turn overdue reminders on/off" },
       { command: "reminders", description: "View overdue reminder status" },
+      { command: "setmsg", description: "Set reply-keyboard custom emoji icons" },
       { command: "stats", description: "View bot statistics" },
     ],
   },
@@ -894,6 +936,19 @@ const en: LocaleText = {
     `Overdue reminder is currently ${inlineCode(enabled ? "ON" : "OFF")} (45-second grace).`,
   reminderUpdated: (enabled) =>
     `✅ Overdue reminder has been turned ${enabled ? "ON" : "OFF"} (45-second grace).`,
+  setmsgPrivate: "Please use /setmsg in the bot's private chat.",
+  setmsgUsage: "Usage: /setmsg [wc|smoke|wcd|back|reset]",
+  setmsgMenu: "Choose the reply-keyboard button whose custom emoji icon you want to configure. ✅ means an icon is set.",
+  setmsgPrompt: (button) => `Send exactly one Telegram custom emoji to use as the icon for ${button}. A regular Unicode emoji cannot be used as a button icon. Send /cancel to cancel. This request expires in 5 minutes.`,
+  setmsgSaved: (button) => `✅ Saved the custom emoji icon for ${inlineCode(button)}. The keyboard below has been refreshed.`,
+  setmsgInvalidEmoji: "No single Telegram custom emoji entity was found. Send one custom emoji directly, without other text or spaces.",
+  setmsgExpired: "This setup request has expired. Run /setmsg again.",
+  setmsgCancelled: "Custom emoji setup cancelled.",
+  setmsgClearedButton: (button) => `✅ Cleared the custom emoji icon for ${inlineCode(button)}.`,
+  setmsgClearedAll: "✅ Cleared all reply-keyboard custom emoji icons.",
+  setmsgNothingToClear: "This button does not have a custom emoji icon configured.",
+  setmsgIconNotVisible: "The emoji ID was saved, but Telegram did not allow this Bot to display the custom emoji on its keyboard. Confirm the Bot owner has Telegram Premium or that the Bot meets Telegram's other eligibility requirements.",
+  setmsgLabels: { wc: "🚽 Toilet", smoke: "🚬 Smoke", wcd: "🟣 WCD", back: "↩️ Back", clear: "Clear", clearAll: "Clear all", cancel: "Cancel", configured: "Set", notConfigured: "Not set" },
 };
 
 export const getLocale = (locale: Locale): LocaleText => {
