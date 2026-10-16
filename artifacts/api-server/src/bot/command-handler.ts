@@ -728,7 +728,7 @@ export class CommandHandler {
       if (!command.argument) {
         await this.telegram.sendMessage(
           message.chat.id,
-          getLocale(currentLocale).languagePicker,
+          await this.attendance.renderBotReplyMessage(currentLocale, "languagePicker", getLocale(currentLocale).languagePicker),
           languageKeyboard(currentLocale),
           message.message_id,
         );
@@ -744,7 +744,7 @@ export class CommandHandler {
       ) {
         await this.telegram.sendMessage(
           message.chat.id,
-          getLocale(currentLocale).unknownLanguage,
+          await this.attendance.renderBotReplyMessage(currentLocale, "unknownLanguage", getLocale(currentLocale).unknownLanguage),
           undefined,
           message.message_id,
         );
@@ -762,7 +762,7 @@ export class CommandHandler {
 
       await this.telegram.sendMessage(
         message.chat.id,
-        `${getLocale(requestedLocale).languageChanged}\n\n${getLocale(requestedLocale).help}`,
+        `${await this.attendance.renderBotReplyMessage(requestedLocale, "languageChanged", getLocale(requestedLocale).languageChanged)}\n\n${await this.attendance.renderBotReplyMessage(requestedLocale, "help", getLocale(requestedLocale).help)}` ,
         await this.replyKeyboard(requestedLocale, activityNames, isGroupChat(message.chat.type)),
         message.message_id,
       );
@@ -777,7 +777,7 @@ export class CommandHandler {
 
     switch (command.name) {
       case "start": {
-        response = text.startWelcome;
+        response = await this.attendance.renderBotReplyMessage(locale, "startWelcome", text.startWelcome);
         markup = await this.replyKeyboard(locale, activityNames, isGroupChat(message.chat.type));
         if (message.chat.type === "private") {
           const botUsername = await this.telegram.getBotUsername();
@@ -805,18 +805,18 @@ export class CommandHandler {
           this.config.botOwnerId === profile.userId ||
           this.config.adminIds.includes(profile.userId);
         if (!isConfiguredAdmin) {
-          response = text.adminOnly;
+          response = await this.attendance.renderBotReplyMessage(locale, "adminOnly", text.adminOnly);
           break;
         }
         if (message.chat.type !== "private") {
-          response = text.adminPrivate;
+          response = await this.attendance.renderBotReplyMessage(locale, "adminPrivate", text.adminPrivate);
           break;
         }
         if (!this.config.adminMiniAppUrl) {
-          response = text.adminMiniAppUnavailable;
+          response = await this.attendance.renderBotReplyMessage(locale, "adminMiniAppUnavailable", text.adminMiniAppUnavailable);
           break;
         }
-        response = text.adminPanelPrompt;
+        response = await this.attendance.renderBotReplyMessage(locale, "adminPanelPrompt", text.adminPanelPrompt);
         markup = {
           inline_keyboard: [
             [
@@ -832,11 +832,11 @@ export class CommandHandler {
         break;
       }
       case "help":
-        response = text.help;
+        response = await this.attendance.renderBotReplyMessage(locale, "help", text.help);
         markup = await this.replyKeyboard(locale, activityNames, isGroupChat(message.chat.type));
         break;
       case "id": {
-        response = text.idInfo(message.chat.id, message.from.id);
+        response = await this.attendance.renderBotReplyMessage(locale, "idInfo", text.idInfo(message.chat.id, message.from.id), { chat_id: message.chat.id, user_id: message.from.id });
         break;
       }
       case "stats": {
@@ -844,15 +844,15 @@ export class CommandHandler {
           this.config.botOwnerId === profile.userId ||
           this.config.adminIds.includes(profile.userId);
         if (!isAdmin) {
-          response = text.adminOnly;
+          response = await this.attendance.renderBotReplyMessage(locale, "adminOnly", text.adminOnly);
           break;
         }
         if (message.chat.type !== "private") {
-          response = text.botStatsPrivate;
+          response = await this.attendance.renderBotReplyMessage(locale, "botStatsPrivate", text.botStatsPrivate);
           break;
         }
         const stats = await this.attendance.getBotStats();
-        response = text.botStats(stats.privateUsers, stats.groups);
+        response = await this.attendance.renderBotReplyMessage(locale, "botStats", text.botStats(stats.privateUsers, stats.groups), { private_users: stats.privateUsers, groups: stats.groups });
         break;
       }
       case "work":
@@ -876,21 +876,21 @@ export class CommandHandler {
         break;
       case "connect":
         if (message.chat.type === "private") {
-          response = text.connectUsage;
+          response = await this.attendance.renderBotReplyMessage(locale, "connectUsage", text.connectUsage);
           break;
         }
         if (!(await this.isGroupAdmin(message))) {
-          response = text.connectAdminOnly;
+          response = await this.attendance.renderBotReplyMessage(locale, "connectAdminOnly", text.connectAdminOnly);
           break;
         }
         if (command.argument) {
           const target = await this.resolveConnectTarget(command.argument);
           if (!target) {
-            response = text.connectInvalid;
+            response = await this.attendance.renderBotReplyMessage(locale, "connectInvalid", text.connectInvalid);
             break;
           }
           if (target.id === message.chat.id) {
-            response = text.connectSelf;
+            response = await this.attendance.renderBotReplyMessage(locale, "connectSelf", text.connectSelf);
             break;
           }
           await this.attendance.setConnectedGroup(
@@ -905,14 +905,11 @@ export class CommandHandler {
             message.chat.id,
             profile.userId,
           );
-          response = text.connectSuccess(
-            target.title || String(target.id),
-            target.id,
-          );
+          response = await this.attendance.renderBotReplyMessage(locale, "connectSuccess", text.connectSuccess(target.title || String(target.id), target.id), { group_name: target.title || String(target.id), group_id: target.id });
           break;
         }
         await this.attendance.beginConnect(message.chat.id, profile.userId);
-        response = text.connectPrompt;
+        response = await this.attendance.renderBotReplyMessage(locale, "connectPrompt", text.connectPrompt);
         break;
       case "limits":
       case "limit":
@@ -927,7 +924,7 @@ export class CommandHandler {
         response = await this.handleReminderCommand(message, profile, command.argument);
         break;
       default:
-        response = text.unknownCommand;
+        response = await this.attendance.renderBotReplyMessage(locale, "unknownCommand", text.unknownCommand);
     }
     if (
       (command.name === "help" ||
@@ -1334,7 +1331,7 @@ export class CommandHandler {
           : message.message_id;
       await this.telegram.sendMessage(
         message.chat.id,
-        `${getLocale(requestedLocale).languageChanged}\n\n${getLocale(requestedLocale).help}`,
+        `${await this.attendance.renderBotReplyMessage(requestedLocale, "languageChanged", getLocale(requestedLocale).languageChanged)}\n\n${await this.attendance.renderBotReplyMessage(requestedLocale, "help", getLocale(requestedLocale).help)}` ,
         await this.replyKeyboard(
           requestedLocale,
           interactionSettings.activityNames,
