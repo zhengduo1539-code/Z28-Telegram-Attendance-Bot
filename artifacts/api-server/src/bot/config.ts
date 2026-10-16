@@ -1,5 +1,5 @@
 import path from "node:path";
-import type { ActivityLimits, ReplyKeyboardEmojiIds } from "./types";
+import type { ActivityLimits } from "./types";
 
 const positiveInteger = (value: string | undefined, fallback: number) => {
   const parsed = Number(value);
@@ -24,15 +24,6 @@ const DEFAULT_ACTIVITY_LIMITS: ActivityLimits = {
   wcd: 15,
 };
 
-const REPLY_KEYBOARD_EMOJI_ENV: ReadonlyArray<
-  readonly [keyof ReplyKeyboardEmojiIds, string]
-> = [
-  ["wc", "REPLY_KEYBOARD_EMOJI_WC_ID"],
-  ["smoke", "REPLY_KEYBOARD_EMOJI_SMOKE_ID"],
-  ["wcd", "REPLY_KEYBOARD_EMOJI_WCD_ID"],
-  ["back", "REPLY_KEYBOARD_EMOJI_BACK_ID"],
-];
-
 export type BotConfig = {
   token?: string;
   pollIntervalMs: number;
@@ -43,7 +34,6 @@ export type BotConfig = {
   timeZone: string;
   botOwnerId?: number;
   adminIds: number[];
-  replyKeyboardEmojiIds?: ReplyKeyboardEmojiIds;
   adminMiniAppUrl?: string;
   userMiniAppUrl?: string;
   historyRetentionDays: number;
@@ -91,18 +81,7 @@ const resolveMiniAppUrl = (target: "admin" | "user"): string | undefined => {
 const resolveAdminMiniAppUrl = (): string | undefined => resolveMiniAppUrl("admin");
 const resolveUserMiniAppUrl = (): string | undefined => resolveMiniAppUrl("user");
 
-const parseCustomEmojiId = (value: string | undefined): string | undefined => {
-  const id = value?.trim();
-  return id && /^\d+$/.test(id) ? id : undefined;
-};
-
 export const getBotConfig = (): BotConfig => {
-  const replyKeyboardEmojiIds: ReplyKeyboardEmojiIds = {};
-  for (const [button, envName] of REPLY_KEYBOARD_EMOJI_ENV) {
-    const customEmojiId = parseCustomEmojiId(process.env[envName]);
-    if (customEmojiId) replyKeyboardEmojiIds[button] = customEmojiId;
-  }
-
   return {
     token: process.env["TELEGRAM_BOT_TOKEN"]?.trim() || undefined,
     pollIntervalMs: positiveInteger(process.env["BOT_POLL_INTERVAL_MS"], 1_000),
@@ -130,6 +109,5 @@ export const getBotConfig = (): BotConfig => {
     memoryRssLimitMb: positiveInteger(process.env["MEMORY_RSS_LIMIT_MB"], 512),
     memoryRssWarnPercent: Math.min(Math.max(Number(process.env["MEMORY_RSS_WARN_PERCENT"]) || 80, 1), 99),
     memoryRssCriticalPercent: Math.min(Math.max(Number(process.env["MEMORY_RSS_CRITICAL_PERCENT"]) || 90, 1), 99),
-    replyKeyboardEmojiIds,
   };
 };
