@@ -10,6 +10,7 @@ export const emptyState = (): BotState => ({
   activityLimits: {},
   connectedGroups: {},
   pendingConnects: {},
+  replyKeyboardEmojiIds: {},
 });
 
 const isObjectRecord = (value: unknown): value is Record<string, unknown> =>
