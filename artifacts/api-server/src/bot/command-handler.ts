@@ -67,6 +67,7 @@ const keyboard = (
   locale: Locale,
   activityNames: Partial<Record<ActivityKind, string>> = {},
   iconCustomEmojiIds: ReplyKeyboardEmojiIds = {},
+  selective = false,
 ): ReplyKeyboardMarkup => {
   const text = getLocale(locale).buttons;
   const makeButton = (
@@ -97,8 +98,12 @@ const keyboard = (
     is_persistent: true,
     one_time_keyboard: false,
     input_field_placeholder: text.inputFieldPlaceholder,
+    ...(selective ? { selective: true } : {}),
   };
 };
+
+const isGroupChat = (chatType?: string): boolean =>
+  chatType === "group" || chatType === "supergroup";
 
 const buttonCommand = (
   value: string,
@@ -160,8 +165,14 @@ export class CommandHandler {
   private async replyKeyboard(
     locale: Locale,
     activityNames: Partial<Record<ActivityKind, string>> = {},
+    selective = false,
   ): Promise<ReplyKeyboardMarkup> {
-    return keyboard(locale, activityNames, await this.attendance.getReplyKeyboardEmojiIds());
+    return keyboard(
+      locale,
+      activityNames,
+      await this.attendance.getReplyKeyboardEmojiIds(),
+      selective,
+    );
   }
 
   private isConfiguredAdmin(userId: number): boolean {
@@ -472,7 +483,7 @@ export class CommandHandler {
       await this.telegram.sendMessage(
         message.chat.id,
         `${getLocale(requestedLocale).languageChanged}\n\n${getLocale(requestedLocale).help}`,
-        await this.replyKeyboard(requestedLocale),
+        await this.replyKeyboard(requestedLocale, activityNames, isGroupChat(message.chat.type)),
         message.message_id,
       );
       return;
@@ -487,7 +498,7 @@ export class CommandHandler {
     switch (command.name) {
       case "start": {
         response = text.startWelcome;
-        markup = await this.replyKeyboard(locale, activityNames);
+        markup = await this.replyKeyboard(locale, activityNames, isGroupChat(message.chat.type));
         if (message.chat.type === "private") {
           const botUsername = await this.telegram.getBotUsername();
           const rows: import("./types").InlineKeyboardButton[][] = [];
@@ -542,7 +553,7 @@ export class CommandHandler {
       }
       case "help":
         response = text.help;
-        markup = await this.replyKeyboard(locale, activityNames);
+        markup = await this.replyKeyboard(locale, activityNames, isGroupChat(message.chat.type));
         break;
       case "id": {
         response = text.idInfo(message.chat.id, message.from.id);
@@ -566,22 +577,22 @@ export class CommandHandler {
       }
       case "work":
         response = await this.attendance.workCheckIn(profile);
-        markup = await this.replyKeyboard(locale, activityNames);
+        markup = await this.replyKeyboard(locale, activityNames, isGroupChat(message.chat.type));
         break;
       case "back":
         response = await this.handleSettlement(profile, "back");
-        markup = await this.replyKeyboard(locale, activityNames);
+        markup = await this.replyKeyboard(locale, activityNames, isGroupChat(message.chat.type));
         break;
       case "eat":
       case "wc":
       case "smoke":
       case "wcd":
         response = await this.attendance.startActivity(profile, command.name);
-        markup = await this.replyKeyboard(locale, activityNames);
+        markup = await this.replyKeyboard(locale, activityNames, isGroupChat(message.chat.type));
         break;
       case "offwork":
         response = await this.handleSettlement(profile, "offwork");
-        markup = await this.replyKeyboard(locale, activityNames);
+        markup = await this.replyKeyboard(locale, activityNames, isGroupChat(message.chat.type));
         break;
       case "connect":
         if (message.chat.type === "private") {
@@ -1013,10 +1024,11 @@ export class CommandHandler {
         return;
       }
 
-      const currentLocale = await this.attendance.getLocale(
+      const interactionSettings = await this.attendance.getUserInteractionSettings(
         message.chat.id,
         callback.from.id,
       );
+      const currentLocale = interactionSettings.locale;
       const syntheticMessage: TelegramMessage = {
         message_id: message.message_id,
         chat: message.chat,
@@ -1033,20 +1045,33 @@ export class CommandHandler {
         requestedLocale,
       );
 
+      const groupChat = isGroupChat(message.chat.type);
+      const originalUserMessageId = message.reply_to_message?.message_id;
+      const replyToMessageId =
+        groupChat && originalUserMessageId !== undefined
+          ? originalUserMessageId
+          : message.message_id;
       await this.telegram.sendMessage(
         message.chat.id,
         `${getLocale(requestedLocale).languageChanged}\n\n${getLocale(requestedLocale).help}`,
-        await this.replyKeyboard(requestedLocale),
-        message.message_id,
+        await this.replyKeyboard(
+          requestedLocale,
+          interactionSettings.activityNames,
+          groupChat && originalUserMessageId !== undefined,
+        ),
+        replyToMessageId,
       );
       return;
     }
 
     const syntheticMessage: TelegramMessage = {
-      message_id: message.message_id,
+      message_id: isGroupChat(message.chat.type)
+        ? message.reply_to_message?.message_id ?? message.message_id
+        : message.message_id,
       chat: message.chat,
       from: callback.from,
       text: action === "back" ? "/back" : `/${action}`,
+      ...(message.reply_to_message ? { reply_to_message: message.reply_to_message } : {}),
     };
     await this.handleMessage(syntheticMessage);
   }

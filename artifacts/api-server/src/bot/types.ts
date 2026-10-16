@@ -160,6 +160,7 @@ export type TelegramMessage = {
   text?: string;
   entities?: TelegramMessageEntity[];
   date?: number;
+  reply_to_message?: TelegramMessage;
 };
 
 export type TelegramCallbackQuery = {
@@ -211,4 +212,5 @@ export type ReplyKeyboardMarkup = {
   is_persistent?: boolean;
   one_time_keyboard?: boolean;
   input_field_placeholder?: string;
+  selective?: boolean;
 };
