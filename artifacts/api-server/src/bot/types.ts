@@ -189,8 +189,13 @@ export type InlineKeyboardMarkup = {
 
 export type ReplyKeyboardButton = {
   text: string;
+  icon_custom_emoji_id?: string;
   style?: "danger" | "success" | "primary";
 };
+
+export type ReplyKeyboardEmojiIds = Partial<
+  Record<"wc" | "smoke" | "wcd" | "back", string>
+>;
 
 export type ReplyKeyboardMarkup = {
   keyboard: ReplyKeyboardButton[][];
