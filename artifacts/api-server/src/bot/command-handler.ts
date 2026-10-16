@@ -5,6 +5,7 @@ import type {
   ActivityKind,
   Locale,
   ReplyKeyboardButton,
+  ReplyKeyboardEmojiKey,
   ReplyKeyboardEmojiIds,
   ReplyKeyboardMarkup,
   TelegramCallbackQuery,
@@ -137,10 +138,18 @@ export const getCommandMenu = (
 export const DEFAULT_MENU_COMMANDS = getCommandMenu("en", false);
 export const ADMIN_MENU_COMMANDS = getCommandMenu("en", true);
 
+const REPLY_KEYBOARD_EMOJI_KEYS: ReplyKeyboardEmojiKey[] = ["wc", "smoke", "wcd", "back"];
+const SETMSG_PENDING_TTL_MS = 5 * 60 * 1_000;
+
 export class CommandHandler {
   private readonly adminMenuScopes = new Set<string>();
   private readonly privateMenuButtonScopes = new Set<string>();
   private readonly settlementQueues = new Map<string, Promise<void>>();
+  private readonly pendingReplyKeyboardEmoji = new Map<number, {
+    chatId: number;
+    key: ReplyKeyboardEmojiKey;
+    expiresAt: number;
+  }>();
 
   constructor(
     private readonly telegram: TelegramClient,
@@ -148,11 +157,164 @@ export class CommandHandler {
     private readonly config: BotConfig,
   ) {}
 
-  private replyKeyboard(
+  private async replyKeyboard(
     locale: Locale,
     activityNames: Partial<Record<ActivityKind, string>> = {},
-  ): ReplyKeyboardMarkup {
-    return keyboard(locale, activityNames, this.config.replyKeyboardEmojiIds);
+  ): Promise<ReplyKeyboardMarkup> {
+    return keyboard(locale, activityNames, await this.attendance.getReplyKeyboardEmojiIds());
+  }
+
+  private isConfiguredAdmin(userId: number): boolean {
+    return this.config.botOwnerId === userId || this.config.adminIds.includes(userId);
+  }
+
+  private replyKeyboardButtonLabel(locale: Locale, key: ReplyKeyboardEmojiKey): string {
+    return getLocale(locale).setmsgLabels[key];
+  }
+
+  private parseReplyKeyboardEmojiKey(value: string | undefined): ReplyKeyboardEmojiKey | undefined {
+    if (!value) return undefined;
+    const aliases: Record<string, ReplyKeyboardEmojiKey> = {
+      wc: "wc", toilet: "wc", smoke: "smoke", wcd: "wcd", back: "back", return: "back",
+    };
+    return aliases[value.trim().toLowerCase()];
+  }
+
+  private buildSetmsgMenu(locale: Locale, emojiIds: ReplyKeyboardEmojiIds): import("./types").InlineKeyboardMarkup {
+    const labels = getLocale(locale).setmsgLabels;
+    const rows: import("./types").InlineKeyboardButton[][] = REPLY_KEYBOARD_EMOJI_KEYS.map((key) => [
+      { text: `${labels[key]} · ${emojiIds[key] ? labels.configured : labels.notConfigured}`, callback_data: `setmsg:select:${key}` },
+      { text: labels.clear, callback_data: `setmsg:clear:${key}`, style: "danger" },
+    ]);
+    rows.push([
+      { text: labels.clearAll, callback_data: "setmsg:clear_all", style: "danger" },
+      { text: labels.cancel, callback_data: "setmsg:cancel" },
+    ]);
+    return { inline_keyboard: rows };
+  }
+
+  private async startReplyKeyboardEmojiSetup(chatId: number, userId: number, locale: Locale, key: ReplyKeyboardEmojiKey, replyToMessageId?: number): Promise<void> {
+    this.pendingReplyKeyboardEmoji.set(userId, { chatId, key, expiresAt: Date.now() + SETMSG_PENDING_TTL_MS });
+    await this.telegram.sendMessage(chatId, getLocale(locale).setmsgPrompt(this.replyKeyboardButtonLabel(locale, key)), undefined, replyToMessageId);
+  }
+
+  private async handlePendingReplyKeyboardEmoji(message: TelegramMessage): Promise<boolean> {
+    if (!message.text || !message.from || message.from.is_bot || message.chat.type !== "private") return false;
+    const pending = this.pendingReplyKeyboardEmoji.get(message.from.id);
+    if (!pending || pending.chatId !== message.chat.id) return false;
+    const locale = await this.attendance.getLocale(message.chat.id, message.from.id);
+    const text = getLocale(locale);
+    const incomingCommand = parseCommand(message.text);
+    if (pending.expiresAt <= Date.now()) {
+      this.pendingReplyKeyboardEmoji.delete(message.from.id);
+      if (incomingCommand) return false;
+      await this.telegram.sendMessage(message.chat.id, text.setmsgExpired);
+      return true;
+    }
+    if (incomingCommand?.name === "cancel") {
+      this.pendingReplyKeyboardEmoji.delete(message.from.id);
+      await this.telegram.sendMessage(message.chat.id, text.setmsgCancelled);
+      return true;
+    }
+    if (incomingCommand) {
+      this.pendingReplyKeyboardEmoji.delete(message.from.id);
+      return false;
+    }
+    const entities = (message.entities || []).filter(
+      (entity) => entity.type === "custom_emoji" && /^\d+$/.test(entity.custom_emoji_id || ""),
+    );
+    const entity = entities[0];
+    const validStandaloneCustomEmoji = entities.length === 1 && entity !== undefined &&
+      entity.offset === 0 && entity.length === message.text.length && message.text.trim() === message.text;
+    if (!validStandaloneCustomEmoji || !entity?.custom_emoji_id) {
+      await this.telegram.sendMessage(message.chat.id, text.setmsgInvalidEmoji);
+      return true;
+    }
+    this.pendingReplyKeyboardEmoji.delete(message.from.id);
+    await this.attendance.setReplyKeyboardEmojiId(pending.key, entity.custom_emoji_id);
+    const settings = await this.attendance.getUserInteractionSettings(message.chat.id, message.from.id);
+    const confirmation = text.setmsgSaved(this.replyKeyboardButtonLabel(locale, pending.key));
+    try {
+      await this.telegram.sendMessage(message.chat.id, confirmation, await this.replyKeyboard(locale, settings.activityNames), message.message_id);
+    } catch {
+      await this.telegram.sendMessage(message.chat.id, `${confirmation}\n\n${text.setmsgIconNotVisible}`, undefined, message.message_id);
+    }
+    return true;
+  }
+
+  private async handleSetmsgCommand(message: TelegramMessage, profile: Omit<UserProfile, "createdAt" | "updatedAt">, argument?: string): Promise<void> {
+    const text = getLocale(profile.locale);
+    if (!this.isConfiguredAdmin(profile.userId)) {
+      await this.telegram.sendMessage(message.chat.id, text.adminOnly, undefined, message.message_id);
+      return;
+    }
+    if (message.chat.type !== "private" || message.chat.id !== profile.userId) {
+      await this.telegram.sendMessage(message.chat.id, text.setmsgPrivate, undefined, message.message_id);
+      return;
+    }
+    const arg = argument?.trim().toLowerCase();
+    if (arg === "reset" || arg === "clear" || arg === "all") {
+      this.pendingReplyKeyboardEmoji.delete(profile.userId);
+      await this.attendance.clearReplyKeyboardEmojiIds();
+      const settings = await this.attendance.getUserInteractionSettings(message.chat.id, profile.userId);
+      await this.telegram.sendMessage(message.chat.id, text.setmsgClearedAll, await this.replyKeyboard(profile.locale, settings.activityNames), message.message_id);
+      return;
+    }
+    if (arg) {
+      const key = this.parseReplyKeyboardEmojiKey(arg);
+      if (!key) {
+        await this.telegram.sendMessage(message.chat.id, text.setmsgUsage, undefined, message.message_id);
+        return;
+      }
+      await this.startReplyKeyboardEmojiSetup(message.chat.id, profile.userId, profile.locale, key, message.message_id);
+      return;
+    }
+    this.pendingReplyKeyboardEmoji.delete(profile.userId);
+    await this.telegram.sendMessage(message.chat.id, text.setmsgMenu, this.buildSetmsgMenu(profile.locale, await this.attendance.getReplyKeyboardEmojiIds()), message.message_id);
+  }
+
+  private async handleSetmsgCallback(callback: TelegramCallbackQuery, message: TelegramMessage, action?: string, value?: string): Promise<void> {
+    if (!callback.from || callback.from.is_bot) return;
+    const locale = await this.attendance.getLocale(message.chat.id, callback.from.id);
+    const text = getLocale(locale);
+    if (!this.isConfiguredAdmin(callback.from.id)) {
+      await this.telegram.sendMessage(message.chat.id, text.adminOnly);
+      return;
+    }
+    if (message.chat.type !== "private" || message.chat.id !== callback.from.id) {
+      await this.telegram.sendMessage(message.chat.id, text.setmsgPrivate);
+      return;
+    }
+    if (action === "cancel") {
+      this.pendingReplyKeyboardEmoji.delete(callback.from.id);
+      await this.telegram.sendMessage(message.chat.id, text.setmsgCancelled);
+      return;
+    }
+    if (action === "clear_all") {
+      this.pendingReplyKeyboardEmoji.delete(callback.from.id);
+      await this.attendance.clearReplyKeyboardEmojiIds();
+      const settings = await this.attendance.getUserInteractionSettings(message.chat.id, callback.from.id);
+      await this.telegram.sendMessage(message.chat.id, text.setmsgClearedAll, await this.replyKeyboard(locale, settings.activityNames), message.message_id);
+      return;
+    }
+    const key = this.parseReplyKeyboardEmojiKey(value);
+    if (!key || (action !== "select" && action !== "clear")) {
+      await this.telegram.sendMessage(message.chat.id, text.setmsgMenu, this.buildSetmsgMenu(locale, await this.attendance.getReplyKeyboardEmojiIds()), message.message_id);
+      return;
+    }
+    if (action === "select") {
+      await this.startReplyKeyboardEmojiSetup(message.chat.id, callback.from.id, locale, key, message.message_id);
+      return;
+    }
+    const emojiIds = await this.attendance.getReplyKeyboardEmojiIds();
+    if (!emojiIds[key]) {
+      await this.telegram.sendMessage(message.chat.id, text.setmsgNothingToClear);
+      return;
+    }
+    this.pendingReplyKeyboardEmoji.delete(callback.from.id);
+    await this.attendance.setReplyKeyboardEmojiId(key);
+    const settings = await this.attendance.getUserInteractionSettings(message.chat.id, callback.from.id);
+    await this.telegram.sendMessage(message.chat.id, text.setmsgClearedButton(this.replyKeyboardButtonLabel(locale, key)), await this.replyKeyboard(locale, settings.activityNames), message.message_id);
   }
 
   async handleUpdate(update: TelegramUpdate): Promise<void> {
@@ -169,6 +331,7 @@ export class CommandHandler {
 
   private async handleMessage(message: TelegramMessage) {
     if (!message.text || !message.from || message.from.is_bot) return;
+    if (await this.handlePendingReplyKeyboardEmoji(message)) return;
     const interactionSettings =
       await this.attendance.getUserInteractionSettings(
         message.chat.id,
@@ -266,6 +429,10 @@ export class CommandHandler {
     }
 
     if (!command) return;
+    if (command.name === "setmsg") {
+      await this.handleSetmsgCommand(message, profile, command.argument);
+      return;
+    }
     if (command.name === "lang" || command.name === "language") {
       if (!command.argument) {
         await this.telegram.sendMessage(
@@ -305,7 +472,7 @@ export class CommandHandler {
       await this.telegram.sendMessage(
         message.chat.id,
         `${getLocale(requestedLocale).languageChanged}\n\n${getLocale(requestedLocale).help}`,
-        this.replyKeyboard(requestedLocale),
+        await this.replyKeyboard(requestedLocale),
         message.message_id,
       );
       return;
@@ -320,7 +487,7 @@ export class CommandHandler {
     switch (command.name) {
       case "start": {
         response = text.startWelcome;
-        markup = this.replyKeyboard(locale, activityNames);
+        markup = await this.replyKeyboard(locale, activityNames);
         if (message.chat.type === "private") {
           const botUsername = await this.telegram.getBotUsername();
           const rows: import("./types").InlineKeyboardButton[][] = [];
@@ -375,7 +542,7 @@ export class CommandHandler {
       }
       case "help":
         response = text.help;
-        markup = this.replyKeyboard(locale, activityNames);
+        markup = await this.replyKeyboard(locale, activityNames);
         break;
       case "id": {
         response = text.idInfo(message.chat.id, message.from.id);
@@ -399,22 +566,22 @@ export class CommandHandler {
       }
       case "work":
         response = await this.attendance.workCheckIn(profile);
-        markup = this.replyKeyboard(locale, activityNames);
+        markup = await this.replyKeyboard(locale, activityNames);
         break;
       case "back":
         response = await this.handleSettlement(profile, "back");
-        markup = this.replyKeyboard(locale, activityNames);
+        markup = await this.replyKeyboard(locale, activityNames);
         break;
       case "eat":
       case "wc":
       case "smoke":
       case "wcd":
         response = await this.attendance.startActivity(profile, command.name);
-        markup = this.replyKeyboard(locale, activityNames);
+        markup = await this.replyKeyboard(locale, activityNames);
         break;
       case "offwork":
         response = await this.handleSettlement(profile, "offwork");
-        markup = this.replyKeyboard(locale, activityNames);
+        markup = await this.replyKeyboard(locale, activityNames);
         break;
       case "connect":
         if (message.chat.type === "private") {
@@ -827,8 +994,14 @@ export class CommandHandler {
   private async handleCallback(callback: TelegramCallbackQuery) {
     await this.telegram.answerCallbackQuery(callback.id);
     const message = callback.message;
-    const [namespace, action] = callback.data?.split(":") || [];
-    if (!message || !action || !callback.from || callback.from.is_bot) return;
+    const [namespace, action, value] = callback.data?.split(":") || [];
+    if (!message || !namespace || !callback.from || callback.from.is_bot) return;
+
+    if (namespace === "setmsg") {
+      await this.handleSetmsgCallback(callback, message, action, value);
+      return;
+    }
+    if (!action) return;
 
     if (namespace === "lang") {
       const requestedLocale = action === "eng" ? "en" : action;
@@ -863,7 +1036,7 @@ export class CommandHandler {
       await this.telegram.sendMessage(
         message.chat.id,
         `${getLocale(requestedLocale).languageChanged}\n\n${getLocale(requestedLocale).help}`,
-        this.replyKeyboard(requestedLocale),
+        await this.replyKeyboard(requestedLocale),
         message.message_id,
       );
       return;
