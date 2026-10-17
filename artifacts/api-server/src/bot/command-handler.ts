@@ -24,6 +24,7 @@ import type {
   TelegramUpdate,
   UserProfile,
 } from "./types";
+import { renderActivityReplyTemplate } from "./activity-reply-messages";
 import { TelegramClient } from "./telegram-client";
 
 type Command = {
@@ -56,6 +57,69 @@ const profileFromUser = (
   };
 };
 
+
+
+const getDefaultBotReplyPreview = (locale: Locale, key: BotReplyMessageKey): string => {
+  const text = getLocale(locale);
+  const userName = "{user_name}";
+  const userId = 123456789;
+  const activity = "{activity}";
+  const sampleCounts = { eat: 1, wc: 2, smoke: 3, wcd: 4 };
+  const sampleLimits = { eat: 30, wc: 5, smoke: 5, wcd: 10 };
+
+  switch (key) {
+    case "startWelcome": return text.startWelcome;
+    case "help": return text.help;
+    case "languageChanged": return text.languageChanged;
+    case "languagePicker": return text.languagePicker;
+    case "unknownLanguage": return text.unknownLanguage;
+    case "unknownCommand": return text.unknownCommand;
+    case "idInfo": return text.idInfo(123456789, userId);
+    case "botStats": return text.botStats(12, 3);
+    case "botStatsPrivate": return text.botStatsPrivate;
+    case "workCheckIn": return text.workCheckIn(userName, userId, "{checked_at}");
+    case "noActive": return text.noActive(userName, userId);
+    case "alreadyActive": return text.alreadyActive(userName, userId, activity);
+    case "started": return text.started(userName, userId, activity, "{time}", 1, 30);
+    case "settled":
+      return text.settled(
+        userName, userId, activity, "{start_time}", 120, 30, 120, 300, sampleCounts,
+      );
+    case "dailyCountLimitReached": return text.dailyCountLimitReached(userName, userId, activity, 3);
+    case "timeoutReminder": return text.timeoutReminder(userName, userId, activity);
+    case "groupTimeoutNotification":
+      return text.groupTimeoutNotification(
+        "{group_name}", 123456789, "{username}", userName, userId, activity, 60, "{warning_time}",
+      );
+    case "shiftEnded": return text.shiftEnded("{time}");
+    case "adminOnly": return text.adminOnly;
+    case "adminPrivate": return text.adminPrivate;
+    case "adminPanelPrompt": return text.adminPanelPrompt;
+    case "adminMiniAppUnavailable": return text.adminMiniAppUnavailable;
+    case "limitPrivate": return text.limitPrivate;
+    case "limitUsage": return text.limitUsage;
+    case "unknownActivity": return text.unknownActivity;
+    case "invalidLimit": return text.invalidLimit;
+    case "limits": return text.limits(sampleLimits);
+    case "limitUpdated": return text.limitUpdated(activity, 30);
+    case "countLimitPrivate": return text.countLimitPrivate;
+    case "countLimitUsage": return text.countLimitUsage;
+    case "invalidCountLimit": return text.invalidCountLimit;
+    case "countLimits": return text.countLimits(sampleCounts);
+    case "countLimitUpdated": return text.countLimitUpdated(activity, 3);
+    case "reminderPrivate": return text.reminderPrivate;
+    case "reminderUsage": return text.reminderUsage;
+    case "reminderStatus": return text.reminderStatus(true);
+    case "reminderUpdated": return text.reminderUpdated(true);
+    case "connectPrompt": return text.connectPrompt;
+    case "connectUsage": return text.connectUsage;
+    case "connectAdminOnly": return text.connectAdminOnly;
+    case "connectSuccess": return text.connectSuccess("{group_name}", 123456789);
+    case "connectSelf": return text.connectSelf;
+    case "connectInvalid": return text.connectInvalid;
+    default: return BOT_REPLY_LABELS[key];
+  }
+};
 
 const languageKeyboard = (locale: Locale): import("./types").InlineKeyboardMarkup => {
   const options: Array<{ locale: Locale; label: string }> = [
@@ -362,12 +426,18 @@ export class CommandHandler {
       key,
       expiresAt: Date.now() + SETMSG_PENDING_TTL_MS,
     });
+    const currentTemplate = await this.attendance.getBotReplyTemplate(targetLocale, key);
+    const currentMessage = currentTemplate
+      ? renderActivityReplyTemplate(currentTemplate, {})
+      : getDefaultBotReplyPreview(targetLocale, key);
     await this.telegram.sendMessage(
       chatId,
       getLocale(uiLocale).setmsgTextPrompt(
         BOT_REPLY_LABELS[key],
         localeName(targetLocale),
         [...BOT_REPLY_VARIABLES[key]],
+        currentMessage,
+        currentTemplate !== undefined,
       ),
       undefined,
       replyToMessageId,
