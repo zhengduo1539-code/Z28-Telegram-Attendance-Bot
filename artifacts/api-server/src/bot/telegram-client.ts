@@ -336,13 +336,13 @@ export class TelegramClient {
     });
   }
 
-  sendMessage(
+  async sendMessage(
     chatId: number,
     text: string,
     replyMarkup?: InlineKeyboardMarkup | ReplyKeyboardMarkup,
     replyToMessageId?: number,
   ) {
-    return this.call("sendMessage", {
+    const payload: Record<string, unknown> = {
       chat_id: chatId,
       text,
       parse_mode: "HTML",
@@ -355,7 +355,26 @@ export class TelegramClient {
             },
           }
         : {}),
-    }, "normal");
+    };
+
+    try {
+      return await this.call("sendMessage", payload, "normal");
+    } catch (error: unknown) {
+      const hasCustomEmojiTag = /<tg-emoji\b/i.test(text);
+      const description = error instanceof Error ? error.message : String(error);
+      const customEmojiRejected =
+        /custom emoji|emoji entities|tg-emoji|unsupported start tag/i.test(description);
+      if (!hasCustomEmojiTag || !customEmojiRejected) throw error;
+
+      // Preserve delivery if Telegram rejects custom emoji tags for this Bot or chat.
+      // The fallback retains the alternative glyph but cannot animate it.
+      const fallbackText = text.replace(
+        /<tg-emoji\s+emoji-id="\d+">([\s\S]*?)<\/tg-emoji>/g,
+        "$1",
+      );
+      if (fallbackText === text) throw error;
+      return this.call("sendMessage", { ...payload, text: fallbackText }, "normal");
+    }
   }
 
   answerCallbackQuery(callbackQueryId: string) {
