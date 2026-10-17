@@ -328,10 +328,10 @@ const encodeCustomEmojiEntitiesForTemplate = (
   entities: TelegramMessageEntity[] | undefined,
 ): string => {
   let result = text;
-  const customEmojiEntities = [...(entities || [])]
+  const formattingEntities = [...(entities || [])]
     .filter((entity) =>
-      entity.type === "custom_emoji" &&
-      /^\d+$/.test(entity.custom_emoji_id || "") &&
+      (entity.type === "custom_emoji" || entity.type === "code" || entity.type === "pre") &&
+      (entity.type !== "custom_emoji" || /^\d+$/.test(entity.custom_emoji_id || "")) &&
       Number.isInteger(entity.offset) &&
       Number.isInteger(entity.length) &&
       entity.offset >= 0 &&
@@ -341,11 +341,21 @@ const encodeCustomEmojiEntitiesForTemplate = (
     .sort((left, right) => right.offset - left.offset);
 
   // Telegram offsets use UTF-16 code units, matching JavaScript string indexes.
-  // Replace right-to-left so replacing an emoji does not shift earlier offsets.
-  for (const entity of customEmojiEntities) {
-    const alternative = result.slice(entity.offset, entity.offset + entity.length);
-    if (!alternative || !entity.custom_emoji_id) continue;
-    const marker = `[[tg-emoji:${entity.custom_emoji_id}:${encodeURIComponent(alternative)}]]`;
+  // Process right-to-left so replacements never shift offsets still to be handled.
+  for (const entity of formattingEntities) {
+    const entityText = result.slice(entity.offset, entity.offset + entity.length);
+    if (!entityText) continue;
+
+    let marker: string;
+    if (entity.type === "custom_emoji") {
+      if (!entity.custom_emoji_id) continue;
+      marker = `[[tg-emoji:${entity.custom_emoji_id}:${encodeURIComponent(entityText)}]]`;
+    } else {
+      // Keep code contents encoded until rendering; this preserves formatting safely
+      // while allowing placeholders inside code/pre spans to be interpolated later.
+      marker = `[[tg-${entity.type}:${encodeURIComponent(entityText)}]]`;
+    }
+
     result =
       result.slice(0, entity.offset) +
       marker +
