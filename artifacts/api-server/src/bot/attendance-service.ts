@@ -147,6 +147,9 @@ const formatLocalizedDuration = (locale: Locale, seconds: number): string => {
   return formatChineseDuration(seconds);
 };
 
+const getTimeoutSeconds = (durationSeconds: number, limitMinutes: number): number =>
+  Math.max(0, Math.floor(durationSeconds - limitMinutes * 60));
+
 const ensureProfile = (
   state: BotState,
   profile: Omit<UserProfile, "createdAt" | "updatedAt">,
