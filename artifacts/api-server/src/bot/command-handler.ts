@@ -61,11 +61,52 @@ const profileFromUser = (
 
 const getDefaultBotReplyPreview = (locale: Locale, key: BotReplyMessageKey): string => {
   const text = getLocale(locale);
+  const placeholderNumber = (name: string): number => `{${name}}` as unknown as number;
   const userName = "{user_name}";
-  const userId = 123456789;
+  const sampleUserId = 123456789;
   const activity = "{activity}";
-  const sampleCounts = { eat: 1, wc: 2, smoke: 3, wcd: 4 };
-  const sampleLimits = { eat: 30, wc: 5, smoke: 5, wcd: 10 };
+  const sampleCounts = { eat: 111, wc: 222, smoke: 333, wcd: 444 };
+  const limitPlaceholders = {
+    eat: placeholderNumber("eat_minutes"),
+    wc: placeholderNumber("wc_minutes"),
+    smoke: placeholderNumber("smoke_minutes"),
+    wcd: placeholderNumber("wcd_minutes"),
+  };
+  const countPlaceholders = {
+    eat: placeholderNumber("eat_count"),
+    wc: placeholderNumber("wc_count"),
+    smoke: placeholderNumber("smoke_count"),
+    wcd: placeholderNumber("wcd_count"),
+  };
+  const replaceVisibleUserId = (message: string): string =>
+    message.replaceAll(`<code>${sampleUserId}</code>`, "<code>{user_id}</code>");
+  const pad = (value: number): string => String(value).padStart(2, "0");
+  const previewDuration = (seconds: number): string => {
+    const safeSeconds = Math.max(0, Math.floor(seconds));
+    const hours = Math.floor(safeSeconds / 3600);
+    const minutes = Math.floor((safeSeconds % 3600) / 60);
+    const remainderSeconds = safeSeconds % 60;
+    if (locale === "en") {
+      return [hours, minutes, remainderSeconds].map(pad).join(":");
+    }
+    if (locale === "zh") {
+      return hours > 0
+        ? `${pad(hours)} 小时 ${pad(minutes)} 分钟 ${pad(remainderSeconds)} 秒`
+        : `${pad(minutes)} 分钟 ${pad(remainderSeconds)} 秒`;
+    }
+    return hours > 0
+      ? `${pad(hours)} နာရီ ${pad(minutes)} မိနစ် ${pad(remainderSeconds)} စက္ကန့်`
+      : `${pad(minutes)} မိနစ် ${pad(remainderSeconds)} စက္ကန့်`;
+  };
+  const previewCount = (count: number): string =>
+    locale === "zh" ? `${count} 次` : locale === "mm" ? `${count} ကြိမ်` : `${count} times`;
+  const replaceReminderState = (message: string): string => {
+    if (locale === "zh") return message.replaceAll("开启", "{enabled}");
+    if (locale === "mm") {
+      return message.replaceAll("ဖွင့်ထားသည်", "{enabled}").replaceAll("ဖွင့်", "{enabled}");
+    }
+    return message.replaceAll("ON", "{enabled}");
+  };
 
   switch (key) {
     case "startWelcome": return text.startWelcome;
@@ -74,23 +115,69 @@ const getDefaultBotReplyPreview = (locale: Locale, key: BotReplyMessageKey): str
     case "languagePicker": return text.languagePicker;
     case "unknownLanguage": return text.unknownLanguage;
     case "unknownCommand": return text.unknownCommand;
-    case "idInfo": return text.idInfo(123456789, userId);
-    case "botStats": return text.botStats(12, 3);
+    case "idInfo": return text.idInfo(placeholderNumber("chat_id"), placeholderNumber("user_id"));
+    case "botStats": return text.botStats(
+      placeholderNumber("private_users"), placeholderNumber("groups"),
+    );
     case "botStatsPrivate": return text.botStatsPrivate;
-    case "workCheckIn": return text.workCheckIn(userName, userId, "{checked_at}");
-    case "noActive": return text.noActive(userName, userId);
-    case "alreadyActive": return text.alreadyActive(userName, userId, activity);
-    case "started": return text.started(userName, userId, activity, "{time}", 1, 30);
-    case "settled":
-      return text.settled(
-        userName, userId, activity, "{start_time}", 120, 30, 120, 300, sampleCounts,
+    case "workCheckIn":
+      return replaceVisibleUserId(text.workCheckIn(userName, sampleUserId, "{checked_at}"));
+    case "noActive":
+      return replaceVisibleUserId(text.noActive(userName, sampleUserId));
+    case "alreadyActive":
+      return replaceVisibleUserId(text.alreadyActive(userName, sampleUserId, activity));
+    case "started":
+      return replaceVisibleUserId(text.started(
+        userName, sampleUserId, activity, "{time}",
+        placeholderNumber("count"), placeholderNumber("limit_minutes"),
+      ));
+    case "settled": {
+      const durationSeconds = 900;
+      const todayActivitySeconds = 1800;
+      const todayTotalSeconds = 2700;
+      const timeoutSeconds = 840;
+      let message = text.settled(
+        userName, sampleUserId, activity, "{start_time}", durationSeconds, 1,
+        todayActivitySeconds, todayTotalSeconds, sampleCounts,
       );
-    case "dailyCountLimitReached": return text.dailyCountLimitReached(userName, userId, activity, 3);
-    case "timeoutReminder": return text.timeoutReminder(userName, userId, activity);
-    case "groupTimeoutNotification":
-      return text.groupTimeoutNotification(
-        "{group_name}", 123456789, "{username}", userName, userId, activity, 60, "{warning_time}",
+      for (const [seconds, name] of [
+        [durationSeconds, "duration"],
+        [todayActivitySeconds, "today_activity_time"],
+        [todayTotalSeconds, "today_total_time"],
+        [timeoutSeconds, "timeout_duration"],
+      ] as const) {
+        message = message.replaceAll(previewDuration(seconds), `{${name}}`);
+      }
+      for (const [count, name] of [
+        [sampleCounts.eat, "today_eat_count"],
+        [sampleCounts.wc, "today_wc_count"],
+        [sampleCounts.smoke, "today_smoke_count"],
+        [sampleCounts.wcd, "today_wcd_count"],
+      ] as const) {
+        message = message.replaceAll(previewCount(count), `{${name}}`);
+      }
+      return replaceVisibleUserId(message);
+    }
+    case "dailyCountLimitReached":
+      return replaceVisibleUserId(text.dailyCountLimitReached(
+        userName, sampleUserId, activity, placeholderNumber("count_limit"),
+      ));
+    case "timeoutReminder":
+      return replaceVisibleUserId(text.timeoutReminder(userName, sampleUserId, activity));
+    case "groupTimeoutNotification": {
+      const sampleSeconds = 60;
+      let message = text.groupTimeoutNotification(
+        "{group_name}", placeholderNumber("group_id"), "{username}", userName,
+        placeholderNumber("user_id"), activity, sampleSeconds, "{warning_time}",
       );
+      const formattedDuration = locale === "en"
+        ? "01 min 00 sec"
+        : locale === "zh"
+          ? "01分钟 00秒"
+          : "01 မိနစ် 00 စက္ကန့်";
+      message = message.replaceAll(formattedDuration, "{timeout_duration}");
+      return message.replaceAll("{ACTIVITY}", "{activity}");
+    }
     case "shiftEnded": return text.shiftEnded("{time}");
     case "adminOnly": return text.adminOnly;
     case "adminPrivate": return text.adminPrivate;
@@ -100,21 +187,21 @@ const getDefaultBotReplyPreview = (locale: Locale, key: BotReplyMessageKey): str
     case "limitUsage": return text.limitUsage;
     case "unknownActivity": return text.unknownActivity;
     case "invalidLimit": return text.invalidLimit;
-    case "limits": return text.limits(sampleLimits);
-    case "limitUpdated": return text.limitUpdated(activity, 30);
+    case "limits": return text.limits(limitPlaceholders);
+    case "limitUpdated": return text.limitUpdated(activity, placeholderNumber("minutes"));
     case "countLimitPrivate": return text.countLimitPrivate;
     case "countLimitUsage": return text.countLimitUsage;
     case "invalidCountLimit": return text.invalidCountLimit;
-    case "countLimits": return text.countLimits(sampleCounts);
-    case "countLimitUpdated": return text.countLimitUpdated(activity, 3);
+    case "countLimits": return text.countLimits(countPlaceholders);
+    case "countLimitUpdated": return text.countLimitUpdated(activity, placeholderNumber("count"));
     case "reminderPrivate": return text.reminderPrivate;
     case "reminderUsage": return text.reminderUsage;
-    case "reminderStatus": return text.reminderStatus(true);
-    case "reminderUpdated": return text.reminderUpdated(true);
+    case "reminderStatus": return replaceReminderState(text.reminderStatus(true));
+    case "reminderUpdated": return replaceReminderState(text.reminderUpdated(true));
     case "connectPrompt": return text.connectPrompt;
     case "connectUsage": return text.connectUsage;
     case "connectAdminOnly": return text.connectAdminOnly;
-    case "connectSuccess": return text.connectSuccess("{group_name}", 123456789);
+    case "connectSuccess": return text.connectSuccess("{group_name}", placeholderNumber("group_id"));
     case "connectSelf": return text.connectSelf;
     case "connectInvalid": return text.connectInvalid;
     default: return BOT_REPLY_LABELS[key];
