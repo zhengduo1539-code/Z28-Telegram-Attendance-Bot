@@ -119,6 +119,34 @@ const formatDuration = (seconds: number) => {
     .join(":");
 };
 
+const formatChineseDuration = (totalSeconds: number): string => {
+  const safeSeconds = Math.max(0, Math.floor(totalSeconds));
+  const hours = Math.floor(safeSeconds / 3600);
+  const minutes = Math.floor((safeSeconds % 3600) / 60);
+  const seconds = safeSeconds % 60;
+  const pad = (value: number) => String(value).padStart(2, "0");
+  return hours > 0
+    ? `${pad(hours)} 小时 ${pad(minutes)} 分钟 ${pad(seconds)} 秒`
+    : `${pad(minutes)} 分钟 ${pad(seconds)} 秒`;
+};
+
+const formatBurmeseDuration = (totalSeconds: number): string => {
+  const safeSeconds = Math.max(0, Math.floor(totalSeconds));
+  const hours = Math.floor(safeSeconds / 3600);
+  const minutes = Math.floor((safeSeconds % 3600) / 60);
+  const seconds = safeSeconds % 60;
+  const pad = (value: number) => String(value).padStart(2, "0");
+  return hours > 0
+    ? `${pad(hours)} နာရီ ${pad(minutes)} မိနစ် ${pad(seconds)} စက္ကန့်`
+    : `${pad(minutes)} မိနစ် ${pad(seconds)} စက္ကန့်`;
+};
+
+const formatLocalizedDuration = (locale: Locale, seconds: number): string => {
+  if (locale === "en") return formatDuration(seconds);
+  if (locale === "mm") return formatBurmeseDuration(seconds);
+  return formatChineseDuration(seconds);
+};
+
 const ensureProfile = (
   state: BotState,
   profile: Omit<UserProfile, "createdAt" | "updatedAt">,
@@ -203,28 +231,17 @@ const buildSettlementResponse = (
     user_id: record.userId,
     activity: activityLabelForState(state, record.chatId, record.kind, locale),
     start_time: formatDateTime(new Date(record.startedAt), timeZone),
-    duration:
-      locale === "en"
-        ? formatEnglishDuration(record.elapsedSeconds)
-        : formatChineseDuration(record.elapsedSeconds),
+    duration: formatLocalizedDuration(locale, record.elapsedSeconds),
     limit_minutes: active.limitMinutes,
-    today_activity_time:
-      locale === "en"
-        ? formatEnglishDuration(activitySummary.seconds)
-        : formatChineseDuration(activitySummary.seconds),
-    today_total_time:
-      locale === "en"
-        ? formatEnglishDuration(totalSeconds)
-        : formatChineseDuration(totalSeconds),
+    today_activity_time: formatLocalizedDuration(locale, activitySummary.seconds),
+    today_total_time: formatLocalizedDuration(locale, totalSeconds),
     today_eat_count: todayCounts.eat,
     today_wc_count: todayCounts.wc,
     today_smoke_count: todayCounts.smoke,
     today_wcd_count: todayCounts.wcd,
     timeout_duration:
       getTimeoutSeconds(record.elapsedSeconds, active.limitMinutes) > 0
-        ? locale === "en"
-          ? formatEnglishDuration(getTimeoutSeconds(record.elapsedSeconds, active.limitMinutes))
-          : formatChineseDuration(getTimeoutSeconds(record.elapsedSeconds, active.limitMinutes))
+        ? formatLocalizedDuration(locale, getTimeoutSeconds(record.elapsedSeconds, active.limitMinutes))
         : "",
   };
   if (customTemplate) return renderActivityReplyTemplate(customTemplate, values);
@@ -767,10 +784,7 @@ export class AttendanceService {
           user_name: active.displayName,
           user_id: active.userId,
           activity: activityName,
-          timeout_duration:
-            locale === "en"
-              ? formatEnglishDuration(timeoutSeconds)
-              : formatChineseDuration(timeoutSeconds),
+          timeout_duration: formatLocalizedDuration(locale, timeoutSeconds),
           warning_time: warningTime,
         };
         const defaultMessage = connection
