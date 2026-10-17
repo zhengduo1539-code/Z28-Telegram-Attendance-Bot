@@ -20,6 +20,7 @@ import type {
   ReplyKeyboardMarkup,
   TelegramCallbackQuery,
   TelegramMessage,
+  TelegramMessageEntity,
   TelegramUpdate,
   UserProfile,
 } from "./types";
@@ -170,6 +171,37 @@ const botReplyCategoryForKey = (key: BotReplyMessageKey): BotReplyCategory =>
   BOT_REPLY_CATEGORIES.find((category) =>
     BOT_REPLY_KEYS_BY_CATEGORY[category].includes(key),
   ) || "general";
+
+const encodeCustomEmojiEntitiesForTemplate = (
+  text: string,
+  entities: TelegramMessageEntity[] | undefined,
+): string => {
+  let result = text;
+  const customEmojiEntities = [...(entities || [])]
+    .filter((entity) =>
+      entity.type === "custom_emoji" &&
+      /^\d+$/.test(entity.custom_emoji_id || "") &&
+      Number.isInteger(entity.offset) &&
+      Number.isInteger(entity.length) &&
+      entity.offset >= 0 &&
+      entity.length > 0 &&
+      entity.offset + entity.length <= text.length,
+    )
+    .sort((left, right) => right.offset - left.offset);
+
+  // Telegram offsets use UTF-16 code units, matching JavaScript string indexes.
+  // Replace right-to-left so replacing an emoji does not shift earlier offsets.
+  for (const entity of customEmojiEntities) {
+    const alternative = result.slice(entity.offset, entity.offset + entity.length);
+    if (!alternative || !entity.custom_emoji_id) continue;
+    const marker = `[[tg-emoji:${entity.custom_emoji_id}:${encodeURIComponent(alternative)}]]`;
+    result =
+      result.slice(0, entity.offset) +
+      marker +
+      result.slice(entity.offset + entity.length);
+  }
+  return result;
+};
 
 export class CommandHandler {
   private readonly adminMenuScopes = new Set<string>();
@@ -380,13 +412,14 @@ export class CommandHandler {
       return false;
     }
 
-    const validationError = validateBotReplyTemplate(pending.key, message.text);
+    const template = encodeCustomEmojiEntitiesForTemplate(message.text, message.entities);
+    const validationError = validateBotReplyTemplate(pending.key, template);
     if (validationError) {
       await this.telegram.sendMessage(message.chat.id, uiText.setmsgTextInvalid(validationError));
       return true;
     }
 
-    await this.attendance.setBotReplyTemplate(pending.locale, pending.key, message.text);
+    await this.attendance.setBotReplyTemplate(pending.locale, pending.key, template);
     this.pendingBotReplyMessage.delete(message.from.id);
     await this.telegram.sendMessage(
       message.chat.id,
