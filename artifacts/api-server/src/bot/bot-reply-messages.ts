@@ -176,6 +176,18 @@ export const BOT_REPLY_VARIABLES: Record<BotReplyMessageKey, readonly string[]> 
 
 export const BOT_REPLY_MAX_LENGTH = 3500;
 
+const expandMonospaceMarkersForValidation = (template: string): string =>
+  template.replace(
+    /\[\[tg-(?:code|pre):([^\]]*)\]\]/g,
+    (marker, encodedContent: string) => {
+      try {
+        return decodeURIComponent(encodedContent);
+      } catch {
+        return marker;
+      }
+    },
+  );
+
 export const validateBotReplyTemplate = (
   key: BotReplyMessageKey,
   value: unknown,
@@ -185,12 +197,13 @@ export const validateBotReplyTemplate = (
 
   const normalized = value.trim();
   if (!normalized) return "Reply text cannot be empty. Send /reset to restore the default instead.";
-  if (normalized.length > BOT_REPLY_MAX_LENGTH) {
+  const templateText = expandMonospaceMarkersForValidation(normalized);
+  if (templateText.length > BOT_REPLY_MAX_LENGTH) {
     return `Reply message must be at most ${BOT_REPLY_MAX_LENGTH} characters.`;
   }
 
   const allowed = new Set(BOT_REPLY_VARIABLES[key]);
-  const placeholders = normalized.match(/\{[a-z0-9_]+\}/g) || [];
+  const placeholders = templateText.match(/\{[a-z0-9_]+\}/g) || [];
   for (const placeholder of placeholders) {
     if (!allowed.has(placeholder.slice(1, -1))) {
       return `Unsupported placeholder ${placeholder} for ${key}.`;
