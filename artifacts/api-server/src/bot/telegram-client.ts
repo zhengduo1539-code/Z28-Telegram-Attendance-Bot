@@ -366,8 +366,8 @@ export class TelegramClient {
         /custom emoji|emoji entities|tg-emoji|unsupported start tag/i.test(description);
       if (!hasCustomEmojiTag || !customEmojiRejected) throw error;
 
-      // Preserve delivery when this Bot is not eligible to send custom emoji entities.
-      // Telegram will display the emoji alternative without animation.
+      // Preserve delivery if Telegram rejects custom emoji tags for this Bot or chat.
+      // The fallback retains the alternative glyph but cannot animate it.
       const fallbackText = text.replace(
         /<tg-emoji\s+emoji-id="\d+">([\s\S]*?)<\/tg-emoji>/g,
         "$1",
