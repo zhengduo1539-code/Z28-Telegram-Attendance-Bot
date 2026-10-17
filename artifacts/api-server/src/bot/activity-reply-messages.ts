@@ -225,6 +225,19 @@ const restoreCustomEmojiMarkers = (renderedTemplate: string): string =>
     },
   );
 
+const restoreMonospaceMarkers = (renderedTemplate: string): string =>
+  renderedTemplate.replace(
+    /\[\[tg-(code|pre):([^\]]*)\]\]/g,
+    (marker, type: string, encodedContent: string) => {
+      try {
+        const content = escapeHtml(decodeURIComponent(encodedContent));
+        return type === "pre" ? `<pre>${content}</pre>` : `<code>${content}</code>`;
+      } catch {
+        return marker;
+      }
+    },
+  );
+
 export const renderActivityReplyTemplate = (
   template: string,
   values: Record<string, string | number>,
@@ -232,7 +245,8 @@ export const renderActivityReplyTemplate = (
   const safeTemplate = escapeHtml(template);
   // Restore markers before interpolation to prevent dynamic user values from creating tags.
   const safeTemplateWithEmoji = restoreCustomEmojiMarkers(safeTemplate);
-  return safeTemplateWithEmoji.replace(/\{([a-z0-9_]+)\}/g, (placeholder, name) => {
+  const safeTemplateWithFormatting = restoreMonospaceMarkers(safeTemplateWithEmoji);
+  return safeTemplateWithFormatting.replace(/\{([a-z0-9_]+)\}/g, (placeholder, name) => {
     if (!Object.prototype.hasOwnProperty.call(values, name)) return placeholder;
     return escapeHtml(String(values[name]));
   });
