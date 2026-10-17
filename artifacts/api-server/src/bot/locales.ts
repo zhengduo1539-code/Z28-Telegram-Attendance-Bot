@@ -114,7 +114,7 @@ type LocaleText = {
   setmsgTextChooseLocale: string;
   setmsgTextChooseCategory: (localeName: string) => string;
   setmsgTextChooseMessage: (localeName: string, categoryName: string) => string;
-  setmsgTextPrompt: (key: string, localeName: string, variables: string[]) => string;
+  setmsgTextPrompt: (key: string, localeName: string, variables: string[], currentMessage: string, customized: boolean) => string;
   setmsgTextSaved: (key: string, localeName: string) => string;
   setmsgTextCleared: (key: string, localeName: string) => string;
   setmsgTextClearedAll: (localeName: string) => string;
@@ -437,7 +437,7 @@ const zh: LocaleText = {
   setmsgTextChooseLocale: "请选择要编辑回复文案的语言。",
   setmsgTextChooseCategory: (localeName) => `请选择 ${localeName} 的回复文案类别。`,
   setmsgTextChooseMessage: (localeName, categoryName) => `请选择 ${localeName} · ${categoryName} 下需要编辑的回复。✅ 表示已自定义。`,
-  setmsgTextPrompt: (key, localeName, variables) => `请发送新的 ${localeName} 回复文案：${key}。每行会保留。直接从 Telegram 表情面板粘贴的自定义/动态表情也会保留。可用变量：${variables.length ? variables.map((name) => `{${name}}`).join(", ") : "无"}。发送 /reset 恢复默认文案，/cancel 取消；5 分钟后过期。`,
+  setmsgTextPrompt: (key, localeName, variables, currentMessage, customized) => `${localeName} · ${key}\n\n${customized ? "当前已保存的回复内容：" : "当前默认回复预览（动态内容使用示例值）：" }\n${currentMessage}\n\n请发送新的回复文案。每行会保留。直接从 Telegram 表情面板粘贴的自定义/动态表情也会保留。可用变量：${variables.length ? variables.map((name) => `{${name}}`).join(", ") : "无"}。发送 /reset 恢复默认文案，/cancel 取消；5 分钟后过期。`,
   setmsgTextSaved: (key, localeName) => `✅ 已保存 ${localeName} 的 ${key} 回复文案。`,
   setmsgTextCleared: (key, localeName) => `✅ 已将 ${localeName} 的 ${key} 回复文案恢复为默认值。`,
   setmsgTextClearedAll: (localeName) => `✅ 已清除 ${localeName} 的所有自定义回复文案。`,
@@ -702,7 +702,7 @@ const mm: LocaleText = {
   setmsgTextChooseLocale: "Reply စာသားပြင်ဆင်မည့် ဘာသာစကားကို ရွေးချယ်ပါ။",
   setmsgTextChooseCategory: (localeName) => `${localeName} ဘာသာစကားအတွက် ပြင်ဆင်မည့် Reply အမျိုးအစားကို ရွေးပါ။`,
   setmsgTextChooseMessage: (localeName, categoryName) => `${localeName} · ${categoryName} ထဲမှ ပြင်ဆင်မည့် Reply ကို ရွေးပါ။ ✅ သည် စိတ်ကြိုက်သတ်မှတ်ထားခြင်းကို ပြပါသည်။`,
-  setmsgTextPrompt: (key, localeName, variables) => `${localeName} အတွက် ${key} reply စာသားအသစ်ကို ပို့ပါ။ စာကြောင်းခွဲများကို ထိန်းသိမ်းပါမည်။ Telegram emoji panel မှ တိုက်ရိုက်ပို့သော Custom/Animated Emoji များကိုလည်း ထိန်းသိမ်းပေးပါမည်။ အသုံးပြုနိုင်သော variable များ: ${variables.length ? variables.map((name) => `{${name}}`).join(", ") : "မရှိပါ"}။ Default ပြန်ထားရန် /reset၊ ပယ်ဖျက်ရန် /cancel ကိုသုံးပါ။ ၅ မိနစ်အကြာ သက်တမ်းကုန်ပါမည်။`,
+  setmsgTextPrompt: (key, localeName, variables, currentMessage, customized) => `${localeName} · ${key}\n\n${customized ? "လက်ရှိသိမ်းထားသော reply စာသား：" : "မူလ Default reply စာသား နမူနာ (dynamic တန်ဖိုးများကို ဥပမာဖြင့်ပြထားသည်)：" }\n${currentMessage}\n\nအစားထိုးမည့် reply စာသားအသစ်ကို ပို့ပါ။ စာကြောင်းခွဲများကို ထိန်းသိမ်းပါမည်။ Telegram emoji panel မှ တိုက်ရိုက်ပို့သော Custom/Animated Emoji များကိုလည်း ထိန်းသိမ်းပေးပါမည်။ အသုံးပြုနိုင်သော variable များ: ${variables.length ? variables.map((name) => `{${name}}`).join(", ") : "မရှိပါ"}။ Default ပြန်ထားရန် /reset၊ ပယ်ဖျက်ရန် /cancel ကိုသုံးပါ။ ၅ မိနစ်အကြာ သက်တမ်းကုန်ပါမည်။`,
   setmsgTextSaved: (key, localeName) => `✅ ${localeName} အတွက် ${key} reply စာသားကို သိမ်းဆည်းပြီးပါပြီ။`,
   setmsgTextCleared: (key, localeName) => `✅ ${localeName} ၏ ${key} reply စာသားကို မူလ default သို့ ပြန်ထားပြီးပါပြီ။`,
   setmsgTextClearedAll: (localeName) => `✅ ${localeName} အတွက် စိတ်ကြိုက် Reply စာသားအားလုံးကို ရှင်းလင်းပြီးပါပြီ။`,
@@ -976,7 +976,7 @@ const en: LocaleText = {
   setmsgTextChooseLocale: "Choose the language of the reply text you want to edit.",
   setmsgTextChooseCategory: (localeName) => `Choose a reply-text category for ${localeName}.`,
   setmsgTextChooseMessage: (localeName, categoryName) => `Choose a ${localeName} reply in ${categoryName}. ✅ means customized.`,
-  setmsgTextPrompt: (key, localeName, variables) => `Send the new ${key} reply text for ${localeName}. Line breaks are preserved. Telegram custom/animated emojis are preserved when pasted directly from the emoji panel. Available placeholders: ${variables.length ? variables.map((name) => `{${name}}`).join(", ") : "none"}. Send /reset to restore the default or /cancel to cancel. Expires in 5 minutes.`,
+  setmsgTextPrompt: (key, localeName, variables, currentMessage, customized) => `Editing: ${key} (${localeName})\n\n${customized ? "Current saved reply text:" : "Default reply preview (dynamic values are examples):"}\n${currentMessage}\n\nSend the replacement reply text. Line breaks are preserved. Telegram custom/animated emojis are preserved when pasted directly from the emoji panel. Available placeholders: ${variables.length ? variables.map((name) => `{${name}}`).join(", ") : "none"}. Send /reset to restore the default or /cancel to cancel. Expires in 5 minutes.`,
   setmsgTextSaved: (key, localeName) => `✅ Saved the ${key} reply text for ${localeName}.`,
   setmsgTextCleared: (key, localeName) => `✅ Restored the default ${key} reply text for ${localeName}.`,
   setmsgTextClearedAll: (localeName) => `✅ Cleared all custom reply text for ${localeName}.`,
