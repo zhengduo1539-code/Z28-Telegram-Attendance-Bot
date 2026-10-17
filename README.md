@@ -24,4 +24,4 @@ Use `/setmsg` in the bot's private chat as the configured bot owner or administr
 - Send `/reset` while editing a reply to restore that message's default text, or `/cancel` to leave it unchanged. The menu also allows resetting all custom reply text for the selected language.
 - Direct shortcut: `/setmsg welcome`. Existing shortcuts such as `/setmsg wc`, `/setmsg smoke`, `/setmsg wcd`, and `/setmsg back` continue to configure emoji icons.
 
-Custom reply templates are global per language. Existing group-specific activity templates remain higher priority for their matching activity replies. Custom reply text is sent as plain text; HTML markup is not interpreted.
+Custom reply templates are global per language. Existing group-specific activity templates remain higher priority for their matching activity replies. Custom/animated emojis are preserved when pasted directly from Telegram's emoji panel, because their Telegram entity IDs are stored with the template. Other HTML markup is treated as plain text and is not interpreted. Displaying custom emojis in bot messages is subject to Telegram's Bot API eligibility requirements.
